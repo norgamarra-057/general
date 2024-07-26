@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: telegraf-memcached-latency-conf-tpl
-data:
-  memcached_latency.conf.tpl: |-
-{{ .Files.Get "files/memcached_latency.conf.tpl" | indent 4 }}

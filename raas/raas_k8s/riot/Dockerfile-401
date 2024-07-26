@@ -1,5 +1,0 @@
-#FROM jruaux/riot-redis
-#FROM fieldengineering/riot
-FROM riotx/riot:latest
-
-ENTRYPOINT ["tail", "-f" , "/dev/null"]

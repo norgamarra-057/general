@@ -1,5 +1,0 @@
-namespace: raas-production
-deployEnv: production
-region: us-west-2
-environment: production
-influx_url: http://telegraf--gateway.production.service

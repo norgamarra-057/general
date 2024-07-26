@@ -1,6 +1,0 @@
-dependencies:
-- name: common
-  repository: file://../../../../helm-charts/common
-  version: 3.70.0-SNAPSHOT
-digest: sha256:a5bd5436da9e3d0d1ed3ae05abdf03092358a77d33c154b0db2f027fe952b850
-generated: "2021-01-07T09:47:29.999437-08:00"

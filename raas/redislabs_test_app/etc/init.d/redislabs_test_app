@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# daemonplate info:
-# https://github.groupondev.com/data/daemonplate
-source /usr/local/etc/init.d/daemonplate
-
-DAEMON_START_CMD="/usr/local/bin/redislabs_test_app"
-cli_handler $*

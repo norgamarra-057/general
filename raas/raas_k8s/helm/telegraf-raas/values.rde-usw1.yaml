@@ -1,4 +1,0 @@
-deployEnv: rde
-region: us-west-1
-environment: dev
-influx_url: http://metrics.rde.gensandbox.us-west-1.aws.groupondev.com:8186

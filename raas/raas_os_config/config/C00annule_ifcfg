@@ -1,5 +1,0 @@
-if host["os_config"].include?("zeus")
-  # zeus already configured nic interfaces, don't screw them:
-  run_command 'mv /usr/local/config/C00ifcfg /usr/local/config/backup_C00ifcfg'
-  create_symlink '/usr/local/config/annuled_C00ifcfg', '/usr/local/config/C00ifcfg'
-end
