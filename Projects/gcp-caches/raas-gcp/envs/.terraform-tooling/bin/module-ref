@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+# This script generates a module path to be used in a Terragrunt configuration
+# as module source. It uses the input values and account configuration to
+# either generate a local relative, or an external path, pointing to a ref on
+# GitHub.
+
+# Example usage:
+#
+# Generates a local relative path:
+#
+# terraform {
+#   source = run_cmd(
+#     "${get_parent_terragrunt_dir()}/.terraform-tooling/bin/module-ref",
+#     "cloud_custodian" # <-- THE MODULE, no ../../.. required!
+#   )
+# }
+#
+# Generates a git url with ref:
+#
+# terraform {
+#   source = run_cmd(
+#     "${get_parent_terragrunt_dir()}/.terraform-tooling/bin/module-ref",
+#     "cloud_custodian",
+#     "v1.0.0"
+#   )
+# }
+#
+# In case the variable "module_version" is set in ${ACCOUNT}/account.hcl the
+# script will generate GitHub URL with ref, instead of a local path
+
+MODULE="$1"
+REF="$2"
+ROOT="$(cd "$( dirname "${BASH_SOURCE[0]}" )/../.." >/dev/null 2>&1 && pwd)"
+MODULE_ROOT_LOCAL="$(realpath --relative-to="$(pwd)" "${ROOT}/../modules")/"
+MODULE_ROOT_REMOTE="git::https://github.groupondev.com/production-fabric/AWSLandingZone.git//terraform/modules"
+ACCOUNT="$(pwd | sed 's/.*envs\/\([^/]*\).*/\1/')"
+
+if [[ "${MODULE}" == git::* ]]; then # if the given module already is a git url, just use it
+    if [[ -z "${REF}" ]]; then
+        printf "%s" "${MODULE}"
+    else
+        printf "%s?ref=%s" "${MODULE}" "${REF}"
+    fi
+    exit
+fi
+
+if [[ -z "${REF}" ]]; then # if no REF was passed as 2nd argument, parse the account config to check for a ref definition
+    eval "$(grep -E '^[a-zA-Z_]+[[:blank:]]+=' "${ROOT}/global.hcl" | sed 's/ *= */=/g')"
+    eval "$(grep -E '^[a-zA-Z_]+[[:blank:]]+=' "${ROOT}/${ACCOUNT}/account.hcl" | sed 's/ *= */=/g')"
+    #shellcheck disable=SC2154
+    REF="${module_version}"
+fi
+
+if [[ -z "${REF}" ]]; then
+    printf "%s/%s" "${MODULE_ROOT_LOCAL}" "${MODULE}"
+else
+    printf "%s/%s?ref=%s" "${MODULE_ROOT_REMOTE}" "${MODULE}" "${REF}"
+fi

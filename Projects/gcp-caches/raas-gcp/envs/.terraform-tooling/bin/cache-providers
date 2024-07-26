@@ -1,0 +1,135 @@
+#!/usr/bin/env python2
+
+import glob
+import mmap
+import os
+import re
+import shutil
+import subprocess
+import stat
+import sys
+import tempfile
+import zipfile
+from jinja2 import Template
+
+"""Searches for terraform provider defintions. Creates a terraform-bundle based
+on the results and installs all plugins with their correct version into
+~/.terraform.d/plugins
+
+The script expects all terragrunt paths to be initialized!
+"""
+
+
+def get_providers():
+    """Searches for provider defintions in all TF files. Returns a dict with
+    all found providers and their required versions.
+    """
+
+    providers = dict()
+
+    # we will search in this directory for .tf files that contain provider info
+    rootdir = os.path.realpath(os.path.dirname(
+        os.path.realpath(__file__)) + '/../envs')
+
+    # pattern to extract provider plugin names and version
+    pattern = re.compile(r'provider "([^"]+)" \{[^{}]*version\s?=\s?"([^"]+)"',
+                         re.DOTALL | re.IGNORECASE | re.MULTILINE)
+
+    for subdir, _, files in os.walk(rootdir):
+        for file in files:
+            if not file.endswith('.tf'):
+                continue
+            full_path = os.path.join(subdir, file)
+            f = open(full_path)
+            s = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+            if s.find('provider ') != -1:
+                for match in pattern.findall(s):
+                    provider = match[0]
+                    version = match[1]
+                    if provider not in providers:
+                        providers[provider] = list()
+                    if version not in providers[provider]:
+                        providers[provider].append(version)
+    return providers
+
+
+def create_bundle_config(providers):
+    """Takes dict of providers and creates a config file for terraform-bundle.
+    Returns path to the config file.
+    """
+    template = Template('''
+terraform {
+    version = "0.11.10" //this doesn't really matter. we only want the plugins
+}
+
+providers {
+  {%- for provider in providers %}
+    {{ provider }} = [{{ '\"' + providers[provider]|join('\", \"') + '\"' }}]
+  {%- endfor %}
+}
+''')
+    content = template.render(providers=providers)
+    tmpdir = tempfile.mkdtemp(prefix='tfbundle-', dir='/tmp')
+    temp = tempfile.NamedTemporaryFile(
+        dir=tmpdir, suffix='.hcl', delete=False)
+    temp.write(content)
+    return temp.name
+
+
+def create_bundle(config_file, plugin_dir):
+    """Creates a terraform bundle out of a config file. Returns path to the
+    zipped bundle.
+    """
+    dirname = os.path.dirname(config_file)
+    os.chdir(dirname)
+    command = 'terraform-bundle package -plugin-dir=%s %s' % (
+        plugin_dir, config_file)
+    p = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE)
+    while True:
+        out = p.stderr.read(1)
+        if out == '' and p.poll() is not None:
+            break
+        if out != '':
+            sys.stdout.write(out)
+            sys.stdout.flush()
+    files = glob.glob('*.zip')
+    return files[0]
+
+
+def extract_bundle(zip_file, plugin_dir):
+    """Extracts all plugins of a given terraform bundle to the users
+    ~/.terraform.d/plugins dir.
+    """
+    with zipfile.ZipFile(zip_file) as file:
+        for member in file.namelist():
+            filename = os.path.basename(member)
+            if not filename:  # it's a directory
+                continue
+            if filename == 'terraform':  # it is the terraform binary
+                continue
+
+            source = file.open(member)
+            target_path = os.path.join(plugin_dir, filename)
+            target = open(target_path, 'wb')
+            print('Installing %s into %s...' % (filename, plugin_dir))
+            with source, target:
+                shutil.copyfileobj(source, target)
+            make_executable(target_path)
+
+
+def make_executable(path):
+    """Makes a given file executable"""
+    mode = os.stat(path).st_mode
+    mode |= (mode & 0o444) >> 2
+    os.chmod(path, mode)
+
+
+if __name__ == '__main__':
+    home = os.path.expanduser('~')
+    plugin_dir = '%s/.terraform.d/plugins' % home
+    providers = get_providers()
+    config_file = create_bundle_config(providers)
+    zip_file = create_bundle(config_file, plugin_dir)
+    extract_bundle(zip_file, plugin_dir)
+    tmp_dir = os.path.dirname(config_file)
+    shutil.rmtree(tmp_dir)

@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+#
+# Generates AWS profile config out of terraform configuration files, ready to be used with aws-okta
+
+current_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+envs_dir="$(cd "${current_dir}/../.." || exit; pwd)"
+
+FEDERATED_AUTH_METHOD=$1
+SAML_URL=$2
+
+# Global var file to check if default iam role is set
+var_file_global="${envs_dir}/global.hcl"
+
+DEFAULT_AWS_ROLE="grpn-sandbox-general-dev"
+DEFAULT_ROLE_WARNING_ALREADY_SHOWN=false
+
+profiles=
+
+# includes tfvars/hcl files and makes their variable definitions available in this script
+function include {
+    if [[ -f "$1" ]]; then
+        eval "$(grep -E '^[a-zA-Z_]+[[:blank:]]+=' "$1" | sed 's/ *= */=/g')"
+    fi
+}
+
+#shellcheck disable=SC2231
+for account in ${envs_dir}/*/; do
+    account=${account%*/}
+    account=${account##*/}
+    var_file_previous="${envs_dir}/${account}/global/env_vars.tfvars"
+    var_file_account="${envs_dir}/${account}/account.hcl"
+
+    unset aws_default_role aws_account_id prof
+
+    if [[ "${account}" != "template" ]]; then
+        include "${var_file_previous}" # env_vars.tfvars files from previous terraform versions. stays here for backwards compatibility
+        include "${var_file_global}"   # global.hcl
+        include "${var_file_account}"  # account.hcl
+
+        # role info will be read in the following order:
+        # 1. AWS_ROLE: passed by environment var
+        # 2. aws_default_role: defined in envs/<ENV>/global/env_vars.tfvars
+        # 3. aws_default_role: defined in envs/global.hcl
+        # 4. aws_default_role: defined in envs/<ENV>/account.hcl
+        # 5. DEFAULT_AWS_ROLE
+
+        #shellcheck disable=SC2154
+        if [[ "${DEFAULT_ROLE_WARNING_ALREADY_SHOWN}" = false && -z "${aws_default_role}" && -z "${AWS_ROLE}" ]]; then
+            echo "WARNING: Using ${DEFAULT_AWS_ROLE} to generate the aws cli config" >&2
+            echo "If you are looking to use a different role, please set a value for aws_default_role in either global.hcl or account.hcl files." >&2
+            DEFAULT_ROLE_WARNING_ALREADY_SHOWN=true
+        fi
+    fi
+
+    ROLE="${AWS_ROLE:-${aws_default_role:-${DEFAULT_AWS_ROLE}}}"
+
+    prof+="\\n[profile ${account}]\\n"
+
+    #shellcheck disable=SC2154
+    if [[ "${FEDERATED_AUTH_METHOD}" == "AWS_OKTA" ]]; then
+        prof+="role_arn = arn:aws:iam::${aws_account_id}:role/${ROLE}\\n"
+    elif [[ "${FEDERATED_AUTH_METHOD}" == "AWS_SSO" ]]; then
+        prof+="sso_account_id = ${aws_account_id}\\n"
+        prof+="sso_role_name = ${ROLE}\\n"
+        prof+="sso_start_url = ${SAML_URL}\\n"
+        prof+="sso_region = eu-west-1\\n"
+    fi  
+    profiles+="${prof}"
+
+done
+
+include "${var_file_global}"
+include "${var_file_previous}"
+
+#shellcheck disable=SC2154
+cat <<EOF
+[default]
+region=${aws_region}
+EOF
+
+if [[ "${FEDERATED_AUTH_METHOD}" == "AWS_OKTA" ]]; then
+cat <<EOF
+
+[okta]
+aws_saml_url = ${SAML_URL}
+EOF
+fi
+
+# For admins, we also add the master/billing accounts, required by landing zone implementation
+if [[ "${ROLE}" == "Groupon-Admin" ]]; then
+cat <<EOF
+
+[profile landingzone/master]
+role_arn = arn:aws:iam::248184355264:role/Groupon-Admin
+
+[profile saml/master]
+role_arn = arn:aws:iam::930442592328:role/Groupon-Admin
+
+[profile legacy/master]
+source_profile = saml/master
+role_arn = arn:aws:iam::140499955345:role/Pre-exist-Superadmin
+EOF
+fi
+
+echo -en "${profiles}"

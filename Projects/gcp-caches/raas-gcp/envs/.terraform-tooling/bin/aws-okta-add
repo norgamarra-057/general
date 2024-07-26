@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+read -rp "Enter OKTA Username: " USERNAME
+aws-okta add --domain groupon.okta.com --username "${USERNAME}"
