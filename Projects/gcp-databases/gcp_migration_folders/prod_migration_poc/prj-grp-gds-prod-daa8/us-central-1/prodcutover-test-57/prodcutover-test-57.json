@@ -1,0 +1,7 @@
+srcpoint: 10.211.41.202
+endpoint: 10.183.198.212
+src_dbs: ["giftcard_prod","percona"]
+src_users: ["c_prod_usr_ro","giftcard_dba","replication"]
+REPLICA_INST_NAME: prodcutover-57version-0
+env: prod
+AWS_CNAME: prodcutover-test-cluster.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "cmi-travelclick-prod",
+         "skipReplicationSetup": true
+       }
+}

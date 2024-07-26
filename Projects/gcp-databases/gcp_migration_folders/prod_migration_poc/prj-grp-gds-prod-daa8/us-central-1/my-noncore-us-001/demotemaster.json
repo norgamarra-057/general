@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "my-noncore-us-001",
+         "skipReplicationSetup": true
+       }
+}

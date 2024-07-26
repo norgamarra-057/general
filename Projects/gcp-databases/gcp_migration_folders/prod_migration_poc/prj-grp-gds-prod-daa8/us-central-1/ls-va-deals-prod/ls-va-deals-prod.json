@@ -1,0 +1,7 @@
+srcpoint: 10.211.133.226
+endpoint: 10.183.194.112
+src_dbs: ["deals_production","maxmind","people","percona_recover","test","tungsten_ls_va_deals"]
+src_users: ["c_prod_usr_ro","groupon_readonly","hadoop","hadoop_w001","ls_va_deals_rw","replication","styx_ilm_ro","tungsten","ptheartbeat_r001","accounts_wr","admin_offline","admin_r001","admin_w001","archive","babysoft_r001","babysoft_read","browsesvc","codes_w001","consumersvc_w001","cupcake_reader","deals_admin","deals_bucks","deals_city","deals_geo","deals_hmailer","deals_o001","deals_o011","deals_partner","deals_r001","deals_w001","end","gordon_writer","hm_reader","hmailer_r001","holmes_reader","hungrymailer_ro","hungrymailer_wr","junglebook_wrtr","lsearch_r001","mrchnt_acc_wrtr","mysqldiff","payment_end","payment_front","payments_end","payments_front","paypal_wrtr","percona","pipeline_o001","pipeline_offline","pipeline_r001","pipeline_w001","pixels_writer","preferator","profiles_loader","profiles_reader","replica_w001","sfextract_r001","sherlock_r001","smail_reader","sphinx_reader","techops","monitoring_w001","monitoring_w001","payment_end","ha"]
+REPLICA_INST_NAME: ls-va-deals-prod-0
+env: prod
+AWS_CNAME: ls-va-deals-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

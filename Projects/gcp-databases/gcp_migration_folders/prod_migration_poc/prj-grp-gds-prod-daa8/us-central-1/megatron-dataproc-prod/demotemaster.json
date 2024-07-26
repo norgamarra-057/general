@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "megatron-dataproc-prod",
+         "skipReplicationSetup": true
+       }
+}

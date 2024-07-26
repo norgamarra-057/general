@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "voucher-ssearch-prod",
+         "skipReplicationSetup": true
+       }
+}

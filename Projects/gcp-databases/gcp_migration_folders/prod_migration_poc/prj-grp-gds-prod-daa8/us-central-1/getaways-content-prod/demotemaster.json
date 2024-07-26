@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "getaways-content-prod",
+         "skipReplicationSetup": true
+       }
+}

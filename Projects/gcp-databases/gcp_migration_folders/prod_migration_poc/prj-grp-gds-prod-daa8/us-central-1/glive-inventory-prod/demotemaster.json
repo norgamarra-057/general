@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "glive-inventory-prod",
+         "skipReplicationSetup": true
+       }
+}

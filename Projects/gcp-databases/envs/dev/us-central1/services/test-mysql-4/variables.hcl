@@ -1,0 +1,12 @@
+  db_name = "test_mysql_4"
+  db_instance_name = "test-mysql-4"
+  #db_replica_name = "test-mysql-4-replica"
+  db_version = "MYSQL_8_0"
+  db_tier = "db-custom-4-15360"
+  #disk_size=500
+  wait_timeout=20000
+  general_log="off"
+  max_connections=2000
+  log_output="FILE"
+  #long_query_time=1.2
+  replica_count = 1

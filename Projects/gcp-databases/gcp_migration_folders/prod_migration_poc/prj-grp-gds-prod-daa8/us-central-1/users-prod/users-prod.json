@@ -1,0 +1,7 @@
+srcpoint: 10.211.134.32
+endpoint: 10.183.194.64
+src_dbs: ["authentication_production","consumer_production","groupon_user_production","rewards_production","tungsten_aws_groupon_user","tungsten_groupon_user","users_prod","users_service_production"]
+src_users: ["auth_db","c_prod_usr_ro","consumer_data_ro","consumer_db","cust_data_eng","datastream","edw_gcp_ro","gss_data_sync_ro","gss_data_sync_rw","hadoop","keboola_ro","megatron_ro","rdsrepladmin","replication","rewards_db","rocketman_user","styx_ilm_ro","subscriptions_ro","svc_bemod","thepoint_db","tungsten","tungsten_aws","user_data_sync","users_service","users_service_ro","users_service_rw","usr_data_sync_ro","usr_data_sync_rw","usr_inv_ro","hadoop"]
+REPLICA_INST_NAME: users-prod-0
+env: prod
+AWS_CNAME: users-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

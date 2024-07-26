@@ -1,0 +1,137 @@
+----------------------------------------------------
+#CREATE THIS USER IN THE SOURCE - AWS Aurora MySQL 
+----------------------------------------------------
+CREATE USER 'replicauser'@'%' IDENTIFIED BY 'rep@123';
+GRANT SELECT, SHOW VIEW ON *.* TO 'replicauser'@'%';
+GRANT REPLICATION SLAVE, EXECUTE ON *.* TO 'replicauser'@'%';
+grant process ON *.* TO 'replicauser'@'%';
+-- grant FLUSH_TABLES ON *.* TO 'replicauser'@'%';
+grant reload ON *.* TO 'replicauser'@'%';
+FLUSH PRIVILEGES;
+
+# Set up source representation instance
+----------------------------------------------------
+cat source.json
+  {
+       "name": "my-noncore-us-503-stg",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_5_7",
+       "onPremisesConfiguration": {
+         "hostPort": "10.213.130.248:3306",
+         "username": "replicauser",
+         "password": "rep@123"
+        }
+  }
+
+gcloud auth login
+ACCESS_TOKEN="$(gcloud auth print-access-token)"
+curl --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+     --header 'Content-Type: application/json' \
+     --data @./source.json \
+     -X POST \
+     https://sqladmin.googleapis.com/sql/v1beta4/projects/prj-grp-gds-dev-4f99/instances
+
+# Set up replica instance
+----------------------------------------------------
+cat replica.json
+{
+    "settings": {
+        "tier": "db-custom-4-15360",
+        "dataDiskSizeGb": "100",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-dev-d89e/global/networks/vpc-dev-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "my-noncore-us-503-stg",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_5_7",
+    "name": "my-noncore-us-503-stg-0"
+}
+
+gcloud auth login
+ACCESS_TOKEN="$(gcloud auth print-access-token)"
+curl --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+     --header 'Content-Type: application/json' \
+     --data @./replica.json \
+     -X POST \
+     https://sqladmin.googleapis.com/sql/v1beta4/projects/prj-grp-gds-dev-4f99/instances
+
+# Add users to CloudSQL replica Instance 
+----------------------------------------------------
+Once the instance has been added as replica under the source representation instance, then only we can add the users 
+Added the user replicauser via GCP console 
+
+gcloud sql users create replicauser --host=% --instance=my-noncore-us-503-stg-0 --password=rep@123
+gcloud sql users create gds_admin --host=% --instance=my-noncore-us-503-stg-0 --password=Gr0up0n!$KaL3$
+gcloud sql users set-password root --host=% --instance=my-noncore-us-503-stg-0 --password=root@123
+
+
+#Take the dump on the GCP JumpHost server. IN our case this is GCP server - gcp-stable-mysql-proxy
+----------------------------------------------------
+mysqldump  -h my-noncore-us-503-stg.cluster-ccoxqscq6x7v.us-west-1.rds.amazonaws.com  --triggers --routines --databases ckod_stg content_flag_srv_stg custsvc_cscs_stg deals_production deals_service_production dora_stg gifting_service_stg  glive_gia_staging hive_app_stg lbms_stg pii pii_production prodsa_sox_audit_stg recoverydb rta_analytics_stg service_portal_dev succ_stg wilson_app -u gds_admin -p > my-noncore-us-503-stg-backup.sql
+
+# Remove the lines in the dump file that require super privileges
+----------------------------------------------------
+sed -i 's/SET @MYSQLDUMP_TEMP_LOG_BIN/#SET @MYSQLDUMP_TEMP_LOG_BIN/g' my-noncore-us-503-stg-backup.sql
+sed -i 's/SET @@SESSION.SQL_LOG_BIN/#SET @@SESSION.SQL_LOG_BIN/g' my-noncore-us-503-stg-backup.sql
+ -i 's/utf8mb4_0900_ai_ci/utf8_general_ci/g' my-noncore-us-503-stg-backup.sql
+ sed -i 's/SET @@GLOBAL.GTID_PURGED/#SET @@GLOBAL.GTID_PURGED/g'
+
+# As the cloud SQL is running with super read-only in order to perform we imnport we need to perform a proote of cloudSQL read replica 
+----------------------------------------------------
+gcloud --impersonate-service-account=grpn-sa-terraform-gds@prj-grp-central-sa-stable-66eb.iam.gserviceaccount.com sql instances promote-replica my-core-gl-us-621-stg-0
+
++----------------------------+----------+--------------+------------------+--------------------------------------------+
+| File                       | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set                          |
++----------------------------+----------+--------------+------------------+--------------------------------------------+
+| mysql-bin-changelog.000501 |   166906 |              |                  | b8190d9d-2692-3515-a0ea-6e47240c4c99:1-720 |
++----------------------------+----------+--------------+------------------+--------------------------------------------+
+
+# Demote the Cloud SQL instance
+----------------------------------------------------
+cat demotemaster.json
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "my-noncore-us-503-stg",
+         "skipReplicationSetup": true
+       }
+}
+
+gcloud auth login
+ACCESS_TOKEN="$(gcloud auth print-access-token)"
+curl --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+  --header 'Content-Type: application/json' \
+  --data @./demotemaster.json \
+      -X POST \
+      https://sqladmin.googleapis.com/sql/v1beta4/projects/prj-grp-gds-dev-4f99/instances/my-noncore-us-503-stg-0/demoteMaster
+
+# Once the demote is done and the instance is acting as read replica we need to performe the below steps to replicate to proxy server 
+# Set Up replication 
+-------------------------------------------------------------------
+Using BInary logs 
+
++----------------------------+----------+--------------+------------------+--------------------------------------------+
+| File                       | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set                          |
++----------------------------+----------+--------------+------------------+--------------------------------------------+
+| mysql-bin-changelog.000501 |   166906 |              |                  | b8190d9d-2692-3515-a0ea-6e47240c4c99:1-720 |
++----------------------------+----------+--------------+------------------+--------------------------------------------+
+
+call mysql.resetMaster();
+
+call mysql.skipTransactionWithGtid('b8190d9d-2692-3515-a0ea-6e47240c4c99:1-720');
+
+call mysql.setupExternalSourceAutoPosition('10.213.130.248', 3306, 'replicauser', 'rep@123', /* master_auto_position= */ 1,false, false);
+
+call mysql.startReplication();
+
+call mysql.stopReplication();
+
+
+call mysql.stopReplication();
+call mysql.setupExternalSource('10.213.129.124', 3306,'replication', 'GaSxrz1twblgEyl', 'mysql-bin-changelog.006053', 67923111, false, false);
+call mysql.startReplication();
+
+
+
+We stopped at log 'mysql-bin-changelog.006053' position 67923111"

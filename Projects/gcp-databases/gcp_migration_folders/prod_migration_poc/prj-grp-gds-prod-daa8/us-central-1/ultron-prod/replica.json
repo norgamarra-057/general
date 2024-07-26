@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-2",
+        "dataDiskSizeGb": "200",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-prod-2511/global/networks/vpc-prod-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "ultron-prod",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_8_0",
+    "name": "ultron-prod-0"
+}

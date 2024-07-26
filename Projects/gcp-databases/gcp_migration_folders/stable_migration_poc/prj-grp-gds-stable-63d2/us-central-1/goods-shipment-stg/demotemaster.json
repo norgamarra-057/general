@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "goods-shipment-stg",
+         "skipReplicationSetup": true
+       }
+}

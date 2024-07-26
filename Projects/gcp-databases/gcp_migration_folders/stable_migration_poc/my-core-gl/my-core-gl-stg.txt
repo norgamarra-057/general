@@ -1,0 +1,120 @@
+----------------------------------------------------
+#CREATE THIS USER IN THE SOURCE - AWS Aurora MySQL 
+----------------------------------------------------
+CREATE USER 'replicauser'@'%' IDENTIFIED BY 'rep@123';
+GRANT SELECT, SHOW VIEW ON *.* TO 'replicauser'@'%';
+GRANT REPLICATION SLAVE, EXECUTE ON *.* TO 'replicauser'@'%';
+grant process ON *.* TO 'replicauser'@'%';
+-- grant FLUSH_TABLES ON *.* TO 'replicauser'@'%';
+grant reload ON *.* TO 'replicauser'@'%';
+FLUSH PRIVILEGES;
+
+# Set up source representation instance
+----------------------------------------------------
+cat source.json
+  {
+       "name": "gcp-client-id-stg",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_5_7",
+       "onPremisesConfiguration": {
+         "hostPort": "10.213.128.40:3306",
+         "username": "replicauser",
+         "password": "rep@123"
+        }
+  }
+
+gcloud auth login
+ACCESS_TOKEN="$(gcloud auth print-access-token)"
+curl --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+     --header 'Content-Type: application/json' \
+     --data @./source.json \
+     -X POST \
+     https://sqladmin.googleapis.com/sql/v1beta4/projects/prj-grp-gds-dev-4f99/instances
+
+# Set up replica instance
+----------------------------------------------------
+cat replica.json
+{
+    "settings": {
+        "tier": "db-custom-4-15360",
+        "dataDiskSizeGb": "100",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-dev-d89e/global/networks/vpc-dev-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "gcp-client-id-stgg",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_5_7",
+    "name": "gcp-client-id-stg-0"
+}
+
+gcloud auth login
+ACCESS_TOKEN="$(gcloud auth print-access-token)"
+curl --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+     --header 'Content-Type: application/json' \
+     --data @./replica.json \
+     -X POST \
+     https://sqladmin.googleapis.com/sql/v1beta4/projects/prj-grp-gds-dev-4f99/instances
+
+# Add users to CloudSQL replica Instance 
+----------------------------------------------------
+Once the instance has been added as replica under the source representation instance, then only we can add the users 
+Added the user replicauser via GCP console 
+
+gcloud sql users create replicauser --host=% --instance=gcp-my-noncore-us-503-stg-0 --password=rep@123
+gcloud sql users create gds_admin --host=% --instance=gcp-my-noncore-us-503-stg-0 --password=Gr0up0n!$KaL3$
+gcloud sql users set-password root --host=% --instance=gcp-my-noncore-us-503-stg-0 --password=root@123
+
+
+#Take the dump on the GCP JumpHost server. IN our case this is GCP server - gcp-stable-mysql-proxy
+----------------------------------------------------
+mysqldump -h client-id-stg.cluster-ccoxqscq6x7v.us-west-1.rds.amazonaws.com --triggers --routines --databases client_id_production client_id_staging percona -u gds_admin -p > client-id-stg.sql
+
+# Remove the lines in the dump file that require super privileges
+----------------------------------------------------
+sed -i 's/SET @MYSQLDUMP_TEMP_LOG_BIN/#SET @MYSQLDUMP_TEMP_LOG_BIN/g' client-id-stg.sql
+sed -i 's/SET @@GLOBAL.GTID_PURGED/#SET @@GLOBAL.GTID_PURGED/g' client-id-stg.sql
+sed -i 's/SET @@SESSION.SQL_LOG_BIN/#SET @@SESSION.SQL_LOG_BIN/g' client-id-stg.sql
+sed -i 's/utf8mb4_0900_ai_ci/utf8_general_ci/g' client-id-stg.sql
+
+# As the cloud SQL is running with super read-only in order to perform we imnport we need to perform a proote of cloudSQL read replica 
+----------------------------------------------------
+gcloud sql instances promote-replica gcp-client-id-stg-0
+
+
+# Demote the Cloud SQL instance
+----------------------------------------------------
+cat demotemaster.json
+{
+       "demoteMasterContext": {
+         "masterInstanceName": " gcp-client-id-stg",
+         "skipReplicationSetup": true
+       }
+}
+
+gcloud auth login
+ACCESS_TOKEN="$(gcloud auth print-access-token)"
+curl --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+  --header 'Content-Type: application/json' \
+  --data @./demotemaster.json \
+      -X POST \
+      https://sqladmin.googleapis.com/sql/v1beta4/projects/prj-grp-gds-dev-4f99/instances/gcp-client-id-stg-0/demoteMaster
+
+# Once the demote is done and the instance is acting as read replica we need to performe the below steps to replicate to proxy server 
+# Set Up replication 
+-------------------------------------------------------------------
+Using BInary logs 
+
++----------------------------+----------+--------------+------------------+-------------------+
+| File                       | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++----------------------------+----------+--------------+------------------+-------------------+
+| mysql-bin-changelog.000290 |    12714 |              |                  |                   |
++----------------------------+----------+--------------+------------------+-------------------+
+
+
+call mysql.resetMaster();
+
+call mysql.setupExternalSource('10.213.128.40', 3306,'replicauser', 'rep@123', 'mysql-bin-changelog.000290', 12714, false, false);
+
+call mysql.startReplication();

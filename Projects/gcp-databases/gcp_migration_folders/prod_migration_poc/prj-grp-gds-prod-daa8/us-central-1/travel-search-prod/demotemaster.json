@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "travel-search-prod",
+         "skipReplicationSetup": true
+       }
+}

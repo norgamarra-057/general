@@ -1,0 +1,10 @@
+{
+       "name": "killbill-prod",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_5_7",
+       "onPremisesConfiguration": {
+         "hostPort": "10.211.128.121:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "my-core-us-526-stg",
+         "skipReplicationSetup": true
+       }
+}

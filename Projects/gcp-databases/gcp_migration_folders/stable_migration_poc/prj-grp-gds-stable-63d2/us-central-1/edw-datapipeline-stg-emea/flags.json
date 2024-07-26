@@ -1,0 +1,13 @@
+{
+  "database-flags": [
+    {
+      "name": "sql_mode",
+      "value": "ALLOW_INVALID_DATES,ANSI_QUOTES"
+    },
+    {
+      "name": "log_bin_trust_function_creators",
+      "value": "ON"
+    }
+  ]
+}
+

@@ -1,0 +1,7 @@
+srcpoint: 10.211.133.178
+endpoint: 10.183.194.35
+src_dbs: ["cs_groupon_production","cyclops_production","tungsten_aws_cyclops","tungsten_custsvc"]
+src_users: ["c_prod_usr_ro","cyclops_rw","cyclops_sox_ro","datastream","edw_gcp_ro","hadoop","keboola_prod_us_ro","megatron_ro","replication","styx_ilm_ro","thepoint_db","tungsten","tungsten_aws"]
+REPLICA_INST_NAME: cyclops-prod-0
+env: prod
+AWS_CNAME: cyclops-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

@@ -1,0 +1,10 @@
+  {
+       "name": "my-noncore-us-003",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_8_0",
+       "onPremisesConfiguration": {
+         "hostPort": "10.211.128.252:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

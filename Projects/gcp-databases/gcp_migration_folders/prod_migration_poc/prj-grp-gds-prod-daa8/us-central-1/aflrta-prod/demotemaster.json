@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "aflrta-prod-new",
+         "skipReplicationSetup": true
+       }
+}

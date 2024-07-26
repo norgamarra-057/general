@@ -1,0 +1,7 @@
+srcpoint: 10.211.132.33
+endpoint: 10.183.194.76
+src_dbs: ["vssearch_production"]
+src_users: ["c_prod_usr_ro","replication","vssearch_prod","vssearch_prod_ro"]
+REPLICA_INST_NAME: voucher-ssearch-prod-0
+env: prod
+AWS_CNAME: voucher-ssearch-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-16",
+        "dataDiskSizeGb": "5000",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-prod-2511/global/networks/vpc-prod-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "vis20-na-prod-0",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_5_7",
+    "name": "vis20-na-prod-1"
+}

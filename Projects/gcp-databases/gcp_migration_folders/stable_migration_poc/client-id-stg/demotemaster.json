@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "gcp-client-id-stg",
+         "skipReplicationSetup": true
+       }
+}

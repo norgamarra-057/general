@@ -1,0 +1,7 @@
+srcpoint: 10.211.128.107
+endpoint: 10.183.194.244
+src_dbs: ["consumer_data_production_snc1","daastest","groupon_production","tungsten_aws_groupon_orders_snc1","tungsten_dr_groupon_orders_snc1","tungsten_groupon_orders","tungsten_groupon_orders_snc1"]
+src_users: ["audit_orders_ro","brs_orders_ro","c_prod_usr_ro","cloud_edw_ro","datastream","dm_report_ro","dw_etl","edw_gcp_ro","gds5091_ro","gds5232_ro","goods","goods_dashboard","goods_dashbrd_ro","goods_del_svc_rw","goods_fulfill","hadoop","keboola_ro","megatron_ro","orders_ht_ro","orders_lt_ro","orders_rails3_ro","orders_rails3_rw","orders_rw","orders_sox_ro","ptselect","replication","smartdeals","styx_ilm_ro","thepoint_db","tungsten","tungsten_aws","vis20_ht_ro","vis20_lt_ro","vis20_ro","vis20_rw","vis_ro_jtier","voucher_inv","pmm","mrbinlog4"]
+REPLICA_INST_NAME: orders-prod-0
+env: prod
+AWS_CNAME: orders-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

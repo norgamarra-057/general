@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-8",
+        "dataDiskSizeGb": "800",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-stable-134f/global/networks/vpc-stable-sharedvpc01" 
+        }
+    },
+    "masterInstanceName": "my-noncore-us-501-stg",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_8_0",
+    "name": "my-noncore-us-501-stg-1"
+}

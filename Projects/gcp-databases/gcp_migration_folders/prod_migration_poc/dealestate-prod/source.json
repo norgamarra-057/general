@@ -1,0 +1,10 @@
+  {
+       "name": "dealestate-prod",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_8_0",
+       "onPremisesConfiguration": {
+         "hostPort": "10.211.133.108:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

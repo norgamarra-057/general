@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "prodcutover-test-cluster",
+         "skipReplicationSetup": true
+       }
+}

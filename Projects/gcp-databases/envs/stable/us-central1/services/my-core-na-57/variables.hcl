@@ -1,0 +1,12 @@
+  db_name = "my_core_na_57_001"
+  db_instance_name = "my-core-na-57-001"
+  #db_replica_name = "test-mysql-4-replica"
+  db_version = "MYSQL_5_7"
+  db_tier = "db-n1-standard-4"
+  #disk_size=500
+  wait_timeout=20000
+  general_log="off"
+  max_connections=2000
+  log_output="FILE"
+  #long_query_time=1.2
+  replica_count = 0

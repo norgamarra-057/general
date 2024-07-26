@@ -1,0 +1,7 @@
+srcpoint: 10.211.130.12
+endpoint: 10.183.194.92
+src_dbs: ["goods_logistics","goods_shipment_db","tungsten_aws_goods_shipment","tungsten_dr_goods_shipment","tungsten_goods_shipment"]
+src_users: ["bi_readonly","bi_user","c_prod_usr_ro","ci_readonly","datastream","dm_report_ro","edw_gcp_ro","gls_readonly","goods_logistics","goodship_sox_ro","logis_goods_ro","logis_goods_rw","megatron_ro","replication","styx_ilm_ro","tungsten","tungsten_aws"]
+REPLICA_INST_NAME: shipment-tracker-prod-0
+env: prod
+AWS_CNAME: shipment-tracker-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

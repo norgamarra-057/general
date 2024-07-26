@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "my-core-emea-571-stg",
+         "skipReplicationSetup": true
+       }
+}

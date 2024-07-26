@@ -1,0 +1,10 @@
+  {
+       "name": "my-noncore-emea-601-stg",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_8_0",
+       "onPremisesConfiguration": {
+         "hostPort": "10.221.133.206:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

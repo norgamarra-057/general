@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "card-purge-batch-prod",
+         "skipReplicationSetup": true
+       }
+}

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "demo-stg-test",
+         "skipReplicationSetup": true
+       }
+}

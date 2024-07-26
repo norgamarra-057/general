@@ -1,0 +1,10 @@
+  {
+       "name": "vis20-na-prod",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_5_7",
+       "onPremisesConfiguration": {
+         "hostPort": "10.211.134.206:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

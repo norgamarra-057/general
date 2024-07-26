@@ -1,0 +1,7 @@
+srcpoint: 10.211.132.88
+endpoint: 10.183.194.135
+src_dbs: ["editorialprod","writers_production"]
+src_users: ["c_prod_usr_ro","editorial_ro","replication","writers"]
+REPLICA_INST_NAME: editorial-0
+env: prod
+AWS_CNAME: editorial.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

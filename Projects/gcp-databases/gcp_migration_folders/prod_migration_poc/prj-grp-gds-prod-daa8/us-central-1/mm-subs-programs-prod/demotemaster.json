@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "mm-subs-programs-prod",
+         "skipReplicationSetup": true
+       }
+}

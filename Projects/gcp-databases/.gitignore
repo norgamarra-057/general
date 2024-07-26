@@ -1,0 +1,11 @@
+terraform
+terraform.tfstate*
+.terragrunt-cache
+Brewfile.lock.json
+.terraform
+**/.terraform.lock.hcl
+**/.DS_Store
+.vscode
+.config/
+.terraform.d/
+.idea

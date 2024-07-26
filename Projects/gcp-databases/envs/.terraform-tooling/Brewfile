@@ -1,0 +1,8 @@
+tap "sigsegv13/tgenv"
+brew "awscli"
+brew "aws-okta"
+brew "coreutils"
+brew "pcre" 
+brew "jq"
+brew "tfenv"
+brew "sigsegv13/tgenv/tgenv"

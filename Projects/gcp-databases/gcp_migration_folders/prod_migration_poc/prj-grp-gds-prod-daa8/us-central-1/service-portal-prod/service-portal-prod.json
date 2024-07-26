@@ -1,0 +1,7 @@
+srcpoint: 10.211.135.179
+endpoint: 10.183.194.145
+src_dbs: ["hydra","service_portal_prod","service_portal_production"]
+src_users: ["c_prod_usr_ro","replication","service_portal","service_portal_ro"]
+REPLICA_INST_NAME: service-portal-prod-0
+env: prod
+AWS_CNAME: service-portal-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

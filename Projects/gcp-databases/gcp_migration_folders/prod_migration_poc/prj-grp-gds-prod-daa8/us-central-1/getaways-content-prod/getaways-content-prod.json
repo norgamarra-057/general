@@ -1,0 +1,7 @@
+srcpoint: 10.211.129.13
+endpoint: 10.183.194.128
+src_dbs: ["travel_content_production","travel_notification_production","tungsten_aws_getaways_content","tungsten_getaways_content"]
+src_users: ["c_prod_usr_ro","cont_ext_user","datastream","getaways_cont_ro","megatron_ro","replication","styx_ilm_ro","travel_cont_ro","travel_content","travelcontentro","trvl_cnt_ro_user","trvl_cont_user","trvl_noti_ro_usr","trvl_noti_user","tungsten","tungsten_aws","tvl_content_ro"]
+REPLICA_INST_NAME: getaways-content-prod-0
+env: prod
+AWS_CNAME: getaways-content-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

@@ -1,0 +1,7 @@
+srcpoint: 10.211.131.136
+endpoint: 10.183.194.131
+src_dbs: ["ad_inv_serv_prod","tungsten_ad_inv_serv_prod","tungsten_ad_inventory_service","tungsten_aws_ad_inventory_service"]
+src_users: ["ad_inv_serv","ad_inv_serv_opt","ad_inventory_ro","c_prod_usr_ro","datastream","edw_readonly","megatron_ro","replication","tungsten","tungsten_aws"]
+REPLICA_INST_NAME: ad-inv-serv-prod-1
+env: prod
+AWS_CNAME: ad-inv-serv-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

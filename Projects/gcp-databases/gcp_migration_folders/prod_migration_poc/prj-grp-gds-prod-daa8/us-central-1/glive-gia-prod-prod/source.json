@@ -1,0 +1,10 @@
+{
+       "name": "glive-gia-prod-prod",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_8_0",
+       "onPremisesConfiguration": {
+         "hostPort": "10.211.135.16:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

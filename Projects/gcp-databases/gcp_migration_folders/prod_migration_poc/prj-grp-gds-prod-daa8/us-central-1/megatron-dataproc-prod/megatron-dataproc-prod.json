@@ -1,0 +1,7 @@
+srcpoint: 10.211.133.97
+endpoint: 10.183.194.141
+src_dbs: ["megatron_dataproc"]
+src_users: ["c_prod_usr_ro","megatron_dataproc_app","megatron_dataproc_dba","megatron_dataproc_ro"]
+REPLICA_INST_NAME: megatron-dataproc-prod-0
+env: prod
+AWS_CNAME: megatron-dataproc-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

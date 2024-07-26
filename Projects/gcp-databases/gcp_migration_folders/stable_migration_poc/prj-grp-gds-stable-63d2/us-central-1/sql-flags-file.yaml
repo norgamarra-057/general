@@ -1,0 +1,8 @@
+- --database-flags:
+    explicit_defaults_for_timestamp: on
+    lower_case_table_names: '1'
+    group_concat_max_len: '67108864'
+    sql_mode: NO_ZERO_DATE,NO_ZERO_IN_DATE,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    default_time_zone: -07:00
+    log_bin_trust_function_creators: on
+    interactive_timeout: '600'

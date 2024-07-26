@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "goods-jobsch-prod-cutover-testing-v80",
+         "skipReplicationSetup": true
+       }
+}

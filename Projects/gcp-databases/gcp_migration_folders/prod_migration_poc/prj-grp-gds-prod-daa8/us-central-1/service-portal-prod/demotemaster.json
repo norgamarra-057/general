@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "service-portal-prod",
+         "skipReplicationSetup": true
+       }
+}

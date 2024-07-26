@@ -1,0 +1,7 @@
+srcpoint: 10.211.128.121
+endpoint: 10.183.198.206
+src_dbs: ["killbill_production","killbilladmin_production","percona","tungsten_aws_killbill","tungsten_dr_killbill","tungsten_killbill"]
+src_users: ["c_prod_usr_ro","datastream","hadoop","kbl_snc1_app_ro","killbill","killbill_app_ro1","killbill_prod_ro","killbill_sox_ro","megatron_ro","replication","styx_ilm_ro","tungsten","tungsten_aws"]
+REPLICA_INST_NAME: killbill-prod-1
+env: prod
+AWS_CNAME: killbill-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

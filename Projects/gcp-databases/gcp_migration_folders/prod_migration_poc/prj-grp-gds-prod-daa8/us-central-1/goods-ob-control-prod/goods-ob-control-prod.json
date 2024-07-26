@@ -1,0 +1,7 @@
+srcpoint: 10.211.131.202
+endpoint: 10.183.194.218
+src_dbs: ["goods_outbound_controller","tungsten_goods_outbound_controller"]
+src_users: ["c_prod_usr_ro","dm_report_ro","edw_gcp_ro","gls_readonly","goods_del_svc_rw","goods_logistics","goods_obc_sox_ro","goods_readonly","mani","replication","styx_ilm_ro","tungsten"]
+REPLICA_INST_NAME: goods-ob-control-prod-0
+env: prod
+AWS_CNAME: goods-ob-control-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-8",
+        "dataDiskSizeGb": "900",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-prod-2511/global/networks/vpc-prod-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "coupon-prod",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_8_0",
+    "name": "coupon-prod-0"
+}

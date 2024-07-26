@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "goods-ob-control-prod",
+         "skipReplicationSetup": true
+       }
+}

@@ -1,0 +1,10 @@
+  {
+       "name": "my-noncore-us-503-stg-v8",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_8_0",
+       "onPremisesConfiguration": {
+         "hostPort": "10.213.130.248:3306",
+         "username": "replicauser",
+         "password": "rep@123"
+        }
+  }

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "message2ledger-prod",
+         "skipReplicationSetup": true
+       }
+}

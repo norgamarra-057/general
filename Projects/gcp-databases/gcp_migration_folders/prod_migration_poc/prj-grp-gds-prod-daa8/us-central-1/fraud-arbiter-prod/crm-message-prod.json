@@ -1,0 +1,7 @@
+srcpoint: 10.211.133.170
+endpoint: 10.183.194.33
+src_dbs: ["crm_message_service"]
+src_users: ["c_prod_usr_ro","crm","edw_gcp_ro","edw_ro","hadoop","replication"]
+REPLICA_INST_NAME: crm-message-prod-0
+env: prod
+AWS_CNAME: crm-message-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

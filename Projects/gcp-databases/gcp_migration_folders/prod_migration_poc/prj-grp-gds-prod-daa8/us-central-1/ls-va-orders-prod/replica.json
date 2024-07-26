@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-4",
+        "dataDiskSizeGb": "800",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-prod-2511/global/networks/vpc-prod-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "ls-va-orders-prod",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_8_0",
+    "name": "ls-va-orders-prod-1"
+}

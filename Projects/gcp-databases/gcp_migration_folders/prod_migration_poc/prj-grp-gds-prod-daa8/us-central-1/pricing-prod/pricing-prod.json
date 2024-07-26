@@ -1,0 +1,7 @@
+srcpoint: 10.211.129.158
+endpoint: 10.183.194.72
+src_dbs: ["pricing_prod","pricing_service","tungsten_aws_groupon_pricing","tungsten_dr_groupon_pricing","tungsten_groupon_pricing","tungsten_pricing"]
+src_users: ["aws_pricing_ro","c_prod_usr_ro","datastream","dp_adhoc","dynamic_pricing","gds_migration","keboola_ro","megatron_ro","pricing_sox_ro","rdsrepladmin","replication","tungsten","tungsten_aws"]
+REPLICA_INST_NAME: pricing-prod-0
+env: prod
+AWS_CNAME: pricing-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

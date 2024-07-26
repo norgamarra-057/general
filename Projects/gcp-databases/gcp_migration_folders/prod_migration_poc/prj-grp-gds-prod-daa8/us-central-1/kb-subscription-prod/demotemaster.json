@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "kb-subscription-prod",
+         "skipReplicationSetup": true
+       }
+}

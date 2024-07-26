@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "deal-management-prod",
+         "skipReplicationSetup": true
+       }
+}

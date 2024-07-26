@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "contract-service-prod",
+         "skipReplicationSetup": true
+       }
+}

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "edw-datapipeline-stg-emea",
+         "skipReplicationSetup": true
+       }
+}

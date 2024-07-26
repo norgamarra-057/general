@@ -1,0 +1,7 @@
+srcpoint: 10.211.128.28
+endpoint: 10.183.194.143
+src_dbs: ["affiliateprograms_prod","mm_subs_programs_prod"]
+src_users: ["affiliate","c_prod_usr_ro","gselect_ro","mmsp_app_ro","replication"]
+REPLICA_INST_NAME: mm-subs-programs-prod-0
+env: prod
+AWS_CNAME: mm-subs-programs-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

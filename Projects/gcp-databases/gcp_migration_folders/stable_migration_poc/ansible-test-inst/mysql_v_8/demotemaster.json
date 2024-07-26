@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "ansible-v8-inst",
+         "skipReplicationSetup": true
+       }
+}

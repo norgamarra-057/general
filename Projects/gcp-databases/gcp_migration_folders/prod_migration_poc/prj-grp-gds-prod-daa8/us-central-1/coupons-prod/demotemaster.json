@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "coupons-prod",
+         "skipReplicationSetup": true
+       }
+}

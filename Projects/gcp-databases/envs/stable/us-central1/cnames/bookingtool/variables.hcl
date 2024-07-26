@@ -1,0 +1,18 @@
+dns_managed_zone = "dz-stable-sharedvpc01-gds-stable"
+db_cname = "bookingtool"
+cnames = [
+{
+db_access_type = "rw"
+aws_backend = "my-core-emea-571-stg.cluster-ccoxqscq6x7v.us-west-1.rds.amazonaws.com."
+gcp_backend = "my-core-emea-571-stg-0.gds.stable.gcp.groupondev.com."
+aws_weight = 1
+gcp_weight = 0
+},
+{
+db_access_type = "ro"
+aws_backend = "my-core-emea-571-stg.cluster-ro-ccoxqscq6x7v.us-west-1.rds.amazonaws.com."
+gcp_backend = "my-core-emea-571-stg-0.gds.stable.gcp.groupondev.com."
+aws_weight = 1
+gcp_weight = 0
+}
+]

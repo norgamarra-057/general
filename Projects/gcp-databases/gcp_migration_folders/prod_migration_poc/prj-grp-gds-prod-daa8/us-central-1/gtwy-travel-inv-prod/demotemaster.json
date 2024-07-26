@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "gtwy-travel-inv-prod",
+         "skipReplicationSetup": true
+       }
+}

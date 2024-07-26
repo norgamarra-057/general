@@ -1,0 +1,7 @@
+srcpoint: 10.211.135.93
+endpoint: 10.183.194.96
+src_dbs: ["afl_getaways","ckod_prod","content_assembly","dwh_manage","dwh_manage_ideel","eanprod","edw","edw_vantage","gas","getaways_stgdata_production","gpn_data","gpn_dist_store","gpn_report_dw","gpn_stats","hivemetadev","job_meta_db","merchant_preview_production","metadata_lup1","my_noncore_us_005_prod","opswise_cntrl_production","orders","perf","pitstop_prod","prod_etl_snc1_production","report_liquibase","td_archive","tdhivemeta","temp","tracky","tracky_lup1","trip_advisor_prod","us_ds_liquibase","us_liquibase","wizard_production","workflow","workflow_dev","zr_db_dev","zr_db_prod"]
+src_users: ["aff_incentive_rw","affnet","affnet_naprod_ro","afl_ro","app_order","c1_affnet","c_prod_usr_ro","ca","checksum","ckod_prod_app_ro","ckod_prod_app_rw","dealwizard","dwh_ideel","dwh_ideel_read","dwh_manage_ro","dwhread","dwhuser","edw_gcp_ro","edw_user","flyway","getaways_stgdata","gpn_prod_usr_ro","hadoop","hiveuser","importer_prod_ro","merch_prev_user","merchant_prod","metauser","opswise","opswise_cntrl","opswise_ro","pitstop_prod_ro","pitstop_ro","prod_etl_snc1","qauser","repl","replication","svc_dnd_pre_rw","td_archive","tdhive","tracky","trackydwh_ro","watson","watson_ro","workflow","workflow_dev","workflow_ro","zr_db_dev","zr_dev_user","zr_user","afl_ro","app_order"]
+REPLICA_INST_NAME: my-noncore-us-005-prod-0
+env: prod
+AWS_CNAME: my-noncore-us-005-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

@@ -1,0 +1,5 @@
+- --database-flags:
+    sql_mode: ALLOW_INVALID_DATES,ANSI_QUOTES,NO_ENGINE_SUBSTITUTION
+    log_bin_trust_function_creators: on
+    character_set_server: utf8
+    slave_parallel_workers: '0'

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "prodcutover-57version",
+         "skipReplicationSetup": true
+       }
+}

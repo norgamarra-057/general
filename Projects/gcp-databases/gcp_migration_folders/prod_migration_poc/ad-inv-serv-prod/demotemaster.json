@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "ad-inv-serv-prod",
+         "skipReplicationSetup": true
+       }
+}

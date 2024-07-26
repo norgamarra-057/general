@@ -1,0 +1,7 @@
+srcpoint: 10.211.135.180
+endpoint: 10.183.194.110
+src_dbs: ["kb_subscriptions_prod","kb_subscriptions_prod_db"]
+src_users: ["c_prod_usr_ro","kb_subs_sox_ro","kb_subscriptions","mm_ro","replication"]
+REPLICA_INST_NAME: kb-subscription-prod-0
+env: prod
+AWS_CNAME: kb-subscription-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

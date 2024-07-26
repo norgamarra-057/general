@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "tronicon-cms-prod",
+         "skipReplicationSetup": true
+       }
+}

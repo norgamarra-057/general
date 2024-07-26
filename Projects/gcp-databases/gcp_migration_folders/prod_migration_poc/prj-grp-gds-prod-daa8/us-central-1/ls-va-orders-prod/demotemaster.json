@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "ls-va-orders-prod",
+         "skipReplicationSetup": true
+       }
+}

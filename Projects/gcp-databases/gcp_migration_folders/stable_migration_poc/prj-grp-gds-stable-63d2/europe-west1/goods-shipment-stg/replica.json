@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-2",
+        "dataDiskSizeGb": "100",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-stable-134f/global/networks/vpc-stable-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "goods-shipment-stg-emea",
+    "region": "europe-west1",
+    "databaseVersion": "MYSQL_8_0",
+    "name": "goods-shipment-stg-emea-0"
+}

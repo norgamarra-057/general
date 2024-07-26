@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "vis20-na-prod",
+         "skipReplicationSetup": true
+       }
+}

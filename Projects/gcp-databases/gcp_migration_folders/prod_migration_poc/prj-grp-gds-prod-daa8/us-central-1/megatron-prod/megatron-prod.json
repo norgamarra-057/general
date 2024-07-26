@@ -1,0 +1,7 @@
+srcpoint: 10.211.130.141
+endpoint: 10.183.194.139
+src_dbs: ["dr_megatron_production","megatron_app_prod","megatron_production"]
+src_users: ["c_prod_usr_ro","megatron","megatron_ro_prd","replication"]
+REPLICA_INST_NAME: megatron-prod-0
+env: prod
+AWS_CNAME: megatron-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "getaways-maris-prod",
+         "skipReplicationSetup": true
+       }
+}

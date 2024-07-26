@@ -1,0 +1,7 @@
+srcpoint: 10.211.135.16
+endpoint: 10.183.194.137
+src_dbs: ["glive_gia_prod_prod","glive_gia_production","hydra"]
+src_users: ["c_prod_usr_ro","glive_gia","glive_gia_ro","glive_gia_sox_ro","replication"]
+REPLICA_INST_NAME: glive-gia-prod-prod-0
+env: prod
+AWS_CNAME: glive-gia-prod-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

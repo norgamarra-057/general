@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "expy-service",
+         "skipReplicationSetup": true
+       }
+}

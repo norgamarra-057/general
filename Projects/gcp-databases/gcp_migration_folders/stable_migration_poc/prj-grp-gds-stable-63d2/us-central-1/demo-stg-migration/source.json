@@ -1,0 +1,10 @@
+  {
+       "name": "demo-stg-test",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_8_0",
+       "onPremisesConfiguration": {
+         "hostPort": "10.213.131.86:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

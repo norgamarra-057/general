@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-8",
+        "dataDiskSizeGb": "1300",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-stable-134f/global/networks/vpc-stable-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "my-core-gl-us-621-stg-1",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_8_0",
+    "name": "my-core-gl-us-621-stg-2"
+}

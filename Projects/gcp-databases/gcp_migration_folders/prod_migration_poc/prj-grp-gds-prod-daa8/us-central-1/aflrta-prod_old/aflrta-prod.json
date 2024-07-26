@@ -1,0 +1,7 @@
+srcpoint: 10.211.132.230
+endpoint: 10.183.194.126
+src_dbs: ["aflrta_prod"]
+src_users: ["aflrtaprod_rw","c_prod_usr_ro","campaign_performance_ro","mao_mysql_ro","replication","sem_gcp_ro"]
+REPLICA_INST_NAME: aflrta-prod-0
+env: prod
+AWS_CNAME: aflrta-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

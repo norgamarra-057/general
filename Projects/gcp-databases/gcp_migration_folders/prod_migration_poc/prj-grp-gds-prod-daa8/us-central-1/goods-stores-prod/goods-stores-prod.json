@@ -1,0 +1,7 @@
+srcpoint: 10.211.133.92
+endpoint: 10.183.194.205
+src_dbs: ["goods_stores_production","tungsten_aws_goods_stores","tungsten_dr_goods_stores","tungsten_goods_stores"]
+src_users: ["c_prod_usr_ro","cloud_edw_ro","datastream","edw_gcp_ro","edw_read_only","goods_sox_ro","goods_st_prod_ro","goods_st_user_ro","goods_stores","goods_stores_ro","keboola_ro","megatron_ro","petl_ro","replication","styx_ilm_ro","tungsten","tungsten_aws","tungsten_rds"]
+REPLICA_INST_NAME: goods-stores-prod-0
+env: prod
+AWS_CNAME: goods-stores-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

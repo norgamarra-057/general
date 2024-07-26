@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-2",
+        "dataDiskSizeGb": "100",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-prod-2511/global/networks/vpc-prod-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "goods-jobsch-prod-cutover-testing-v57",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_5_7",
+    "name": "goods-jobsch-prod-cutover-testing-v57-0"
+}

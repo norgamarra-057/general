@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "megatron-prod",
+         "skipReplicationSetup": true
+       }
+}

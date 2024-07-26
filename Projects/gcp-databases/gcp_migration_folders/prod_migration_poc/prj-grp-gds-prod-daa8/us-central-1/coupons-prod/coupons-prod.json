@@ -1,0 +1,7 @@
+srcpoint: 10.211.133.237
+endpoint: 10.183.194.149
+src_dbs: ["coupons_prod","coupons_production"]
+src_users: ["c_prod_usr_ro","coupons","coupons_ro","edw_gcp_ro","replication","styx_ilm_ro"]
+REPLICA_INST_NAME: coupons-prod-1
+env: prod
+AWS_CNAME: coupons-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

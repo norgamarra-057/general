@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-4",
+        "dataDiskSizeGb": "300",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-prod-2511/global/networks/vpc-prod-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "my-noncore-us-003",
+    "region": "us-central1",
+    "databaseVersion": "MYSQL_8_0",
+    "name": "my-noncore-us-003-0"
+}

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "orders-msg-prod",
+         "skipReplicationSetup": true
+       }
+}

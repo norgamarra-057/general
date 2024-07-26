@@ -1,0 +1,7 @@
+srcpoint: 10.211.133.168
+endpoint: 10.183.194.98
+src_dbs: ["getaways_partner_siteminder","getaways_supply_prod","getawayssupplyprod"]
+src_users: ["c_prod_usr_ro","getaways_ro","getaways_sup_sox","getaways_supply","gtwys_prtnr_prod_ro","gtwys_prtnr_prod_rw","gtwys_supply_ro","replication"]
+REPLICA_INST_NAME: getaways-supply-prod-0
+env: prod
+AWS_CNAME: getaways-supply-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

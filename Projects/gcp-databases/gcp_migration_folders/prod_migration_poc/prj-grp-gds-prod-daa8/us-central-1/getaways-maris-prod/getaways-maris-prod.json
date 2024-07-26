@@ -1,0 +1,7 @@
+srcpoint: 10.211.134.105
+endpoint: 10.183.194.100
+src_dbs: ["getaways_maris_prod","getaways_maris_production","tungsten_aws_maris","tungsten_dr_maris","tungsten_maris"]
+src_users: ["c_prod_usr_ro","cloud_edw_ro","datastream","edw_readonly","getaway_maris_ro","getaways_maris","keboola_ro","megatron_ro","replication","styx_ilm_ro","tungsten","tungsten_aws"]
+REPLICA_INST_NAME: getaways-maris-prod-0
+env: prod
+AWS_CNAME: getaways-maris-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

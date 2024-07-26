@@ -1,0 +1,7 @@
+srcpoint: 10.211.128.210
+endpoint: 10.183.194.70
+src_dbs: ["message2ledger_prod","tungsten_aws_message_ledger","tungsten_message_ledger"]
+src_users: ["c_prod_usr_ro","datastream","hadoop","megatron_ro","message2ledger","replication","styx_ilm_ro","tungsten_aws","tungsten_rds","tungsten"]
+REPLICA_INST_NAME: message2ledger-prod-0
+env: prod
+AWS_CNAME: message2ledger-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

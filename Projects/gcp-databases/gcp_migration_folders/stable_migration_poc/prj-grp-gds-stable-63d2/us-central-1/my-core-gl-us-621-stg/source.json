@@ -1,0 +1,10 @@
+  {
+       "name": "my-core-gl-us-621-stg",
+       "region": "us-west1",
+       "databaseVersion": "MYSQL_8_0",
+       "onPremisesConfiguration": {
+         "hostPort": "10.213.130.210:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

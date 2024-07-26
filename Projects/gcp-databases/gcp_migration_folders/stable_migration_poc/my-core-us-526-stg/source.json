@@ -1,0 +1,10 @@
+  {
+       "name": "gcp-my-core-us-526-stg",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_5_7",
+       "onPremisesConfiguration": {
+         "hostPort": "10.213.128.12:3306",
+         "username": "replicauser",
+         "password": "rep@123"
+        }
+  }

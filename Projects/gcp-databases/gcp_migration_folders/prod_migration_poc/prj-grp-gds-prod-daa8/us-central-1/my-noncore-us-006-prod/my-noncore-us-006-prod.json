@@ -1,0 +1,7 @@
+srcpoint: 10.211.131.15
+endpoint: 10.183.202.33
+src_dbs: ["confwiz","deployboy_production","getaways_pay_recon","getaways_pay_recon_bkp","gss_crons_us_prod","gur","my_noncore_us_006_prod","percona","status_dashboard_prod"]
+src_users: ["c_prod_usr_ro","confwiz_prod","deployboy","gpn_data_api_app","gpr_rw","gss_crons_us_prod_rw","gur_user","re_eng_ro","replication","status_dashboard","edw"]
+REPLICA_INST_NAME: my-noncore-us-006-prod-0
+env: prod
+AWS_CNAME: my-noncore-us-006-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

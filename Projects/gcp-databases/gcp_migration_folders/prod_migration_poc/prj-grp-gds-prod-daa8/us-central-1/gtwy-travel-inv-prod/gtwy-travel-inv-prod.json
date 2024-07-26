@@ -1,0 +1,7 @@
+srcpoint: 10.211.130.15
+endpoint: 10.183.194.226
+src_dbs: ["gtwy_travel_inv","tungsten_aws_getaways_inventory","tungsten_getaways_inventory"]
+src_users: ["EDW-ro","analyst_gtwy_inv","c_prod_usr_ro","datastream","edw_gcp_ro","getaways_trvl_ro","gtwy_inv_prod","gtwy_inv_ro","gtwy_inv_user","gtwy_oprns_ro","gtwy_tvl_inv_ro","keboola_ro","megatron_ro","opsgate_ro","rdsrepladmin","replication","styx_ilm_ro","travel_sox_ro","tungsten","tungsten_aws"]
+REPLICA_INST_NAME: gtwy-travel-inv-prod-0
+env: prod
+AWS_CNAME: gtwy-travel-inv-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

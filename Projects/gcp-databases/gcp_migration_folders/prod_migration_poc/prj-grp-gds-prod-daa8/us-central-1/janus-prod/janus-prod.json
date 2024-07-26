@@ -1,0 +1,7 @@
+srcpoint: 10.211.133.143
+endpoint: 10.183.194.133 
+src_dbs: ["janus","janus_prod","janus_production"]
+src_users: ["c_prod_usr_ro","janus","replication"]
+REPLICA_INST_NAME: janus-prod-0
+env: prod
+AWS_CNAME: janus-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

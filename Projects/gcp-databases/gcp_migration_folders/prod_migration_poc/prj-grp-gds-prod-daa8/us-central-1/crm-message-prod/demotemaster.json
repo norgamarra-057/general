@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "crm-message-prod",
+         "skipReplicationSetup": true
+       }
+}

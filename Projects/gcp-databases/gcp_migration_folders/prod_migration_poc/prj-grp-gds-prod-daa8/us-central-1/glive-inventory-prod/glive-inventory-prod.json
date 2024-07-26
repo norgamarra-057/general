@@ -1,0 +1,7 @@
+srcpoint: 10.211.132.172
+endpoint: 10.183.194.104
+src_dbs: ["glive_inventory_prod","glive_inventory_production","hydra"]
+src_users: ["c_prod_usr_ro","cronus_glive_p_r","cronus_glive_p_w","glive_inv_sox_ro","glive_invent_ro","glive_inventory","keebola_ro","megatron_ro","ra_team_ro","replication"]
+REPLICA_INST_NAME: glive-inventory-prod-0
+env: prod
+AWS_CNAME: glive-inventory-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "my-noncore-gl-441-prod",
+         "skipReplicationSetup": true
+       }
+}

@@ -1,0 +1,10 @@
+  {
+       "name": "gcp-ansible-inst",
+       "region": "us-central1",
+       "databaseVersion": "MYSQL_5_7",
+       "onPremisesConfiguration": {
+         "hostPort": "10.213.131.86:3306",
+         "username": "replicauser",
+         "password": "rep@123"
+        }
+  }

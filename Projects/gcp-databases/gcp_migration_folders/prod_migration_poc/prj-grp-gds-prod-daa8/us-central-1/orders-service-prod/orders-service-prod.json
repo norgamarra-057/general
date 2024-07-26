@@ -1,0 +1,7 @@
+srcpoint: 10.211.135.34
+endpoint: 10.183.194.66
+src_dbs: ["fraud_production"]
+src_users: ["c_prod_usr_ro","edw_gcp_ro","edw_readonly","fraud","fraud_rails3_ro","fraud_rails3_rw","replication"]
+REPLICA_INST_NAME: orders-service-prod-0
+env: prod
+AWS_CNAME: orders-service-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com.

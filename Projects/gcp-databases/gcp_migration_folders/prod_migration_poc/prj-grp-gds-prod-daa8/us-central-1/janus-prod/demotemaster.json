@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "janus-prod",
+         "skipReplicationSetup": true
+       }
+}
