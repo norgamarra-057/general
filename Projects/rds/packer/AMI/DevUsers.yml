@@ -1,0 +1,29 @@
+---
+###################################################
+# Devs..yml
+#
+# Description:  Vars file that lists the DEV userto add
+#
+# Parameters:  None
+#
+###################################################
+
+users: 
+group:
+  dev:
+    gid: 10003
+  svuppalapati:
+    uid: 4714
+    group: dev
+    comment: "Sri Hari Krishna Vuppalapati"
+    shell: /usr/bin/bash
+  haxu:
+    uid: 6328
+    group: dev
+    comment: "John Xu"
+    shell: /usr/bin/bash
+  allkim:
+    uid: 6405
+    group: dev
+    comment: "Allon Kim"
+    shell: /usr/bin/bash

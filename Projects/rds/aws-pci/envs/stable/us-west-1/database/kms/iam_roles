@@ -1,0 +1,2 @@
+PROD:   arn:aws:iam::496778485823:role/aws-reserved/sso.amazonaws.com/eu-west-1/AWSReservedSSO_grpn-pci-dba-admin_849edf583add7386
+STABLE: arn:aws:iam::683644855136:role/aws-reserved/sso.amazonaws.com/eu-west-1/AWSReservedSSO_grpn-pci-dba-admin_6f8d3e87e6405398

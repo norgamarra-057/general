@@ -1,0 +1,74 @@
+---
+###################################################
+# Users.yml
+#
+# Description:  Vars file that lists the GDS user to add
+#
+# Parameters:  None
+#
+###################################################
+
+group:
+  gds:
+    gid: 10001
+users: 
+  asutherland: 
+    uid: 4115
+    group: gds
+    comment: "Ammon Sutherland"
+    shell: /usr/bin/bash
+  dminor: 
+    uid: 4252
+    group: gds
+    comment: "David Minor"
+    shell: /usr/bin/bash
+  fkalamidas: 
+    uid: 2959
+    group: gds
+    comment: "Flippos Kalamidas"
+    shell: /usr/bin/tcsh
+  klarsen: 
+    uid: 4642
+    group: gds
+    comment: "Kurt Larsen"
+    shell: /usr/bin/bash
+  ksatyamurthy: 
+    uid: 2697
+    group: gds
+    comment: "Kharthigeyan Satyamurthy"
+    shell: /usr/bin/tcsh
+  mojamal: 
+    uid: 5526
+    group: gds
+    comment: "Moosa Jamal"
+    shell: /usr/bin/tcsh
+  msubramanian: 
+    uid: 2980
+    group: gds
+    comment: "Mani Subramanian"
+    shell: /usr/bin/tcsh
+  pablo: 
+    uid: 1215
+    group: gds
+    comment: "Pablo Bustos"
+    shell: /usr/bin/tcsh
+  vramasahayam: 
+    uid: 6544 
+    group: gds
+    comment: "Varsha Reddy Ramasahayam"
+    shell: /usr/bin/bash
+  ragarwal:
+    uid: 6558
+    group: gds
+    comment: "Ruchi S Agarwal"
+    shell: /usr/bin/tcsh
+  cyadav:
+    uid: 6562
+    group: gds
+    comment: "Chetan Nirmal Yadav"
+    shell: /usr/bin/tcsh
+  ramas:
+    uid: 6648 
+    group: gds
+    comment: "Rama Selvaraj"
+    shell: /usr/bin/bash

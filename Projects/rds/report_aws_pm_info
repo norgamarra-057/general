@@ -1,0 +1,80 @@
+#! /usr/bin/env python2
+###################################################
+# report_aws_pm_info
+#
+# Version:      1.0.0
+#
+# Descripton:   Connects to RDS endpoint  and if the gds_pm database exists, outputs the version and ops_check
+#
+# Usage:        report_aws_pm_info [-r region] | [-V]
+#
+# Optional arguments:
+#   -h --help             Show this help message and exit
+#   -r aws_region, --region us-west-1
+#   -V --version          Displays version and exits
+#
+# Requirements: python 2.7
+#
+# Notes:        Output format example: 
+#               gds-sac1-prod-db043m1.sac1 analytics_prod Partition_Manager: 1.2.3
+###################################################
+
+# Import needed modules
+
+import sys
+import string
+import argparse
+import os
+import shlex
+import mysql.connector
+from mysql.connector import errorcode
+from subprocess import Popen, PIPE
+import getpass
+
+# Default values
+Version = "1.0.0"
+
+# Parse and load command line options
+parser = argparse.ArgumentParser(description="report_aws_pm_info connects to the RDS endpoint(s) and if the gds_pm database exists, outputs the version and check_ops.  report_aws_pm_info: [-r aws_region] | [-V]")
+
+parser.add_argument("-r", "--region", help="Override default AWS region of us-west-1", default='us-west-1')
+parser.add_argument("-V", "--version", help="Displays version and exits.", action='store_true')
+args = parser.parse_args()
+
+if args.region:
+   region = args.region
+if args.version:
+   print "Version: " + Version
+   quit()
+my_cnf = "/home/" + getpass.getuser() + "/.my.cnf"
+
+aws_endpoints = "aws rds describe-db-cluster-endpoints --filters Name='db-cluster-endpoint-type',Values='writer' --query 'DBClusterEndpoints[*].Endpoint' --region=" + region + " --output=text"
+
+command = shlex.split(aws_endpoints)
+output = Popen(command,stdout=PIPE)
+lines = output.stdout.readline()
+
+for endpoint in lines.split():
+    try:
+       my_con = mysql.connector.connect(host=endpoint, option_files=my_cnf)
+       try:
+           my_cursor = my_con.cursor()
+           results = my_cursor.callproc('gds_pm.partition_manager_ops_check')
+           for result in my_cursor.stored_results():
+               print(endpoint + ":" + result.fetchone()[0])
+           my_cursor.close()
+       except:
+           my_cursor.close()
+           my_con.close()
+
+       my_con.close()
+    except mysql.connector.Error as err:
+       if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+          print("No acces")
+       elif err.errno == errorcode.ER_BAD_DB_ERROR:
+          print("No database")
+       else:
+          print(err)
+    else:
+       my_cursor.close()
+       my_con.close()

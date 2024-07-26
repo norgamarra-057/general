@@ -1,0 +1,32 @@
+---
+###################################################
+# Remove.yml
+#
+# Description:  This playbook is intended to remove GDS users, public keys, and sudo access from GDS EC2 instances
+#
+###################################################
+
+- name: Remove requested GDS Users
+  hosts: all
+  gather_facts: false
+  become: true
+  vars_files:
+    - DelUsers.yml
+
+  tasks:
+    - name: Remove sudo access
+      lineinfile:
+        path: /etc/sudoers.d/99-gds-users
+        line: "{{ item }} ALL=(ALL) NOPASSWD:ALL"
+        create: no
+        mode: 0440
+        state: absent
+      with_items: "{{ users }}"
+
+    - name: Remove GDS users
+      user:
+        name: "{{ item }}"
+        groups: ""
+        state: absent
+        remove: yes
+      with_items: "{{ users }}"

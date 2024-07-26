@@ -1,0 +1,121 @@
+{
+  "builders": [
+    {
+      "run_tags": [
+        {
+          "Name": "Packer for GDSv2",
+          "Owner": "gds",
+          "Service": "daas",
+          "Team": "GDS"
+        }
+      ],
+      "vpc_filter": {
+        "filters": {
+          "tag:Name": "PrimaryVPC",
+          "isDefault": "false"
+        }
+      },
+      "subnet_filter": {
+        "filters": {
+           "tag:Tier": "App"
+        },
+        "most_free": true
+      }, 
+      "security_group_filter": {
+        "filters": {
+           "group-name": "default"
+        }
+      },
+      "type": "amazon-ebs",
+      "region": "us-west-1",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "groupon-base-ami-stable*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["744390875592"],
+        "most_recent": true
+      },
+      "force_deregister": true,
+      "force_delete_snapshot": true,
+      "instance_type": "t2.micro",
+      "ssh_timeout": "60s",
+      "ssh_username": "ec2-user",
+      "ami_name": "GDS_PACKER_AMIV2"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "pgdg.repo",
+      "destination": "/tmp/pgdg.repo"
+    },
+    {
+      "type": "shell",
+      "inline": [
+         "sleep 30",
+	 "sudo mv /tmp/pgdg.repo /etc/yum.repos.d/pgdg.repo",
+         "sudo chown root:root /etc/yum.repos.d/pgdg.repo",
+         "sudo chmod 644 /etc/yum.repos.d/pgdg.repo",
+         "wget -nv --content-disposition https://releases.hashicorp.com/terraform/0.12.31/terraform_0.12.31_linux_386.zip",
+         "unzip terraform_0.12.31_linux_386.zip",
+         "wget -nv --content-disposition https://github.com/gruntwork-io/terragrunt/releases/download/v0.21.11/terragrunt_linux_386",
+         "sudo mv terragrunt_linux_386 /usr/local/bin/terragrunt",
+         "sudo mv terraform /usr/local/bin/",
+         "sudo chown root:wheel /usr/local/bin/terragrunt",
+         "sudo chown root:wheel /usr/local/bin/terraform",
+         "sudo chmod 755 /usr/local/bin/terragrunt",
+         "sudo chmod 755 /usr/local/bin/terraform",
+         "rm -f terraform_0.12.31_linux_386.zip",
+         "sudo yum -y update",
+         "sudo yum -y install git",
+         "sudo yum -y install tmux.x86_64",
+         "sudo yum -y install jq.x86_64",
+         "sudo wget -nv --content-disposition https://packagecloud.io/segment/aws-okta/packages/fedora/30/aws-okta-1.0.11-1.x86_64.rpm/download.rpm",
+         "sudo yum -y install aws-okta-1.0.11-1.x86_64.rpm",
+         "sudo rm -f aws-okta-1.0.11-1.x86_64.rpm",
+         "sudo yum -y install https://github.com/mydumper/mydumper/releases/download/v0.12.1/mydumper-0.12.1-1.el7.x86_64.rpm",
+         "sudo curl https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 > /tmp/key",
+         "sudo mv /tmp/key /etc/pki/rpm-gpg/RPM-GPG-KEY-mysql",
+         "sudo cp /etc/pki/rpm-gpg/RPM-GPG-KEY-mysql /etc/pki/rpm-gpg/RPM-GPG-KEY-mysql-2022",
+         "sudo chown root:root /etc/pki/rpm-gpg/RPM-GPG-KEY-my*",
+         "sudo yum -y install --nogpgcheck https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm",
+         "sudo yum -y install --nogpgcheck mysql-community-client",
+         "sudo yum -y install https://download.postgresql.org/pub/repos/yum/14/redhat/rhel-7-x86_64/postgresql14-libs-14.2-1PGDG.rhel7.x86_64.rpm",
+         "sudo yum -y install https://download.postgresql.org/pub/repos/yum/14/redhat/rhel-7-x86_64/postgresql14-14.2-1PGDG.rhel7.x86_64.rpm",
+         "sudo yum -y install pg_repack_14.x86_64",
+         "sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo",
+         "sudo yum -y install packer",
+         "sudo yum -y install python2-pip.noarch",
+         "sudo ln -s /usr/bin/python2.7 /usr/local/bin/python2.7",
+         "sudo pip install 'ansible==2.4.2.0'",
+	 "sudo pip install 'mysql.connector'",
+         "sudo pip install 'boto3'",
+         "sudo yum -y install perl-ExtUtils-MakeMaker.noarch",
+         "sudo yum -y install perl-Data-Dumper.x86_64",
+         "sudo yum -y install perl-DBI.x86_64",
+         "sudo yum -y install perl-DBD-MySQL.x86_64",
+         "sudo yum -y install perl-Digest-MD5.x86_64",
+         "sudo wget -nv --content-disposition https://downloads.percona.com/downloads/percona-toolkit/3.3.1/binary/tarball/percona-toolkit-3.3.1_x86_64.tar.gz",
+         "sudo tar xvf percona-toolkit-3.3.1_x86_64.tar.gz",
+         "sudo sh -c \"cd percona-toolkit-3.3.1; perl Makefile.PL;  make; make install\"",
+         "sudo rm -rf percona-toolkit-3.3.1*",
+         "sudo wget -nv --content-disposition https://github.com/github/gh-ost/releases/download/v1.1.5/gh-ost-1.1.5-1.x86_64.rpm",
+         "sudo yum -y install gh-ost-1.1.5-1.x86_64.rpm",
+	 "sudo rm -f gh-ost-1.1.5-1.x86_64.rpm",
+         "git clone https://github.groupondev.com/ops/paver.git",
+         "sudo cp /home/ec2-user/paver/roles/check_mk/templates/pg_scripts/rds/* /usr/local/sbin",
+	 "rm -rf paver"
+      ]
+    },
+    {
+      "type": "ansible",
+      "playbook_file": "./Provision.yml",
+      "user": "ec2-user",
+      "skip_version_check": true
+    }
+  ]
+}
+

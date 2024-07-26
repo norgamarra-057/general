@@ -1,0 +1,81 @@
+---
+###################################################
+# Provision.yml
+#
+# Description:  This playbook is intended to install users, public keys, and sudo access to the Packer AMI build process.
+#
+# Parameters:  None
+#
+# Notes:  1. To be called by Packer or manually (ansible-playbook).  
+#            It's not part of the paver repo and thus needs no access to on-prem databases.
+#
+###################################################
+
+- name: Check for needed local tools
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Does jq exist on localhost?
+      shell: jq -V
+      register: jq
+      failed_when: jq.rc != 0
+
+- name: Install and configure Users
+  hosts: all
+  gather_facts: false
+  become: true
+  vars_files:
+    - Users.yml
+
+  tasks:
+    - name: Add group
+      group: 
+        name: "{{ item.key }}"
+        gid: "{{ item.value.gid }}"
+        state: present
+      with_dict: "{{ group_name }}"
+
+    - name: Add users
+      user:
+        name: "{{ item.key }}"
+        uid: "{{ item.value.uid }}"
+        comment: "{{ item.value.comment }}"
+        group: "{{ item.value.group }}"
+        shell: "{{ item.value.shell }}"
+        state: present
+      with_dict: "{{ users }}"
+
+    - name: Add sudo access
+      lineinfile:
+        path: /etc/sudoers.d/99-gds-users
+        line: "{{ item.key }} ALL=(ALL) NOPASSWD:ALL"
+        create: yes
+        mode: 0440
+        state: present
+      with_dict: "{{ users }}"
+
+#    - name: Pull public keys - if available
+#      local_action: shell curl -X GET 'login.snc1/v1/users/{{ item.key}}/keys' | jq '.[-1]' | jq '.key' | cut -d\" -f2 > keys/{{ item.key }}.pub
+#      become: false
+#      with_dict: "{{ users }}"
+#      ignore_errors: true
+
+    - name: Create home .ssh dir
+      file:
+        path: "/home/{{ item.key }}/.ssh"
+        state: directory
+        owner: "{{ item.key }}"
+        group: "{{ item.value.group }}"
+        mode: 0700
+      with_dict: "{{ users }}"
+
+    - name: Upload public keys - if available
+      copy:
+        dest: "/home/{{ item.key }}/.ssh/authorized_keys"
+        src: "keys/{{ item.key }}.pub"
+        owner: "{{ item.key }}"
+        group: "{{ item.value.group }}"
+        mode: 0400
+      with_dict: "{{ users }}"
+

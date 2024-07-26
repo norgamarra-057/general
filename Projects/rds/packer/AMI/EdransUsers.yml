@@ -1,0 +1,55 @@
+---
+###################################################
+# EdransUsers.yml
+#
+# Description:  Vars file that lists the Edrans Users to add
+#
+# Parameters:  None
+#
+###################################################
+
+group_name:
+  edrans:
+    gid: 10002
+
+users: 
+  c_aferrero:
+    uid: 7000
+    group: edrans
+    comment: "Andres Ferrero"
+    shell: /usr/bin/bash
+  c_enazareno:
+    uid: 7001
+    group: edrans
+    comment: "Eduardo Nazareno"
+    shell: /usr/bin/bash
+  c_avillarroel:
+    uid: 7002
+    group: edrans
+    comment: "Andres Raul Villarroel"
+    shell: /usr/bin/bash
+  c_darata:
+    uid: 7003
+    group: edrans
+    comment: "Damian Arata"
+    shell: /usr/bin/bash
+  c_jnelo:
+    uid: 7004
+    group: edrans
+    comment: "Jose Nelo"
+    shell: /usr/bin/bash
+  c_gtondato:
+    uid: 7005
+    group: edrans
+    comment: "Geronimo Tondato"
+    shell: /usr/bin/bash
+  c_ngamarra:
+    uid: 7006
+    group: edrans
+    comment: "Norberto Gamarra"
+    shell: /usr/bin/bash
+  c_bgalvan:
+    uid: 7007
+    group: edrans
+    comment: "Bruno Galvan"
+    shell: /usr/bin/bash

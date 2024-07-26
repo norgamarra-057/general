@@ -1,0 +1,25 @@
+---
+###################################################
+# DelUsers.yml
+#
+# Description:  Vars file containing list of users to remove from EC2 instances
+#
+###################################################
+
+users: 
+  - c_mthambara:
+  - c_senose:
+  - c_wayang:
+  - c_amodi:
+  - c_ncalero:
+  - c_pdhayanithi:
+  - c_dmorales:
+  - c_jbratina:
+  - c_msiqueira:
+  - c_ngoud:
+  - c_andeoliveira:
+  - c_ldavies:
+  - c_ansharma:
+  - c_mbate:
+  - c_mapearson:
+  - c_litowle:

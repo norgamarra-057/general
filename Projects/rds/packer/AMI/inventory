@@ -1,0 +1,7 @@
+gds-prd-rds01.prod.us-west-1.aws.groupondev.com
+gds-prd-rds02.prod.us-west-1.aws.groupondev.com
+gds-prd-rds03.prod.eu-west-1.aws.groupondev.com
+gds-stg-rds01.stable.us-west-1.aws.groupondev.com
+gds-stg-rds02.stable.us-west-1.aws.groupondev.com
+gds-snd-rds00.gensandbox.us-west-1.aws.groupondev.com
+gds-prd-jump01.prod.us-west-1.aws.groupondev.com

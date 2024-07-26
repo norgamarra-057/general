@@ -1,0 +1,7 @@
+*.tfstate
+*.tfstate.*
+*.terraform
+*.terragrunt-cache
+
+# IntelliJ files
+.idea

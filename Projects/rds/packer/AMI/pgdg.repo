@@ -1,0 +1,6 @@
+[pgdg14]
+name=PostgreSQL 14 for RHEL/CentOS7 - x86_64
+gpgkey=https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-14
+baseurl=https://download.postgresql.org/pub/repos/yum/14/redhat/rhel-7-x86_64/
+enabled=1
+gpgcheck=1

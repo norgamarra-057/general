@@ -1,0 +1,32 @@
+terraform {
+    source = "../../../../../../modules/aurora-mysql"
+}
+
+include {
+	path = find_in_parent_folders()
+}
+
+dependencies {
+	paths = [
+  		"../../../database/networking",
+#     	"../../../database/options",
+  		"../../../database/parameters/aurora/5.7",
+  		"../../../database/security",
+	]
+}
+
+
+# If module specific variables need to be defined, these variables need to be defined in a "module-specific.tfvars" file inside the same directory
+
+inputs = {
+  instance_type       = "db.r5.xlarge"
+  local_replica_cnt = 2
+  local_subnet_group  = "sgroup-1"
+  size                = "large"
+  db_name			  = "portunus_prod"
+  engine			  = "aurora-mysql"
+  engine_version	  = "5.7.12"
+  multi_az			  = false
+  port				  = 3306
+  cluster_master_arn  = ""
+}
