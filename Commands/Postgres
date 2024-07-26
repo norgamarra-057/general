@@ -1,0 +1,233 @@
+PSQL
+
+#Generar password random
+
+openssl rand -base64 12
+
+-Jumpbox-
+
+gds-prd-rds01.prod.us-west-1.aws.groupondev.com
+gds-prd-rds02.prod.us-west-1.aws.groupondev.com
+gds-prd-rds03.prod.eu-west-1.aws.groupondev.com
+gds-stg-rds01.stable.us-west-1.aws.groupondev.com
+gds-stg-rds02.stable.us-west-1.aws.groupondev.com
+gds-snd-rds00.gensandbox.us-west-1.aws.groupondev.com
+gds-prd-jump01.prod.us-west-1.aws.groupondev.com
+
+psql -h arbitration-service-prod.czlsgz0xic0p.us-west-1.rds.amazonaws.com -U gds_admin postgres
+
+Gr0up0n!$KaL3$
+
+pg_restore -h pg-noncore-us-514-stg.ccoxqscq6x7v.us-west-1.rds.amazonaws.com -U gds_admin -d deals_clustr_stg -t deals_clustr.client_id_roles -t deals_clustr.client_ids -t deals_clustr.qrtz_blob_triggers -t deals_clustr.qrtz_calendars -t deals_clustr.qrtz_cron_triggers -t deals_clustr.qrtz_fired_triggers -t deals_clustr.qrtz_job_details -t deals_clustr.qrtz_locks -t deals_clustr.qrtz_paused_trigger_grps -t deals_clustr.qrtz_scheduler_state -t deals_clustr.qrtz_simple_triggers -t deals_clustr.qrtz_simprop_triggers -t deals_clustr.qrtz_triggers -t deals_clustr.schema_version -t deals_clustr.tagging_audit -t deals_clustr.use_case_refresh_settings -t deals_clustr.use_cases -F c -f GDS-37549_dump.custom
+
+SELECT
+    query,
+    calls,
+    total_time,
+    rows,
+    100.0 * shared_blks_hit / nullif(shared_blks_hit + shared_blks_read, 0) AS hit_percent
+FROM pg_stat_statements
+WHERE total_time > 1000
+ORDER BY total_time DESC;
+
+SELECT deal_merchandising.deal_id FROM deal_merchandising INNER JOIN product_merchandising ON product_merchandising.deal_id = deal_merchandising.deal_id WHERE deal_merchandising.deal_id IN (x'3482F7181C3311E38A650025906A929E',x'D88214B41C3511E397D70025906A929E',x'DC0DBC941C3711E390420025906A929E',x'1E4C674E1C4811E394650025906A929E',x'5E5448241C4E11E3ADF50025906A903C',x'6B668DF61C4E11E3B3790025906A929E',x'E205692C1C4F11E383100025906A929E',x'B2ED056C1C5111E3B4F40025906A929E',x'FB0951841C5111E3AB7F0025906A929E',x'758F88A61C5211E39E780025906A929E',x'B51B78EA1C5211E3B3390025906A929E',x'C635C1C41C5411E3B7940025906A929E',x'F37CAAB21C5411E386640025906A929E',x'B78E29441C5511E3A5370025906A9064',x'36D898C01C5A11E3B0060025906A929E',x'CF85098C1C5F11E3AD880025906A929E',x'668FE1161C6111E3AC230025906A929E',x'65CDF8521C6211E382700025906A929E',x'95CC2C9E1C6311E385D40025906A929E',x'4B1655CA1C6411E3A5760025906A929E',x'0B01E6281C6611E39F500025906A929E',x'C22E16721C6711E3B6810025906A929E',x'DA8E236A1C6711E3BE930025906A929E',x'0933E2CC1C6811E397BD0025906A929E',x'723E3B6E1C6811E3AD8E0025906A929E',x'7A5287241C6811E3B9210025906A929E',x'21E0CF0A1C6911E3A0220025906A929E',x'2DF8348A1C6A11E3856F0025906A929E',x'90C5982C1C6B11E391980025906A929E',x'E9D2AF361C6B11E3ADA20025906A929E',x'C6FA11061C6C11E391590025906A929E',x'3F6470A01C6D11E3A7110025906A929E',x'45625DF41C6E11E391CC0025906A929E',x'780F17FE1C7011E38EA20025906A929E',x'B0855EE01C7011E3A5370025906A9064',x'4552589C1C7211E3A0AC0025906A929E',x'6AC2ABCA1C7411E3AB100025906A929E',x'224E6DFA1C7611E39A740025906A9064',x'7EA1A8241C7611E3B8870025906A929E',x'0061BB401C7911E3A81A0025906A929E',x'E107FD981C7A11E39B7F0025906A929E',x'17A106641C7C11E3ABF90025906A929E',x'3460D6B21C7C11E3A4E10025906A9220',x'8DE9581C1C7C11E3B2A30025906A929E',x'AFCC29E01C7D11E396FD0025906A929E',x'24BF9CC01C8111E395370025906A929E',x'C300AEEC1C8111E395050025906A929E',x'17C4786E1C8211E3AA340025906A929E',x'EC3DAEBC1C8211E3B7520025906A929E',x'7E89F0F01C8311E3A7050025906A929E',x'76291D3E1C8611E3A53B0025906A929E',x'6D2F2D441C8711E39CB70025906A929E',x'82BA52601C8711E3A4E10025906A9220',x'599669CC1C8811E391310025906A929E',x'28CCC3F81C8911E3BE8C0025906A929E',x'387275141C8911E3942F0025906A929E',x'421E7EAE1C8A11E388660025906A9064',x'F1BECF161C8B11E382FD0025906A929E',x'90CE12CE1C8C11E38AEF0025906A929E',x'CF6298F61C8D11E397080025906A929E',x'EDBED24C1C8D11E3B4180025906A929E',x'48A89B9C1C8F11E3B3140025906A9220',x'51C53CD41C9011E3AC860025906A929E',x'CE5B294A1C9311E3AE4B0025906A929E',x'D28B661E1C9411E3BE460025906A929E',x'E1D33A701C9411E3B0E10025906A929E',x'7C4BAB781C9511E396550025906A929E',x'875A721A1C9511E399F30025906A9064',x'A2F71DA21C9511E39F580025906A929E',x'A690B0681C9511E384B20025906A929E',x'D2FB99BE1C9611E39BEE0025906A929E',x'754390401C9811E3AE5E0025906A929E',x'E128C49C1C9811E39D7B0025906A929E',x'BB20E1161C9911E39A820025906A929E',x'01B8FD341C9A11E393C40025906A929E',x'2EECDE741C9A11E3BF4E0025906A929E',x'22CF51CA1C9B11E383AB0025906A929E',x'68F891701C9B11E38CD20025906A929E',x'9D14F1881C9B11E3A31B0025906A929E',x'E9CB3A8C1E9E11E3B6060025906A929E',x'97D2C2981EA511E3BC840025906A9064',x'D0EE96921EA511E3B0DD0025906A903C',x'A5A68EDA1EA611E3987D0025906A9064',x'D48F902A1EA611E39B670025906A9220',x'37A5B3101EA711E3A0110025906A929E',x'E1B829A01EA711E38BD60025906A929E',x'FB8A5B861EA811E3A8060025906A903C',x'72C1905E1EAC11E38DF60025906A9220',x'C0570EA21EAC11E3A95E0025906A9220',x'FD3418C41EAC11E3ABC60025906A929E',x'29C3FEB81EAD11E395500025906A929E',x'E7EF56761EAD11E3B4B10025906A903C',x'BD9880901EAE11E3907F0025906A903C',x'20D6D8521EB211E3A0680025906A9064',x'401895CA1EB211E3907F0025906A903C',x'3D56C1441EB311E3944D0025906A903C',x'78863FF41EB511E38DF60025906A9220',x'DD48AF941EB511E38F900025906A903C',x'E254AD121EB511E3B3140025906A9220',x'64A5A2441EB611E388660025906A9064',x'861F12841EB611E3A0680025906A9064',x'A47B73441EB611E3B4B10025906A903C',x'BD778A901EB611E399F30025906A9064',x'C77ECBD41EB611E3885E0025906A903C',x'F0FEAFA61EB611E385790025906A903C',x'1A65607E1EB711E3BE360025906A9064',x'5350694C1EB711E3961B0025906A9064',x'A17FF6DC1EB711E38F900025906A903C');
+
+- Check the search path -
+
+SELECT r.rolname, d.datname, rs.setconfig
+FROM   pg_db_role_setting rs
+LEFT   JOIN pg_roles      r ON r.oid = rs.setrole
+LEFT   JOIN pg_database   d ON d.oid = rs.setdatabase
+WHERE  r.rolname = 'goods_mkt_pric_stg_dba' OR d.datname = 'goods_market_pricing_stg';
+
+- Get user grants -
+
+\du username
+
+-Describe table-
+
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'dealinfo';
+
+-Change user password-
+
+ALTER USER gdt_automation_prod_app WITH PASSWORD '4kwHRaXfFQSAKiZV';
+ALTER USER gdt_automation_prod_dba WITH PASSWORD 'ZRXz93H/7R6bdggn';
+
+-Get table size- 
+
+SELECT pg_size_pretty (pg_relation_size('schema.table')); (Para pesar tablas)
+
+select table_schema, table_name, pg_relation_size('"'||table_schema||'"."'||table_name||'"')/ 1024 / 1024 /1024 AS "Size (GB)" from information_schema.tables order by 3 DESC limit 10;
+
+SELECT schemaname AS table_schema,relname AS table_name,PG_SIZE_PRETTY(PG_TOTAL_RELATION_SIZE(relid)) AS total_size FROM pg_catalog.pg_statio_user_tables ORDER BY PG_TOTAL_RELATION_SIZE(relid) DESC, PG_RELATION_SIZE(relid) DESC LIMIT 1;
+
+-Check users-
+
+\du+
+
+- Change user password -
+
+ALTER USER mls_deal_index_stg_app WITH PASSWORD 'T5lUyGyZHUEwa/pO';
+
+ALTER USER mls_deal_index_stg_dba WITH PASSWORD 'R+gukGyp4VjU3yxo';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA mls_deal_index TO mls_deal_index_stg_dba
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO mls_deal_index_stg_dba;
+
+## Chequear queries activas en postgres - 
+Select pid, usename, query from pg_stat_activity where state = 'active';
+
+-Check max connections-
+
+SELECT *
+FROM   pg_settings
+WHERE  name = 'max_connections';
+
+-Check primary keys on db -
+
+1. \c db
+2. select tab.table_schema, tab. table_name from information_schema.tables tab left join information_schema.table_constraints tco on tab.table_schema = tco.table_schema and tab.table_name = tco.table_name and tco.constraint_type = 'PRIMARY KEY' where tab.table_type = 'BASE TABLE' and tab.table_schema not in ('pg_catalog', 'information_schema') and tco.constraint_name is null order by table_schema, table_name;
+
+-Check active queries-
+
+SELECT pid,datname,usename,query FROM pg_stat_activity WHERE state = 'active';
+
+Cancel the mentioned query-
+
+SELECT pg_cancel_backend(PID);
+
+Hard kill-
+
+SELECT pg_terminate_backend(PID);
+
+
+-Check roles connection limit-
+
+SELECT rolname, rolconnlimit FROM pg_roles WHERE rolconnlimit <> -1 and rolname like 'optimus_prime_prod_dba%';
+
+-GDS crear db en instancia PSQL-
+
+Crear DB PSQL (CREATE DATABASE janus_bcookie_stg; )
+
+Crear 2 users con sus passwords (DBA Y APP) 
+create user janus_bcookie_prd_dba password 'DBAfVjCs+++SY0Pi5RqpN4H2ibO' connection limit 10;
+create user janus_bcookie_prd_app password 'APPLuPmIYeOr2hrPDacXZCNHMKd';
+
+\l listo las dbs
+
+\c janus_bcookie_stg
+
+Creo el schema (create schema janus_bcookie;) - Usar nombre app
+
+Crear un schema ext (create schema ext;)
+
+Listo los schemas (\dn)
+
+Darle permiso de uso al schema principal 
+grant usage on schema ext to janus_bcookie_stg_dba;
+grant usage on schema ext to janus_bcookie_stg_app;
+
+Crear extensiones asignadas al schema ext
+create extension "uuid-ossp" with schema ext;
+create extension pg_trgm with schema ext;
+create extension hstore with schema ext;
+
+Asignar privilegios a todas las funciones del schema ext a 
+grant all privileges on all functions in schema ext to janus_bcookie_stg_dba;
+grant all privileges on all functions in schema ext to janus_bcookie_stg_app;
+
+Asigno permiso para ejecutar todas las funciones al schema ext
+grant execute on all functions in schema ext to janus_bcookie_stg_dba;
+grant execute on all functions in schema ext to janus_bcookie_stg_app;
+
+Otorgo el owner de los schemas al schema dba
+alter schema janus_bcookie OWNER TO janus_bcookie_stg_dba ;
+alter schema ext OWNER TO janus_bcookie_stg_dba ;
+
+Seteo path para ambos usuarios sobre ambos schemas
+alter user janus_bcookie_stg_dba set search_path=janus_bcookie,ext;
+alter user janus_bcookie_stg_app set search_path=janus_bcookie,ext;
+
+Concedo accesos ingresando a la dbname con user dba
+\c janus_bcookie_stg janus_bcookie_stg_dba
+grant usage on schema janus_bcookie to janus_bcookie_stg_app;
+grant usage on schema janus_bcookie to janus_bcookie_stg_dba;
+
+Modifico los privilegios por defecto en el schema principal dandole permisos en la tabla
+alter default privileges in schema janus_bcookie grant select,insert,update,delete on tables to janus_bcookie_stg_app;
+alter default privileges in schema janus_bcookie grant select,update on sequences to janus_bcookie_stg_app;
+alter default privileges for role janus_bcookie_stg_dba in schema janus_bcookie grant select,insert,update,delete on tables to janus_bcookie_stg_app;
+alter default privileges for role janus_bcookie_stg_dba in schema janus_bcookie grant select,update on sequences to janus_bcookie_stg_app;
+
+Doy acceso a GDS ADMIN
+grant usage on schema janus_bcookie to gds_admin;
+grant usage on schema ext to gds_admin;
+alter default privileges in schema janus_bcookie grant select,insert,update,delete on tables to gds_admin; 
+alter default privileges in schema janus_bcookie grant select,update on sequences to gds_admin;
+
+Proveo las credenciales al requester
+
+janus_bcookie_stg_dba: DBAfVjCs+++SY0Pi5RqpN4H2ibO
+janus_bcookie_stg_app: APPLuPmIYeOr2hrPDacXZCNHMKd
+database: janus_bcookie_stg
+port: 5432
+master-endpoint = pg-noncore-us-511-stg.ccoxqscq6x7v.us-west-1.rds.amazonaws.com
+replica-endpoint = pg-noncore-us-511-1-stg.ccoxqscq6x7v.us-west-1.rds.amazonaws.com
+Wavefront RW : https://groupon.wavefront.com/u/Zgx8TjFcy4?t=groupon
+Wavefront RO : https://groupon.wavefront.com/u/GY8ZkPdJVQ?t=groupon
+
+-#To copy user grants from one MySQL database to another with pt-schema-change online, you can follow these steps:#-
+
+First, use the pt-show-grants tool to export the user grants from the source database. You can use the following command:
+
+pt-show-grants --only $DATABASE_NAME --host $SOURCE_HOST --user $SOURCE_USER --ask-pass > grants.sql
+
+This  exports only the grants for the specified database name ($DATABASE_NAME) from the source host ($SOURCE_HOST) using the specified user ($SOURCE_USER) and prompts for a password.
+
+Next, copy the grants.sql file to the target host.
+
+Create the target database on the target host, if it doesn't exist already.
+
+Use pt-schema-change to apply the grants to the target database. You can use the following command:
+
+pt-schema-change --execute --alter "SOURCE grants.sql" D=$DATABASE_NAME,h=$TARGET_HOST,u=$TARGET_USER,p=$TARGET_PASSWORD
+
+This command executes the schema change to apply the grants in the grants.sql file to the target database on the target host. Replace $DATABASE_NAME, $TARGET_HOST, $TARGET_USER, and $TARGET_PASSWORD with the appropriate values for your target database.
+
+Verify that the grants have been applied to the target database by checking the MySQL mysql.user table on the target host. You can use the following command:
+
+mysql -h $TARGET_HOST -u $TARGET_USER -p$TARGET_PASSWORD -e "SELECT * FROM mysql.user WHERE user LIKE '%$SOURCE_USER%'"
+
+This command selects all rows from the mysql.user table on the target host where the user name contains the source user name. This should show you the new grants that were applied to the target database.
+
+## User creation for read only on DB 
+https://groupondev.atlassian.net/browse/GPROD-331247
+
+# pg_restore -h localhost -U gds_admin -a --data-only /home/c_ngamarra/paver/device_tokens_new_EU.dump > /home/c_ngamarra/paver/device_tokens_new_EU.csv
+
+\copy mobile_push_token_service.device_tokens_new TO '/home/c_ngamarra/mobile_push_token_serviceUS.csv' WITH CSV HEADER;
+
+pg_dump -h gds-mobile-push-token-service-prod-rw.prod.us-west-1.aws.groupondev.com -U gds_admin -d mobile_push_token_service_prod -F c -f /home/c_ngamarra/mobile_push_token_service_prodUS.dump
+
+-Steps to set privileges in a migrated schema-
+1) ALTER SCHEMA mkttag_service OWNER TO deals_clustr_stg_dba;
+2) ALTER TABLE mkttag_service.* OWNER TO deals_clustr_stg_dba;
+3) GRANT SELECT ON ALL TABLES IN SCHEMA mkttag_service TO deals_clustr_stg_app;
+GRANT UPDATE ON ALL TABLES IN SCHEMA mkttag_service TO deals_clustr_stg_app;
+GRANT INSERT ON ALL TABLES IN SCHEMA mkttag_service TO deals_clustr_stg_app;
+GRANT DELETE ON ALL TABLES IN SCHEMA mkttag_service TO deals_clustr_stg_app;
+4) GRANT USAGE ON SCHEMA mkttag_service TO deals_clustr_stg_app;
+GRANT ALL ON FUNCTION schema_name.function_name TO deals_clustr_stg_app;
+ALTER FUNCTION schema_name.function_name OWNER TO deals_clustr_stg_dba;
+
+alter user deals_clustr_stg_app set search_path=mkttag_service;
+alter user deals_clustr_stg_dba set search_path=mkttag_service;
+
+1) i created dns records for all isntsnces for.tomorrow. run a test to connect to them to make sure the names/ips are correct
+2) check all replications are live and up to date without delay
+3) check that we have all the passwords and that the commands of the pass are ready
+4) check the dns endpoints in the repo to make sure all are correct and push them
+5) run a new compare nulls for all.instances
+6) and yes, also the dns for EU now that the replicas have been created

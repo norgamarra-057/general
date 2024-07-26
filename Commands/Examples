@@ -1,0 +1,55 @@
+GDS-36262
+
+mysql -h gds-us-pwa-vis-ro.prod.us-west-1.aws.groupondev.com -e "SELECT table_name AS \`Table\`, table_rows, round(((data_length + index_length) / 1024 / 1024), 2) \`Size in MB\`  FROM information_schema.TABLES  
+ WHERE table_schema = 'groupon_production' 
+ AND table_name in ('merchants')
+ order by 1"
+
+ oak-chunk-update --user=gds_admin --ask-pass  --host=gds-emea-vis20-rw.prod.eu-west-1.aws.groupondev.com --database=vis20_production --execute="update voucher_barcodes  set merchant_uuid=(select uuid from merchants where id=merchant_id),updated_at=now() where id<>0 and OAK_CHUNK(voucher_barcodes)"  --chunk-size=1000 --sleep=200 --verbose --terminate-on-not-found  --print-progress --skip-retry-chunk
+
+ UPDATE voucher_barcodes vb INNER JOIN campaign_membership_coupons cmc on vb.id = cmc.voucher_barcode_id SET vb.merchant_uuid = cmc.merchant_id WHERE vb.merchant_uuid is NULL and vb.merchant_id is NULL
+
+ select vb.id, vb.merchant_id, vb.merchant_uuid from voucher_barcodes vb INNER JOIN campaign_membership_coupons cmc on vb.id = cmc.voucher_barcode_id WHERE vb.merchant_uuid is NULL and vb.merchant_id is NULL limit 10;
+
+ select count(*) from voucher_barcodes vb INNER JOIN campaign_membership_coupons cmc on vb.id = cmc.voucher_barcode_id WHERE vb.merchant_uuid is NULL and vb.merchant_id is NULL limit 10;
+
+ mysql -h vis20-emea-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com vis20_production -e  "select vb.id, vb.merchant_id, vb.merchant_uuid from voucher_barcodes vb INNER JOIN campaign_membership_coupons cmc on vb.id = cmc.voucher_barcode_id WHERE vb.merchant_uuid is NULL and vb.merchant_id is NULL;" >GDS-36232.txt
+
+oak-chunk-update --user=gds_admin --ask-pass  --host=gds-emea-vis20-rw.prod.eu-west-1.aws.groupondev.com --database=vis20_production --execute="UPDATE voucher_barcodes vb INNER JOIN campaign_membership_coupons cmc on vb.id = cmc.voucher_barcode_id SET vb.merchant_uuid = cmc.merchant_id WHERE vb.merchant_uuid is NULL and vb.merchant_id is NULL and vb.id<>0 and OAK_CHUNK(voucher_barcodes)" --chunk-size=5000 --sleep=200 --verbose --terminate-on-not-found  --print-progress --skip-retry-chunk
+
+
+
+
+SELECT vbb.uuid FROM voucher_barcode_buckets vbb , voucher_barcodes vb , campaign_membership_coupons cmc WHERE vb.voucher_barcode_bucket_id = vbb.id and cmc.voucher_barcode_id = vb.id AND cmc.uuid=0x
+
+UPDATE vbb.uuid FROM voucher_barcode_buckets vbb , voucher_barcodes vb , campaign_membership_coupons cmc WHERE vb.voucher_barcode_bucket_id = vbb.id and cmc.voucher_barcode_id = vb.id AND cmc.uuid=0x
+
+SELECT 'UPDATE campaign_membership_coupons SET legacy_code=''816682212_817841495_817319070'', updated_at=NOW() WHERE id='||id||';' AS sql FROM campaign_membership_coupons WHERE uuid=unhex(replace('73743842-0c4d-4749-ba5e-42a9b0165923','-',''));
+
+sudo cp -r /home/c_jnelo/gds-36262 /home/c_ngamarra/
+
+pt-online-schema-change  --alter="add index cmpn_mem_cpns_on_inv_prd_id_flfild_at_sts_mrcht_redeemed(inventory_product_id, fulfilled_at, status, merchant_redeemed);"  --ask-pass  D=groupon_production,\
+t=campaign_membership_coupons,\
+h=gds-us-vis20-rw.prod.us-west-1.aws.groupondev.com,\
+u=gds_admin \
+--execute \
+--critical-load \
+Threads_running=1500 \
+--max-load \
+Threads_running=50 \
+--no-check-replication-filters \
+--no-drop-old-table \
+--no-drop-new-table  \
+--progress time,1 \
+--tries copy_rows:1000:1 \
+--chunk-size=1500 \
+--alter-foreign-keys-method=auto \
+--recursion-method=none \
+--pause-file=/home/c_ngamarra/GPROD-319657/pause \
+--sleep 0.01 \
+--print
+
+--chunk-size=1500 \
+--Threads_running=50 \
+
+echo "Threads_running=50" | nc -U /tmp/gh-ost.groupon_production.campaign_membership_coupons.sock (ajusta parametro mientras corre)

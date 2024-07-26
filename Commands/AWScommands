@@ -1,0 +1,42 @@
+AWS commands
+
+Chequear versiones de instancias RDS en una region
+aws rds describe-orderable-db-instance-options --region us-west-1 --engine aurora --availability-zone-group us-west-1 --output table | grep r5
+
+
+Chequear instancias por region excluyendo una version engine version
+aws rds describe-db-instances --region=eu-west-1 --query "DBInstances[?Engine=='aurora-mysql' &&EngineVersion!='5.7.mysql_aurora.2.10.1'].{DBClusterIdentifier:DBClusterIdentifier,DBInstanceIdentifier:DBInstanceIdentifier,EngineVersion:EngineVersion}" --output table;
+
+aws rds describe-db-instances \
+--filters "Name=engine,Values=aurora-mysql" \
+--output text  \
+--query 'DBInstances[*].{DBInstanceIdentifier:DBInstanceIdentifier,InstanceCreateTime:InstanceCreateTime,DBInstanceStatus:DBInstanceStatus}' | grep available
+
+aws cloudwatch get-metric-statistics \
+    --metric-name DatabaseConnections \
+    --start-time $STARTDATE \
+    --end-time $UTCDATE \
+    --period $period \
+    --namespace AWS/RDS \
+    --statistics Maximum \
+    --dimensions Name=DBInstanceIdentifier,Value=$server \
+    --output text \
+    --query 'Datapoints[0].{Maximum:Maximum}
+
+aws rds modify-db-instance --region us-west-1 --db-instance-identifier bhuvan-prod --allocated-storage 1000 --iops 3000
+
+aws rds modify-db-instance --region us-west-1 --db-instance-identifier my-core-gl-us-621-stg-0 --apply-immediately
+
+df -h (Terminal free space)
+
+du -h --max-depth=1 /path/to/search (Who is consuming the top folders)
+
+aws rds create-db-instance --db-cluster-identifier arifactory-restore --db-instance-identifier arifactory-restore --db-instance-class db.r6g.large --engine aurora-mysql --engine-version 5.7.mysql_aurora.2.10.1 --db-subnet-group-name sgroup-1
+
+aws rds restore-db-cluster-from-snapshot --db-cluster-identifier arifactory-restore --snapshot-identifier artifactory-copy0410126 --engine aurora-mysql --engine-version 5.7.mysql_aurora.2.10.1 --db-subnet-group-name sgroup-1
+
+^$\n (borrar lineas vacias visualcode)
+
+:1,$d (borrar todo en vim)
+
+gsutil -i grpn-sa-terraform-gds@prj-grp-central-sa-stable-66eb.iam.gserviceaccount.com rm gs://grpn-gcp-gds-gcp-databases-3301-state-926600789615/stable/us-central1/cnames/watson-api/default.tflock

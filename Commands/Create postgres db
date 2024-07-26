@@ -1,0 +1,66 @@
+GDS-36053
+
+Crear DB PSQL (CREATE DATABASE arq_stg;)
+
+Crear 2 users con sus passwords (DBA Y APP) 
+create user arq_stg_dba password 'DBAvV8qQxTOmDHnexlH6BshU0uH' connection limit 10;
+create user arq_stg_app password 'APPrqt4MVYupzgpamh7v5E9Uc0U';
+
+\l listo las dbs
+
+\c arq_stg
+
+Creo el schema (create schema arq_stg;) - Usar nombre app
+
+Crear un schema ext (create schema ext;)
+
+Listo los schemas (\dn)
+
+Darle permiso de uso al schema principal 
+
+grant usage on schema ext to arq_stg_dba;
+grant usage on schema ext to arq_stg_app;
+
+Crear extensiones asignadas al schema ext
+
+create extension "uuid-ossp" with schema ext;
+create extension pg_trgm with schema ext;
+create extension hstore with schema ext;
+
+Asignar privilegios a todas las funciones del schema ext a 
+grant all privileges on all functions in schema ext to arq_stg_dba;
+grant all privileges on all functions in schema ext to arq_stg_app;
+
+Asigno permiso para ejecutar todas las funciones al schema ext
+grant execute on all functions in schema ext to arq_stg_dba;
+grant execute on all functions in schema ext to arq_stg_app;
+
+Otorgo el owner de los schemas al schema dba
+alter schema arq OWNER TO arq_stg_dba;
+alter schema ext OWNER TO arq_stg_dba;
+
+Seteo path para ambos usuarios sobre ambos schemas
+alter user arq_stg_dba set search_path=arq,ext;
+alter user arq_stg_app set search_path=arq,ext;
+
+Concedo accesos ingresando a la dbname con user dba
+
+\c arq_stg arq_stg_dba
+grant usage on schema arq to arq_stg_app;
+grant usage on schema ext to arq_stg_app;
+
+Modifico los privilegios por defecto en el schema principal dandole permisos en la tabla
+
+alter default privileges in schema arq grant select,insert,update,delete on tables to arq_stg_app;
+alter default privileges in schema arq grant select,update on sequences to arq_stg_app;
+alter default privileges for role arq_stg_dba in schema arq grant select,insert,update,delete on tables to arq_stg_app;
+alter default privileges for role arq_stg_dba in schema arq grant select,update on sequences to arq_stg_app;
+
+Doy acceso a GDS ADMIN
+
+grant usage on schema arq_stg to gds_admin;
+grant usage on schema ext to gds_admin;
+alter default privileges in schema arq grant select,insert,update,delete on tables to gds_admin; 
+alter default privileges in schema arq grant select,update on sequences to gds_admin;
+
+Proveo las credenciales al requester

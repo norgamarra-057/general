@@ -1,0 +1,198 @@
+RAAS
+
+h=endpoint
+
+redis-cli -h $h ping
+
+redis-cli -h $h --bigkeys
+
+redis-cli -h $h MONITOR
+
+redis-cli -h $h INFO
+
+redis-cli -h $h SCAN 0 COUNT 5 match cachecardscambridgegetawaystopcategory*
+
+redis-cli -h $h -c GET cachecardsvaresesearch
+
+redis-cli -h $h -c TTL
+
+redis-cli -h $h -c FLUSHALL ASYNC
+
+redis-cli -h $h CLIENT LIST
+
+Redis report
+------------
+
+- Para sacar TLS a las redis -
+aws elasticache describe-cache-clusters --region eu-west-1 --query 'CacheClusters[*].[ReplicationGroupId,TransitEncryptionEnabled]' --output table|grep True
+
+aws-okta exec $TF_RAAS_ENV -- terragrunt  apply \
+    -target=aws_elasticache_cluster.itier-support[0] 
+    -target=aws_route53_record.itier-support_cname[0]
+
+    pub   rsa3072 2023-05-05 [SC]
+      5604B3ABB996D384DC0C720CADC43A716AB05987
+uid                      c_ngamarra <c_ngamarra@groupon.con>
+sub   rsa3072 2023-05-05 [E]
+
+aws-okta exec $TF_RAAS_ENV -- terragrunt force-unlock 476ae462-df7b-70f8-4191-d9aa1ea74b70
+
+#!/bin/bash
+
+replications=(
+  "inbox-mgmt-mobile-prod-users01-prod"
+  "inbox-mgmt-mobile-prod-users02-prod"
+  "inbox-mgmt-mobile-prod-users03-prod"
+  "inbox-mgmt-mobile-prod-users04-prod"
+  "inbox-mgmt-mobile-prod-users05-prod"
+  "inbox-mgmt-mobile-prod-users06-prod"
+  "inbox-mgmt-mobile-prod-users07-prod"
+  "inbox-mgmt-mobile-prod-users08-prod"
+  "inbox-mgmt-mobile-prod-users09-prod"
+  "inbox-mgmt-mobile-prod-users10-prod"
+  "inbox-mgmt-mobile-prod-users11-prod"
+  "inbox-mgmt-mobile-prod-users12-prod"
+  "inbox-mgmt-mobile-prod-users13-prod"
+  "inbox-mgmt-mobile-prod-users14-prod"
+  "inbox-mgmt-mobile-prod-users15-prod"
+  "inbox-mgmt-mobile-prod-users16-prod"
+  "inbox-mgmt-mobile-prod-users17-prod"
+  "inbox-mgmt-mobile-prod-users18-prod"
+  "inbox-mgmt-mobile-prod-users19-prod"
+  "inbox-mgmt-mobile-prod-users20-prod"
+  "inbox-mgmt-mobile-prod-users21-prod"
+  "inbox-mgmt-mobile-prod-users22-prod"
+  "inbox-mgmt-mobile-prod-users23-prod"
+  "inbox-mgmt-mobile-prod-users24-prod"
+  "inbox-mgmt-mobile-prod-users25-prod"
+  "inbox-mgmt-mobile-prod-users26-prod"
+  "inbox-mgmt-mobile-prod-users27-prod"
+  "inbox-mgmt-mobile-prod-users28-prod"
+  "inbox-mgmt-mobile-prod-users29-prod"
+  "inbox-mgmt-mobile-prod-users30-prod"
+  "inbox-mgmt-mobile-prod-users31-prod"
+  "inbox-mgmt-mobile-prod-users32-prod"
+)
+
+clusters=(
+  "inbox-mgmt-mobile-prod-users01-prod-001"
+  "inbox-mgmt-mobile-prod-users02-prod-001"
+  "inbox-mgmt-mobile-prod-users03-prod-001"
+  "inbox-mgmt-mobile-prod-users04-prod-001"
+  "inbox-mgmt-mobile-prod-users05-prod-001"
+  "inbox-mgmt-mobile-prod-users06-prod-001"
+  "inbox-mgmt-mobile-prod-users07-prod-001"
+  "inbox-mgmt-mobile-prod-users08-prod-001"
+  "inbox-mgmt-mobile-prod-users09-prod-001"
+  "inbox-mgmt-mobile-prod-users10-prod-001"
+  "inbox-mgmt-mobile-prod-users11-prod-001"
+  "inbox-mgmt-mobile-prod-users12-prod-001"
+  "inbox-mgmt-mobile-prod-users13-prod-001"
+  "inbox-mgmt-mobile-prod-users14-prod-001"
+  "inbox-mgmt-mobile-prod-users15-prod-001"
+  "inbox-mgmt-mobile-prod-users16-prod-001"
+  "inbox-mgmt-mobile-prod-users17-prod-001"
+  "inbox-mgmt-mobile-prod-users18-prod-001"
+  "inbox-mgmt-mobile-prod-users19-prod-001"
+  "inbox-mgmt-mobile-prod-users20-prod-001"
+  "inbox-mgmt-mobile-prod-users21-prod-001"
+  "inbox-mgmt-mobile-prod-users22-prod-001"
+  "inbox-mgmt-mobile-prod-users23-prod-001"
+  "inbox-mgmt-mobile-prod-users24-prod-001"
+  "inbox-mgmt-mobile-prod-users25-prod-001"
+  "inbox-mgmt-mobile-prod-users26-prod-001"
+  "inbox-mgmt-mobile-prod-users27-prod-001"
+  "inbox-mgmt-mobile-prod-users28-prod-001"
+  "inbox-mgmt-mobile-prod-users29-prod-001"
+  "inbox-mgmt-mobile-prod-users30-prod-001"
+  "inbox-mgmt-mobile-prod-users31-prod-001"
+  "inbox-mgmt-mobile-prod-users32-prod-001"
+)
+
+# Check if the number of elements in both arrays is the same
+if [ ${#replications[@]} -ne ${#clusters[@]} ]; then
+  echo "Error: Number of replication groups and snapshotting cluster IDs do not match."
+  exit 1
+fi
+
+# Loop through the arrays and execute the AWS CLI command
+for ((i=0; i<${#replications[@]}; i++))
+do
+  aws elasticache modify-replication-group --replication-group-id "${replications[$i]}" --snapshot-retention-limit 14 --snapshotting-cluster-id "${clusters[$i]}" --region us-west-1
+done
+
+-------------------
+#!/bin/bash
+
+# List of ElastiCache cluster names
+CLUSTER_NAMES=(
+  "inbox-mgmt-mobile-prod-users01-prod"
+  "inbox-mgmt-mobile-prod-users02-prod"
+  "inbox-mgmt-mobile-prod-users03-prod"
+  "inbox-mgmt-mobile-prod-users04-prod"
+  "inbox-mgmt-mobile-prod-users05-prod"
+  "inbox-mgmt-mobile-prod-users06-prod"
+  "inbox-mgmt-mobile-prod-users07-prod"
+  "inbox-mgmt-mobile-prod-users08-prod"
+  "inbox-mgmt-mobile-prod-users09-prod"
+  "inbox-mgmt-mobile-prod-users10-prod"
+  "inbox-mgmt-mobile-prod-users11-prod"
+  "inbox-mgmt-mobile-prod-users12-prod"
+  "inbox-mgmt-mobile-prod-users13-prod"
+  "inbox-mgmt-mobile-prod-users14-prod"
+  "inbox-mgmt-mobile-prod-users15-prod"
+  "inbox-mgmt-mobile-prod-users16-prod"
+  "inbox-mgmt-mobile-prod-users17-prod"
+  "inbox-mgmt-mobile-prod-users18-prod"
+  "inbox-mgmt-mobile-prod-users19-prod"
+  "inbox-mgmt-mobile-prod-users20-prod"
+  "inbox-mgmt-mobile-prod-users21-prod"
+  "inbox-mgmt-mobile-prod-users22-prod"
+  "inbox-mgmt-mobile-prod-users23-prod"
+  "inbox-mgmt-mobile-prod-users24-prod"
+  "inbox-mgmt-mobile-prod-users25-prod"
+  "inbox-mgmt-mobile-prod-users26-prod"
+  "inbox-mgmt-mobile-prod-users27-prod"
+  "inbox-mgmt-mobile-prod-users28-prod"
+  "inbox-mgmt-mobile-prod-users29-prod"
+  "inbox-mgmt-mobile-prod-users30-prod"
+  "inbox-mgmt-mobile-prod-users31-prod"
+  "inbox-mgmt-mobile-prod-users32-prod"
+)
+
+# Disable multi-AZ and automatic failover for each cluster
+for CLUSTER_NAME in "${CLUSTER_NAMES[@]}"
+do
+  echo "Disabling multi-AZ and automatic failover for cluster: $CLUSTER_NAME"
+
+  # Disable multi-AZ and automatic failover
+  aws elasticache modify-replication-group \
+    --region eu-west-1 \
+    --replication-group-id $CLUSTER_NAME \
+    --apply-immediately \
+    --no-automatic-failover
+
+  echo "Multi-AZ and automatic failover disabled for cluster: $CLUSTER_NAME"
+done
+
+echo "All clusters have multi-AZ and automatic failover disabled."
+
+
+    --no-automatic-failover
+
+    https://severalnines.com/blog/hash-slot-resharding-and-rebalancing-redis-cluster/
+
+   aws-okta exec $TF_RAAS_ENV -- aws elasticache modify-global-replication-group \
+   --region us-west-2 \
+   --global-replication-group-id sgaui-holmes-user-search-personalize-prod  \
+   --cache-node-type cache.t4g.micro \
+   --apply-immediately
+
+aws elasticache modify-replication-group --replication-group-id taxonomyv2-dev --region us-west-2 --engine-version 6.2.6 --apply-immediately
+
+#Cluster to cluster
+riot-redis -h $SH -p $SP --cluster replicate -h $TH -p $TP --cluster --batch 10000 --scan-count 10000 --threads 4 --reader-threads 4 --reader-batch 500 --reader-queue 2000 --reader-pool 4
+
+gsutil -i grpn-sa-terraform-caches@prj-grp-central-sa-stable-66eb.iam.gserviceaccount.com rm gs://grpn-gcp-gds-gcp-caches-4548-state-767545743504/stable/us-central1/services/norber-poc-test-2/default.tflock
+
+telnet coupons-itier-global--cache.prod.service 11211

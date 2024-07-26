@@ -1,0 +1,93 @@
+pt-online-schema-change
+
+pt-online-schema-change  --alter="ADD CONSTRAINT `ix_hotel_iem_active_status` FOREIGN KEY (`active_status`) REFERENCES `active_status_type` (`id`) ON DELETE NO ACTION ON UPDATE RESTRICT" --ask-pass  D=travel_content_production,\
+t=x,\
+h=getaways-content-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com,\
+u=gds_admin \
+--execute \
+--critical-load \
+Threads_running=1000 \
+--max-load \
+Threads_running=25 \
+--no-check-replication-filters \
+--no-drop-old-table \
+--no-drop-new-table  \
+--progress time,1 \
+--tries copy_rows:1000:1 \
+--chunk-size=1000 \
+--chunk-size-limit=4 \
+--alter-foreign-keys-method=auto \
+--recursion-method=none \
+--pause-file=/home/c_ngamarra/pause \
+--sleep 0.01 \
+--print
+
+ALTER TABLE __hotel_id_external_mapping_old ADD CONSTRAINT `ix_hotel_iem_active_status` FOREIGN KEY (`active_status`) REFERENCES `active_status_type` (`id`) ON DELETE NO ACTION ON UPDATE RESTRICT
+
+pt-online-schema-change  --alter="add index invoices_on_created_at(created_at),add index invoices_on_updated_at(updated_at);"  --ask-pass  D=accounting_service_production,\
+t=invoices,\
+
+gh-ost --conf=/home/c_ngamarra/.my.cnf \
+--max-load=Threads_running=150 \
+--critical-load=Threads_running=1000 \
+--chunk-size=1000 \
+--max-lag-millis=500 \
+--assume-master-host="accounting-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com:3306" \
+--host="accounting-prod.cluster-czlsgz0xic0p.us-west-1.rds.amazonaws.com" \
+--port="3306" \
+--table="invoices" \
+--database="accounting_service_production" \
+--verbose \
+--alter="ALTER TABLE invoices ADD INDEX invoices_on_created_at(created_at), ADD INDEX invoices_on_updated_at(updated_at);" \
+--assume-rbr \
+--cut-over=default \
+--exact-rowcount \
+--concurrent-rowcount \
+--default-retries=120 \
+--allow-on-master \
+--hooks-path=/home/c_ngamarra/ghost_hooks/ \
+--panic-flag-file=/home/c_ngamarra/ghost.panic.flag \
+--postpone-cut-over-flag-file=/home/c_ngamarra/ghost.postpone.tablelag \
+--execute 2>&1 | tee gh-ost.log
+
+Al finalizar
+
+echo unpostpone | nc -U /tmp/gh-ost.deal_catalog_production.deal_creative_contents.sock (cierra el proceso al 100%)
+
+echo unpostpone | socat - UNIX-CONNECT:/tmp/gh-ost.consumer_data_production_snc1.consumers.sock (cierra el proceso al 100%)
+
+echo throttle | nc -U /tmp/gh-ost.groupon_production.campaign_membership_coupons.sock (pausa proceso)
+
+echo no-throttle | nc -U /tmp/gh-ost.groupon_production.campaign_membership_coupons.sock (sigue proceso pausado)
+
+echo "dml-batch-size=20" | nc -U /tmp/gh-ost.groupon_production.campaign_membership_coupons.sock (ajusta parametro mientras corre)
+
+--nice-ratio=2 \
+
+--dml-batch-size=20
+
+chunk-size=500
+
+gh-ost --conf=/home/c_ngamarra/.my.cnf \
+--allow-on-master \
+--max-load=Threads_running=50 \
+--critical-load=Threads_running=1000 \
+--chunk-size=1000 \
+--dml-batch-size=20 \
+--nice-ratio=2 \
+--max-lag-millis=500 \
+--assume-master-host="my-core-gl-us-621-stg.cluster-ccoxqscq6x7v.us-west-1.rds.amazonaws.com:3306" \
+--host="my-core-gl-us-621-stg.cluster-ccoxqscq6x7v.us-west-1.rds.amazonaws.com" \
+--port="3306" \
+--database="deal_catalog_staging" \
+--table="deal_creative_contents" \
+--verbose \
+--alter="ALTER TABLE deal_creative_contents MODIFY COLUMN brief_summary VARCHAR(300), MODIFY COLUMN brief_summary_html VARCHAR(450);" \
+--switch-to-rbr \
+--cut-over=default \
+--exact-rowcount \
+--concurrent-rowcount \
+--default-retries=120 \
+--panic-flag-file=/home/c_ngamarra/ghost.panic.flag \
+--postpone-cut-over-flag-file=/home/c_ngamarra/ghost.postpone.flag \
+--execute 2>&1 | tee gh-ost.log
