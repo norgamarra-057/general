@@ -1,0 +1,54 @@
+---
+test2: {version: 1.5.10, service: raas, single: true}
+cluster-test1: {version: 1.5.10, service: raas}
+mfake: {version: 1.5.10, service: raas}
+deckard: {version: 1.5.16, service: deckard}
+layout-svc: {version: 1.5.10, service: layout-service, dnsalias: layout-service}
+occasions: {version: 1.5.10, service: occasions, legacy: true}
+usr-sessions: {version: 1.5.10, service: user_sessions, single: true, dnsalias: user-sessions} # few keys -> using 1 node
+awx-a-agent1: {version: 1.5.10, service: olympus, single: true, allow_onprem: true}
+awx-a-agent2: {version: 1.5.10, service: olympus, single: true, allow_onprem: true}
+awx-b-agent1: {version: 1.6.6, service: olympus, single: true, allow_onprem: true}
+awx-b-agent2: {version: 1.6.6, service: olympus, single: true, allow_onprem: true}
+awx-b-agent2: {version: 1.6.6, service: olympus, single: true, allow_onprem: true}
+awx-a-infosec-agent1: {version: 1.6.6, service: olympus, single: true, allow_onprem: true}
+awx-a-infosec-agent2: {version: 1.6.6, service: olympus, single: true, allow_onprem: true}
+awx-a-metrics-agent1: {version: 1.6.6, service: olympus, single: true, allow_onprem: true}
+awx-a-metrics-agent2: {version: 1.6.6, service: olympus, single: true, allow_onprem: true}
+dealestate-cache: {version: 1.6.12, service: deal-estate, single: true, allow_onprem: true}
+unwrap: {version: 1.5.10, service: unwrap}
+cont-pages: {version: 1.5.10, single: true, service: content-pages, dnsalias: content-pages}
+deal: {version: 1.6.12, service: deal}
+checkout: {version: 1.5.10, service: checkout-itier, single: true, dnsalias: checkout-itier}
+coupons: {version: 1.5.10, single: true, service: coupons-itier-global, dnsalias: coupons-itier-global}
+pull: {version: 1.5.10, service: pull}
+skeletor-nex: {version: 1.5.10, service: skeletor-node-examples, dnsalias: skeletor-node-examples}
+goods: {version: 1.5.10, service: goods}
+track-order: {version: 1.5.10, service: track-order-itier, dnsalias: track-order-itier}
+sub-center: {version: 1.5.16, service: sub-center}
+itier-ls-voucher-archive: {version: 1.5.16, service: itier-ls-voucher-archive}
+clo-campaign: {version: 1.5.16, single: true, service: clo-campaign}
+my-account-itier: {version: 1.5.16, service: my-account-itier}
+subscription-flow: {version: 1.5.16, service: subscription-flow}
+clo-itier: {version: 1.5.16, single: true, service: clo-itier}
+subscription-programs-itier: {version: 1.5.16, service: subscription-programs-itier}
+itier-support: {version: 1.5.16, service: customer-support, allow_onprem: true}
+getaways-browse: {version: 1.5.16, single: true, service: getaways-browse}
+tpis-booking-ita: {version: 1.5.16, service: tpis-booking-ita}
+gfi-cache: {version: 1.6.6, service: gfi, allow_onprem: true}
+editorial-writers-cache: {version: 1.6.6, single: true, service: gazebo, allow_onprem: true}
+goods-outbound-controller: {version: 1.6.6, service: goods-outbound-controller, allow_onprem: true}
+goodscentral-cache: {version: 1.6.6, service: goods_commerce_interface, allow_onprem: true}
+booking-engine-appointments1: {version: 1.6.6, single: true, service: appointment_engine, allow_onprem: true}
+booking-engine-appointments2: {version: 1.6.6, single: true, service: appointment_engine, allow_onprem: true}
+booking-engine-appointments3: {version: 1.6.6, single: true, service: appointment_engine, allow_onprem: true}
+booking-engine-appointments4: {version: 1.6.6, single: true, service: appointment_engine, allow_onprem: true}
+users-service-cache: {version: 1.6.6, service: users-service, allow_onprem: true}
+getaways-extranet: {version: 1.6.6, service: getaways-extranet, allow_onprem: true}
+accounting-service-memcache: {version: 1.6.6, service: accounting_service, allow_onprem: true}
+accounting-service-memcache01: {version: 1.6.6, single: true, service: accounting_service, allow_onprem: true}
+accounting-service-memcache02: {version: 1.6.6, single: true, service: accounting_service, allow_onprem: true}
+accounting-service-memcache03: {version: 1.6.6, single: true, service: accounting_service, allow_onprem: true}
+orders-cache: {version: 1.6.6, single: true, service: orders, allow_onprem: true}
+geo-taxonomy-memcached: {version: 1.6.6, single: true, service: geo_taxonomy, allow_onprem: true}
+# https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/supported-engine-versions.html

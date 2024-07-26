@@ -1,0 +1,464 @@
+---
+test1: {version: 6.x, service: raas, oomalert: falser}
+test1a: {version: 6.x, service: raas, oomalert: false, data_tiering: true}
+test1b: {version: 6.x, service: raas, oomalert: false, data_tiering: true}
+test1c: {version: 6.x, service: raas, oomalert: false, data_tiering: true}
+test2: {version: 6.x, cluster: true, service: raas, oomalert: true}
+test3: {version: 6.x, service: raas, oomalert: false}
+test3a: {version: 6.x, service: raas, oomalert: false}
+test3b: {version: 6.x, service: raas, oomalert: false}
+test3c: {version: 6.x, service: raas, oomalert: false}
+test4: {version: 6.x, cluster: true, service: raas, oomalert: true}
+test-bast: {version: 5.0.5, service: raas, bast: C2}
+rfake1: {version: 5.0.4, service: raas, oomalert: true} # DATA-7169
+rfake2: {version: 5.0.4, service: raas} # DATA-7169, DATA-7194
+api-proxy: {version: 5.0.6, service: api-proxy, oomalert: true, allow: [conveyor_gcp]}
+taxonomyv2: {version: 6.x, service: taxonomyv2, oomalert: true, allow: [conveyor_gcp]}
+dlsvc-shield: {version: 5.0.6, cluster: true, service: deal-catalog, oomalert: true, allow: [conveyor_gcp]}
+dlsvc-shield-cache: {version: 5.0.6, cluster: true, service: deal-catalog, oomalert: true, allow: [conveyor_gcp]}
+dlsvc-shield-queue: {version: 5.0.6, service: deal-catalog, oomalert: true, allow: [conveyor_gcp]}
+vis: {version: 5.0.6, cluster: true, service: voucher-inventory-jtier, oomalert: true, allow: [conveyor_gcp]}
+tpis: {version: 5.0.6, service: tpis-third-party-inventory-service, oomalert: true, allow: [conveyor_gcp]}
+cobot: {version: 5.0.6, service: conveyor-cloud, allow: [conveyor_gcp]}
+true-uniques: {version: 5.0.6, service: birdcage, oomalert: true, allow: [conveyor_gcp]}
+rfs-cache: {version: 5.0.6, service: regulatory-consent-log, oomalert: true, allow: [conveyor_gcp]}
+mentos-cache: {version: 5.0.6, service: mentos, oomalert: true, allow: [conveyor_gcp]}
+dealshow: {version: 5.0.6, cluster: true, service: relevance, dnsalias: rapi-rt-cloud-deal-show, oomalert: true, allow: [conveyor_gcp]}
+rapi-rt-pag: {version: 5.0.6, cluster: true, service: relevance, dnsalias: rapi-realtime-cloud-pagination, oomalert: true, allow: [conveyor_gcp]}
+rapi-fallback: {version: 6.x, service: relevance-fallback, cluster: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+relevance-fallback: {version: 6.x, service: relevance-fallback, cluster: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+rapi-pagination: {version: 6.x, service: relevance, cluster: true, oomalert: true, allow: [conveyor_gcp]}
+rapi-hotel-show: {version: 6.x, service: relevance, cluster: true, oomalert: true, allow: [conveyor_gcp]}
+rapi-merchandising-show: {version: 6.x, service: relevance, cluster: true, oomalert: true, allow: [conveyor_gcp]}
+pagination: {version: 5.0.6, cluster: true, service: relevance, dnsalias: relevance-cloud-rapi-pagination, oomalert: true, allow: [conveyor_gcp]}
+goods-inventory-service: {version: 6.x, service: goods-inventory-service, cluster: true, oomalert: true, allow: [conveyor_gcp]}
+layout-svc-templates: {version: 5.0.6, service: layout-service, dnsalias: layout-service-templates, param_group: raas-redis5-allkeys-lfu, oomalert: true, allow: [conveyor_gcp]}
+gdt-automation: {version: 6.x, service: gdt-automation-service, param_group: raas-redis6-allkeys-lru, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+m3-placeread: {version: 6.x, service: m3_placeread, cluster: true, oomalert: true, replica: false, allow: [conveyor_gcp]}
+dmapi: {version: 6.x, service: deal_management_api,oomalert: true, allow: [conveyor_gcp]}
+geo-bhuvan-cache: {version: 6.x, cluster: true, service: bhuvan, oomalert: true, allow: [conveyor_gcp]}
+geo-bhuvan-indexer: {version: 6.x, cluster: true, service: bhuvan, oomalert: true, allow: [conveyor_gcp]}
+geo-bhuvan-geoms: {version: 6.x, cluster: true, service: bhuvan, oomalert: true, allow: [conveyor_gcp]}
+deckard-cache: {version: 5.0.6, cluster: true, service: deckard, oomalert: true, allow: [conveyor_gcp]}
+deckard-async: {version: 5.0.6, service: deckard, replica: false, oomalert: true, allow: [conveyor_gcp]}
+cs-api: {version: 5.0.6, service: cs-api, oomalert: true, allow: [conveyor_gcp]}
+raas-im-node1: {version: 5.0.6, service: inbox_management_platform, oomalert: true}
+control-cloud: {version: 5.0.6, service: coupons_api, allow: [voucher_account], oomalert: true, allow: [conveyor_gcp]}
+batch-quraas: {version: 5.0.6, service: relevance, allow: [conveyor_gcp]}
+pizza-ng: {version: 6.x, service: pizza-ng, allow: [conveyor_gcp]}
+jarvis: {version: 6.x, service: jarvis, oomalert: true, allow: [conveyor_gcp]}
+metro: {version: 6.x, service: draft-service, oomalert: true, allow: [conveyor_gcp]}
+deal-book-service: {version: 6.x, service: deal-book-service, oomalert: true, allow: [conveyor_gcp]}
+im-email-payload01: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-email-payload02: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-email-payload03: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-email-payload04: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-mobile-payload01: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-mobile-payload02: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-email-events01: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-email-events02: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-mobile-events01: {version: 6.x, service: inbox_management_platform, oomalert: true}
+im-mobile-events02: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-emea01: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-emea02: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-emea03: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-emea04: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-emea01: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-emea02: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-emea03: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-emea04: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-user-lock01: {version: 6.x, service: inbox_management_platform, allow: [conveyor_in_other_region], oomalert: true}
+inbox-mgmt-user-lock02: {version: 6.x, service: inbox_management_platform, allow: [conveyor_in_other_region], oomalert: true}
+inbox-mgmt-user-lock03: {version: 6.x, service: inbox_management_platform, allow: [conveyor_in_other_region], oomalert: true}
+inbox-mgmt-user-lock04: {version: 6.x, service: inbox_management_platform, allow: [conveyor_in_other_region], oomalert: true}
+badges: {version: 6.x, dnsalias: badges-service-cloud, service: badges-service, cluster: true, oomalert: true, allow: [emr_account, conveyor_in_other_region, gcp, conveyor_gcp], replica: false}
+pt-service-cache: {version: 6.x, service: perf-tools-service, oomalert: true, allow: [conveyor_gcp]}
+accounting-service: {version: 6.x, service: accounting_service, allow: [conveyor_gcp],oomalert: true, resque: true}
+da-s2s: {version: 6.x, service: da-s2s, oomalert: true}
+bros-cache: {version: 6.x, service: bros}
+proximity-cache: {version: 6.x, service: proximity_notifications, oomalert: true, allow: [conveyor_gcp]}
+regla: {version: 6.x, service: regla, oomalert: true, allow: [conveyor_gcp]}
+targeted-deal-message-cache: {version: 6.x, service: targeted-deal-message, allow: [gcp, conveyor_gcp], oomalert: true}
+inbox-mgmt-email-prod-users01: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users01: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users02: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users02: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users03: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users03: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users04: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users04: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users05: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users05: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users06: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users06: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users07: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users07: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users08: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users08: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users09: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users09: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users10: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users10: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users11: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users11: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users12: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users12: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users13: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users13: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users14: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users14: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users15: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users15: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users16: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users16: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users17: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users17: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users18: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users18: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users19: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users19: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users20: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users20: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users21: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users21: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users22: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users22: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users23: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users23: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users24: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users24: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users25: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users25: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users26: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users26: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users27: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users27: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users28: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users28: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users29: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users29: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users30: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users30: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users31: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users31: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-users32: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-users32: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-events01: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-events01: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-events02: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-events02: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-events03: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-prod-events03: {version: 6.x, service: inbox_management_platform, oomalert: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-prod-events04: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events04: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events05: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events05: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events06: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events06: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events07: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events07: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events08: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events08: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events09: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events09: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events10: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events10: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events11: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events11: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events12: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events12: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events13: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events13: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events14: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events14: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events15: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events15: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events16: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events16: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events17: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events17: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events18: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events18: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events19: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events19: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events20: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events20: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events21: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events21: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events22: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events22: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events23: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events23: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events24: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events24: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events25: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events25: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events26: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events26: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events27: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events27: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events28: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events28: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events29: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events29: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events30: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events30: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events31: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events31: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-events32: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-events32: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload01: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload01: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload02: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload02: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload03: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload03: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload04: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload04: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload05: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload05: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload06: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload06: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload07: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload07: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload08: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload08: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload09: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload09: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload10: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload10: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload11: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload11: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload12: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload12: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload13: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload13: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload14: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload14: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload15: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload15: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload16: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload16: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload17: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload17: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload18: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload18: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload19: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload19: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload20: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload20: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload21: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload21: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload22: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload22: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload23: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload23: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload24: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload24: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload25: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload25: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload26: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload26: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload27: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload27: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload28: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload28: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload29: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload29: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload30: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload30: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload31: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload31: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-prod-payload32: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-prod-payload32: {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-cmpaigncntxt   : {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-email-cacheset       : {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-cmpaigncntxt  : {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-mobile-cacheset      : {version: 6.x, service: inbox_management_platform, oomalert: true}
+inbox-mgmt-cmpaignmetrics       : {version: 6.x, service: inbox_management_platform, oomalert: true}
+#inbox-mgmt-cmpaigncntxt: {version: 6.x, service: inbox_management_platform, oomalert: true}
+#inbox-mgmt-cacheset: {version: 6.x, service: inbox_management_platform, oomalert: true}
+goodscentral: {version: 6.x, service: goods_commerce_interface, oomalert: true, resque: true, allow: [conveyor_gcp]}
+goodscentral-async: {version: 6.x, service: goods_commerce_interface, oomalert: true, resque: true, allow: [conveyor_gcp]}
+item-authority: {version: 6.x, service: item-authority, allow: [conveyor_gcp]}
+lbms-cache: {version: 6.x, service: lbms, oomalert: true, allow: [conveyor_gcp]}
+lbms-queue: {version: 6.x, service: lbms, oomalert: true, allow: [conveyor_gcp]}
+merchant-data-dora: {version: 6.x, service: m3_local_dora, oomalert: true, allow: [conveyor_gcp]}
+web-crawl: {version: 6.x, service: web-crawl, oomalert: true, allow: [conveyor_gcp]}
+backbeat: {version: 6.x, service: backbeat, oomalert: true, resque: true, allow: [conveyor_gcp]}
+casesservice-cache: {version: 6.x, service: mx-merchant-cases, param_group: raas-redis6-allkeys-lru, allow: [conveyor_in_other_region, conveyor_gcp], oomalert: true}
+content-service-cache: {version: 6.x, service: ece-non-eng-email, allow: [dnd_account], param_group: raas-redis6-allkeys-lru, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+device-fingerprint-storage: {version: 6.x, service: device_fingerprint_storage, oomalert: true, allow: [conveyor_gcp]}
+dynamo: {version: 6.x, service: dynamo, oomalert: true, allow: [conveyor_gcp]}
+gfi: {version: 6.x, service: gfi, oomalert: true, resque: true, allow: [conveyor_gcp]}
+custsvc-tokenizer: {version: 6.x, service: cs-token-service, bast: C1, allow: [conveyor_in_other_region, conveyor_gcp], oomalert: true, replica: false}
+deal-pwa-mirror-cache: {version: 6.x, service: deal-catalog, allow: [conveyor_in_other_region, conveyor_gcp], oomalert: true, resque: true}
+glive-3rd-party: {version: 6.x, service: grouponlive-gtx, oomalert: true, resque: true, allow: [conveyor_gcp]}
+glive-gia: {version: 6.x, service: grouponlive-inventory-admin, oomalert: true, allow: [conveyor_gcp]}
+glive-inventory: {version: 6.x, service: grouponlive-inventory-service, oomalert: true, resque: true, allow: [conveyor_gcp]}
+ttd-gia-resque: {version: 6.x, service: grouponlive-inventory-admin, oomalert: true, resque: true, allow: [conveyor_gcp]}
+ttd-gis-cache: {version: 6.x, service: grouponlive-inventory-service, replica: true, oomalert: true, allow: [conveyor_gcp]}
+fraud-arbiter-config: {version: 6.x, service: fraud-arbiter, oomalert: true, allow: [conveyor_gcp]}
+fraud-arbiter-cache: {version: 6.x, service: fraud-arbiter, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+fraud-arbiter-queue: {version: 6.x, service: fraud-arbiter, bast: C2, oomalert: true, resque: true, allow: [conveyor_gcp]}
+calendar-service-cache: {version: 6.x, service: calendar-service, oomalert: true, allow: [conveyor_gcp]}
+epods: {version: 6.x, service: epods, oomalert: true, allow: [conveyor_gcp, conveyor_in_other_region]}
+transporter: {version: 6.x, service: transporter, bast: C1, oomalert: true, allow: [conveyor_gcp]}
+flying-dutchman: {version: 6.x, service: flying_dutchman, bast: C2, oomalert: true, resque: true, allow: [conveyor_gcp]}
+goods-market-pricing: {version: 6.x, service: goods-market-pricing, oomalert: true, resque: true, allow: [conveyor_gcp]}
+minos-cache: {version: 6.x, service: minos, oomalert: true, allow: [conveyor_gcp]}
+mobilebot-cache: {version: 6.x, service: mobilebot, oomalert: true, allow: [conveyor_gcp]}
+offer-aggregator: {version: 6.x, service: offer-aggregator-v2, global_datastore: true, replica: false, oomalert: true, allow: [conveyor_gcp]}   # Global datastore, exempted from removing replica
+supply-chain-gateway-cache: {version: 6.x, service: supply_chain_gateway, oomalert: true, allow: [conveyor_gcp]}
+wishlist: {cluster: true, version: 6.x, service: wishlist-service, oomalert: true, replica: false, allow: [conveyor_gcp]}
+fraud: {version: 6.x, service: orders, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+orders-dashboard: {version: 6.x, service: orders-dashboard, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+orders: {version: 6.x, service: orders, oomalert: true, resque: true, replica: false, allow: [conveyor_gcp]}
+orders-cloud: {version: 6.x, service: orders, oomalert: true, allow: [conveyor_gcp]}
+orders-conveyor: {version: 6.x, service: orders, oomalert: true, resque: true, allow: [conveyor_gcp]}
+consumer-authority-user: {version: 6.x, cluster: true, service: realtimeaudiencemanagementservicejtier, oomalert: true, allow: [gcp, conveyor_gcp]}
+sportal-cache: {version: 6.x, service: service-portal, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+sportal-cache-dev: {version: 6.x, service: service-portal, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+sportal-workers-sidekiq: {version: 6.x, service: service-portal, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+sportal-workers-sidekiq-dev: {version: 6.x, service: service-portal, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+getaways-inventory: {version: 6.x, service: getaways-inventory, oomalert: true, allow: [conveyor_gcp]}
+getaways-inventory-product: {version: 6.x, service: getaways-inventory, oomalert: true, allow: [conveyor_gcp]}
+getaways-search-cache: {version: 6.x, service: travel-search, oomalert: true, allow: [conveyor_gcp]}
+lazlo-deals: {version: 6.x, service: api-lazlo, cluster: true, oomalert: true, allow: [conveyor_gcp]}
+api-lazlo: {version: 6.x, service: api-lazlo, oomalert: true, allow: [conveyor_gcp]}
+goods-stores: {version: 6.x, service: goods_stores, oomalert: true, resque: true, allow: [conveyor_gcp]}
+ob-3rd-party-resque: {version: 6.x, service: online_booking_3rd_party, oomalert: true, resque: true, resque_ns: 3rdparty, allow: [conveyor_gcp]}
+appointments-resque: {version: 6.x, service: appointment_engine, oomalert: true, resque: true, resque_ns: appointment_engine, replica: false, allow: [conveyor_gcp]}
+availability-resque: {version: 6.x, service: availability_engine, oomalert: true, resque: true, resque_ns: availability_engine, allow: [conveyor_gcp]}
+billing-record-service: {version: 6.x, service: billing-record-service, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+booking-engine: {version: 6.x, service: availability_engine, oomalert: true, resque: true, resque_ns: availability_engine, allow: [conveyor_gcp]}
+clo-service: {version: 6.x, service: clo-service, oomalert: true, allow: [conveyor_gcp]}
+clo-service-jtier: {version: 6.x, service: clo-inventory-service, oomalert: true, allow: [conveyor_gcp]}
+coupon: {version: 6.x, service: coupons_api, oomalert: true, allow: [conveyor_gcp]}
+coupon-worker: {version: 6.x, service: coupons-revproc, oomalert: true, resque: true, allow: [conveyor_gcp]}
+custsvc: {version: 6.x, service: cyclops, oomalert: true, resque: true, replica: false, allow: [conveyor_gcp]}
+custsvc-cache: {version: 6.x, service: cyclops, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+custsvc-cscs: {version: 6.x, service: cscs, oomalert: true, allow: [conveyor_gcp]}
+custsvc-cache-irb: {version: 6.x, service: cyclops, replica: false, oomalert: true, allow: [conveyor_gcp]}
+deal-management-backbeat: {version: 6.x, service: deal_management_api, oomalert: true, allow: [conveyor_gcp]}
+dealestate-configuration: {version: 6.x, service: deal-estate, oomalert: true, replica: false, allow: [conveyor_gcp]}
+dealestate-resque: {version: 6.x, service: deal-estate, oomalert: true, resque: true, replica: false, allow: [conveyor_gcp]}
+eds: {version: 6.x, service: event_delivery_service, replica: false, oomalert: true, allow: [conveyor_gcp]}
+bookingtool-cache: {version: 6.x, service: bookingtool, oomalert: true, allow: [conveyor_gcp]}
+finch-cache: {version: 6.x, service: birdcage, oomalert: true, allow: [conveyor_gcp]}
+#geo-bhoomi-cache: {version: 6.x, service: bhoomi, cluster: true, replica: false}
+gpapi-workers: {version: 6.x, service: gpapi, oomalert: true, resque: true, allow: [conveyor_gcp]}
+incentive-cache: {version: 6.x, service: incentive-service, oomalert: true, replica: false, allow: [conveyor_gcp]}
+crm-message-service: {version: 6.x, service: crm-message-service, oomalert: true, replica: true, allow: [conveyor_gcp]}
+ingestion-cache: {version: 6.x, service: ingestion-jtier, oomalert: true, allow: [conveyor_gcp]}
+ipam1: {version: 6.x, service: network, oomalert: true, allow: [conveyor_gcp]}
+ipam: {version: 6.x, service: network, oomalert: true, allow: [conveyor_gcp]}
+killbill: {version: 6.x, service: killbill-payments, oomalert: true, allow: [conveyor_gcp]}
+mds: {version: 6.x, service: marketing-deal-service, oomalert: true, allow: [dnd_account, gcp, conveyor_gcp]}
+merchant-self-service-engine: {version: 6.x, service: self-services-service-engine, oomalert: true, resque: true, allow: [conveyor_gcp]}
+mppservice-cache: {version: 6.x, service: mpp-service, oomalert: true, allow: [conveyor_gcp]}
+rise: {version: 6.x, service: rise, oomalert: true, resque: true, allow: [conveyor_gcp]}
+social-raf: {version: 6.x, service: raf, oomalert: true, resque: true, allow: [conveyor_gcp]}
+ticketsvc: {version: 6.x, service: ticketing_service, bast: C2, oomalert: true, resque: true, allow: [conveyor_gcp]}
+users-service: {version: 6.x, service: users-service, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+voucher-inventory: {version: 6.x, service: voucher-inventory, oomalert: true, allow: [conveyor_gcp]}
+ugc: {version: 6.x, service: ugc-api-jtier, oomalert: true, allow: [conveyor_gcp]}
+ugc2: {version: 6.x, service: ugc-api-jtier, oomalert: true, cluster: true, allow: [conveyor_gcp]}
+ugc-cache: {version: 6.x, service: ugc-api-jtier, oomalert: true, cluster: true, allow: [conveyor_gcp]}
+coupons-inventory: {version: 6.x, service: coupons-inventory-service, oomalert: true, allow: [conveyor_gcp]}
+watson-user-kv: {version: 6.x, service: watson-api, oomalert: true, cluster: true, allow: [conveyor_in_other_region, dnd_account, emr_account, conveyor_gcp]}
+watson-deal-kv: {version: 6.x, service: watson-api, oomalert: true, cluster: true, allow: [conveyor_in_other_region, emr_account, conveyor_gcp]}
+watson-freshness: {version: 6.x, service: watson-api, oomalert: true, cluster: true, allow: [conveyor_in_other_region, dnd_account, emr_account, conveyor_gcp], autoscaling: true}
+watson-search-kv: {version: 6.x, service: watson-api, oomalert: true, allow: [dnd_account, emr_account, conveyor_gcp], replica: false}
+holmes-lovo-rvd: {version: 6.x, service: watson-api, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+holmes-user-identities: {version: 6.x, service: watson-api, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+holmes-user-recent-searches: {version: 6.x, service: relevance, oomalert: true, allow: [emr_account, conveyor_in_other_region, conveyor_gcp]}
+holmes-user-search-personalize: {version: 6.x, service: relevance, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], replica: false, global_datastore: true}
+holmes-user-rt-search-eng: {version: 6.x, service: holmes-feature-platform, oomalert: true, allow: [conveyor_in_other_region, emr_account, conveyor_gcp]}
+holmes-deal-rt-loci: {version: 6.x, service: holmes-feature-platform, oomalert: true, allow: [conveyor_gcp]}
+holmes-deal-rt-goods: {version: 6.x, service: holmes-feature-platform, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+holmes-user-rt-marketing: {version: 6.x, service: holmes-feature-platform, oomalert: true, allow: [conveyor_gcp]}
+holmes-deals-rt-core-ranking: {version: 6.x, service: holmes-feature-platform, oomalert: true, allow: [conveyor_in_other_region, emr_account, conveyor_gcp]}
+holmes-deals-rt-dsp: {version: 6.x, service: holmes-feature-platform, oomalert: true, allow: [conveyor_in_other_region, emr_account, conveyor_gcp]}
+janus00: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus01: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus02: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus03: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus04: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus05: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus06: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus07: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus08: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus09: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus10: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus11: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus12: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus13: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus14: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+janus15: {version: 6.x, service: janus, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp], global_datastore: false}
+rm-cache: {version: 6.x, service: rocketman_v2, cluster: true, oomalert: true, allow: [conveyor_gcp]}
+#rm-error-handling: {version: 6.x, service: rocketman_v2, cluster: true}
+rm-error-handling: {version: 6.x, service: rocketman_v2, instance_param_group: [maxmemory-policy], cluster: true, allow: [conveyor_gcp]}
+rm-state-tracking: {version: 6.x, service: rocketman_v2, cluster: true, oomalert: true, allow: [conveyor_gcp]}
+rm-user-resque: {version: 6.x, service: rocketman_v2, oomalert: true, allow: [conveyor_gcp]}
+cs-api-cache: {version: 6.x, service: cs-api, oomalert: true, allow: [conveyor_gcp]}
+janus-bcookie: {version: 6.x, service: janus, cluster: true, oomalert: true, allow: [conveyor_in_other_region, conveyor_gcp]}
+oxygen: {version: 6.x, service: jtier-oxygen, oomalert: true, allow: [conveyor_gcp]}
+relevance-sponsored-deals: {version: 6.x, service: relevance, oomalert: true, allow: [conveyor_gcp]}
+unity-gifting-emailer: {version: 6.x, service: gifting-emailer, bast: C2, oomalert: true, allow: [conveyor_gcp]}
+vex: {version: 6.x, service: vex, oomalert: true, allow: [conveyor_gcp]}
+merchant-advisor: {version: 6.x, service: merchant-advisor-service, allow: [conveyor_in_other_region, emr_account, conveyor_gcp], oomalert: true}
+general-ledger-gateway: {version: 6.x, service: general-ledger-gateway, allow: [conveyor_gcp]}
+search-backend: {version: 6.x, service: autocomplete, oomalert: true, allow: [conveyor_gcp]}
+menu-service-v2-cache: {version: 6.x, service: menu-service-v2, allow: [conveyor_gcp]}
+quantum-lead: {version: 6.x, service: salesforce-cache, oomalert: true, allow: [conveyor_gcp]}
+dispatcher-cache: {version: 6.x, service: rocketman-commercial, cluster: true, oomalert: true, allow: [conveyor_gcp]}
+m3-merchant-service-cache: {version: 6.x, service: m3_merchant_service, oomalert: true, allow: [conveyor_gcp]}
+cds-cache: {version: 6.x, service: coupons-data-service, allow: [conveyor_gcp]}
+jarvis-bot: {version: 6.x, service: jarvis-bot, oomalert: true, allow: [conveyor_gcp]}
+prodcat: {version: 6.x, service: prodcat, oomalert: true, allow: [conveyor_gcp]}
+edrans-test: {version: 6.x, service: raas, oomalert: true, allow: [conveyor_gcp]}
+pricing: {version: 6.x, service: pricing_service, cluster: true, oomalert: true, resque: true, allow: [conveyor_gcp]}
+arbitration: {version: 6.x, service: arbitration-service, cluster: true, oomalert: true, resque: true, allow: [conveyor_gcp]}
+mx: {version: 6.x, service: mx-merchant-api, oomalert: true,resque: true, allow: [conveyor_gcp]}
+mx-reporting: {version: 6.x, service: mx-merchant-reporting, oomalert: true,resque: true, allow: [conveyor_gcp]}
+autocomplete: {version: 6.x, service: autocomplete, cluster: true, oomalert: true, resque: true, allow: [conveyor_gcp]}
+inbox-mgmt-email-stg-users01: {version: 6.x, service: inbox_management_platform, oomalert: true, resque: true, allow: [conveyor_gcp]}
+inbox-mgmt-mobile-stg-users01: {version: 6.x, service: inbox_management_platform, oomalert: true, resque: true, allow: [conveyor_gcp]}
+mls-rin: {version: 6.x, service: mls-rin, oomalert: true,resque: true, allow: [conveyor_gcp]}
+geo-bhuvan-cache-new: {version: 6.x, cluster: true, oomalert: true, service: bhuvan, allow: [conveyor_gcp]}
+watson-user-kv-test: {version: 6.x, service: watson-api, oomalert: true, cluster: true, allow: [conveyor_in_other_region, dnd_account, emr_account, conveyor_gcp]}
+rapi-citrus-ads: {version: 6.x, service: relevance, oomalert: true, allow: [conveyor_gcp]}
+mobile-next: {version: 6.x, service: next-pwa-app, oomalert: true, allow: [conveyor_gcp]}
+editorial-writers: {version: 6.x, service: gazebo, oomalert: true, allow: [conveyor_gcp]}
+
+# Optional attributes:
+# - oomalert: true (if evictions=false)
+# - allow: conveyor_in_other_region, dnd_account, emr_account, voucher_account
+# - cluster: true|false
+# Advanced attributes (you may never need them):
+# - bast (gdpr)
+# - autoscaling
+# - replica (boolean, force replica creation)
+# - dnsalias: just in case we need an endpoint different than the name
+# - global_datastore: set this to true AFTER setting up a global datastore (example: RAAS-202),
+#    then set the new parameter group given by Elasticache to each primary instance in terraform,
+#    if this line had a specific parameter group before, remove it
+# - param_group: specify a special parameter group to use instead of the default
+# - instance_param_group: creates a special parameter group for the instance,
+#   with the list of configurable attributes. The values must be given in the live repo's instance hash.
+# - resque: adds resque monitoring
+# - resque_ns: specifies the resque namespace for monitoring
+
+#################################################
+# Ready to uncomment for migration (RAAS-98):
+#################################################
+# pt-service-cache: {version: 6.x, service: perf-tools-service, oomalert: true}
+# stores-merchant: {version: 6.x, service: stores_merchant, oomalert: true, resque: true}
+# ums: {version: 6.x, service: ums_api, oomalert: true}
+# wilson-resque: {version: 6.x, service: wilson, oomalert: true, resque: true, resque_ns: wilson}
+# gconfig: {version: 6.x, service: gconfig, oomalert: true}
+# gpapi-qa: {version: 6.x, service, oomalert: true, resque: true}
+# holmes-deals-realtime-search-engineers: {version: 6.x, service: holmes-feature-platform, oomalert: true}
+# m2le: {version: 6.x, service: tx_ledger, oomalert: true}
+# notifications-resque: {version: 6.x, service: online_booking_notifications, oomalert: true, resque: true, resque_ns: notification_engine}
