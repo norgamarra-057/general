@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-updater
+  labels:
+    run: config-updater
+    tier: backend
+  annotations:
+    com.groupon.conveyor.policies/skip-liveness-probe: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: config-updater
+      tier: backend
+  template:
+    metadata:
+      labels:
+        run: config-updater
+        tier: backend
+    spec:
+      serviceAccountName: daas-mon-sa
+      containers:
+      - name: config-updater
+        image: docker.groupondev.com/daas-config-updater:v1.13
+        resources:
+          requests:
+            cpu: 20m
+            memory: 100Mi
+        volumeMounts:
+        - name: vol-telegraf-mysql-conf
+          mountPath: /etc/config-updater/telegraf-mysql/
+        - name: vol-telegraf-postgresql-extensible-conf
+          mountPath: /etc/config-updater/telegraf-postgresql-extensible/
+        - name: vol-telegraf-postgresql-conf
+          mountPath: /etc/config-updater/telegraf-postgresql/
+        - name: vol-telegraf-daas-deploy
+          mountPath: /etc/config-updater/
+        - name: vol-bast
+          mountPath: "/etc/bast"
+        - name: logs-default
+          mountPath: /var/groupon/logs
+        - name: aws-token
+          mountPath: "/var/run/secrets/conveyor/serviceaccount/"
+        env:
+          - name: CONFIG_UPDATER_EXCLUDED_DBS
+            value: {{ .Values.excluded_dbs }}
+          - name: CONFIG_UPDATER_NAMESPACE
+            value: {{ .Release.Namespace }}
+          - name: CONFIG_UPDATER_AWS_REGION
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: aws-region
+          - name: LOGS_DIR
+            value: "/var/groupon/logs/"
+          # this env var is appended to User-Agent:
+          # https://github.groupondev.com/data/raas/issues/26
+          - name: AWS_EXECUTION_ENV
+            value: "daas-config-updater"
+          - name: AWS_WEB_IDENTITY_TOKEN_FILE
+            value: "/var/run/secrets/conveyor/serviceaccount/token"
+          - name: AWS_ROLE_ARN
+            valueFrom:
+              configMapKeyRef:
+                name: iamrole-daas-mon-role-config
+                key: AWS_ROLE_ARN
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "find /tmp/config-updater.touched-when-healthy -mmin -2|grep config-updater"
+          initialDelaySeconds: 10
+          periodSeconds: 50
+          timeoutSeconds: 2
+          failureThreshold: 3
+{{- include "common.filebeatSidecar" . | indent 6}}
+      volumes:
+      - name: vol-telegraf-mysql-conf
+        configMap:
+          name: telegraf-mysql-conf
+      - name: vol-telegraf-postgresql-extensible-conf
+        configMap:
+          name: telegraf-postgresql-extensible-conf
+      - name: vol-telegraf-postgresql-conf
+        configMap:
+          name: telegraf-postgresql-conf
+      - name: aws-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              # The projected token must have this audience
+              # or it will not be verified by our IAM OIDC
+              # Provider during federation
+              audience: "sts.amazonaws.com"
+              expirationSeconds: 86400
+              path: token
+      - name: vol-telegraf-daas-deploy
+        configMap:
+          name: telegraf-daas-deployment
+      - name: vol-bast
+        secret:
+          secretName: bast
+          defaultMode: 256
+      - name: envoy-logs
+        emptyDir: {}
+{{- range $name, $dir := fromYaml (include "common.logDirectories" . ) }}
+      - name: {{ printf "logs-%s" $name }}
+        emptyDir: {}
+{{- end }}
+      - name: filebeat-config
+        configMap:
+          name: {{ .Values.serviceId }}--{{ .Values.component }}--{{ .Values.instance }}--filebeat-config

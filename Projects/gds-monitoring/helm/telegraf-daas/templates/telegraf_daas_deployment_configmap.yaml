@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-daas-deployment
+data:
+  telegraf-daas-deployment.yml: |-
+{{- include "tg-daas.telegraf-daas-deployment" . | indent 4 }}

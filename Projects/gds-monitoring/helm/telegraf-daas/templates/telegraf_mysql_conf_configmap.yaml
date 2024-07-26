@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-mysql-conf
+data:
+  telegraf.mysql.conf: |-
+{{ .Files.Get "files/telegraf.mysql.conf" | indent 4 }}

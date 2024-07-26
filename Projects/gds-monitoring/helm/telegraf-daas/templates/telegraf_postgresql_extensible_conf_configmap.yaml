@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-postgresql-extensible-conf
+data:
+  telegraf.postgresql.extensible.conf: |-
+{{ .Files.Get "files/telegraf.postgresql.extensible.conf" | indent 4 }}

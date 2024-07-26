@@ -1,0 +1,5 @@
+deployEnv: rde-dev
+region: us-west-2
+environment: dev
+influx_url: http://telegraf.gensandbox.service
+namespace: daas-test-pablo-dev

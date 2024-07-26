@@ -1,0 +1,5 @@
+deployEnv: staging
+region: us-west-1
+environment: staging
+influx_url: http://metrics-gateway-vip.snc1:80
+namespace: daas-mysql-staging

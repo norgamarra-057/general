@@ -1,0 +1,31 @@
+From 5bd3dcb923b8bb9ef4488a4248d801d81ed64b9c Mon Sep 17 00:00:00 2001
+From: Pablo Bustos <pablo@groupon.com>
+Date: Thu, 5 May 2022 10:37:52 -0500
+Subject: [PATCH] GDS-34359 pg debugging info
+
+---
+ .../inputs/postgresql_extensible/postgresql_extensible.go | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/plugins/inputs/postgresql_extensible/postgresql_extensible.go b/plugins/inputs/postgresql_extensible/postgresql_extensible.go
+index 61af57e6..f582720c 100644
+--- a/plugins/inputs/postgresql_extensible/postgresql_extensible.go
++++ b/plugins/inputs/postgresql_extensible/postgresql_extensible.go
+@@ -211,6 +211,14 @@ func (p *Postgresql) gatherMetricsFromQuery(acc telegraf.Accumulator, sqlQuery s
+ 
+ 	rows, err := p.DB.Query(sqlQuery)
+ 	if err != nil {
++		// add debugging info to error msg
++		host, errS := p.SanitizedAddress()
++		if errS != nil {
++			host = "unknown"
++		}
++		sqlQuery = strings.Replace(sqlQuery, "\r", "", -1)
++		sqlQuery = strings.Replace(sqlQuery, "\n", "", -1)
++		err = fmt.Errorf("%v (host=%v) SQL: %v", err, host, sqlQuery)
+ 		acc.AddError(err)
+ 		return
+ 	}
+-- 
+2.31.0
+

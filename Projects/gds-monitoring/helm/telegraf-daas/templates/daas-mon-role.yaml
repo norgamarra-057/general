@@ -1,0 +1,15 @@
+apiVersion: catalog.conveyor.groupon.com/v1
+kind: IAMRole
+metadata:
+  name: daas-mon-role
+  namespace: {{ .Values.namespace }}
+spec:
+  template:
+    roleName: daas-mon
+    trustedServiceAccounts:
+    - daas-mon-sa
+    tags:
+    - key: TenantService
+      value: daas_mysql
+    - key: TenantTeam
+      value: gds@groupon.com

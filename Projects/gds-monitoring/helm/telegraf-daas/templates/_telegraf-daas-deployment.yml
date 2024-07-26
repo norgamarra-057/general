@@ -1,0 +1,125 @@
+{{- define "tg-daas.telegraf-daas-deployment" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegraf-daas
+  labels:
+    run: telegraf-daas
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: telegraf-daas
+      tier: backend
+  minReadySeconds: 180
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: telegraf-daas
+        tier: backend
+    spec:
+      serviceAccountName: daas-mon-sa
+      initContainers:
+{{ include "common.trafficInterceptor" . | indent 6}}
+      containers:
+      - name: telegraf-daas
+        image: docker.groupondev.com/telegraf-daas:v1.10
+        resources:
+          requests:
+            cpu: 300m
+            memory: 1000Mi
+        command: ["telegraf"]
+        args: ["--config-directory", "/etc/telegraf/telegraf.d", "--pidfile", "/telegraf.pid"]
+        env:
+          - name: INFLUX_URL
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: influx-url
+          - name: ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: environment
+          - name: TELEGRAF_DAAS_AWS_REGION
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: aws-region
+          - name: AWS_WEB_IDENTITY_TOKEN_FILE
+            value: "/var/run/secrets/conveyor/serviceaccount/token"
+          - name: AWS_ROLE_ARN
+            valueFrom:
+              configMapKeyRef:
+                name: iamrole-daas-mon-role-config
+                key: AWS_ROLE_ARN
+        volumeMounts:
+        - name: vol-etc-telegraf
+          mountPath: /etc/telegraf/
+        - name: vol-etc-telegrafd
+          mountPath: /etc/telegraf/telegraf.d
+        - name: logs-default
+          mountPath: /var/groupon/logs
+        - name: aws-token
+          mountPath: "/var/run/secrets/conveyor/serviceaccount/"
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "find /proc/1 -maxdepth 0 -mmin +1|grep ."
+          initialDelaySeconds: 63
+          periodSeconds: 50
+          timeoutSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grep
+            - -a
+            - telegraf
+            - /proc/1/cmdline
+          initialDelaySeconds: 5
+          periodSeconds: 50
+          timeoutSeconds: 2
+          failureThreshold: 3
+{{- include "common.envoySidecar" .    | indent 6}}
+{{- include "common.filebeatSidecar" . | indent 6}}
+      volumes:
+      - name: vol-etc-telegraf
+        configMap:
+          name: telegraf-conf
+      - name: vol-etc-telegrafd
+        configMap:
+          name: xxxxxx
+      - name: aws-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              # The projected token must have this audience
+              # or it will not be verified by our IAM OIDC
+              # Provider during federation
+              audience: "sts.amazonaws.com"
+              expirationSeconds: 86400
+              path: token
+      - name: client-certs
+        secret:
+          secretName: "namespace-tls-identity"
+      - name: envoy-config
+        emptyDir: {}
+      - name: envoy-logs
+        emptyDir: {}
+{{- range $name, $dir := fromYaml (include "common.logDirectories" . ) }}
+      - name: {{ printf "logs-%s" $name }}
+        emptyDir: {}
+{{- end }}
+      - name: filebeat-config
+        configMap:
+          name: {{ .Values.serviceId }}--{{ .Values.component }}--{{ .Values.instance }}--filebeat-config
+{{- end }}

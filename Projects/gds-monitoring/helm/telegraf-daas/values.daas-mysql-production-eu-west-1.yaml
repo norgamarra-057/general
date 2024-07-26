@@ -1,0 +1,5 @@
+deployEnv: production
+region: eu-west-1
+environment: production
+influx_url: http://telegraf--gateway.production.service
+namespace: daas-mysql-production

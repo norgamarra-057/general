@@ -1,0 +1,17 @@
+{{- if or (empty .Values.environment) (empty .Values.influx_url) (empty .Values.region) }}
+{{- fail "Please specify a values file!" }}
+{{- end }}
+{{- if not (or (hasPrefix "gds-" .Release.Namespace) (hasPrefix "daas-" .Release.Namespace)) }}
+{{- fail "Please use a valid gds- or daas- namespace" }}
+{{- end }}
+{{- if not (hasSuffix .Values.environment .Release.Namespace) }}
+{{- fail "kubectl namespace and \"environment\" var are inconsistent" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-vars
+data:
+  environment: {{ .Values.environment }}
+  influx-url: {{ .Values.influx_url }}
+  aws-region: {{ .Values.region }}

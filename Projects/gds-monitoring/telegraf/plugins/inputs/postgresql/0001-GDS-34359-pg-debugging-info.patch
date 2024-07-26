@@ -1,0 +1,35 @@
+From 5bd3dcb923b8bb9ef4488a4248d801d81ed64b9c Mon Sep 17 00:00:00 2001
+From: Pablo Bustos <pablo@groupon.com>
+Date: Thu, 5 May 2022 10:37:52 -0500
+Subject: [PATCH] GDS-34359 pg debugging info
+
+---
+ plugins/inputs/postgresql/postgresql.go | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/plugins/inputs/postgresql/postgresql.go b/plugins/inputs/postgresql/postgresql.go
+index b131642c..9c5c519e 100644
+--- a/plugins/inputs/postgresql/postgresql.go
++++ b/plugins/inputs/postgresql/postgresql.go
+@@ -79,6 +79,18 @@ func (p *Postgresql) Init() error {
+ }
+ 
+ func (p *Postgresql) Gather(acc telegraf.Accumulator) error {
++	err := p.GatherOriginal(acc)
++	if err != nil {
++		host, errS := p.SanitizedAddress()
++		if errS != nil {
++			host = "unknown"
++		}
++		err = fmt.Errorf("%v (host=%v)", err, host)
++	}
++	return err
++}
++
++func (p *Postgresql) GatherOriginal(acc telegraf.Accumulator) error {
+ 	var (
+ 		err     error
+ 		query   string
+-- 
+2.31.0
+

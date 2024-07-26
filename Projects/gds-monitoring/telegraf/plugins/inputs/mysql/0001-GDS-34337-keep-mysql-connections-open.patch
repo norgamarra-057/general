@@ -1,0 +1,108 @@
+From ec9c0ce6656f6c0122828e22d8d9bbd9333240cb Mon Sep 17 00:00:00 2001
+From: Pablo Bustos <pablo@groupon.com>
+Date: Mon, 2 May 2022 12:03:04 -0500
+Subject: [PATCH] GDS-34337: keep mysql connections open
+
+---
+ plugins/inputs/mysql/mysql.go | 57 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 49 insertions(+), 8 deletions(-)
+
+diff --git a/plugins/inputs/mysql/mysql.go b/plugins/inputs/mysql/mysql.go
+index aced75b1..56b76dff 100644
+--- a/plugins/inputs/mysql/mysql.go
++++ b/plugins/inputs/mysql/mysql.go
+@@ -3,6 +3,7 @@ package mysql
+ import (
+ 	"database/sql"
+ 	"fmt"
++	"regexp"
+ 	"strconv"
+ 	"strings"
+ 	"sync"
+@@ -50,6 +51,7 @@ type Mysql struct {
+ 	initDone         bool
+ 	scanIntervalSlow uint32
+ 	getStatusQuery   string
++	dbs              map[string]*sql.DB
+ }
+ 
+ const sampleConfig = `
+@@ -180,9 +182,55 @@ func (m *Mysql) InitMysql() {
+ 	} else {
+ 		m.getStatusQuery = slaveStatusQuery
+ 	}
++	m.connectDBs()
+ 	m.initDone = true
+ }
+ 
++func (m *Mysql) connectDBs() {
++	m.Log.Debugf("connecting to %v dbs", len(m.Servers))
++	m.dbs = make(map[string]*sql.DB)
++	for _, serv := range m.Servers {
++		m.Log.Debugf("connecting to %v", m.sanitizedAddress(serv))
++		m.connectDB(serv)
++	}
++}
++
++func (m *Mysql) connectDB(serv string) error {
++	if _, ok := m.dbs[serv]; ok {
++		return fmt.Errorf("already connected to: %v", m.sanitizedAddress(serv))
++	}
++	serv2, err := dsnAddTimeout(serv)
++	if err != nil {
++		return err
++	}
++	db, err := sql.Open("mysql", serv2)
++	if err != nil {
++		return err
++	}
++	db.Ping()
++	m.dbs[serv] = db
++	return nil
++}
++
++func (m *Mysql) getDB(serv string) (*sql.DB, error) {
++	if m.dbs[serv] == nil {
++		m.Log.Debugf("reconnecting to %v", m.sanitizedAddress(serv))
++		err := m.connectDB(serv)
++		if err != nil {
++			return nil, err
++		}
++	}
++	return m.dbs[serv], nil
++}
++
++func (m *Mysql) sanitizedAddress(serv string) string {
++	// user:password@tcp(something.us-west-1.rds.amazonaws.com:3306)/?tls=false
++	r := regexp.MustCompile(`@tcp\((?P<HostPort>.*)\)`)
++	matches := r.FindStringSubmatch(serv)
++	hostPortIndex := r.SubexpIndex("HostPort")
++	return matches[hostPortIndex]
++}
++
+ func (m *Mysql) Gather(acc telegraf.Accumulator) error {
+ 	if len(m.Servers) == 0 {
+ 		// default to localhost if nothing specified.
+@@ -483,18 +531,11 @@ const (
+ )
+ 
+ func (m *Mysql) gatherServer(serv string, acc telegraf.Accumulator) error {
+-	serv, err := dsnAddTimeout(serv)
+-	if err != nil {
+-		return err
+-	}
+-
+-	db, err := sql.Open("mysql", serv)
++	db, err := m.getDB(serv)
+ 	if err != nil {
+ 		return err
+ 	}
+ 
+-	defer db.Close()
+-
+ 	err = m.gatherGlobalStatuses(db, serv, acc)
+ 	if err != nil {
+ 		return err
+-- 
+2.31.0
+
