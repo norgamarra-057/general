@@ -1,0 +1,27 @@
+[default]
+region=us-west-2
+
+[okta]
+aws_saml_url = home/amazon_aws/0oa1drin1zvdpxBdo1d8/272
+
+[profile gsb]
+role_arn = arn:aws:iam::549734399709:role/grpn-sandbox-general-dev
+[profile sandbox]
+role_arn = arn:aws:iam::549734399709:role/grpn-all-dba-admin
+
+[profile stg]
+role_arn = arn:aws:iam::286052569778:role/grpn-all-raas-admin
+[profile stable]
+role_arn = arn:aws:iam::286052569778:role/grpn-all-dba-admin
+
+[profile dev]
+role_arn = arn:aws:iam::286052569778:role/grpn-all-raas-admin
+
+[profile prd]
+role_arn = arn:aws:iam::497256801702:role/grpn-all-raas-admin
+[profile prod]
+role_arn = arn:aws:iam::497256801702:role/grpn-all-dba-admin
+
+# ddd = D&D dev
+[profile ddd]
+role_arn = arn:aws:iam::575209962483:role/grpn-sandbox-dnd-dev

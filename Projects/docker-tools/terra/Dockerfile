@@ -1,0 +1,65 @@
+FROM ubuntu:jammy-20220531
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update && apt-get install -y \
+  curl \
+  less \
+  pass \
+  ruby \
+  unzip \
+  wget \
+  && rm -rf /var/lib/apt/lists/*
+
+#########################
+# AWS CLI / aws-okta
+#########################
+
+# based on: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
+
+# Normal Mac:
+# RUN curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o awscliv2.zip
+# Mac M1:
+RUN curl https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip -o awscliv2.zip
+
+RUN unzip awscliv2.zip
+RUN ./aws/install
+RUN rm awscliv2.zip
+RUN rm -r ./aws
+
+#########################
+# Terraform/Terragrunt
+#########################
+
+RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+RUN ln -s ~/.tfenv/bin/* /usr/local/bin
+
+RUN git clone https://github.com/cunymatthieu/tgenv.git ~/.tgenv
+RUN ln -s ~/.tgenv/bin/* /usr/local/bin
+
+# this is the only non-core Ruby library required by the after_hook:
+RUN gem install rhcl
+
+# preinstall the specific versions:
+RUN tfenv install $(curl https://raw.github.groupondev.com/data/raas/master/raas_aws/terragrunt_live/.terraform-version)
+RUN tgenv install $(curl https://raw.github.groupondev.com/data/raas/master/raas_aws/terragrunt_live/.terragrunt-version)
+
+#########################
+# final details
+#########################
+
+COPY ./bash_aliases.sh /root/.bash_aliases
+# Normal Mac:
+# COPY ./aws-okta.amd64 /usr/local/bin/aws-okta
+# Mac M1:
+COPY ./aws-okta.arm64 /usr/local/bin/aws-okta
+COPY ./aws_config /root/.aws/config
+
+RUN git config --global alias.co checkout
+RUN git config --global alias.br branch
+RUN git config --global alias.ci commit
+RUN git config --global alias.st status
+
+WORKDIR /root/git/
+
+CMD ["/usr/bin/tail", "-f" , "/dev/null"]
