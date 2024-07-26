@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : us.raas-bast-cs-prod.grpn
+Shards limit : 4
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+V5D0OSCy8kUKht51xmCm/teLPc5GraWkrU4sc9BejJ4QRJN0s6GjEprFFhSU
+uT/9Kcu6hzHD15YmWeY2cmvXMrocI/+T6+N42hDhd0b1XFBwBycqtpOcQ3pB
+ysQ2ilTEpFokEhbH2sCiwR+RNEWbDdKATcX6Yv8GZqoCBHetXMWPOkkPOg/x
+y0WK1PcIUQhSLTMP1W6UrVYKHi4VD8CB6OPlsO4pn5GgsD9Q97xQWaN9DMS1
+igE8zdkSfA4TD9Y33L1agRB1XY5ZTRK67BtJu+8O7aecRkKpO1osNtWiZJJj
+igwjt6dscUjFd28rwrxs6NKzvFvvQAketoWLxGnCxw==
+----- LICENSE END -----
+
+

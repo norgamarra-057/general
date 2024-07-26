@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: riot-323
+  labels:
+    run: riot-323
+    tier: backend
+  annotations:
+    com.groupon.conveyor.policies/skip-probes: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: riot-323
+      tier: backend
+  template:
+    metadata:
+      labels:
+        run: riot-323
+        tier: backend
+    spec:
+      containers:
+        - name: riot
+          image: docker-conveyor.groupondev.com/raas/riot:3.2.3
+          resources:
+            requests:
+              cpu: 1
+              memory: 6000Mi

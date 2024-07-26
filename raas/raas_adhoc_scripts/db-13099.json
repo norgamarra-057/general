@@ -1,0 +1,28 @@
+{
+  "type": "redis",
+  "name": "dealservice-shield-db",
+  "memory_size": 665719930880,
+  "oss_cluster": true,
+  "port": 13099,
+  "shards_count": 32,
+  "sharding": true,
+  "shards_placement": "sparse",
+  "proxy_policy": "all-master-shards",
+  "eviction_policy": "volatile-lru",
+  "authentication_redis_pass": "",
+  "rack_aware": true,
+  "email_alerts": false,
+  "replication": true,
+  "data_persistence": "disabled",
+  "aof_policy": "appendfsync-every-sec",
+  "max_aof_file_size": 41607495680,
+  "max_aof_load_time": 96,
+  "shard_key_regex": [
+    {
+      "regex": ".*\\{(?<tag>.*)\\}.*"
+    },
+    {
+      "regex": "(?<tag>.*)"
+    }
+  ]
+}

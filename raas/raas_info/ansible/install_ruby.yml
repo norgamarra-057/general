@@ -1,0 +1,86 @@
+---
+###################################
+# rbenv
+# based on https://github.com/rbenv/rbenv#basic-github-checkout
+###################################
+- name: check if git is installed
+  shell: "git >/dev/null 2>&1"
+  register: git_installed
+  ignore_errors: yes
+- name: install git
+  yum:
+    name: git
+  become: true
+  become_user: root
+  when:
+    - git_installed.rc != 0
+- name: clone rbenv
+  git:
+    repo: https://github.com/rbenv/rbenv.git
+    dest: ~/.rbenv
+- name: set rbenv in PATH and remove /usr/local/ from PATH
+  lineinfile: >
+    dest=~/.bash_profile
+    regexp="PATH=.*.rbenv/bin"
+    insertafter="^PATH="
+    line="PATH=/home/{{ deploy_user }}/.rbenv/bin:/usr/bin:/usr/sbin:/bin:/sbin"
+- name: load rbenv automatically
+  lineinfile: >
+    dest=~/.bash_profile
+    regexp="rbenv init"
+    line="eval \"$(rbenv init -)\""
+- name: create rbenv plugin dir
+  file: >
+    state=directory
+    path=~/.rbenv/plugins
+    mode=0755
+- name: clone ruby-build
+  git:
+    repo: https://github.com/rbenv/ruby-build.git
+    dest: ~/.rbenv/plugins/ruby-build
+###################################
+#  copile ruby
+###################################
+- name: add yum repo to get centos7.4's openssl1.0.2 on centos7.3
+  copy:
+    src: uploads/raas_patch_groupon.repo
+    dest: /etc/yum.repos.d/raas_patch_groupon.repo
+  become: true
+  become_user: root
+- name: install gcc
+  yum:
+    name: gcc
+    state: latest
+  become: true
+  become_user: root
+- name: install openssl-devel
+  yum:
+    name: openssl-devel
+    state: latest
+  become: true
+  become_user: root
+- name: install readline-devel
+  yum:
+    name: readline-devel
+  become: true
+  become_user: root
+- name: check if roller openssl is installed
+  shell: "/usr/local/bin/openssl version >/dev/null 2>&1"
+  register: roller_openssl_installed
+  ignore_errors: yes
+- name: temporarily remove roller openssl
+  shell: "/usr/local/bin/epkg -r openssl"
+  become: true
+  become_user: root
+  when:
+    - roller_openssl_installed.rc == 0
+- name: install ruby {{ rbenv_ruby_version }}
+  shell: "bash -lc 'rbenv install {{ rbenv_ruby_version }}'"
+- name: re-install roller openssl
+  shell: "/usr/local/bin/epkg openssl"
+  become: true
+  become_user: root
+  when:
+    - roller_openssl_installed.rc == 0
+- name: set default ruby {{ rbenv_ruby_version }}
+  shell: "bash -lc 'rbenv global {{ rbenv_ruby_version }}'"

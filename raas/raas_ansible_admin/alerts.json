@@ -1,0 +1,14 @@
+{
+  "bdb_high_latency": {
+    "enabled": true,
+    "threshold": "50000"
+  },
+  "bdb_high_throughput": {
+    "enabled": true,
+    "threshold": "10000"
+  },
+  "bdb_size": {
+    "enabled": false,
+    "threshold": "80"
+  }
+}

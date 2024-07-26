@@ -1,0 +1,52 @@
+<%= form_with(model: shard, local: true) do |form| %>
+  <% if shard.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(shard.errors.count, "error") %> prohibited this shard from being saved:</h2>
+
+      <ul>
+      <% shard.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :rl_id %>
+    <%= form.number_field :rl_id, id: :shard_rl_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :role %>
+    <%= form.text_field :role, id: :shard_role %>
+  </div>
+
+  <div class="field">
+    <%= form.label :slots %>
+    <%= form.text_field :slots, id: :shard_slots %>
+  </div>
+
+  <div class="field">
+    <%= form.label :used_memory %>
+    <%= form.text_field :used_memory, id: :shard_used_memory %>
+  </div>
+
+  <div class="field">
+    <%= form.label :status %>
+    <%= form.text_field :status, id: :shard_status %>
+  </div>
+
+  <div class="field">
+    <%= form.label :db_id %>
+    <%= form.text_field :db_id, id: :shard_db_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :node_id %>
+    <%= form.text_field :node_id, id: :shard_node_id %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

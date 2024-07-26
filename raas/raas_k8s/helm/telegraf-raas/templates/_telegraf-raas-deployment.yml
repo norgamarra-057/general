@@ -1,0 +1,276 @@
+{{- define "tgraas.telegraf-raas-deployment" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegraf-raas
+  labels:
+    run: telegraf-raas
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: telegraf-raas
+      tier: backend
+  minReadySeconds: 180
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: telegraf-raas
+        tier: backend
+    spec:
+      initContainers:
+      - env:
+        - name: HYBRID_BOUNDARY_SUBNETS
+          value: 10.221.137.0/26 10.221.137.64/26 10.221.137.128/26 10.216.38.0/23
+        - name: HYBRID_BOUNDARY_HOST
+          value: edge-proxy--staging--default.stable.us-west-2.aws.groupondev.com
+        - name: SERVICE_ID
+          value: raas
+        - name: SIDECAR_ENABLE_HTTP2
+          value: "false"
+        - name: SIDECAR_ENABLE_RRDNS
+          value: "false"
+        image: docker.groupondev.com/service-mesh/hybrid-boundary/traffic-interceptor:2020.11.03-19.58.41-a38b42c
+        imagePullPolicy: IfNotPresent
+        name: traffic-interceptor
+        resources: {}
+        securityContext:
+          privileged: true
+          readOnlyRootFilesystem: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/envoy
+          name: envoy-config
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: telegraf-conf
+        name: vol-etc-telegraf
+      - configMap:
+          defaultMode: 420
+          name: cmap-telegrafd-v2023-11-08.18.55.08
+        name: vol-etc-telegrafd
+      - name: client-certs
+        secret:
+          defaultMode: 420
+          secretName: namespace-tls-identity
+      - emptyDir: {}
+        name: envoy-config
+      - emptyDir: {}
+        name: envoy-logs
+      - emptyDir: {}
+        name: logs-default
+      - configMap:
+          defaultMode: 420
+          name: raas--monitoring--default--filebeat-config
+        name: filebeat-config
+
+      containers:
+      - name: telegraf-raas
+        image: docker-dev.groupondev.com/telegraf-raas:v1.52
+        resources:
+          requests:
+            cpu: 1
+            memory: 400Mi
+        command: ["telegraf"]
+        args: ["--config-directory", "/etc/telegraf/telegraf.d", "--pidfile", "/telegraf.pid"]
+        env:
+          - name: INFLUX_URL
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: influx-url
+          - name: ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: environment
+          - name: TELEGRAF_RAAS_AWS_REGION
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: aws-region
+          - name: RESQUE_MAX_QUEUES
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: resque-max-queues
+        volumeMounts:
+        - name: vol-etc-telegraf
+          mountPath: /etc/telegraf/
+        - name: vol-etc-telegrafd
+          mountPath: /etc/telegraf/telegraf.d
+        - name: logs-default
+          mountPath: /var/groupon/logs
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "find /proc/1 -maxdepth 0 -mmin +1|grep ."
+          initialDelaySeconds: 63
+          periodSeconds: 50
+          timeoutSeconds: 2
+          failureThreshold: 3
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grep
+            - -a
+            - telegraf
+            - /proc/1/cmdline
+          initialDelaySeconds: 5
+          periodSeconds: 50
+          timeoutSeconds: 2
+          failureThreshold: 3
+
+      - image: docker.groupondev.com/service-mesh/hybrid-boundary/envoy-with-hot-restart:2020.11.03-19.58.41-a38b42c
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sleep
+              - "30"
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - wget -q -O - http://localhost:9901/server_info | grep state | grep -q
+              LIVE
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: envoy
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - wget -q -O - http://localhost:9901/server_info | grep state | grep -q
+              LIVE
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        securityContext:
+          privileged: true
+          readOnlyRootFilesystem: false
+          runAsGroup: 1337
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/envoy
+          name: envoy-config
+        - mountPath: /etc/envoy/log
+          name: envoy-logs
+        - mountPath: /var/groupon/certs
+          name: client-certs
+          readOnly: true
+
+      - args:
+        - -c
+        - /etc/filebeat.yml
+        env:
+        - name: REGION
+          value: us-west-2
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: KAFKA_ENDPOINT
+          value: kafka-elk-broker-staging.snc1
+        - name: KAFKA_PORT
+          value: "9092"
+        - name: KAFKA_PREFIX
+          value: logging_staging_
+        image: docker.groupondev.com/logging-platform/filebeat:7.5.2
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sleep
+              - "45"
+        livenessProbe:
+          exec:
+            command:
+            - pgrep
+            - filebeat
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: filebeat
+        readinessProbe:
+          exec:
+            command:
+            - pgrep
+            - filebeat
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 180m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 75Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/filebeat.yml
+          name: filebeat-config
+          subPath: filebeat.yml
+        - mountPath: /var/groupon/logs
+          name: logs-default
+        - mountPath: /etc/envoy/log
+          name: envoy-logs
+      dnsPolicy: ClusterFirst
+      volumes:
+      - name: vol-etc-telegraf
+        configMap:
+          name: telegraf-conf
+      - name: vol-etc-telegrafd
+        configMap:
+          name: xxxxxx
+      - name: client-certs
+        secret:
+          secretName: "namespace-tls-identity"
+      - name: envoy-config
+        emptyDir: {}
+      - name: envoy-logs
+        emptyDir: {}
+{{- range $name, $dir := fromYaml (include "common.logDirectories" . ) }}
+      - name: {{ printf "logs-%s" $name }}
+        emptyDir: {}
+{{- end }}
+      - name: filebeat-config
+        configMap:
+          name: {{ .Values.serviceId }}--{{ .Values.component }}--{{ .Values.instance }}--filebeat-config
+{{- end }}

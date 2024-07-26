@@ -1,0 +1,91 @@
+
+<!-- saved from url=(0060)https://pages.github.groupondev.com/data/raas/wizard_rl.html -->
+<html class="fa-events-icons-ready"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><link href="./wizard_rl_files/840a321d95.css" media="all" rel="stylesheet"></head><span id="warning-container"><i data-reactroot=""></i></span><body><form>
+  type:<br>
+  <input type="radio" name="dbtype" value="redis" checked="">redis<br>
+  <input type="radio" name="dbtype" value="memcached">memcached<br>
+  <br>
+  db name: <input type="text" id="dbname"><br>
+  size: <input type="text" id="dbsize"> <small>GB, including replication</small><br>
+  port: <input type="text" id="dbport"><br>
+
+  #shards: <input type="text" id="dbshards" value="2"> <small>not including replication, 1 means no sharding (req_multi_key=yes)</small><br>
+
+  <br><input type="checkbox" id="ossmode">OSS Cluster mode<br>
+
+  <br>shards placement:<br>
+  <input type="radio" name="dbshardsplacement" value="dense" checked="">dense<br>
+  <input type="radio" name="dbshardsplacement" value="sparse">sparse <small>(only high traffic dbs, to avoid NIC saturation)</small><br>
+
+  <br>proxy policy:<br>
+  <input type="radio" name="dbproxypolicy" value="all-master-shards" checked="">all-master-shards <small>(default, follows the master shard; useful for high traffic dbs, to avoid NIC saturation)</small><br>
+  <input type="radio" name="dbproxypolicy" value="all-nodes">all-nodes <small>(regional)</small><br>
+
+  <br>eviction policy:<br>
+  <input type="radio" name="dbevictionpolicy" value="volatile-lru" checked="">volatile-lru <small>(evict the less-recently-used keys first, among those with expire set)</small><br>
+  <input type="radio" name="dbevictionpolicy" value="allkeys-lru">allkeys-lru <small>(evict the less-recently-used keys first)</small><br>
+  <input type="radio" name="dbevictionpolicy" value="noeviction">noeviction <small>(errors if OOM)</small><br>
+  <input type="radio" name="dbevictionpolicy" value="volatile-ttl">volatile-ttl <small>(evict those with shorter TTL first)</small><br>
+
+  <br>password: <input type="text" id="dbpassword"> <small>(leave empty if no password)</small><br>
+
+  <br><input type="checkbox" id="dbpersistence">persistence (AOF)<br>
+
+  <br><input type="submit" value="Submit" onclick="return print_json();">
+
+</form>
+
+<pre id="result"></pre>
+
+<script type="text/javascript">
+  function print_json() {
+    var db = {};
+    db['type'] = document.querySelector('input[name = "dbtype"]:checked').value;
+    db['name'] = document.getElementById("dbname").value;
+    db['memory_size'] = Math.ceil(document.getElementById("dbsize").value*Math.pow(1024,3));
+    db['oss_cluster'] = document.getElementById("ossmode").checked ? true : false;
+    port = parseInt(document.getElementById("dbport").value);
+    if(port)
+      db['port'] = port;
+    db['shards_count'] = parseInt(document.getElementById("dbshards").value);
+    db['sharding'] = db['shards_count'] == 1 ? false : true
+    db['shards_placement'] = document.querySelector('input[name = "dbshardsplacement"]:checked').value;
+    db['proxy_policy'] = document.querySelector('input[name = "dbproxypolicy"]:checked').value;
+    db['eviction_policy'] = document.querySelector('input[name = "dbevictionpolicy"]:checked').value;
+
+    db['authentication_redis_pass'] = document.getElementById("dbpassword").value;
+
+    db['rack_aware'] = true;
+    db['email_alerts'] = false;
+    db['replication'] = true;
+    db['data_persistence'] = document.getElementById("dbpersistence").checked ? "aof" : "disabled";
+    db['aof_policy'] = "appendfsync-every-sec";
+    db['max_aof_file_size'] = Math.floor(4*db['memory_size']/(2*db['shards_count']));
+    db['max_aof_load_time'] = Math.floor(60*db['max_aof_file_size']/Math.pow(1024,3)/24);
+    if (db['max_aof_load_time'] < 60) {
+      db['max_aof_load_time'] = 60;
+    }
+    if (db['type'] == 'memcached') {
+      db['shard_key_regex'] = [];
+    }
+    else { // redis
+      var reg = `[
+      {
+        "regex": ".*\\\\{(?<tag>.*)\\\\}.*"
+      },
+      {
+        "regex": "(?<tag>.*)"
+      }
+      ]`;
+      db['shard_key_regex'] = JSON.parse(reg);
+
+    }
+
+    document.getElementById("result").innerText = JSON.stringify(db, null, 2) // spacing level = 2
+    return false;
+  }
+
+</script>
+
+
+</body></html>

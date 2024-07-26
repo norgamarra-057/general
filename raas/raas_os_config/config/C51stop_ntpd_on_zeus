@@ -1,0 +1,5 @@
+if host["os_config"].include?("zeus")
+  # zeus comes with ntpd:
+  run_command 'cp /usr/local/etc/init.d/ntpd /usr/local/etc/init.d/ntpd.backup.C51stop_ntpd_on_zeus'
+  run_command 'echo "echo using zeus ntpd, C51stop_ntpd_on_zeus" > /usr/local/etc/init.d/ntpd'
+end

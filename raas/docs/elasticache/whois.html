@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>RaaS: AWS Elasticache DB provision calculator</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+	<!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" /> -->
+	<script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <py-env>
+        - pandas
+    </py-env>
+</head>
+<body>
+  <div>Ip address :</div>
+<input type="text" id="ip-add"/>
+<button id="submit-button" type="submit" pys-onClick="my_output">Submit</button>
+<br><br>
+<div id="test-output"></div>
+<py-script>
+
+data={
+    "VPN-DUB1": "10.37.0.0/16",
+    "VPN-SAC1": "10.36.0.0/16",
+    "VPN-SNC1": "10.60.0.0/16",
+    "conveyorsandbox-eu-west-1-proper_app_cidrs_eu-west-1a": "10.233.64.0/25",
+    "conveyorsandbox-eu-west-1-proper_app_cidrs_eu-west-1b": "10.233.64.128/25",
+    "conveyorsandbox-eu-west-1-proper_app_cidrs_eu-west-1c": "10.233.65.0/25",
+    "conveyorsandbox-eu-west-1-proper_con_cidrs_eu-west-1a": "10.233.67.0/25",
+    "conveyorsandbox-eu-west-1-proper_con_cidrs_eu-west-1b": "10.233.67.128/25",
+    "conveyorsandbox-eu-west-1-proper_con_cidrs_eu-west-1c": "10.233.68.0/25",
+    "conveyorsandbox-eu-west-1-proper_db_cidrs_eu-west-1a": "10.233.65.128/25",
+    "conveyorsandbox-eu-west-1-proper_db_cidrs_eu-west-1b": "10.233.66.0/25",
+    "conveyorsandbox-eu-west-1-proper_db_cidrs_eu-west-1c": "10.233.66.128/25",
+    "conveyorsandbox-eu-west-1-proper_edge_proxy_cidrs_eu-west-1a": "10.233.71.0/26",
+    "conveyorsandbox-eu-west-1-proper_edge_proxy_cidrs_eu-west-1b": "10.233.71.64/26",
+    "conveyorsandbox-eu-west-1-proper_edge_proxy_cidrs_eu-west-1c": "10.233.71.128/26",
+    "conveyorsandbox-eu-west-1-proper_pub_cidrs_eu-west-1a": "10.233.70.0/26",
+    "conveyorsandbox-eu-west-1-proper_pub_cidrs_eu-west-1b": "10.233.70.64/26",
+    "conveyorsandbox-eu-west-1-proper_pub_cidrs_eu-west-1c": "10.233.70.128/26",
+    "conveyorsandbox-us-west-1_app_cidrs_us-west-1b": "10.216.64.0/25",
+    "conveyorsandbox-us-west-1_app_cidrs_us-west-1c": "10.216.64.128/25",
+    "conveyorsandbox-us-west-1_con_cidrs_us-west-1a": "10.216.68.0/25",
+    "conveyorsandbox-us-west-1_con_cidrs_us-west-1b": "10.216.67.0/25",
+    "conveyorsandbox-us-west-1_con_cidrs_us-west-1c": "10.216.67.128/25",
+    "conveyorsandbox-us-west-1_db_cidrs_us-west-1b": "10.216.65.128/25",
+    "conveyorsandbox-us-west-1_db_cidrs_us-west-1c": "10.216.66.0/25",
+    "conveyorsandbox-us-west-1_edge_proxy_cidrs_us-west-1b": "10.216.71.0/26",
+    "conveyorsandbox-us-west-1_edge_proxy_cidrs_us-west-1c": "10.216.71.64/26",
+    "conveyorsandbox-us-west-1_pub_cidrs_us-west-1b": "10.216.70.0/26",
+    "conveyorsandbox-us-west-1_pub_cidrs_us-west-1c": "10.216.70.64/26",
+    "conveyorsandbox-us-west-2-v2_app_cidrs_us-west-2a": "10.197.0.0/27",
+    "conveyorsandbox-us-west-2-v2_app_cidrs_us-west-2b": "10.197.0.32/27",
+    "conveyorsandbox-us-west-2-v2_app_cidrs_us-west-2c": "10.197.0.64/27",
+    "conveyorsandbox-us-west-2-v2_con_cidrs_us-west-2a": "10.197.2.0/23",
+    "conveyorsandbox-us-west-2-v2_con_cidrs_us-west-2b": "10.197.4.0/23",
+    "conveyorsandbox-us-west-2-v2_con_cidrs_us-west-2c": "10.197.6.0/23",
+    "conveyorsandbox-us-west-2-v2_db_cidrs_us-west-2a": "10.197.0.96/27",
+    "conveyorsandbox-us-west-2-v2_db_cidrs_us-west-2b": "10.197.0.128/27",
+    "conveyorsandbox-us-west-2-v2_db_cidrs_us-west-2c": "10.197.0.160/27",
+    "conveyorsandbox-us-west-2-v2_edge_proxy_cidrs_us-west-2a": "10.197.0.192/27",
+    "conveyorsandbox-us-west-2-v2_edge_proxy_cidrs_us-west-2b": "10.197.0.224/27",
+    "conveyorsandbox-us-west-2-v2_edge_proxy_cidrs_us-west-2c": "10.197.1.0/27",
+    "conveyorsandbox-us-west-2-v2_pub_cidrs_us-west-2a": "10.197.1.32/27",
+    "conveyorsandbox-us-west-2-v2_pub_cidrs_us-west-2b": "10.197.1.64/27",
+    "conveyorsandbox-us-west-2-v2_pub_cidrs_us-west-2c": "10.197.1.96/27",
+    "dev-cloudcore-us-west-2_app_cidrs_us-west-2a": "10.224.88.0/25",
+    "dev-cloudcore-us-west-2_app_cidrs_us-west-2b": "10.224.88.128/25",
+    "dev-cloudcore-us-west-2_app_cidrs_us-west-2c": "10.224.89.0/25",
+    "dev-cloudcore-us-west-2_con_cidrs_us-west-2a": "10.224.89.128/25",
+    "dev-cloudcore-us-west-2_con_cidrs_us-west-2b": "10.224.90.0/25",
+    "dev-cloudcore-us-west-2_con_cidrs_us-west-2c": "10.224.90.128/25",
+    "dev-cloudcore-us-west-2_db_cidrs_us-west-2a": "10.224.91.0/25",
+    "dev-cloudcore-us-west-2_db_cidrs_us-west-2b": "10.224.91.128/25",
+    "dev-cloudcore-us-west-2_db_cidrs_us-west-2c": "10.224.92.0/25",
+    "dev-cloudcore-us-west-2_pub_cidrs_us-west-2a": "10.224.92.128/25",
+    "dev-cloudcore-us-west-2_pub_cidrs_us-west-2b": "10.224.93.0/25",
+    "dev-cloudcore-us-west-2_pub_cidrs_us-west-2c": "10.224.93.128/25",
+    "dub1": "10.12.0.0/14",
+    "edwprod-us-west-1_app_cidrs_us-west-1a": "10.214.0.0/21",
+    "edwprod-us-west-1_app_cidrs_us-west-1c": "10.214.8.0/21",
+    "edwprod-us-west-1_db_cidrs_us-west-1a": "10.214.16.0/26",
+    "edwprod-us-west-1_db_cidrs_us-west-1c": "10.214.16.64/26",
+    "edwprod-us-west-1_pub_cidrs_us-west-1a": "10.214.16.128/26",
+    "edwprod-us-west-1_pub_cidrs_us-west-1c": "10.214.16.192/26",
+    "edwprod-us-west-2_app_cidrs_us-west-2a": "10.222.0.0/20",
+    "edwprod-us-west-2_app_cidrs_us-west-2b": "10.222.16.0/20",
+    "edwprod-us-west-2_app_cidrs_us-west-2c": "10.222.32.0/20",
+    "edwprod-us-west-2_con_cidrs_us-west-2a": "10.222.137.0/24",
+    "edwprod-us-west-2_con_cidrs_us-west-2b": "10.222.138.0/24",
+    "edwprod-us-west-2_con_cidrs_us-west-2c": "10.222.139.0/24",
+    "edwprod-us-west-2_db_cidrs_us-west-2a": "10.222.128.0/23",
+    "edwprod-us-west-2_db_cidrs_us-west-2b": "10.222.130.0/23",
+    "edwprod-us-west-2_db_cidrs_us-west-2c": "10.222.132.0/23",
+    "edwprod-us-west-2_pub_cidrs_us-west-2a": "10.222.134.0/24",
+    "edwprod-us-west-2_pub_cidrs_us-west-2b": "10.222.135.0/24",
+    "edwprod-us-west-2_pub_cidrs_us-west-2c": "10.222.136.0/24",
+    "edwsandbox-us-east-2_app_cidrs_us-east-2a": "10.241.0.0/27",
+    "edwsandbox-us-east-2_app_cidrs_us-east-2b": "10.241.0.32/27",
+    "edwsandbox-us-east-2_app_cidrs_us-east-2c": "10.241.0.64/27",
+    "edwsandbox-us-east-2_pub_cidrs_us-east-2a": "10.241.0.96/27",
+    "edwsandbox-us-east-2_pub_cidrs_us-east-2b": "10.241.0.128/27",
+    "edwsandbox-us-east-2_pub_cidrs_us-east-2c": "10.241.0.160/27",
+    "edwsandbox-us-west-1_app_cidrs_us-west-1a": "10.216.96.0/21",
+    "edwsandbox-us-west-1_app_cidrs_us-west-1c": "10.216.104.0/21",
+    "edwsandbox-us-west-1_db_cidrs_us-west-1a": "10.216.112.0/26",
+    "edwsandbox-us-west-1_db_cidrs_us-west-1c": "10.216.112.64/26",
+    "edwsandbox-us-west-1_pub_cidrs_us-west-1a": "10.216.113.0/26",
+    "edwsandbox-us-west-1_pub_cidrs_us-west-1c": "10.216.113.64/26",
+    "edwsandbox-us-west-2-expanded_app_cidrs_us-west-2a": "10.224.192.0/21",
+    "edwsandbox-us-west-2-expanded_app_cidrs_us-west-2b": "10.224.200.0/21",
+    "edwsandbox-us-west-2-expanded_app_cidrs_us-west-2c": "10.224.208.0/21",
+    "edwsandbox-us-west-2-expanded_con_cidrs_us-west-2a": "10.224.216.0/24",
+    "edwsandbox-us-west-2-expanded_con_cidrs_us-west-2b": "10.224.217.0/24",
+    "edwsandbox-us-west-2-expanded_con_cidrs_us-west-2c": "10.224.218.0/24",
+    "edwsandbox-us-west-2-expanded_db_cidrs_us-west-2a": "10.224.219.0/26",
+    "edwsandbox-us-west-2-expanded_db_cidrs_us-west-2b": "10.224.219.64/26",
+    "edwsandbox-us-west-2-expanded_db_cidrs_us-west-2c": "10.224.219.128/26",
+    "edwsandbox-us-west-2-expanded_pub_cidrs_us-west-2a": "10.224.220.0/26",
+    "edwsandbox-us-west-2-expanded_pub_cidrs_us-west-2b": "10.224.220.64/26",
+    "edwsandbox-us-west-2-expanded_pub_cidrs_us-west-2c": "10.224.220.128/26",
+    "gensandbox-eu-west-1_app_cidrs_eu-west-1a": "10.232.0.0/20",
+    "gensandbox-eu-west-1_app_cidrs_eu-west-1b": "10.232.16.0/20",
+    "gensandbox-eu-west-1_app_cidrs_eu-west-1c": "10.232.32.0/20",
+    "gensandbox-eu-west-1_con_cidrs_eu-west-1a": "10.232.48.0/20",
+    "gensandbox-eu-west-1_con_cidrs_eu-west-1b": "10.232.64.0/20",
+    "gensandbox-eu-west-1_con_cidrs_eu-west-1c": "10.232.80.0/20",
+    "gensandbox-eu-west-1_db_cidrs_eu-west-1a": "10.232.128.0/23",
+    "gensandbox-eu-west-1_db_cidrs_eu-west-1b": "10.232.130.0/23",
+    "gensandbox-eu-west-1_db_cidrs_eu-west-1c": "10.232.132.0/23",
+    "gensandbox-eu-west-1_edge_proxy_cidrs_eu-west-1a": "10.232.137.0/26",
+    "gensandbox-eu-west-1_edge_proxy_cidrs_eu-west-1b": "10.232.137.64/26",
+    "gensandbox-eu-west-1_edge_proxy_cidrs_eu-west-1c": "10.232.137.128/26",
+    "gensandbox-eu-west-1_pub_cidrs_eu-west-1a": "10.232.134.0/24",
+    "gensandbox-eu-west-1_pub_cidrs_eu-west-1b": "10.232.135.0/24",
+    "gensandbox-eu-west-1_pub_cidrs_eu-west-1c": "10.232.136.0/24",
+    "gensandbox-us-east-1_app_cidrs_us-east-1a": "10.243.0.0/26",
+    "gensandbox-us-east-1_app_cidrs_us-east-1b": "10.243.0.64/26",
+    "gensandbox-us-east-1_app_cidrs_us-east-1c": "10.243.0.128/26",
+    "gensandbox-us-east-1_con_cidrs_us-east-1a": "10.243.0.192/26",
+    "gensandbox-us-east-1_con_cidrs_us-east-1b": "10.243.1.0/26",
+    "gensandbox-us-east-1_con_cidrs_us-east-1c": "10.243.1.64/26",
+    "gensandbox-us-east-1_db_cidrs_us-east-1a": "10.243.1.128/26",
+    "gensandbox-us-east-1_db_cidrs_us-east-1b": "10.243.1.192/26",
+    "gensandbox-us-east-1_db_cidrs_us-east-1c": "10.243.2.0/26",
+    "gensandbox-us-east-1_pub_cidrs_us-east-1a": "10.243.2.64/26",
+    "gensandbox-us-east-1_pub_cidrs_us-east-1b": "10.243.2.128/26",
+    "gensandbox-us-east-1_pub_cidrs_us-east-1c": "10.243.2.192/26",
+    "gensandbox-us-west-1_app_cidrs_us-west-1b": "10.215.0.0/20",
+    "gensandbox-us-west-1_app_cidrs_us-west-1c": "10.215.16.0/20",
+    "gensandbox-us-west-1_con_cidrs_us-west-1b": "10.215.48.0/20",
+    "gensandbox-us-west-1_con_cidrs_us-west-1c": "10.215.64.0/20",
+    "gensandbox-us-west-1_db_cidrs_us-west-1b": "10.215.128.0/23",
+    "gensandbox-us-west-1_db_cidrs_us-west-1c": "10.215.130.0/23",
+    "gensandbox-us-west-1_edge_proxy_cidrs_us-west-1b": "10.215.137.0/26",
+    "gensandbox-us-west-1_edge_proxy_cidrs_us-west-1c": "10.215.137.64/26",
+    "gensandbox-us-west-1_pub_cidrs_us-west-1b": "10.215.134.0/24",
+    "gensandbox-us-west-1_pub_cidrs_us-west-1c": "10.215.135.0/24",
+    "gensandbox-us-west-2_app_cidrs_us-west-2a": "10.223.0.0/20",
+    "gensandbox-us-west-2_app_cidrs_us-west-2b": "10.223.16.0/20",
+    "gensandbox-us-west-2_app_cidrs_us-west-2c": "10.223.32.0/20",
+    "gensandbox-us-west-2_con_cidrs_us-west-2a": "10.223.48.0/20",
+    "gensandbox-us-west-2_con_cidrs_us-west-2b": "10.223.64.0/20",
+    "gensandbox-us-west-2_con_cidrs_us-west-2c": "10.223.80.0/20",
+    "gensandbox-us-west-2_db_cidrs_us-west-2a": "10.223.128.0/23",
+    "gensandbox-us-west-2_db_cidrs_us-west-2b": "10.223.130.0/23",
+    "gensandbox-us-west-2_db_cidrs_us-west-2c": "10.223.132.0/23",
+    "gensandbox-us-west-2_edge_proxy_cidrs_us-west-2a": "10.223.137.0/26",
+    "gensandbox-us-west-2_edge_proxy_cidrs_us-west-2b": "10.223.137.64/26",
+    "gensandbox-us-west-2_edge_proxy_cidrs_us-west-2c": "10.223.137.128/26",
+    "gensandbox-us-west-2_pub_cidrs_us-west-2a": "10.223.134.0/24",
+    "gensandbox-us-west-2_pub_cidrs_us-west-2b": "10.223.135.0/24",
+    "gensandbox-us-west-2_pub_cidrs_us-west-2c": "10.223.136.0/24",
+    "gensandbox2-us-west-2_app_cidrs_us-west-2a": "10.225.0.0/20",
+    "gensandbox2-us-west-2_app_cidrs_us-west-2b": "10.225.16.0/20",
+    "gensandbox2-us-west-2_app_cidrs_us-west-2c": "10.225.32.0/20",
+    "gensandbox2-us-west-2_con_cidrs_us-west-2a": "10.225.48.0/20",
+    "gensandbox2-us-west-2_con_cidrs_us-west-2b": "10.225.64.0/20",
+    "gensandbox2-us-west-2_con_cidrs_us-west-2c": "10.225.80.0/20",
+    "gensandbox2-us-west-2_db_cidrs_us-west-2a": "10.225.128.0/23",
+    "gensandbox2-us-west-2_db_cidrs_us-west-2b": "10.225.130.0/23",
+    "gensandbox2-us-west-2_db_cidrs_us-west-2c": "10.225.132.0/23",
+    "gensandbox2-us-west-2_edge_proxy_cidrs_us-west-2a": "10.225.137.0/26",
+    "gensandbox2-us-west-2_edge_proxy_cidrs_us-west-2b": "10.225.137.64/26",
+    "gensandbox2-us-west-2_edge_proxy_cidrs_us-west-2c": "10.225.137.128/26",
+    "gensandbox2-us-west-2_pub_cidrs_us-west-2a": "10.225.134.0/24",
+    "gensandbox2-us-west-2_pub_cidrs_us-west-2b": "10.225.135.0/24",
+    "gensandbox2-us-west-2_pub_cidrs_us-west-2c": "10.225.136.0/24",
+    "grpn-backup-stable-us-west-2_app_cidrs_us-west-2a": "10.224.76.0/26",
+    "grpn-backup-stable-us-west-2_app_cidrs_us-west-2b": "10.224.76.64/26",
+    "grpn-backup-stable-us-west-2_app_cidrs_us-west-2c": "10.224.76.128/26",
+    "grpn-conveyor-internal-stable-us-west-2_app_cidrs_us-west-2a": "10.196.0.0/20",
+    "grpn-conveyor-internal-stable-us-west-2_app_cidrs_us-west-2b": "10.196.16.0/20",
+    "grpn-conveyor-internal-stable-us-west-2_app_cidrs_us-west-2c": "10.196.32.0/20",
+    "grpn-conveyor-internal-stable-us-west-2_con_cidrs_us-west-2a": "10.196.48.0/20",
+    "grpn-conveyor-internal-stable-us-west-2_con_cidrs_us-west-2b": "10.196.64.0/20",
+    "grpn-conveyor-internal-stable-us-west-2_con_cidrs_us-west-2c": "10.196.80.0/20",
+    "grpn-conveyor-internal-stable-us-west-2_db_cidrs_us-west-2a": "10.196.128.0/23",
+    "grpn-conveyor-internal-stable-us-west-2_db_cidrs_us-west-2b": "10.196.130.0/23",
+    "grpn-conveyor-internal-stable-us-west-2_db_cidrs_us-west-2c": "10.196.132.0/23",
+    "grpn-conveyor-internal-stable-us-west-2_edge_proxy_cidrs_us-west-2a": "10.196.137.0/26",
+    "grpn-conveyor-internal-stable-us-west-2_edge_proxy_cidrs_us-west-2b": "10.196.137.64/26",
+    "grpn-conveyor-internal-stable-us-west-2_edge_proxy_cidrs_us-west-2c": "10.196.137.128/26",
+    "grpn-conveyor-internal-stable-us-west-2_pub_cidrs_us-west-2a": "10.196.134.0/24",
+    "grpn-conveyor-internal-stable-us-west-2_pub_cidrs_us-west-2b": "10.196.135.0/24",
+    "grpn-conveyor-internal-stable-us-west-2_pub_cidrs_us-west-2c": "10.196.136.0/24",
+    "grpn-cstools-dev-eu-west-1_app_cidrs_eu-west-1a": "10.233.94.0/25",
+    "grpn-cstools-dev-eu-west-1_app_cidrs_eu-west-1b": "10.233.94.128/25",
+    "grpn-cstools-dev-eu-west-1_app_cidrs_eu-west-1c": "10.233.95.0/25",
+    "grpn-cstools-dev-eu-west-1_pub_cidrs_eu-west-1a": "10.233.95.128/27",
+    "grpn-cstools-dev-eu-west-1_pub_cidrs_eu-west-1b": "10.233.95.160/27",
+    "grpn-cstools-dev-eu-west-1_pub_cidrs_eu-west-1c": "10.233.95.192/27",
+    "grpn-cstools-dev-us-east-1_app_cidrs_us-east-1a": "10.243.8.0/25",
+    "grpn-cstools-dev-us-east-1_app_cidrs_us-east-1b": "10.243.8.128/25",
+    "grpn-cstools-dev-us-east-1_app_cidrs_us-east-1c": "10.243.9.0/25",
+    "grpn-cstools-dev-us-west-2_app_cidrs_us-west-2a": "10.197.28.0/25",
+    "grpn-cstools-dev-us-west-2_app_cidrs_us-west-2b": "10.197.28.128/25",
+    "grpn-cstools-dev-us-west-2_app_cidrs_us-west-2c": "10.197.29.0/25",
+    "grpn-cstools-dev-us-west-2_pub_cidrs_us-west-2a": "10.197.29.128/27",
+    "grpn-cstools-dev-us-west-2_pub_cidrs_us-west-2b": "10.197.29.160/27",
+    "grpn-cstools-dev-us-west-2_pub_cidrs_us-west-2c": "10.197.29.192/27",
+    "grpn-cstools-prod-eu-west-1_app_cidrs_eu-west-1a": "10.233.124.0/24",
+    "grpn-cstools-prod-eu-west-1_app_cidrs_eu-west-1b": "10.233.125.0/24",
+    "grpn-cstools-prod-eu-west-1_app_cidrs_eu-west-1c": "10.233.126.0/24",
+    "grpn-cstools-prod-eu-west-1_pub_cidrs_eu-west-1a": "10.233.127.0/27",
+    "grpn-cstools-prod-eu-west-1_pub_cidrs_eu-west-1b": "10.233.127.32/27",
+    "grpn-cstools-prod-eu-west-1_pub_cidrs_eu-west-1c": "10.233.127.64/27",
+    "grpn-cstools-prod-us-west-2_app_cidrs_us-west-2a": "10.197.32.0/24",
+    "grpn-cstools-prod-us-west-2_app_cidrs_us-west-2b": "10.197.33.0/24",
+    "grpn-cstools-prod-us-west-2_app_cidrs_us-west-2c": "10.197.34.0/24",
+    "grpn-cstools-prod-us-west-2_pub_cidrs_us-west-2a": "10.197.35.0/27",
+    "grpn-cstools-prod-us-west-2_pub_cidrs_us-west-2b": "10.197.35.32/27",
+    "grpn-cstools-prod-us-west-2_pub_cidrs_us-west-2c": "10.197.35.64/27",
+    "grpn-dse-dev-us-west-2_app_cidrs_us-west-2a": "10.197.16.0/25",
+    "grpn-dse-dev-us-west-2_app_cidrs_us-west-2b": "10.197.16.128/25",
+    "grpn-dse-dev-us-west-2_app_cidrs_us-west-2c": "10.197.17.0/25",
+    "grpn-dse-dev-us-west-2_pub_cidrs_us-west-2a": "10.197.21.0/27",
+    "grpn-dse-dev-us-west-2_pub_cidrs_us-west-2b": "10.197.21.32/27",
+    "grpn-dse-dev-us-west-2_pub_cidrs_us-west-2c": "10.197.21.64/27",
+    "grpn-dse-prod-eu-west-1_app_cidrs_eu-west-1a": "10.233.104.0/25",
+    "grpn-dse-prod-eu-west-1_app_cidrs_eu-west-1b": "10.233.104.128/25",
+    "grpn-dse-prod-eu-west-1_app_cidrs_eu-west-1c": "10.233.105.0/25",
+    "grpn-dse-prod-eu-west-1_pub_cidrs_eu-west-1a": "10.233.107.192/27",
+    "grpn-dse-prod-eu-west-1_pub_cidrs_eu-west-1b": "10.233.107.224/27",
+    "grpn-dse-prod-eu-west-1_pub_cidrs_eu-west-1c": "10.233.108.0/27",
+    "grpn-dse-prod-us-west-1_app_cidrs_us-west-1a": "10.216.56.0/25",
+    "grpn-dse-prod-us-west-1_app_cidrs_us-west-1b": "10.216.56.128/25",
+    "grpn-dse-prod-us-west-1_pub_cidrs_us-west-1a": "10.216.57.0/27",
+    "grpn-dse-prod-us-west-1_pub_cidrs_us-west-1b": "10.216.57.32/27",
+    "grpn-dse-prod-us-west-2_app_cidrs_us-west-2a": "10.224.64.0/25",
+    "grpn-dse-prod-us-west-2_app_cidrs_us-west-2b": "10.224.64.128/25",
+    "grpn-dse-prod-us-west-2_app_cidrs_us-west-2c": "10.224.65.0/25",
+    "grpn-dse-prod-us-west-2_pub_cidrs_us-west-2a": "10.224.68.192/27",
+    "grpn-dse-prod-us-west-2_pub_cidrs_us-west-2b": "10.224.68.224/27",
+    "grpn-dse-prod-us-west-2_pub_cidrs_us-west-2c": "10.224.69.0/27",
+    "grpn-dse-stable-eu-west-1_app_cidrs_eu-west-1a": "10.233.96.0/25",
+    "grpn-dse-stable-eu-west-1_app_cidrs_eu-west-1b": "10.233.96.128/25",
+    "grpn-dse-stable-eu-west-1_app_cidrs_eu-west-1c": "10.233.97.0/25",
+    "grpn-dse-stable-eu-west-1_pub_cidrs_eu-west-1a": "10.233.99.192/27",
+    "grpn-dse-stable-eu-west-1_pub_cidrs_eu-west-1b": "10.233.99.224/27",
+    "grpn-dse-stable-eu-west-1_pub_cidrs_eu-west-1c": "10.233.100.0/27",
+    "grpn-dse-stable-us-west-1_app_cidrs_us-west-1a": "10.216.72.0/25",
+    "grpn-dse-stable-us-west-1_app_cidrs_us-west-1b": "10.216.72.128/25",
+    "grpn-dse-stable-us-west-1_pub_cidrs_us-west-1a": "10.216.73.0/27",
+    "grpn-dse-stable-us-west-1_pub_cidrs_us-west-1b": "10.216.73.32/27",
+    "grpn-dse-stable-us-west-2_app_cidrs_us-west-2a": "10.224.104.0/25",
+    "grpn-dse-stable-us-west-2_app_cidrs_us-west-2b": "10.224.104.128/25",
+    "grpn-dse-stable-us-west-2_app_cidrs_us-west-2c": "10.224.105.0/25",
+    "grpn-dse-stable-us-west-2_pub_cidrs_us-west-2a": "10.224.108.192/27",
+    "grpn-dse-stable-us-west-2_pub_cidrs_us-west-2b": "10.224.108.224/27",
+    "grpn-dse-stable-us-west-2_pub_cidrs_us-west-2c": "10.224.109.0/27",
+    "grpn-edw-stable-us-west-1_app_cidrs_us-west-1b": "10.216.128.0/21",
+    "grpn-edw-stable-us-west-1_app_cidrs_us-west-1c": "10.216.136.0/21",
+    "grpn-edw-stable-us-west-1_db_cidrs_us-west-1b": "10.216.144.0/26",
+    "grpn-edw-stable-us-west-1_db_cidrs_us-west-1c": "10.216.144.64/26",
+    "grpn-edw-stable-us-west-1_pub_cidrs_us-west-1b": "10.216.145.0/26",
+    "grpn-edw-stable-us-west-1_pub_cidrs_us-west-1c": "10.216.145.64/26",
+    "grpn-edw-stable-us-west-2_app_cidrs_us-west-2a": "10.224.224.0/21",
+    "grpn-edw-stable-us-west-2_app_cidrs_us-west-2b": "10.224.232.0/21",
+    "grpn-edw-stable-us-west-2_app_cidrs_us-west-2c": "10.224.240.0/21",
+    "grpn-edw-stable-us-west-2_con_cidrs_us-west-2a": "10.224.248.0/24",
+    "grpn-edw-stable-us-west-2_con_cidrs_us-west-2b": "10.224.249.0/24",
+    "grpn-edw-stable-us-west-2_con_cidrs_us-west-2c": "10.224.250.0/24",
+    "grpn-edw-stable-us-west-2_db_cidrs_us-west-2a": "10.224.251.0/26",
+    "grpn-edw-stable-us-west-2_db_cidrs_us-west-2b": "10.224.251.64/26",
+    "grpn-edw-stable-us-west-2_db_cidrs_us-west-2c": "10.224.251.128/26",
+    "grpn-edw-stable-us-west-2_pub_cidrs_us-west-2a": "10.224.252.0/26",
+    "grpn-edw-stable-us-west-2_pub_cidrs_us-west-2b": "10.224.252.64/26",
+    "grpn-edw-stable-us-west-2_pub_cidrs_us-west-2c": "10.224.252.128/26",
+    "grpn-geekon-dev-us-west-2_app_cidrs_us-west-2a": "10.218.0.0/20",
+    "grpn-geekon-dev-us-west-2_app_cidrs_us-west-2b": "10.218.16.0/20",
+    "grpn-geekon-dev-us-west-2_app_cidrs_us-west-2c": "10.218.32.0/20",
+    "grpn-geekon-dev-us-west-2_con_cidrs_us-west-2a": "10.218.48.0/20",
+    "grpn-geekon-dev-us-west-2_con_cidrs_us-west-2b": "10.218.64.0/20",
+    "grpn-geekon-dev-us-west-2_con_cidrs_us-west-2c": "10.218.80.0/20",
+    "grpn-geekon-dev-us-west-2_db_cidrs_us-west-2a": "10.218.128.0/23",
+    "grpn-geekon-dev-us-west-2_db_cidrs_us-west-2b": "10.218.130.0/23",
+    "grpn-geekon-dev-us-west-2_db_cidrs_us-west-2c": "10.218.132.0/23",
+    "grpn-geekon-dev-us-west-2_edge_proxy_cidrs_us-west-2a": "10.218.137.0/26",
+    "grpn-geekon-dev-us-west-2_edge_proxy_cidrs_us-west-2b": "10.218.137.64/26",
+    "grpn-geekon-dev-us-west-2_edge_proxy_cidrs_us-west-2c": "10.218.137.128/26",
+    "grpn-geekon-dev-us-west-2_pub_cidrs_us-west-2a": "10.218.134.0/24",
+    "grpn-geekon-dev-us-west-2_pub_cidrs_us-west-2b": "10.218.135.0/24",
+    "grpn-geekon-dev-us-west-2_pub_cidrs_us-west-2c": "10.218.136.0/24",
+    "grpn-logging-dev-eu-west-1_app_cidrs_eu-west-1a": "10.233.74.0/25",
+    "grpn-logging-dev-eu-west-1_app_cidrs_eu-west-1b": "10.233.74.128/25",
+    "grpn-logging-dev-eu-west-1_app_cidrs_eu-west-1c": "10.233.75.0/25",
+    "grpn-logging-dev-eu-west-1_pub_cidrs_eu-west-1a": "10.233.75.128/27",
+    "grpn-logging-dev-eu-west-1_pub_cidrs_eu-west-1b": "10.233.75.160/27",
+    "grpn-logging-dev-eu-west-1_pub_cidrs_eu-west-1c": "10.233.75.192/27",
+    "grpn-logging-dev-us-west-2_app_cidrs_us-west-2a": "10.197.8.0/25",
+    "grpn-logging-dev-us-west-2_app_cidrs_us-west-2b": "10.197.8.128/25",
+    "grpn-logging-dev-us-west-2_app_cidrs_us-west-2c": "10.197.9.0/25",
+    "grpn-logging-dev-us-west-2_pub_cidrs_us-west-2a": "10.197.9.128/27",
+    "grpn-logging-dev-us-west-2_pub_cidrs_us-west-2b": "10.197.9.160/27",
+    "grpn-logging-dev-us-west-2_pub_cidrs_us-west-2c": "10.197.9.192/27",
+    "grpn-logging-prod-eu-west-1_app_cidrs_eu-west-1a": "10.233.80.0/24",
+    "grpn-logging-prod-eu-west-1_app_cidrs_eu-west-1b": "10.233.81.0/24",
+    "grpn-logging-prod-eu-west-1_app_cidrs_eu-west-1c": "10.233.82.0/24",
+    "grpn-logging-prod-eu-west-1_pub_cidrs_eu-west-1a": "10.233.83.0/27",
+    "grpn-logging-prod-eu-west-1_pub_cidrs_eu-west-1b": "10.233.83.32/27",
+    "grpn-logging-prod-eu-west-1_pub_cidrs_eu-west-1c": "10.233.83.64/27",
+    "grpn-logging-prod-us-west-1_app_cidrs_us-west-1a": "10.216.44.0/24",
+    "grpn-logging-prod-us-west-1_app_cidrs_us-west-1b": "10.216.45.0/24",
+    "grpn-logging-prod-us-west-1_pub_cidrs_us-west-1a": "10.216.46.0/27",
+    "grpn-logging-prod-us-west-1_pub_cidrs_us-west-1b": "10.216.46.32/27",
+    "grpn-logging-prod-us-west-2_app_cidrs_us-west-2a": "10.197.12.0/24",
+    "grpn-logging-prod-us-west-2_app_cidrs_us-west-2b": "10.197.13.0/24",
+    "grpn-logging-prod-us-west-2_app_cidrs_us-west-2c": "10.197.14.0/24",
+    "grpn-logging-prod-us-west-2_pub_cidrs_us-west-2a": "10.197.15.0/27",
+    "grpn-logging-prod-us-west-2_pub_cidrs_us-west-2b": "10.197.15.32/27",
+    "grpn-logging-prod-us-west-2_pub_cidrs_us-west-2c": "10.197.15.64/27",
+    "grpn-logging-stable-eu-west-1_app_cidrs_eu-west-1a": "10.233.76.0/24",
+    "grpn-logging-stable-eu-west-1_app_cidrs_eu-west-1b": "10.233.77.0/24",
+    "grpn-logging-stable-eu-west-1_app_cidrs_eu-west-1c": "10.233.78.0/24",
+    "grpn-logging-stable-eu-west-1_pub_cidrs_eu-west-1a": "10.233.79.0/27",
+    "grpn-logging-stable-eu-west-1_pub_cidrs_eu-west-1b": "10.233.79.32/27",
+    "grpn-logging-stable-eu-west-1_pub_cidrs_eu-west-1c": "10.233.79.64/27",
+    "grpn-logging-stable-us-west-1_app_cidrs_us-west-1b": "10.216.48.0/24",
+    "grpn-logging-stable-us-west-1_app_cidrs_us-west-1c": "10.216.49.0/24",
+    "grpn-logging-stable-us-west-1_pub_cidrs_us-west-1b": "10.216.50.0/27",
+    "grpn-logging-stable-us-west-1_pub_cidrs_us-west-1c": "10.216.50.32/27",
+    "grpn-logging-stable-us-west-2_app_cidrs_us-west-2a": "10.197.24.0/24",
+    "grpn-logging-stable-us-west-2_app_cidrs_us-west-2b": "10.197.25.0/24",
+    "grpn-logging-stable-us-west-2_app_cidrs_us-west-2c": "10.197.26.0/24",
+    "grpn-logging-stable-us-west-2_pub_cidrs_us-west-2a": "10.197.27.0/27",
+    "grpn-logging-stable-us-west-2_pub_cidrs_us-west-2b": "10.197.27.32/27",
+    "grpn-logging-stable-us-west-2_pub_cidrs_us-west-2c": "10.197.27.64/27",
+    "grpn-mobile-dev-us-west-2_app_cidrs_us-west-2a": "10.224.73.0/26",
+    "grpn-mobile-dev-us-west-2_app_cidrs_us-west-2b": "10.224.73.64/26",
+    "grpn-mobile-dev-us-west-2_app_cidrs_us-west-2c": "10.224.73.128/26",
+    "grpn-mta-dev-eu-west-1_app_cidrs_eu-west-1a": "10.233.112.0/25",
+    "grpn-mta-dev-eu-west-1_app_cidrs_eu-west-1b": "10.233.112.128/25",
+    "grpn-mta-dev-eu-west-1_app_cidrs_eu-west-1c": "10.233.113.0/25",
+    "grpn-mta-dev-eu-west-1_pub_cidrs_eu-west-1a": "10.233.113.128/27",
+    "grpn-mta-dev-eu-west-1_pub_cidrs_eu-west-1b": "10.233.113.160/27",
+    "grpn-mta-dev-eu-west-1_pub_cidrs_eu-west-1c": "10.233.113.192/27",
+    "grpn-mta-dev-us-west-2_app_cidrs_us-west-2a": "10.197.10.0/25",
+    "grpn-mta-dev-us-west-2_app_cidrs_us-west-2b": "10.197.10.128/25",
+    "grpn-mta-dev-us-west-2_app_cidrs_us-west-2c": "10.197.11.0/25",
+    "grpn-mta-dev-us-west-2_pub_cidrs_us-west-2a": "10.197.11.128/27",
+    "grpn-mta-dev-us-west-2_pub_cidrs_us-west-2b": "10.197.11.160/27",
+    "grpn-mta-dev-us-west-2_pub_cidrs_us-west-2c": "10.197.11.192/27",
+    "grpn-mta-prod-eu-west-1_app_cidrs_eu-west-1a": "10.233.123.0/27",
+    "grpn-mta-prod-eu-west-1_app_cidrs_eu-west-1b": "10.233.123.32/27",
+    "grpn-mta-prod-eu-west-1_app_cidrs_eu-west-1c": "10.233.123.64/27",
+    "grpn-mta-prod-eu-west-1_pub_cidrs_eu-west-1a": "10.233.120.0/24",
+    "grpn-mta-prod-eu-west-1_pub_cidrs_eu-west-1b": "10.233.121.0/24",
+    "grpn-mta-prod-eu-west-1_pub_cidrs_eu-west-1c": "10.233.122.0/24",
+    "grpn-mta-prod-us-west-2_app_cidrs_us-west-2a": "10.197.39.0/27",
+    "grpn-mta-prod-us-west-2_app_cidrs_us-west-2b": "10.197.39.32/27",
+    "grpn-mta-prod-us-west-2_app_cidrs_us-west-2c": "10.197.39.64/27",
+    "grpn-mta-prod-us-west-2_pub_cidrs_us-west-2a": "10.197.36.0/24",
+    "grpn-mta-prod-us-west-2_pub_cidrs_us-west-2b": "10.197.37.0/24",
+    "grpn-mta-prod-us-west-2_pub_cidrs_us-west-2c": "10.197.38.0/24",
+    "grpn-mta-stable-eu-west-1_app_cidrs_eu-west-1a": "10.233.87.128/27",
+    "grpn-mta-stable-eu-west-1_app_cidrs_eu-west-1b": "10.233.87.160/27",
+    "grpn-mta-stable-eu-west-1_app_cidrs_eu-west-1c": "10.233.87.192/27",
+    "grpn-mta-stable-eu-west-1_pub_cidrs_eu-west-1a": "10.233.86.0/25",
+    "grpn-mta-stable-eu-west-1_pub_cidrs_eu-west-1b": "10.233.86.128/25",
+    "grpn-mta-stable-eu-west-1_pub_cidrs_eu-west-1c": "10.233.87.0/25",
+    "grpn-mta-stable-us-west-1_app_cidrs_us-west-1a": "10.216.37.0/27",
+    "grpn-mta-stable-us-west-1_app_cidrs_us-west-1b": "10.216.37.32/27",
+    "grpn-mta-stable-us-west-1_pub_cidrs_us-west-1a": "10.216.36.0/25",
+    "grpn-mta-stable-us-west-1_pub_cidrs_us-west-1b": "10.216.36.128/25",
+    "grpn-mta-stable-us-west-2_app_cidrs_us-west-2a": "10.197.31.128/27",
+    "grpn-mta-stable-us-west-2_app_cidrs_us-west-2b": "10.197.31.160/27",
+    "grpn-mta-stable-us-west-2_app_cidrs_us-west-2c": "10.197.31.192/27",
+    "grpn-mta-stable-us-west-2_pub_cidrs_us-west-2a": "10.197.30.0/25",
+    "grpn-mta-stable-us-west-2_pub_cidrs_us-west-2b": "10.197.30.128/25",
+    "grpn-mta-stable-us-west-2_pub_cidrs_us-west-2c": "10.197.31.0/25",
+    "grpn-netops-dev-eu-west-1_app_cidrs_eu-west-1a": "10.233.72.0/27",
+    "grpn-netops-dev-eu-west-1_app_cidrs_eu-west-1b": "10.233.72.32/27",
+    "grpn-netops-dev-eu-west-1_app_cidrs_eu-west-1c": "10.233.72.64/27",
+    "grpn-netops-dev-eu-west-1_db_cidrs_eu-west-1a": "10.233.72.192/27",
+    "grpn-netops-dev-eu-west-1_db_cidrs_eu-west-1b": "10.233.72.224/27",
+    "grpn-netops-dev-eu-west-1_db_cidrs_eu-west-1c": "10.233.73.0/27",
+    "grpn-netops-dev-eu-west-1_edge_proxy_cidrs_eu-west-1a": "10.233.73.32/27",
+    "grpn-netops-dev-eu-west-1_edge_proxy_cidrs_eu-west-1b": "10.233.73.64/27",
+    "grpn-netops-dev-eu-west-1_edge_proxy_cidrs_eu-west-1c": "10.233.73.96/27",
+    "grpn-netops-dev-eu-west-1_pub_cidrs_eu-west-1a": "10.233.73.128/27",
+    "grpn-netops-dev-eu-west-1_pub_cidrs_eu-west-1b": "10.233.73.160/27",
+    "grpn-netops-dev-eu-west-1_pub_cidrs_eu-west-1c": "10.233.73.192/27",
+    "grpn-netops-dev-us-west-1_app_cidrs_us-west-1b": "10.216.32.0/27",
+    "grpn-netops-dev-us-west-1_app_cidrs_us-west-1c": "10.216.32.32/27",
+    "grpn-netops-dev-us-west-1_con_cidrs_us-west-1b": "10.216.32.96/27",
+    "grpn-netops-dev-us-west-1_con_cidrs_us-west-1c": "10.216.32.128/27",
+    "grpn-netops-dev-us-west-1_db_cidrs_us-west-1b": "10.216.32.192/27",
+    "grpn-netops-dev-us-west-1_db_cidrs_us-west-1c": "10.216.32.224/27",
+    "grpn-netops-dev-us-west-1_edge_proxy_cidrs_us-west-1b": "10.216.33.32/27",
+    "grpn-netops-dev-us-west-1_edge_proxy_cidrs_us-west-1c": "10.216.33.64/27",
+    "grpn-netops-dev-us-west-1_pub_cidrs_us-west-1b": "10.216.33.128/27",
+    "grpn-netops-dev-us-west-1_pub_cidrs_us-west-1c": "10.216.33.160/27",
+    "grpn-netops-dev-us-west-2_app_cidrs_us-west-2a": "10.224.74.0/27",
+    "grpn-netops-dev-us-west-2_app_cidrs_us-west-2b": "10.224.74.32/27",
+    "grpn-netops-dev-us-west-2_app_cidrs_us-west-2c": "10.224.74.64/27",
+    "grpn-netops-dev-us-west-2_db_cidrs_us-west-2a": "10.224.74.192/27",
+    "grpn-netops-dev-us-west-2_db_cidrs_us-west-2b": "10.224.74.224/27",
+    "grpn-netops-dev-us-west-2_db_cidrs_us-west-2c": "10.224.75.0/27",
+    "grpn-netops-dev-us-west-2_edge_proxy_cidrs_us-west-2a": "10.224.75.32/27",
+    "grpn-netops-dev-us-west-2_edge_proxy_cidrs_us-west-2b": "10.224.75.64/27",
+    "grpn-netops-dev-us-west-2_edge_proxy_cidrs_us-west-2c": "10.224.75.96/27",
+    "grpn-netops-dev-us-west-2_pub_cidrs_us-west-2a": "10.224.75.128/27",
+    "grpn-netops-dev-us-west-2_pub_cidrs_us-west-2b": "10.224.75.160/27",
+    "grpn-netops-dev-us-west-2_pub_cidrs_us-west-2c": "10.224.75.192/27",
+    "grpn-netops-stable-eu-west-1_app_cidrs_eu-west-1a": "10.233.84.128/27",
+    "grpn-netops-stable-eu-west-1_app_cidrs_eu-west-1b": "10.233.84.160/27",
+    "grpn-netops-stable-eu-west-1_app_cidrs_eu-west-1c": "10.233.84.192/27",
+    "grpn-netops-stable-eu-west-1_pub_cidrs_eu-west-1a": "10.233.84.96/27",
+    "grpn-netops-stable-eu-west-1_pub_cidrs_eu-west-1b": "10.233.85.32/27",
+    "grpn-netops-stable-eu-west-1_pub_cidrs_eu-west-1c": "10.233.85.64/27",
+    "grpn-netops-stable-us-west-1_app_cidrs_us-west-1a": "10.216.34.128/27",
+    "grpn-netops-stable-us-west-1_app_cidrs_us-west-1b": "10.216.34.160/27",
+    "grpn-netops-stable-us-west-1_pub_cidrs_us-west-1a": "10.216.34.64/27",
+    "grpn-netops-stable-us-west-1_pub_cidrs_us-west-1b": "10.216.34.96/27",
+    "grpn-netops-stable-us-west-2_app_cidrs_us-west-2a": "10.224.112.128/27",
+    "grpn-netops-stable-us-west-2_app_cidrs_us-west-2b": "10.224.112.160/27",
+    "grpn-netops-stable-us-west-2_app_cidrs_us-west-2c": "10.224.112.192/27",
+    "grpn-netops-stable-us-west-2_pub_cidrs_us-west-2a": "10.224.112.96/27",
+    "grpn-netops-stable-us-west-2_pub_cidrs_us-west-2b": "10.224.113.32/27",
+    "grpn-netops-stable-us-west-2_pub_cidrs_us-west-2c": "10.224.113.64/27",
+    "grpn-partners3-prod-us-west-2_app_cidrs_us-west-2a": "10.224.77.0/27",
+    "grpn-partners3-prod-us-west-2_app_cidrs_us-west-2b": "10.224.77.32/27",
+    "grpn-partners3-prod-us-west-2_app_cidrs_us-west-2c": "10.224.77.64/27",
+    "grpn-partners3-prod-us-west-2_pub_cidrs_us-west-2a": "10.224.77.96/27",
+    "grpn-partners3-prod-us-west-2_pub_cidrs_us-west-2b": "10.224.77.128/27",
+    "grpn-partners3-prod-us-west-2_pub_cidrs_us-west-2c": "10.224.77.160/27",
+    "grpn-security-dev-us-west-2_app_cidrs_us-west-2a": "10.224.96.0/25",
+    "grpn-security-dev-us-west-2_app_cidrs_us-west-2b": "10.224.96.128/25",
+    "grpn-security-dev-us-west-2_app_cidrs_us-west-2c": "10.224.97.0/25",
+    "grpn-security-dev-us-west-2_db_cidrs_us-west-2a": "10.224.99.0/25",
+    "grpn-security-dev-us-west-2_db_cidrs_us-west-2b": "10.224.99.128/25",
+    "grpn-security-dev-us-west-2_db_cidrs_us-west-2c": "10.224.100.0/25",
+    "grpn-security-dev-us-west-2_pub_cidrs_us-west-2a": "10.224.100.128/25",
+    "grpn-security-dev-us-west-2_pub_cidrs_us-west-2b": "10.224.101.0/25",
+    "grpn-security-dev-us-west-2_pub_cidrs_us-west-2c": "10.224.101.128/25",
+    "grpn-security-forensic-eu-west-1_app_cidrs_eu-west-1a": "10.233.76.0/26",
+    "grpn-security-forensic-eu-west-1_app_cidrs_eu-west-1b": "10.233.76.64/26",
+    "grpn-security-forensic-eu-west-1_app_cidrs_eu-west-1c": "10.233.76.128/26",
+    "grpn-security-forensic-eu-west-1_pub_cidrs_eu-west-1a": "10.233.77.0/27",
+    "grpn-security-forensic-eu-west-1_pub_cidrs_eu-west-1b": "10.233.77.32/27",
+    "grpn-security-forensic-eu-west-1_pub_cidrs_eu-west-1c": "10.233.77.64/27",
+    "grpn-security-forensic-us-east-1_app_cidrs_us-east-1a": "10.241.2.0/26",
+    "grpn-security-forensic-us-east-1_app_cidrs_us-east-1b": "10.241.2.64/26",
+    "grpn-security-forensic-us-east-1_app_cidrs_us-east-1c": "10.241.2.128/26",
+    "grpn-security-forensic-us-east-1_pub_cidrs_us-east-1a": "10.241.3.0/27",
+    "grpn-security-forensic-us-east-1_pub_cidrs_us-east-1b": "10.241.3.32/27",
+    "grpn-security-forensic-us-east-1_pub_cidrs_us-east-1c": "10.241.3.64/27",
+    "grpn-security-forensic-us-west-1_app_cidrs_us-west-1a": "10.216.34.0/26",
+    "grpn-security-forensic-us-west-1_app_cidrs_us-west-1b": "10.216.34.64/26",
+    "grpn-security-forensic-us-west-1_pub_cidrs_us-west-1a": "10.216.35.0/27",
+    "grpn-security-forensic-us-west-1_pub_cidrs_us-west-1b": "10.216.35.32/27",
+    "grpn-security-forensic-us-west-2_app_cidrs_us-west-2a": "10.224.78.0/26",
+    "grpn-security-forensic-us-west-2_app_cidrs_us-west-2b": "10.224.78.64/26",
+    "grpn-security-forensic-us-west-2_app_cidrs_us-west-2c": "10.224.78.128/26",
+    "grpn-security-forensic-us-west-2_pub_cidrs_us-west-2a": "10.224.79.0/27",
+    "grpn-security-forensic-us-west-2_pub_cidrs_us-west-2b": "10.224.79.32/27",
+    "grpn-security-forensic-us-west-2_pub_cidrs_us-west-2c": "10.224.79.64/27",
+    "netops-eu-west-1_app_cidrs_eu-west-1a": "10.233.0.0/23",
+    "netops-eu-west-1_app_cidrs_eu-west-1b": "10.233.2.0/23",
+    "netops-eu-west-1_app_cidrs_eu-west-1c": "10.233.4.0/23",
+    "netops-eu-west-1_db_cidrs_eu-west-1a": "10.233.11.0/24",
+    "netops-eu-west-1_db_cidrs_eu-west-1b": "10.233.12.0/24",
+    "netops-eu-west-1_db_cidrs_eu-west-1c": "10.233.13.0/24",
+    "netops-eu-west-1_pub_cidrs_eu-west-1a": "10.233.8.0/24",
+    "netops-eu-west-1_pub_cidrs_eu-west-1b": "10.233.9.0/24",
+    "netops-eu-west-1_pub_cidrs_eu-west-1c": "10.233.10.0/24",
+    "netops-us-west-1_app_cidrs_us-west-1a": "10.216.0.0/23",
+    "netops-us-west-1_app_cidrs_us-west-1c": "10.216.4.0/23",
+    "netops-us-west-1_db_cidrs_us-west-1a": "10.216.11.0/24",
+    "netops-us-west-1_db_cidrs_us-west-1c": "10.216.13.0/24",
+    "netops-us-west-1_pub_cidrs_us-west-1a": "10.216.8.0/24",
+    "netops-us-west-1_pub_cidrs_us-west-1c": "10.216.10.0/24",
+    "netops-us-west-2_app_cidrs_us-west-2a": "10.224.0.0/23",
+    "netops-us-west-2_app_cidrs_us-west-2b": "10.224.2.0/23",
+    "netops-us-west-2_app_cidrs_us-west-2c": "10.224.4.0/23",
+    "netops-us-west-2_db_cidrs_us-west-2a": "10.224.11.0/24",
+    "netops-us-west-2_db_cidrs_us-west-2b": "10.224.12.0/24",
+    "netops-us-west-2_db_cidrs_us-west-2c": "10.224.13.0/24",
+    "netops-us-west-2_pub_cidrs_us-west-2a": "10.224.8.0/24",
+    "netops-us-west-2_pub_cidrs_us-west-2b": "10.224.9.0/24",
+    "netops-us-west-2_pub_cidrs_us-west-2c": "10.224.10.0/24",
+    "prod-corp-it-ap-south-1_app_cidrs_ap-south-1a": "10.164.16.0/21",
+    "prod-corp-it-ap-south-1_app_cidrs_ap-south-1b": "10.164.80.0/21",
+    "prod-corp-it-ap-south-1_db_cidrs_ap-south-1a": "10.164.0.0/21",
+    "prod-corp-it-ap-south-1_db_cidrs_ap-south-1b": "10.164.64.0/21",
+    "prod-corp-it-ap-south-1_pub_cidrs_ap-south-1a": "10.164.8.0/21",
+    "prod-corp-it-ap-south-1_pub_cidrs_ap-south-1b": "10.164.72.0/21",
+    "prod-corp-it-ap-southeast-2_app_cidrs_ap-southeast-2a": "10.165.16.0/21",
+    "prod-corp-it-ap-southeast-2_app_cidrs_ap-southeast-2b": "10.165.80.0/21",
+    "prod-corp-it-ap-southeast-2_app_cidrs_ap-southeast-2c": "10.165.144.0/21",
+    "prod-corp-it-ap-southeast-2_db_cidrs_ap-southeast-2a": "10.165.0.0/21",
+    "prod-corp-it-ap-southeast-2_db_cidrs_ap-southeast-2b": "10.165.64.0/21",
+    "prod-corp-it-ap-southeast-2_db_cidrs_ap-southeast-2c": "10.165.128.0/21",
+    "prod-corp-it-ap-southeast-2_pub_cidrs_ap-southeast-2a": "10.165.8.0/21",
+    "prod-corp-it-ap-southeast-2_pub_cidrs_ap-southeast-2b": "10.165.72.0/21",
+    "prod-corp-it-ap-southeast-2_pub_cidrs_ap-southeast-2c": "10.165.136.0/21",
+    "prod-corp-it-eu-central-1_app_cidrs_eu-central-1a": "10.162.16.0/21",
+    "prod-corp-it-eu-central-1_app_cidrs_eu-central-1b": "10.162.80.0/21",
+    "prod-corp-it-eu-central-1_app_cidrs_eu-central-1c": "10.162.144.0/21",
+    "prod-corp-it-eu-central-1_db_cidrs_eu-central-1a": "10.162.0.0/21",
+    "prod-corp-it-eu-central-1_db_cidrs_eu-central-1b": "10.162.64.0/21",
+    "prod-corp-it-eu-central-1_db_cidrs_eu-central-1c": "10.162.128.0/21",
+    "prod-corp-it-eu-central-1_pub_cidrs_eu-central-1a": "10.162.8.0/21",
+    "prod-corp-it-eu-central-1_pub_cidrs_eu-central-1b": "10.162.72.0/21",
+    "prod-corp-it-eu-central-1_pub_cidrs_eu-central-1c": "10.162.136.0/21",
+    "prod-corp-it-us-east-2_app_cidrs_us-east-2a": "10.161.16.0/21",
+    "prod-corp-it-us-east-2_app_cidrs_us-east-2b": "10.161.80.0/21",
+    "prod-corp-it-us-east-2_app_cidrs_us-east-2c": "10.161.144.0/21",
+    "prod-corp-it-us-east-2_db_cidrs_us-east-2a": "10.161.0.0/21",
+    "prod-corp-it-us-east-2_db_cidrs_us-east-2b": "10.161.64.0/21",
+    "prod-corp-it-us-east-2_db_cidrs_us-east-2c": "10.161.128.0/21",
+    "prod-corp-it-us-east-2_pub_cidrs_us-east-2a": "10.161.8.0/21",
+    "prod-corp-it-us-east-2_pub_cidrs_us-east-2b": "10.161.72.0/21",
+    "prod-corp-it-us-east-2_pub_cidrs_us-east-2c": "10.161.136.0/21",
+    "prod-corp-it-us-west-2_app_cidrs_us-west-2a": "10.160.16.0/21",
+    "prod-corp-it-us-west-2_app_cidrs_us-west-2b": "10.160.80.0/21",
+    "prod-corp-it-us-west-2_app_cidrs_us-west-2c": "10.160.144.0/21",
+    "prod-corp-it-us-west-2_db_cidrs_us-west-2a": "10.160.0.0/21",
+    "prod-corp-it-us-west-2_db_cidrs_us-west-2b": "10.160.64.0/21",
+    "prod-corp-it-us-west-2_db_cidrs_us-west-2c": "10.160.128.0/21",
+    "prod-corp-it-us-west-2_pub_cidrs_us-west-2a": "10.160.8.0/21",
+    "prod-corp-it-us-west-2_pub_cidrs_us-west-2b": "10.160.72.0/21",
+    "prod-corp-it-us-west-2_pub_cidrs_us-west-2c": "10.160.136.0/21",
+    "prod-eu-west-1_app_cidrs_eu-west-1a": "10.228.0.0/20",
+    "prod-eu-west-1_app_cidrs_eu-west-1b": "10.228.16.0/20",
+    "prod-eu-west-1_app_cidrs_eu-west-1c": "10.228.32.0/20",
+    "prod-eu-west-1_con_cidrs_eu-west-1a": "10.228.48.0/20",
+    "prod-eu-west-1_con_cidrs_eu-west-1b": "10.228.64.0/20",
+    "prod-eu-west-1_con_cidrs_eu-west-1c": "10.228.80.0/20",
+    "prod-eu-west-1_db_cidrs_eu-west-1a": "10.228.128.0/23",
+    "prod-eu-west-1_db_cidrs_eu-west-1b": "10.228.130.0/23",
+    "prod-eu-west-1_db_cidrs_eu-west-1c": "10.228.132.0/23",
+    "prod-eu-west-1_edge_proxy_cidrs_eu-west-1a": "10.228.137.0/26",
+    "prod-eu-west-1_edge_proxy_cidrs_eu-west-1b": "10.228.137.64/26",
+    "prod-eu-west-1_edge_proxy_cidrs_eu-west-1c": "10.228.137.128/26",
+    "prod-eu-west-1_pub_cidrs_eu-west-1a": "10.228.134.0/24",
+    "prod-eu-west-1_pub_cidrs_eu-west-1b": "10.228.135.0/24",
+    "prod-eu-west-1_pub_cidrs_eu-west-1c": "10.228.136.0/24",
+    "prod-grouponinternal-eu-west-1_app_cidrs_eu-west-1a": "10.233.32.0/23",
+    "prod-grouponinternal-eu-west-1_app_cidrs_eu-west-1b": "10.233.34.0/23",
+    "prod-grouponinternal-eu-west-1_app_cidrs_eu-west-1c": "10.233.36.0/23",
+    "prod-grouponinternal-eu-west-1_con_cidrs_eu-west-1a": "10.233.38.0/23",
+    "prod-grouponinternal-eu-west-1_con_cidrs_eu-west-1b": "10.233.40.0/23",
+    "prod-grouponinternal-eu-west-1_con_cidrs_eu-west-1c": "10.233.42.0/23",
+    "prod-grouponinternal-eu-west-1_db_cidrs_eu-west-1a": "10.233.44.0/25",
+    "prod-grouponinternal-eu-west-1_db_cidrs_eu-west-1b": "10.233.44.128/25",
+    "prod-grouponinternal-eu-west-1_db_cidrs_eu-west-1c": "10.233.45.0/25",
+    "prod-grouponinternal-eu-west-1_pub_cidrs_eu-west-1a": "10.233.45.128/25",
+    "prod-grouponinternal-eu-west-1_pub_cidrs_eu-west-1b": "10.233.46.0/25",
+    "prod-grouponinternal-eu-west-1_pub_cidrs_eu-west-1c": "10.233.46.128/25",
+    "prod-grouponinternal-us-west-2_app_cidrs_us-west-2a": "10.224.32.0/23",
+    "prod-grouponinternal-us-west-2_app_cidrs_us-west-2b": "10.224.34.0/23",
+    "prod-grouponinternal-us-west-2_app_cidrs_us-west-2c": "10.224.36.0/23",
+    "prod-grouponinternal-us-west-2_con_cidrs_us-west-2a": "10.224.38.0/23",
+    "prod-grouponinternal-us-west-2_con_cidrs_us-west-2b": "10.224.40.0/23",
+    "prod-grouponinternal-us-west-2_con_cidrs_us-west-2c": "10.224.42.0/23",
+    "prod-grouponinternal-us-west-2_db_cidrs_us-west-2a": "10.224.44.0/25",
+    "prod-grouponinternal-us-west-2_db_cidrs_us-west-2b": "10.224.44.128/25",
+    "prod-grouponinternal-us-west-2_db_cidrs_us-west-2c": "10.224.45.0/25",
+    "prod-grouponinternal-us-west-2_pub_cidrs_us-west-2a": "10.224.45.128/25",
+    "prod-grouponinternal-us-west-2_pub_cidrs_us-west-2b": "10.224.46.0/25",
+    "prod-grouponinternal-us-west-2_pub_cidrs_us-west-2c": "10.224.46.128/25",
+    "prod-us-west-1_app_cidrs_us-west-1a": "10.211.0.0/19",
+    "prod-us-west-1_app_cidrs_us-west-1c": "10.211.32.0/19",
+    "prod-us-west-1_con_cidrs_us-west-1a": "10.211.64.0/19",
+    "prod-us-west-1_con_cidrs_us-west-1b": "10.211.142.0/24",
+    "prod-us-west-1_con_cidrs_us-west-1c": "10.211.96.0/19",
+    "prod-us-west-1_db_cidrs_us-west-1a": "10.211.128.0/22",
+    "prod-us-west-1_db_cidrs_us-west-1c": "10.211.132.0/22",
+    "prod-us-west-1_edge_proxy_cidrs_us-west-1a": "10.211.140.0/25",
+    "prod-us-west-1_edge_proxy_cidrs_us-west-1c": "10.211.140.128/25",
+    "prod-us-west-1_pub_cidrs_us-west-1a": "10.211.136.0/23",
+    "prod-us-west-1_pub_cidrs_us-west-1c": "10.211.138.0/23",
+    "prod-us-west-2_app_cidrs_us-west-2a": "10.219.0.0/20",
+    "prod-us-west-2_app_cidrs_us-west-2b": "10.219.16.0/20",
+    "prod-us-west-2_app_cidrs_us-west-2c": "10.219.32.0/20",
+    "prod-us-west-2_con_cidrs_us-west-2a": "10.219.48.0/20",
+    "prod-us-west-2_con_cidrs_us-west-2b": "10.219.64.0/20",
+    "prod-us-west-2_con_cidrs_us-west-2c": "10.219.80.0/20",
+    "prod-us-west-2_db_cidrs_us-west-2a": "10.219.128.0/23",
+    "prod-us-west-2_db_cidrs_us-west-2b": "10.219.130.0/23",
+    "prod-us-west-2_db_cidrs_us-west-2c": "10.219.132.0/23",
+    "prod-us-west-2_edge_proxy_cidrs_us-west-2a": "10.219.137.0/26",
+    "prod-us-west-2_edge_proxy_cidrs_us-west-2b": "10.219.137.64/26",
+    "prod-us-west-2_edge_proxy_cidrs_us-west-2c": "10.219.137.128/26",
+    "prod-us-west-2_pub_cidrs_us-west-2a": "10.219.134.0/24",
+    "prod-us-west-2_pub_cidrs_us-west-2b": "10.219.135.0/24",
+    "prod-us-west-2_pub_cidrs_us-west-2c": "10.219.136.0/24",
+    "recreate-us-west-2_app_cidrs_us-west-2a": "10.224.80.0/25",
+    "recreate-us-west-2_app_cidrs_us-west-2b": "10.224.80.128/25",
+    "recreate-us-west-2_app_cidrs_us-west-2c": "10.224.81.0/25",
+    "recreate-us-west-2_con_cidrs_us-west-2a": "10.224.83.0/25",
+    "recreate-us-west-2_con_cidrs_us-west-2b": "10.224.83.128/25",
+    "recreate-us-west-2_con_cidrs_us-west-2c": "10.224.84.0/25",
+    "recreate-us-west-2_db_cidrs_us-west-2a": "10.224.81.128/25",
+    "recreate-us-west-2_db_cidrs_us-west-2b": "10.224.82.0/25",
+    "recreate-us-west-2_db_cidrs_us-west-2c": "10.224.82.128/25",
+    "recreate-us-west-2_pub_cidrs_us-west-2a": "10.224.84.128/25",
+    "recreate-us-west-2_pub_cidrs_us-west-2b": "10.224.85.0/25",
+    "recreate-us-west-2_pub_cidrs_us-west-2c": "10.224.85.128/25",
+    "sac1": "10.32.0.0/14",
+    "security-us-west-2_app_cidrs_us-west-2a": "10.224.16.0/23",
+    "security-us-west-2_app_cidrs_us-west-2b": "10.224.18.0/23",
+    "security-us-west-2_app_cidrs_us-west-2c": "10.224.20.0/23",
+    "security-us-west-2_con_cidrs_us-west-2a": "10.224.30.0/25",
+    "security-us-west-2_con_cidrs_us-west-2b": "10.224.30.128/25",
+    "security-us-west-2_con_cidrs_us-west-2c": "10.224.31.0/25",
+    "security-us-west-2_db_cidrs_us-west-2a": "10.224.27.0/24",
+    "security-us-west-2_db_cidrs_us-west-2b": "10.224.28.0/24",
+    "security-us-west-2_db_cidrs_us-west-2c": "10.224.29.0/24",
+    "security-us-west-2_pub_cidrs_us-west-2a": "10.224.24.0/24",
+    "security-us-west-2_pub_cidrs_us-west-2b": "10.224.25.0/24",
+    "security-us-west-2_pub_cidrs_us-west-2c": "10.224.26.0/24",
+    "snc1_1": "10.20.0.0/14",
+    "snc1_2": "10.24.0.0/15",
+    "stable-corp-it-ap-south-1_app_cidrs_ap-south-1a": "10.172.16.0/21",
+    "stable-corp-it-ap-south-1_app_cidrs_ap-south-1b": "10.172.80.0/21",
+    "stable-corp-it-ap-south-1_db_cidrs_ap-south-1a": "10.172.0.0/21",
+    "stable-corp-it-ap-south-1_db_cidrs_ap-south-1b": "10.172.64.0/21",
+    "stable-corp-it-ap-south-1_pub_cidrs_ap-south-1a": "10.172.8.0/21",
+    "stable-corp-it-ap-south-1_pub_cidrs_ap-south-1b": "10.172.72.0/21",
+    "stable-corp-it-ap-southeast-2_app_cidrs_ap-southeast-2a": "10.173.16.0/21",
+    "stable-corp-it-ap-southeast-2_app_cidrs_ap-southeast-2b": "10.173.80.0/21",
+    "stable-corp-it-ap-southeast-2_app_cidrs_ap-southeast-2c": "10.173.144.0/21",
+    "stable-corp-it-ap-southeast-2_db_cidrs_ap-southeast-2a": "10.173.0.0/21",
+    "stable-corp-it-ap-southeast-2_db_cidrs_ap-southeast-2b": "10.173.64.0/21",
+    "stable-corp-it-ap-southeast-2_db_cidrs_ap-southeast-2c": "10.173.128.0/21",
+    "stable-corp-it-ap-southeast-2_pub_cidrs_ap-southeast-2a": "10.173.8.0/21",
+    "stable-corp-it-ap-southeast-2_pub_cidrs_ap-southeast-2b": "10.173.72.0/21",
+    "stable-corp-it-ap-southeast-2_pub_cidrs_ap-southeast-2c": "10.173.136.0/21",
+    "stable-corp-it-eu-central-1_app_cidrs_eu-central-1a": "10.170.16.0/21",
+    "stable-corp-it-eu-central-1_app_cidrs_eu-central-1b": "10.170.80.0/21",
+    "stable-corp-it-eu-central-1_app_cidrs_eu-central-1c": "10.170.144.0/21",
+    "stable-corp-it-eu-central-1_db_cidrs_eu-central-1a": "10.170.0.0/21",
+    "stable-corp-it-eu-central-1_db_cidrs_eu-central-1b": "10.170.64.0/21",
+    "stable-corp-it-eu-central-1_db_cidrs_eu-central-1c": "10.170.128.0/21",
+    "stable-corp-it-eu-central-1_pub_cidrs_eu-central-1a": "10.170.8.0/21",
+    "stable-corp-it-eu-central-1_pub_cidrs_eu-central-1b": "10.170.72.0/21",
+    "stable-corp-it-eu-central-1_pub_cidrs_eu-central-1c": "10.170.136.0/21",
+    "stable-corp-it-us-east-2_app_cidrs_us-east-2a": "10.174.16.0/21",
+    "stable-corp-it-us-east-2_app_cidrs_us-east-2b": "10.174.80.0/21",
+    "stable-corp-it-us-east-2_app_cidrs_us-east-2c": "10.174.144.0/21",
+    "stable-corp-it-us-east-2_db_cidrs_us-east-2a": "10.174.0.0/21",
+    "stable-corp-it-us-east-2_db_cidrs_us-east-2b": "10.174.64.0/21",
+    "stable-corp-it-us-east-2_db_cidrs_us-east-2c": "10.174.128.0/21",
+    "stable-corp-it-us-east-2_pub_cidrs_us-east-2a": "10.174.8.0/21",
+    "stable-corp-it-us-east-2_pub_cidrs_us-east-2b": "10.174.72.0/21",
+    "stable-corp-it-us-east-2_pub_cidrs_us-east-2c": "10.174.136.0/21",
+    "stable-corp-it-us-west-2_app_cidrs_us-west-2a": "10.169.16.0/21",
+    "stable-corp-it-us-west-2_app_cidrs_us-west-2b": "10.169.80.0/21",
+    "stable-corp-it-us-west-2_app_cidrs_us-west-2c": "10.169.144.0/21",
+    "stable-corp-it-us-west-2_db_cidrs_us-west-2a": "10.169.0.0/21",
+    "stable-corp-it-us-west-2_db_cidrs_us-west-2b": "10.169.64.0/21",
+    "stable-corp-it-us-west-2_db_cidrs_us-west-2c": "10.169.128.0/21",
+    "stable-corp-it-us-west-2_pub_cidrs_us-west-2a": "10.169.8.0/21",
+    "stable-corp-it-us-west-2_pub_cidrs_us-west-2b": "10.169.72.0/21",
+    "stable-corp-it-us-west-2_pub_cidrs_us-west-2c": "10.169.136.0/21",
+    "stable-grouponinternal-eu-west-1_app_cidrs_eu-west-1a": "10.233.48.0/23",
+    "stable-grouponinternal-eu-west-1_app_cidrs_eu-west-1b": "10.233.50.0/23",
+    "stable-grouponinternal-eu-west-1_app_cidrs_eu-west-1c": "10.233.52.0/23",
+    "stable-grouponinternal-eu-west-1_con_cidrs_eu-west-1a": "10.233.54.0/23",
+    "stable-grouponinternal-eu-west-1_con_cidrs_eu-west-1b": "10.233.56.0/23",
+    "stable-grouponinternal-eu-west-1_con_cidrs_eu-west-1c": "10.233.58.0/23",
+    "stable-grouponinternal-eu-west-1_db_cidrs_eu-west-1a": "10.233.60.0/25",
+    "stable-grouponinternal-eu-west-1_db_cidrs_eu-west-1b": "10.233.60.128/25",
+    "stable-grouponinternal-eu-west-1_db_cidrs_eu-west-1c": "10.233.61.0/25",
+    "stable-grouponinternal-eu-west-1_pub_cidrs_eu-west-1a": "10.233.61.128/25",
+    "stable-grouponinternal-eu-west-1_pub_cidrs_eu-west-1b": "10.233.62.0/25",
+    "stable-grouponinternal-eu-west-1_pub_cidrs_eu-west-1c": "10.233.62.128/25",
+    "stable-grouponinternal-us-west-2_app_cidrs_us-west-2a": "10.224.48.0/23",
+    "stable-grouponinternal-us-west-2_app_cidrs_us-west-2b": "10.224.50.0/23",
+    "stable-grouponinternal-us-west-2_app_cidrs_us-west-2c": "10.224.52.0/23",
+    "stable-grouponinternal-us-west-2_con_cidrs_us-west-2a": "10.224.54.0/23",
+    "stable-grouponinternal-us-west-2_con_cidrs_us-west-2b": "10.224.56.0/23",
+    "stable-grouponinternal-us-west-2_con_cidrs_us-west-2c": "10.224.58.0/23",
+    "stable-grouponinternal-us-west-2_db_cidrs_us-west-2a": "10.224.60.0/25",
+    "stable-grouponinternal-us-west-2_db_cidrs_us-west-2b": "10.224.60.128/25",
+    "stable-grouponinternal-us-west-2_db_cidrs_us-west-2c": "10.224.61.0/25",
+    "stable-grouponinternal-us-west-2_pub_cidrs_us-west-2a": "10.224.61.128/25",
+    "stable-grouponinternal-us-west-2_pub_cidrs_us-west-2b": "10.224.62.0/25",
+    "stable-grouponinternal-us-west-2_pub_cidrs_us-west-2c": "10.224.62.128/25",
+    "staging-eu-west-1_app_cidrs_eu-west-1a": "10.230.0.0/20",
+    "staging-eu-west-1_app_cidrs_eu-west-1b": "10.230.16.0/20",
+    "staging-eu-west-1_app_cidrs_eu-west-1c": "10.230.32.0/20",
+    "staging-eu-west-1_con_cidrs_eu-west-1a": "10.230.48.0/20",
+    "staging-eu-west-1_con_cidrs_eu-west-1b": "10.230.64.0/20",
+    "staging-eu-west-1_con_cidrs_eu-west-1c": "10.230.80.0/20",
+    "staging-eu-west-1_db_cidrs_eu-west-1a": "10.230.128.0/23",
+    "staging-eu-west-1_db_cidrs_eu-west-1b": "10.230.130.0/23",
+    "staging-eu-west-1_db_cidrs_eu-west-1c": "10.230.132.0/23",
+    "staging-eu-west-1_edge_proxy_cidrs_eu-west-1a": "10.230.137.0/26",
+    "staging-eu-west-1_edge_proxy_cidrs_eu-west-1b": "10.230.137.64/26",
+    "staging-eu-west-1_edge_proxy_cidrs_eu-west-1c": "10.230.137.128/26",
+    "staging-eu-west-1_pub_cidrs_eu-west-1a": "10.230.134.0/24",
+    "staging-eu-west-1_pub_cidrs_eu-west-1b": "10.230.135.0/24",
+    "staging-eu-west-1_pub_cidrs_eu-west-1c": "10.230.136.0/24",
+    "staging-us-west-1_app_cidrs_us-west-1a": "10.213.0.0/20",
+    "staging-us-west-1_app_cidrs_us-west-1c": "10.213.16.0/20",
+    "staging-us-west-1_con_cidrs_us-west-1a": "10.213.48.0/20",
+    "staging-us-west-1_con_cidrs_us-west-1b": "10.213.138.0/24",
+    "staging-us-west-1_con_cidrs_us-west-1c": "10.213.64.0/20",
+    "staging-us-west-1_db_cidrs_us-west-1a": "10.213.128.0/23",
+    "staging-us-west-1_db_cidrs_us-west-1c": "10.213.130.0/23",
+    "staging-us-west-1_edge_proxy_cidrs_us-west-1a": "10.213.137.0/26",
+    "staging-us-west-1_edge_proxy_cidrs_us-west-1c": "10.213.137.64/26",
+    "staging-us-west-1_pub_cidrs_us-west-1a": "10.213.134.0/24",
+    "staging-us-west-1_pub_cidrs_us-west-1c": "10.213.135.0/24",
+    "staging-us-west-2-new_app_cidrs_us-west-2a": "10.221.0.0/20",
+    "staging-us-west-2-new_app_cidrs_us-west-2b": "10.221.16.0/20",
+    "staging-us-west-2-new_app_cidrs_us-west-2c": "10.221.32.0/20",
+    "staging-us-west-2-new_con_cidrs_us-west-2a": "10.221.48.0/20",
+    "staging-us-west-2-new_con_cidrs_us-west-2b": "10.221.64.0/20",
+    "staging-us-west-2-new_con_cidrs_us-west-2c": "10.221.80.0/20",
+    "staging-us-west-2-new_db_cidrs_us-west-2a": "10.221.128.0/23",
+    "staging-us-west-2-new_db_cidrs_us-west-2b": "10.221.130.0/23",
+    "staging-us-west-2-new_db_cidrs_us-west-2c": "10.221.132.0/23",
+    "staging-us-west-2-new_edge_proxy_cidrs_us-west-2a": "10.221.137.0/26",
+    "staging-us-west-2-new_edge_proxy_cidrs_us-west-2b": "10.221.137.64/26",
+    "staging-us-west-2-new_edge_proxy_cidrs_us-west-2c": "10.221.137.128/26",
+    "staging-us-west-2-new_pub_cidrs_us-west-2a": "10.221.134.0/24",
+    "staging-us-west-2-new_pub_cidrs_us-west-2b": "10.221.135.0/24",
+    "staging-us-west-2-new_pub_cidrs_us-west-2c": "10.221.136.0/24"
+}
+
+
+# -*- coding: utf-8 -*-
+# pep8-ignore: E501, E241
+# pylint: disable=invalid-name
+
+"""
+IP subnet calculator.
+
+.. moduleauthor:: Wijnand Modderman-Lenstra <maze@pyth0n.org>
+.. note:: BSD License
+
+About
+=====
+
+This module allows you to perform network calculations.
+
+References
+==========
+
+References:
+ * http://www.estoile.com/links/ipv6.pdf
+ * http://www.iana.org/assignments/ipv4-address-space
+ * http://www.iana.org/assignments/multicast-addresses
+ * http://www.iana.org/assignments/ipv6-address-space
+ * http://www.iana.org/assignments/ipv6-tla-assignments
+ * http://www.iana.org/assignments/ipv6-multicast-addresses
+ * http://www.iana.org/assignments/ipv6-anycast-addresses
+
+Thanks
+======
+
+Thanks to all who have contributed:
+
+https://github.com/tehmaze/ipcalc/graphs/contributors
+"""
+
+# from __future__ import print_function
+
+__version__ = '1.99.0'
+
+
+import re
+import six
+
+
+MAX_IPV6 = (1 << 128) - 1
+MAX_IPV4 = (1 << 32) - 1
+BASE_6TO4 = (0x2002 << 112)
+
+
+class IP(object):
+
+    """
+    Represent a single IP address.
+
+    :param ip: the ip address
+    :type ip: :class:`IP` or str or long or int
+
+    >>> localhost = IP("127.0.0.1")
+    >>> print(localhost)
+    127.0.0.1
+    >>> localhost6 = IP("::1")
+    >>> print(localhost6)
+    0000:0000:0000:0000:0000:0000:0000:0001
+    """
+
+    # Hex-to-Bin conversion masks
+    _bitmask = {
+        '0': '0000', '1': '0001', '2': '0010', '3': '0011',
+        '4': '0100', '5': '0101', '6': '0110', '7': '0111',
+        '8': '1000', '9': '1001', 'a': '1010', 'b': '1011',
+        'c': '1100', 'd': '1101', 'e': '1110', 'f': '1111'
+    }
+
+    # IP range specific information, see IANA allocations.
+    _range = {
+        # http://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xhtml
+        4: {
+            '00000000':                 'THIS HOST',             # 0/8
+            '00001010':                 'PRIVATE',               # 10/8
+            '0110010001':               'SHARED ADDRESS SPACE',  # 100.64/10
+            '01111111':                 'LOOPBACK',              # 127/8
+            '101011000001':             'PRIVATE',               # 172.16/12
+            '110000000000000000000000': 'IETF PROTOCOL',         # 192/24
+            '110000000000000000000010': 'TEST-NET-1',            # 192.0.2/24
+            '110000000101100001100011': '6TO4-RELAY ANYCAST',    # 192.88.99/24
+            '1100000010101000':         'PRIVATE',               # 192.168/16
+            '110001100001001':          'BENCHMARKING',          # 198.18/15
+            '110001100011001':          'TEST-NET-2',            # 198.51.100/24
+            '110010110000000':          'TEST-NET-3',            # 203.0.113/24
+            '1111':                     'RESERVED',              # 240/4
+
+        },
+        # http://www.iana.org/assignments/iana-ipv6-special-registry/iana-ipv6-special-registry.xhtml
+        6: {
+            '0' * 128:                          'UNSPECIFIED',    # ::/128
+            '0' * 127 + '1':                    'LOOPBACK',       # ::1/128
+            '0' * 96:                           'IPV4COMP',       # ::/96
+            '0' * 80 + '1' * 16:                'IPV4MAP',        # ::ffff:0:0/96
+                                                                  # 64:ff9b::/96
+            '00000000011001001111111110011011' + 64 * '0': 'IPV4-IPV6',
+            '00000001' + 56 * '0':              'DISCARD-ONLY',   # 100::/64
+            '0010000000000001' + 7 * '0':       'IETF PROTOCOL',  # 2001::/23
+            '0010000000000001' + 16 * '0':      'TEREDO',         # 2001::/32
+                                                                  # 2001:2::/48
+            '00100000000000010000000000000010000000000000000': 'BENCHMARKING',
+            '00100000000000010000110110111000': 'DOCUMENTATION',  # 2001:db8::/32
+            '0010000000000001000000000001':     'DEPRECATED',     # 2001:10::/28
+            '0010000000000001000000000010':     'ORCHIDv2',       # 2001:20::/28
+            '0010000000000010':                 '6TO4',           # 2002::/16
+            '11111100000000000':                'UNIQUE-LOCAL',   # fc00::/7
+            '1111111010':                       'LINK-LOCAL',     # fe80::/10
+        }
+    }
+
+    def __init__(self, ip, mask=None, version=0):
+        """Initialize a new IPv4 or IPv6 address."""
+        self.mask = mask
+        self.v = 0
+        # Parse input
+        if ip is None:
+            raise ValueError('Can not pass None')
+        elif isinstance(ip, IP):
+            self.ip = ip.ip
+            self.dq = ip.dq
+            self.v = ip.v
+            self.mask = ip.mask
+        elif isinstance(ip, six.integer_types):
+            self.ip = int(ip)
+            if self.ip <= MAX_IPV4:
+                self.v = version or 4
+                self.dq = self._itodq(ip)
+            else:
+                self.v = version or 6
+                self.dq = self._itodq(ip)
+        else:
+            # network identifier
+            if '%' in ip:
+                ip = ip.split('%', 1)[0]
+            # If string is in CIDR or netmask notation
+            if '/' in ip:
+                ip, mask = ip.split('/', 1)
+                self.mask = mask
+            self.v = version or 0
+            self.dq = ip
+            self.ip = self._dqtoi(ip)
+            assert self.v != 0, 'Could not parse input'
+        # Netmask defaults to one ip
+        if self.mask is None:
+            self.mask = {4: 32, 6: 128}[self.v]
+        # Netmask is numeric CIDR subnet
+        elif isinstance(self.mask, six.integer_types) or self.mask.isdigit():
+            self.mask = int(self.mask)
+        # Netmask is in subnet notation
+        elif isinstance(self.mask, six.string_types):
+            limit = [32, 128][':' in self.mask]
+            inverted = ~self._dqtoi(self.mask)
+            if inverted == -1:
+                self.mask = 0
+            else:
+                count = 0
+                while inverted & pow(2, count):
+                    count += 1
+                self.mask = (limit - count)
+        else:
+            raise ValueError('Invalid netmask')
+        # Validate subnet size
+        if self.v == 6:
+            self.dq = self._itodq(self.ip)
+            if not 0 <= self.mask <= 128:
+                raise ValueError('IPv6 subnet size must be between 0 and 128')
+        elif self.v == 4:
+            if not 0 <= self.mask <= 32:
+                raise ValueError('IPv4 subnet size must be between 0 and 32')
+
+    def bin(self):
+        """Full-length binary representation of the IP address.
+
+        >>> ip = IP("127.0.0.1")
+        >>> print(ip.bin())
+        01111111000000000000000000000001
+        """
+        bits = self.v == 4 and 32 or 128
+        return bin(self.ip).split('b')[1].rjust(bits, '0')
+
+    def hex(self):
+        """Full-length hexadecimal representation of the IP address.
+
+        >>> ip = IP("127.0.0.1")
+        >>> print(ip.hex())
+        7f000001
+        """
+        if self.v == 4:
+            return '%08x' % self.ip
+        else:
+            return '%032x' % self.ip
+
+    def subnet(self):
+        """CIDR subnet size."""
+        return self.mask
+
+    def version(self):
+        """IP version.
+
+        >>> ip = IP("127.0.0.1")
+        >>> print(ip.version())
+        4
+        """
+        return self.v
+
+    def info(self):
+        """Show IANA allocation information for the current IP address.
+
+        >>> ip = IP("127.0.0.1")
+        >>> print(ip.info())
+        LOOPBACK
+        """
+        b = self.bin()
+        for i in range(len(b), 0, -1):
+            if b[:i] in self._range[self.v]:
+                return self._range[self.v][b[:i]]
+        return 'UNKNOWN'
+
+    def _dqtoi(self, dq):
+        """Convert dotquad or hextet to long."""
+        # hex notation
+        if dq.startswith('0x'):
+            return self._dqtoi_hex(dq)
+
+        # IPv6
+        if ':' in dq:
+            return self._dqtoi_ipv6(dq)
+        elif len(dq) == 32:
+            # Assume full heximal notation
+            self.v = 6
+            return int(dq, 16)
+
+        # IPv4
+        if '.' in dq:
+            return self._dqtoi_ipv4(dq)
+
+        raise ValueError('Invalid address input')
+
+    def _dqtoi_hex(self, dq):
+        ip = int(dq[2:], 16)
+        if ip > MAX_IPV6:
+            raise ValueError('%s: IP address is bigger than 2^128' % dq)
+        if ip <= MAX_IPV4:
+            self.v = 4
+        else:
+            self.v = 6
+        return ip
+
+    def _dqtoi_ipv4(self, dq):
+        q = dq.split('.')
+        q.reverse()
+        if len(q) > 4:
+            raise ValueError('%s: IPv4 address invalid: '
+                             'more than 4 bytes' % dq)
+        for x in q:
+            if not 0 <= int(x) <= 255:
+                raise ValueError('%s: IPv4 address invalid: '
+                                 'bytes should be between 0 and 255' % dq)
+        while len(q) < 4:
+            q.insert(1, '0')
+        self.v = 4
+        return sum(int(byte) << 8 * index for index, byte in enumerate(q))
+
+    def _dqtoi_ipv6(self, dq):
+        # Split hextets
+        hx = dq.split(':')
+        if ':::' in dq:
+            raise ValueError("%s: IPv6 address can't contain :::" % dq)
+        # Mixed address (or 4-in-6), ::ffff:192.0.2.42
+        if '.' in dq:
+            col_ind = dq.rfind(":")
+            ipv6part = dq[:col_ind] + ":0:0"
+            return self._dqtoi_ipv6(ipv6part) + self._dqtoi(hx[-1])
+        if len(hx) > 8:
+            raise ValueError('%s: IPv6 address with more than 8 hexlets' % dq)
+        elif len(hx) < 8:
+            # No :: in address
+            if '' not in hx:
+                raise ValueError('%s: IPv6 address invalid: '
+                                 'compressed format malformed' % dq)
+            elif not (dq.startswith('::') or dq.endswith('::')) and len([x for x in hx if x == '']) > 1:
+                raise ValueError('%s: IPv6 address invalid: '
+                                 'compressed format malformed' % dq)
+            ix = hx.index('')
+            px = len(hx[ix + 1:])
+            for x in range(ix + px + 1, 8):
+                hx.insert(ix, '0')
+        elif dq.endswith('::'):
+            pass
+        elif '' in hx:
+            raise ValueError('%s: IPv6 address invalid: '
+                             'compressed format detected in full notation' % dq())
+        ip = ''
+        hx = [x == '' and '0' or x for x in hx]
+        for h in hx:
+            if len(h) < 4:
+                h = '%04x' % int(h, 16)
+            if not 0 <= int(h, 16) <= 0xffff:
+                raise ValueError('%r: IPv6 address invalid: '
+                                 'hexlets should be between 0x0000 and 0xffff' % dq)
+            ip += h
+        self.v = 6
+        return int(ip, 16)
+
+    def _itodq(self, n):
+        """Convert long to dotquad or hextet."""
+        if self.v == 4:
+            return '.'.join(map(str, [
+                (n >> 24) & 0xff,
+                (n >> 16) & 0xff,
+                (n >> 8) & 0xff,
+                n & 0xff,
+            ]))
+        else:
+            n = '%032x' % n
+            return ':'.join(n[4 * x:4 * x + 4] for x in range(0, 8))
+
+    def __str__(self):
+        """Return dotquad representation of the IP.
+
+        >>> ip = IP("::1")
+        >>> print(str(ip))
+        0000:0000:0000:0000:0000:0000:0000:0001
+        """
+        return self.dq
+
+    def __repr__(self):
+        """Return canonical representation of the IP.
+
+        >>> repr(IP("::1"))
+        "IP('::1')"
+        >>> repr(IP("fe80:0000:0000:0000:abde:3eff:ffab:0012/64"))
+        "IP('fe80::abde:3eff:ffab:12/64')"
+        >>> repr(IP("1.2.3.4/29"))
+        "IP('1.2.3.4/29')"
+        >>> repr(IP("127.0.0.1/8"))
+        "IP('127.0.0.1/8')"
+        """
+        dq = self.dq if self.v == 4 else self.to_compressed()
+        args = (self.__class__.__name__, dq, self.mask)
+        if (self.version(), self.mask) in [(4, 32), (6, 128)]:
+            fmt = "{0}('{1}')"
+        else:
+            fmt = "{0}('{1}/{2}')"
+        return fmt.format(*args)
+
+    def __hash__(self):
+        """Hash for collection operations and py:`hash()`."""
+        return hash(self.to_tuple())
+
+    hash = __hash__
+
+    def __int__(self):
+        """Convert to int."""
+        return int(self.ip)
+
+    def __long__(self):
+        """Convert to long."""
+        return self.ip
+
+    def __lt__(self, other):
+        """Less than other test."""
+        return int(self) < int(IP(other))
+
+    def __le__(self, other):
+        """Less than or equal to other test."""
+        return int(self) <= int(IP(other))
+
+    def __ge__(self, other):
+        """Greater than or equal to other test."""
+        return int(self) >= int(IP(other))
+
+    def __gt__(self, other):
+        """Greater than other."""
+        return int(self) > int(IP(other))
+
+    def __eq__(self, other):
+        """Test if other is address is equal to the current address."""
+        return int(self) == int(IP(other))
+
+    def __ne__(self, other):
+        """Test if other is address is not equal to the current address."""
+        return int(self) != int(IP(other))
+
+    def __add__(self, offset):
+        """Add numeric offset to the IP."""
+        if not isinstance(offset, six.integer_types):
+            return ValueError('Value is not numeric')
+        return self.__class__(self.ip + offset, mask=self.mask, version=self.v)
+
+    def __sub__(self, offset):
+        """Substract numeric offset from the IP."""
+        if not isinstance(offset, six.integer_types):
+            return ValueError('Value is not numeric')
+        return self.__class__(self.ip - offset, mask=self.mask, version=self.v)
+
+    @staticmethod
+    def size():
+        """Return network size."""
+        return 1
+
+    def clone(self):
+        """
+        Return a new <IP> object with a copy of this one.
+
+        >>> ip = IP('127.0.0.1')
+        >>> ip2 = ip.clone()
+        >>> ip2
+        IP('127.0.0.1')
+        >>> ip is ip2
+        False
+        >>> ip == ip2
+        True
+        >>> ip.mask = 24
+        >>> ip2.mask
+        32
+        """
+        return IP(self)
+
+    def to_compressed(self):
+        """
+        Compress an IP address to its shortest possible compressed form.
+
+        >>> print(IP('127.0.0.1').to_compressed())
+        127.1
+        >>> print(IP('127.1.0.1').to_compressed())
+        127.1.1
+        >>> print(IP('127.0.1.1').to_compressed())
+        127.0.1.1
+        >>> print(IP('2001:1234:0000:0000:0000:0000:0000:5678').to_compressed())
+        2001:1234::5678
+        >>> print(IP('1234:0000:0000:beef:0000:0000:0000:5678').to_compressed())
+        1234:0:0:beef::5678
+        >>> print(IP('0000:0000:0000:0000:0000:0000:0000:0001').to_compressed())
+        ::1
+        >>> print(IP('fe80:0000:0000:0000:0000:0000:0000:0000').to_compressed())
+        fe80::
+        """
+        if self.v == 4:
+            quads = self.dq.split('.')
+            try:
+                zero = quads.index('0')
+                if zero == 1 and quads.index('0', zero + 1):
+                    quads.pop(zero)
+                    quads.pop(zero)
+                    return '.'.join(quads)
+                elif zero == 2:
+                    quads.pop(zero)
+                    return '.'.join(quads)
+            except ValueError:  # No zeroes
+                pass
+
+            return self.dq
+        else:
+            quads = map(lambda q: '%x' % (int(q, 16)), self.dq.split(':'))
+            quadc = ':%s:' % (':'.join(quads),)
+            zeros = [0, -1]
+
+            # Find the largest group of zeros
+            for match in re.finditer(r'(:[:0]+)', quadc):
+                count = len(match.group(1)) - 1
+                if count > zeros[0]:
+                    zeros = [count, match.start(1)]
+
+            count, where = zeros
+            if count:
+                quadc = quadc[:where] + ':' + quadc[where + count:]
+
+            quadc = re.sub(r'((^:)|(:$))', '', quadc)
+            quadc = re.sub(r'((^:)|(:$))', '::', quadc)
+
+            return quadc
+
+    def to_ipv4(self):
+        """
+        Convert (an IPv6) IP address to an IPv4 address, if possible.
+
+        Only works for IPv4-compat (::/96), IPv4-mapped (::ffff/96), and 6-to-4
+        (2002::/16) addresses.
+
+        >>> ip = IP('2002:c000:022a::')
+        >>> print(ip.to_ipv4())
+        192.0.2.42
+        """
+        if self.v == 4:
+            return self
+        else:
+            if self.bin().startswith('0' * 96):
+                return IP(int(self), version=4)
+            elif self.bin().startswith('0' * 80 + '1' * 16):
+                return IP(int(self) & MAX_IPV4, version=4)
+            elif int(self) & BASE_6TO4:
+                return IP((int(self) - BASE_6TO4) >> 80, version=4)
+            else:
+                return ValueError('%s: IPv6 address is not IPv4 compatible or mapped, '
+                                  'nor an 6-to-4 IP' % self.dq)
+
+    @classmethod
+    def from_bin(cls, value):
+        """Initialize a new network from binary notation."""
+        value = value.lstrip('b')
+        if len(value) == 32:
+            return cls(int(value, 2))
+        elif len(value) == 128:
+            return cls(int(value, 2))
+        else:
+            return ValueError('%r: invalid binary notation' % (value,))
+
+    @classmethod
+    def from_hex(cls, value):
+        """Initialize a new network from hexadecimal notation."""
+        if len(value) == 8:
+            return cls(int(value, 16))
+        elif len(value) == 32:
+            return cls(int(value, 16))
+        else:
+            raise ValueError('%r: invalid hexadecimal notation' % (value,))
+
+    def to_ipv6(self, ip_type='6-to-4'):
+        """
+        Convert (an IPv4) IP address to an IPv6 address.
+
+        >>> ip = IP('192.0.2.42')
+        >>> print(ip.to_ipv6())
+        2002:c000:022a:0000:0000:0000:0000:0000
+
+        >>> print(ip.to_ipv6('compat'))
+        0000:0000:0000:0000:0000:0000:c000:022a
+
+        >>> print(ip.to_ipv6('mapped'))
+        0000:0000:0000:0000:0000:ffff:c000:022a
+        """
+        assert ip_type in ['6-to-4', 'compat', 'mapped'], 'Conversion ip_type not supported'
+        if self.v == 4:
+            if ip_type == '6-to-4':
+                return IP(BASE_6TO4 | int(self) << 80, version=6)
+            elif ip_type == 'compat':
+                return IP(int(self), version=6)
+            elif ip_type == 'mapped':
+                return IP(0xffff << 32 | int(self), version=6)
+        else:
+            return self
+
+    def to_reverse(self):
+        """Convert the IP address to a PTR record.
+
+        Using the .in-addr.arpa zone for IPv4 and .ip6.arpa for IPv6 addresses.
+
+        >>> ip = IP('192.0.2.42')
+        >>> print(ip.to_reverse())
+        42.2.0.192.in-addr.arpa
+        >>> print(ip.to_ipv6().to_reverse())
+        0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.2.2.0.0.0.0.c.2.0.0.2.ip6.arpa
+        """
+        if self.v == 4:
+            return '.'.join(list(self.dq.split('.')[::-1]) + ['in-addr', 'arpa'])
+        else:
+            return '.'.join(list(self.hex())[::-1] + ['ip6', 'arpa'])
+
+    def to_tuple(self):
+        """Used for comparisons."""
+        return (self.dq, self.mask)
+
+    def guess_network(self):
+        netmask = 0x100000000 - 2**(32-self.mask)
+        return Network(netmask & self.ip, mask=self.mask)
+
+
+class Network(IP):
+
+    """
+    Network slice calculations.
+
+    :param ip: network address
+    :type ip: :class:`IP` or str or long or int
+    :param mask: netmask
+    :type mask: int or str
+
+
+    >>> localnet = Network('127.0.0.1/8')
+    >>> print(localnet)
+    127.0.0.1/8
+    """
+
+    def netmask(self):
+        """
+        Network netmask derived from subnet size, as IP object.
+
+        >>> localnet = Network('127.0.0.1/8')
+        >>> print(localnet.netmask())
+        255.0.0.0
+        """
+        return IP(self.netmask_long(), version=self.version())
+
+    def netmask_long(self):
+        """
+        Network netmask derived from subnet size, as long.
+
+        >>> localnet = Network('127.0.0.1/8')
+        >>> print(localnet.netmask_long())
+        4278190080
+        """
+        if self.version() == 4:
+            return (MAX_IPV4 >> (32 - self.mask)) << (32 - self.mask)
+        else:
+            return (MAX_IPV6 >> (128 - self.mask)) << (128 - self.mask)
+
+    def network(self):
+        """
+        Network address, as IP object.
+
+        >>> localnet = Network('127.128.99.3/8')
+        >>> print(localnet.network())
+        127.0.0.0
+        """
+        return IP(self.network_long(), version=self.version())
+
+    def network_long(self):
+        """
+        Network address, as long.
+
+        >>> localnet = Network('127.128.99.3/8')
+        >>> print(localnet.network_long())
+        2130706432
+        """
+        return self.ip & self.netmask_long()
+
+    def broadcast(self):
+        """
+        Broadcast address, as IP object.
+
+        >>> localnet = Network('127.0.0.1/8')
+        >>> print(localnet.broadcast())
+        127.255.255.255
+        """
+        # XXX: IPv6 doesn't have a broadcast address, but it's used for other
+        #      calculations such as <Network.host_last>
+        return IP(self.broadcast_long(), version=self.version())
+
+    def broadcast_long(self):
+        """
+        Broadcast address, as long.
+
+        >>> localnet = Network('127.0.0.1/8')
+        >>> print(localnet.broadcast_long())
+        2147483647
+        """
+        if self.version() == 4:
+            return self.network_long() | (MAX_IPV4 - self.netmask_long())
+        else:
+            return self.network_long() \
+                | (MAX_IPV6 - self.netmask_long())
+
+    def host_first(self):
+        """First available host in this subnet."""
+        if (self.version() == 4 and self.mask > 30) or \
+                (self.version() == 6 and self.mask > 126):
+            return self
+        else:
+            return IP(self.network_long() + 1, version=self.version())
+
+    def host_last(self):
+        """Last available host in this subnet."""
+        if (self.version() == 4 and self.mask == 32) or \
+                (self.version() == 6 and self.mask == 128):
+            return self
+        elif (self.version() == 4 and self.mask == 31) or \
+                (self.version() == 6 and self.mask == 127):
+            return IP(int(self) + 1, version=self.version())
+        else:
+            return IP(self.broadcast_long() - 1, version=self.version())
+
+    def check_collision(self, other):
+        """Check another network against the given network."""
+        other = Network(other)
+        return self.network_long() <= other.network_long() <= self.broadcast_long() or \
+            other.network_long() <= self.network_long() <= other.broadcast_long()
+
+    def __str__(self):
+        """
+        Return CIDR representation of the network.
+
+        >>> net = Network("::1/64")
+        >>> print(str(net))
+        0000:0000:0000:0000:0000:0000:0000:0001/64
+        """
+        return "%s/%d" % (self.dq, self.mask)
+
+    def __contains__(self, ip):
+        """
+        Check if the given ip is part of the network.
+
+        >>> '192.0.2.42' in Network('192.0.2.0/24')
+        True
+        >>> '192.168.2.42' in Network('192.0.2.0/24')
+        False
+        """
+        return self.check_collision(ip)
+
+    def __lt__(self, other):
+        """Compare less than."""
+        return self.size() < Network(other).size()
+
+    def __le__(self, other):
+        """Compare less than or equal to."""
+        return self.size() <= Network(other).size()
+
+    def __gt__(self, other):
+        """Compare greater than."""
+        return self.size() > Network(other).size()
+
+    def __ge__(self, other):
+        """Compare greater than or equal to."""
+        return self.size() >= Network(other).size()
+
+    def __eq__(self, other):
+        """Compare equal."""
+        other = Network(other)
+        return int(self) == int(other) and self.size() == other.size()
+
+    def __ne__(self, other):
+        """Compare not equal."""
+        other = Network(other)
+        return int(self) != int(other) or self.size() != other.size()
+
+    def __hash__(self, other):
+        """Hash the current network."""
+        return hash(int(self))
+
+    def __getitem__(self, key):
+        """Get the nth item or slice of the network."""
+        if isinstance(key, slice):
+            # Work-around IPv6 subnets being huge. Slice indices don't like
+            # long int.
+            x = key.start or 0
+            slice_stop = (key.stop or self.size()) - 1
+            slice_step = key.step or 1
+            arr = list()
+            while x < slice_stop:
+                arr.append(IP(int(self) + x, mask=self.subnet()))
+                x += slice_step
+            return tuple(arr)
+        else:
+            if key >= self.size():
+                raise IndexError("Index out of range: %d > %d" % (key, self.size()-1))
+            return IP(int(self) + (key + self.size()) % self.size(), mask=self.subnet())
+
+    def __iter__(self):
+        """Generate a range of usable host IP addresses within the network.
+
+        >>> for ip in Network('192.168.114.0/30'):
+        ...     print(str(ip))
+        ...
+        192.168.114.1
+        192.168.114.2
+        """
+        curr = int(self.host_first())
+        stop = int(self.host_last())
+        while curr <= stop:
+            yield IP(curr)
+            curr += 1
+
+    def has_key(self, ip):
+        """
+        Check if the given ip is part of the network.
+
+        :param ip: the ip address
+        :type ip: :class:`IP` or str or long or int
+
+        >>> net = Network('192.0.2.0/24')
+        >>> net.has_key('192.168.2.0')
+        False
+        >>> net.has_key('192.0.2.42')
+        True
+        """
+        return self.__contains__(ip)
+
+    def size(self):
+        """
+        Number of ip's within the network.
+
+        >>> net = Network('192.0.2.0/24')
+        >>> print(net.size())
+        256
+        """
+        return 2 ** ({4: 32, 6: 128}[self.version()] - self.mask)
+
+    def __len__(self):
+        return self.size()
+
+
+def my_output(*args, **kwargs):
+
+    ip_address = Element('ip-add').element.value
+
+    for ip1 in data.keys():
+        if(ip_address in Network(data[ip1])):
+            output=f"{ip_address} {ip1} {data[ip1]}"
+    
+    Element('test-output').element.innerHTML=''
+    pyscript.write('test-output',output)
+
+</py-script>
+</body>
+</html>

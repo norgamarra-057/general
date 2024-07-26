@@ -1,0 +1,38 @@
+<div class="main row">
+  <section class="twelve columns">
+
+    <table id="raas-info-list" class="table-row-hover" style="white-space:nowrap;">
+
+      <h3>Shards</h3>
+
+      <thead>
+        <tr>
+          <th>Rl</th>
+          <th>Role</th>
+          <th>Slots</th>
+          <th>Used memory</th>
+          <th>Status</th>
+          <th>Db</th>
+          <th>Node:ID</th>
+          <th>Node</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @shards.each do |shard| %>
+          <tr>
+            <td><%= shard.rl_id %></td>
+            <td><%= shard.role %></td>
+            <td><%= shard.slots %></td>
+            <td><%= number_to_human_size(shard.used_memory) %></td>
+            <td><%= shard.status %></td>
+            <td><%= shard.db.name %></td>
+            <td><%= shard.node.rl_id %></td>
+            <td><%= shard.node.fqdn %></td>
+          </tr>
+        <% end %>
+      </tbody>
+
+    </table>
+  </section>
+</div>

@@ -1,0 +1,21 @@
+CLUSTER NODES:
+NODE:ID ROLE   ADDRESS      EXTERNAL_ADDRESS HOSTNAME             SHARDS CORES FREE_RAM       VERSION        RACK-ID    STATUS
+*node:1 master 10.23.43.190                  raas-shared-big1-uat 1/100  8     28.34GB/29.3GB 4.4.2-35.rhel7 SNC2-R9-6  OK    
+node:2  slave  10.23.44.136                  raas-shared-big2-uat 1/100  8     28.43GB/29.3GB 4.4.2-35.rhel7 SNC2-R10-7 OK    
+node:3  slave  10.23.43.55                   raas-shared-big3-uat 1/100  8     28.43GB/29.3GB 4.4.2-35.rhel7 SNC2-R9-3  OK    
+
+DATABASES:
+DB:ID NAME               TYPE  STATUS SHARDS PLACEMENT REPLICATION PERSISTENCE ENDPOINT                                    
+db:1  test-noreplication redis active 1      dense     disabled    disabled    redis-15581.snc1.raas-shared2-uat.grpn:15581
+db:2  test-replication   redis active 1      dense     enabled     disabled    redis-17862.snc1.raas-shared2-uat.grpn:17862
+
+ENDPOINTS:
+DB:ID       NAME                         ID                  NODE      ROLE     
+db:1        test-noreplication           endpoint:1:1        node:1    single   
+db:2        test-replication             endpoint:2:1        node:2    single   
+
+SHARDS:
+DB:ID       NAME                ID      NODE   ROLE   SLOTS  USED_MEMORY  STATUS
+db:1        test-noreplication  redis:1 node:1 master 1-4096 1.81MB       OK    
+db:2        test-replication    redis:2 node:2 master 1-4096 2.87MB       OK    
+db:2        test-replication    redis:3 node:3 slave  1-4096 1.79MB       OK    

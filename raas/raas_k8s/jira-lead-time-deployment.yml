@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jira-lead-time
+  labels:
+    run: jira-lead-time
+    tier: backend
+  annotations:
+    com.groupon.conveyor.policies/skip-probes: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: jira-lead-time
+      tier: backend
+  template:
+    metadata:
+      labels:
+        run: jira-lead-time
+        tier: backend
+    spec:
+      volumes:
+      - name: vol-etc-telegraf
+        configMap:
+          name: jira-telegraf-conf
+      containers:
+      - name: telegraf-raas
+        image: docker-dev.groupondev.com/telegraf-raas:v1.38
+        resources:
+          requests:
+            cpu: 30m
+            memory: 50Mi
+        command: ["telegraf"]
+        env:
+          - name: INFLUX_URL
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: influx-url
+          - name: ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: environment
+          - name: JIRA_LEAD_TIME_USER
+            valueFrom:
+              secretKeyRef:
+                name: jira
+                key: username
+          - name: JIRA_LEAD_TIME_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: jira
+                key: password
+        volumeMounts:
+        - name: vol-etc-telegraf
+          mountPath: /etc/telegraf/

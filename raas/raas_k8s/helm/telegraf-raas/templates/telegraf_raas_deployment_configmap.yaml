@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-raas-deployment
+data:
+  telegraf-raas-deployment.yml: |-
+{{- include "tgraas.telegraf-raas-deployment" . | indent 4 }}

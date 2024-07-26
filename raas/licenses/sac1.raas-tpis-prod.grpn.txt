@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : sac1.raas-tpis-prod.grpn
+Shards limit : 16
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+hbo5K1cp0+RLmhDTZG1ph+KjxPV176NVmtB8Ltcx2w3yMjPqAxfFbh3L4UJF
+7R7dFzXj535at9Ro9v1trdMa4W9utAUqjGHix5Km/2yX+y8WEkRn6CBJAzZ0
+NVfyeKDYVfExfG3tzIdPEC5CSyFj4pxsX7ppY7Fhe9IHpUXKGtQwC1wvZOCT
+5fn5o329So3uGICpyf70yP7PZiX65UzK3wvD/lpVThoSolWCsJZCE7rzgNOD
+zOPmbOlaWP1HGiFYQ11Gw26SUleKgJ3fxaTFHKtVxl5PE2uIFztNMgUdDz+p
+qN9AzJPbXYwzZIsf/PSXFddweQnk6LhmVVgXdCgR1Q==
+----- LICENSE END -----
+
+

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: failover-timer-memcached
+  labels:
+    run: failover-timer-memcached
+    tier: backend
+  annotations:
+    com.groupon.conveyor.policies/skip-probes: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: failover-timer-memcached
+      tier: backend
+  template:
+    metadata:
+      labels:
+        run: failover-timer-memcached
+        tier: backend
+    spec:
+      containers:
+      - name: failover-timer-memcached
+        image: docker-dev.groupondev.com/raas-memcached-failure-observer:v1.0.8
+        env:
+          - name: ENDPOINT
+            # value: "memcached-10052.snc1.raas-shared1-uat.grpn:10052"
+            value: "occasions--cache.dev:11211"

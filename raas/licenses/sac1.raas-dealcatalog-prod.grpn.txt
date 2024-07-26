@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : sac1.raas-dealcatalog-prod.grpn
+Shards limit : 60
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+aZF/8phsh5/4QY/azAfSsew/qtA5AV9vVHxD/D41Gurfj9W1owRhd9aK0bIv
+6/XCKWvxWjVwcyc+D/+BHO8tqPhrQfA5KNWFHate+59VgFW+hXsKj9EzbkXU
+52bE1+j+w17d97+ZQw8gbiIL1axeLAYmYD2sXpqrHTPffPuP1uJgXRAriFBB
+HhJduZXyIZswwoZZVS0HF0famfSlO0fuGVwaUKM7ahSHWRaxJjFEk2nHgAPF
+TJRodJcdTNEOq8tlw7Z1uuXhzexriKhCUJpMSX8OVsF2HqED/bHXiuyE6V1r
+gXswPDQkpSRx1lE6HWXHtnJ0bz32k3PqEKbEe2bWXQ==
+----- LICENSE END -----
+
+

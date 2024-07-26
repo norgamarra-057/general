@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RaaS - Info</title>
+    <%= csrf_meta_tags %>
+
+    <!--
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    -->
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+
+    <%= stylesheet_link_tag "toolstrap" %>
+    <%= stylesheet_link_tag "icon-font" %>
+    <%= javascript_include_tag "toolstrap" %>
+    <%= javascript_include_tag "jquery.floatThead.min" %>
+
+  </head>
+
+  <body class="panel-in full-height full-width" style="display:inline-block">
+    <header class="header header-blue">
+      <div class="row">
+        <div class="twelve columns">
+          <span class="icon-logo-g pull-left"></span>
+          <h1 class="pull-left"><%= link_to('RaaS', root_path) %></h1>
+          <nav>
+            <ul>
+              <li class="<%= blue_button_class('clusters') %>"><%= link_to('clusters', clusters_path) %></li>
+              <li class="<%= blue_button_class('dbs') %>"><%= link_to('dbs', dbs_path) %></li>
+            </ul>
+          </nav>
+          <p id='p-update' style="margin-left: 500px;">data: <%= distance_of_time_in_words(Time.now - Node.first.updated_at)%> <u><%= link_to('(update)', update_run_path, id: 'update-link') %></u></p>
+        </div>
+      </div>
+    </header>
+
+    <%= yield %>
+
+    <!-- any table with id raas-info-list will have a floating header -->
+    <script type="text/javascript">
+      var $table = $('#raas-info-list');
+      $table.floatThead();
+    </script>
+
+    <script type="text/javascript">
+      $('#update-link').click(function (event) {
+        // event.preventDefault(); // Prevent link from following its href
+        $('#p-update').text('🔄...');
+      });
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,30 @@
+apiVersion: catalog.conveyor.groupon.com/v1
+kind: IAMRolePolicy
+metadata:
+  name: raas-iamrolepolicy
+  namespace: raas-{{ .Values.environment }}
+spec:
+  template:
+    # A name for the AWS role policy. The role policy
+    # name must be unique to the set of inline policies
+    # attached to the role
+    policyName: raas-elasticache-readonly
+
+    # An AWS IAM JSON policy document
+    policyDocument: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "ReadOnlyElasticachePermsRequiredForRAAS",
+            "Effect": "Allow",
+            "Action": [
+              "elasticache:Describe*"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+
+  # The name of an IAMRole resource in the same namespace
+  iamRoleName: raas-iamrole

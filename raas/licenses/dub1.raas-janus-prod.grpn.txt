@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : dub1.raas-janus-prod.grpn
+Shards limit : 512
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+UI799EhJs1pxCet/e+MhvrozbvLLhfrHQLdBNSsUJxraOk1rUvEmsNhn07vs
+yTA8XvqpjxOnDYRt3eNGe7biR/cz3JCl7Fo1H+cRfRVDYWPz1xdLVZETeBsf
+C/FdF+lIzkr8yHlegDrIqxMGuf0xvg5bQPaA0VbKmHyX2czSQsn23tWqcIMz
+p4cVGuSomX0gDZbDAMCcOzmiLG3C5nqkwsN5PZ+FXbedPPyErUr2QvVR43O8
+AtxvoMqSaRxknU5Tjbdh2VsU6Gv3IitJCapi1HQxv1Ez4xrnsyRa0plyXdZp
+8P0+7EP94jXSCqs/rkj1t113buYkxVFJqdML/T3vfg==
+----- LICENSE END -----
+
+

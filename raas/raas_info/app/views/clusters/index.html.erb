@@ -1,0 +1,35 @@
+<div class="main row">
+  <section class="twelve columns">
+
+    <table id="raas-info-list" class="table-row-hover" style="white-space:nowrap;">
+
+      <h3><%= link_to('Clusters', clusters_path) %></h3>
+
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Version</th>
+          <th colspan="9"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @clusters.each do |cluster| %>
+          <tr>
+            <td><%= cluster.name %></td>
+            <td><%= cluster.version %></td>
+            <td><%= link_to image_tag('wavefront_logo', size: 25), "https://groupon.wavefront.com/dashboards/raas_clusters#(g:(d:7200,c:off,l:!t,ls:!t,w:'2h'),p:(cluster:(d:Label,f:SOURCE,l:cluster,m:(Label:x,Label_2:#{cluster.name}),q:'ts(monitord.rlec_cluster_alerts.status)',s:Label_2)))", target: :_blank %></td>
+            <td><%= link_to image_tag('nagios', size: 25), "https://thruk-#{cluster.colo}.groupondev.com/thruk/cgi-bin/status.cgi?hidesearch=2&dfl_s0_type=host&dfl_s0_op=~&entries=all&dfl_s0_value=#{cluster.name}", target: :_blank %></td>
+            <td><%= link_to image_tag('redislabs', size: 25), "https://#{cluster.name}:8443", target: :_blank %></td>
+            <td><%= link_to('nodes', nodes_path(cluster_id: cluster.id)) %></td>
+            <td><%= link_to('shards', shards_path(cluster_id: cluster.id)) %></td>
+            <td><%= link_to('dbs', dbs_path(cluster_id: cluster.id)) %></td>
+            <td>( hosts: </td>
+            <td><%= link_to image_tag('wavefront_logo', size: 25), "https://groupon.wavefront.com/dashboards/raas_hosts#(g:(d:7200,c:off,l:!t,ls:!t,w:'2h'),p:(cluster:(d:#{cluster.monitoring_cluster},l:cluster,m:(#{cluster.monitoring_cluster}:#{cluster.monitoring_cluster}),s:#{cluster.monitoring_cluster}),colo:(d:#{cluster.colo},l:colo,m:(#{cluster.colo}:#{cluster.colo}))))", target: :_blank %></td>
+            <td><%= link_to image_tag('nagios', size: 25), "https://thruk-#{cluster.colo}.groupondev.com/thruk/cgi-bin/status.cgi?hidesearch=2&s0_op=~&entries=all&s0_type=search&s0_value=hg%3A#{cluster.monitoring_cluster}", target: :_blank %>)</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+</div>

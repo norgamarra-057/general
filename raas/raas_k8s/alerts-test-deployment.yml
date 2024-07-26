@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: raas-alerts-test
+  labels:
+    run: raas-alerts-test
+    tier: backend
+  annotations:
+    com.groupon.conveyor.policies/skip-probes: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: raas-alerts-test
+      tier: backend
+  template:
+    metadata:
+      labels:
+        run: raas-alerts-test
+        tier: backend
+    spec:
+      volumes:
+      - name: telegraf-conf
+        configMap:
+          name: alerts-test-telegraf-conf
+      - name: telegrafd
+        configMap:
+          name: alerts-test-telegrafd
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "rfake1-dev-001.mgiuid.0001.usw2.cache.amazonaws.com"
+        - "rfake1-dev-001.mgiuid.0002.usw2.cache.amazonaws.com"
+        - "rfake2-dev-001.mgiuid.0001.usw2.cache.amazonaws.com"
+        - "rfake2-dev-001.mgiuid.0002.usw2.cache.amazonaws.com"
+        - "mfake-dev.mgiuid.0001.usw2.cache.amazonaws.com"
+        - "mfake-dev.mgiuid.0002.usw2.cache.amazonaws.com"
+      containers:
+      - name: rfake
+        image: docker-dev.groupondev.com/raas-fake-redis:1.0
+        resources:
+          requests:
+            cpu: 30m
+            memory: 50Mi
+      - name: mfake
+        image: docker-dev.groupondev.com/raas-fake-memcached:1.0
+        resources:
+          requests:
+            cpu: 30m
+            memory: 50Mi
+      - name: telegraf-raas
+        image: docker-dev.groupondev.com/telegraf-raas:v1.22
+        resources:
+          requests:
+            cpu: 30m
+            memory: 50Mi
+        command: ["telegraf"]
+        args: ["--config-directory", "/etc/telegraf/telegraf.d"]
+        # default --config /etc/telegraf/telegraf.conf
+        # default --config-directory /etc/telegraf/telegraf.d
+        env:
+          - name: INFLUX_URL
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: influx-url
+          - name: ENVIRONMENT
+            valueFrom:
+              configMapKeyRef:
+                name: env-vars
+                key: environment
+        volumeMounts:
+        - name: telegraf-conf
+          mountPath: /etc/telegraf/
+        - name: telegrafd
+          mountPath: /etc/telegraf/telegraf.d/

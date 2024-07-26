@@ -1,0 +1,59 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Rl:</strong>
+  <%= @db.rl_id %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @db.name %>
+</p>
+
+<p>
+  <strong>Engine:</strong>
+  <%= @db.engine %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @db.status %>
+</p>
+
+<p>
+  <strong>Num shards:</strong>
+  <%= @db.num_shards %>
+</p>
+
+<p>
+  <strong>Placement:</strong>
+  <%= @db.placement %>
+</p>
+
+<p>
+  <strong>Replication:</strong>
+  <%= @db.replication %>
+</p>
+
+<p>
+  <strong>Persistence:</strong>
+  <%= @db.persistence %>
+</p>
+
+<p>
+  <strong>Endpoint host:</strong>
+  <%= @db.endpoint_host %>
+</p>
+
+<p>
+  <strong>Endpoint port:</strong>
+  <%= @db.endpoint_port %>
+</p>
+
+<p>
+  <strong>Cluster:</strong>
+  <%= @db.cluster %>
+</p>
+
+<%= link_to 'Edit', edit_db_path(@db) %> |
+<%= link_to 'Back', dbs_path %>

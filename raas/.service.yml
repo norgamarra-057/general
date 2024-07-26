@@ -1,0 +1,68 @@
+version: 4
+name: raas
+title: Redis as a Service (raas)
+description: "Shared Redis service to be used by all of Groupon. <a href='https://confluence.groupondev.com/display/RED/FAQ'>FAQ</a>"
+documentation:
+- name: faq
+  url: https://groupondev.atlassian.net/wiki/display/RED/Cloud+FAQ
+- name: owners_manual
+  url: https://groupondev.atlassian.net/wiki/display/RED/RaaS+Cloud+Manual
+- name: orr_raas
+  url: https://docs.google.com/document/d/1N6FwxmXoKmIa4mVjaHfPkOeOAq4wmhiFsNhRcVEoou0
+- name: gears_raas
+  url: https://docs.google.com/document/d/1lxxI9tOP5YTnOPQbZ48uKVKDVLCNVqHUzvnJ4H8O3wY
+sre:
+  notify: raas-pager@groupon.com
+  dashboards:
+  - https://pages.github.groupondev.com/data/raas/elasticache/list.html
+  pagerduty: https://groupon.pagerduty.com/services/PTK0O0E # URL to pagerduty service page
+  slack_channel_id: redis-memcached
+  new_ticket_link: "https://dse-ops-request.groupondev.com"
+mailing_list: raas-announce@groupon.com
+team:
+  name: raas-team
+  owner: pablo
+  members:
+  - pablo
+  - ksatyamurthy
+  - kbandaru
+  url: https://confluence.groupondev.com/display/RED
+  email: raas-team@groupon.com
+subservices:
+  - name: raas::mon
+    title: "Monitoring Host"
+    description: |
+      Monitors the clusters and databases of the colo
+    repo: https://github.groupondev.com/data/raas
+  - name: raas::redis
+    title: "Redis node"
+    description: |
+      Node of a Redislabs Cluster
+    repo: https://github.groupondev.com/data/redislabs_config
+colos:
+  snc1:
+    environments:  # valid keys are: 'environments'
+      production:  # match these with entries in ops-config/ops_params/environment
+        base_urls: # valid keys are: 'base_urls'
+          internal: "https://snc1.raas-shared1-prod.grpn:8443"  # DO include http(s)://, wrap in quotes
+      staging:     # match these with entries in ops-config/ops_params/environment
+        base_urls:
+          internal: "https://snc1.raas-shared1-staging.grpn:8443"  # DO include http(s)://, wrap in quotes
+      uat:     # match these with entries in ops-config/ops_params/environment
+        base_urls:
+          internal: "https://snc1.raas-shared1-uat.grpn:8443"  # DO include http(s)://, wrap in quotes
+  sac1:
+    environments:  # valid keys are: 'environments'
+      production:  # match these with entries in ops-config/ops_params/environment
+        base_urls: # valid keys are: 'base_urls'
+          internal: "https://sac1.raas-shared1-prod.grpn:8443"  # DO include http(s)://, wrap in quotes
+  dub1:
+    environments:  # valid keys are: 'environments'
+      production:  # match these with entries in ops-config/ops_params/environment
+        base_urls: # valid keys are: 'base_urls'
+          internal: "https://dub1.raas-shared1-prod.grpn:8443"  # DO include http(s)://, wrap in quotes
+schema: disabled
+status_endpoint:
+  disabled: true
+dependencies:
+- raas_dns

@@ -1,0 +1,10 @@
+if host['os_config'].start_with?('centos73')
+  # Redis Pack v5 requires openssl1.0.2
+  # We found that pkg here: http://repo-vip.snc1/mirrors/centos/7.4.1708/os/x86_64/Packages/
+  # Let's add yum repo to get centos7.4's openssl1.0.2 on centos7.3
+  create_symlink '/usr/local/etc/raas_patch_groupon.repo', '/etc/yum.repos.d/raas_patch_groupon.repo'
+end
+
+if host['os_config'].start_with?('centos7')
+  create_symlink '/usr/local/etc/tmp_raas_groupon.conf', '/usr/lib/tmpfiles.d/raas_groupon.conf'
+end

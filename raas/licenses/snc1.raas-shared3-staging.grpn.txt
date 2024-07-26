@@ -1,0 +1,14 @@
+License Owner: Groupon
+Cluster Name : snc1.raas-shared3-staging.grpn
+Shards limit : 2000
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+aaKMhRM1Sfk1xpfGc/viMyHucYQrtJWZdVZej4hjiWo3YxUvNuCTPFW8zDyS
+4QwTBLdpgikWEO8p3+mKoyD1d6eg5eptDIH45kOZYSygUkJ1ZPe/JHzzlrZu
+HXN57LS7Al8dn27R1ONkcHtRgMaE/WlsyspqTzqMDkGDElfDvsnFTcI5S3xW
+bHr0dF4vXZWEG7H4K19KkItrOplYKmJObEg6guzEFeVINYvGja+2CJQr0VIi
+Mcv+4YoZ4MZC0s0KxzJtarG+DZDKxg3Oaa4LbgP+5XMD2DhLUF/pdpF9ot6c
+wW31Uh8cp6q9jyAaJJXDumRZ5l1s59/2SXWq27pM/Q==
+----- LICENSE END -----
+

@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import sys, json
+
+data = json.load(sys.stdin)
+data.pop('authentication_admin_pass', None)
+data.pop('background_op', None)
+data.pop('backup_failure_reason', None)
+data.pop('backup_progress', None)
+data.pop('backup_status', None)
+data.pop('created_time', None)
+data.pop('dns_address_master', None)
+data.pop('endpoint_ip', None)
+data.pop('endpoint_node', None)
+data.pop('endpoints', None)
+data.pop('export_failure_reason', None)
+data.pop('export_progress', None)
+data.pop('export_status', None)
+data.pop('import_failure_reason', None)
+data.pop('import_progress', None)
+data.pop('import_status', None)
+data.pop('last_backup_time', None)
+data.pop('last_changed_time', None)
+data.pop('last_export_time', None)
+data.pop('status', None)
+data.pop('wait_command', None)
+data.pop('shard_list', None)
+data.pop('uid', None)
+data.pop('authentication_ssl_crdt_certs', None)
+data.pop('crdt_sources', None)
+data.pop('tls_mode', None)
+data.pop('replica_sync', None)
+data.pop('replica_sources', None)
+
+# data.pop('port', None)
+# data.pop('name', None)
+
+print json.dumps(data, sort_keys=True, indent=2, separators=(',', ': '))

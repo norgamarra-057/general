@@ -1,0 +1,4 @@
+#FROM jruaux/riot-redis
+FROM fieldengineering/riot
+
+ENTRYPOINT ["tail", "-f" , "/dev/null"]

@@ -1,0 +1,5 @@
+namespace: raas-mon-staging
+deployEnv: staging
+region: us-west-2
+environment: staging
+influx_url: http://telegraf--gateway.staging.service

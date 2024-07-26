@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: riot
+  labels:
+    run: riot
+    tier: backend
+  annotations:
+    com.groupon.conveyor.policies/skip-probes: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: riot
+      tier: backend
+  template:
+    metadata:
+      labels:
+        run: riot
+        tier: backend
+    spec:
+      containers:
+      - name: riot
+        image: docker.groupondev.com/raas-riot:2.16.0
+        resources:
+          requests:
+            cpu: 1
+            memory: 1000Mi

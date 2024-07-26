@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : snc1.raas-watson-kv-prod.grpn
+Shards limit : 650
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+IU40G8zFhIPrLdm6kalv9HbJXwBmRvQ7mJWQfFk4G75R8VDgeXZV8O2RhV/6
+rnxUdTFO4XVAj/bbPBcDARjJBT/WyiEPr+lc/CSGWizmydrbEvlHdhNGqAKU
+UtTCr+BCJF13A7gaJrIezE/pr15Qw/uoNFFdX1nZ6Fn85bF1cStfpENt4Gvf
+U3qjtmILo/E3L31OaZs4hiVZe53jkCe0NqmsOTp8x4J6Vfd4TlhTSoB79hWX
+kWECWBB4BnMS8JV7GmhX5XAQl5QfxQx8zsqzhWO6y7xXGgQqksTTUS7KBenJ
+KNYZPzvZlSl8g0ACHA6/LV53ru6dYwsH+zu4pMFukg==
+----- LICENSE END -----
+
+

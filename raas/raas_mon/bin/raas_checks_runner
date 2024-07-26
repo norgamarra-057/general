@@ -1,0 +1,97 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'fileutils'
+require 'logger'
+require 'set'
+
+$logger = Logger.new(STDOUT)
+
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '../lib/')
+require 'checks_runner'
+
+def get_check_name(shell_command)
+  # ex shell_command = /usr/local/libexec/redislabs/check_aof_params --clustername=us.raas-test1.grpn
+  # -> check_aof_params
+  shell_command.split.first.split('/').last
+end
+
+def get_check_names(rlec_mons)
+  check_names = Set.new
+  rlec_mons.each do |k,v|
+    if v.is_a?(Hash)
+      check_names << get_check_name(v['shell_command'])
+    else # Array
+      v.each do |m|
+        check_names << get_check_name(m['shell_command'])
+      end
+    end
+  end
+  check_names
+end
+
+API_CACHE_DIR = '/var/groupon/raas/api_cache'
+# global variables available to any check script
+# in order to reduce some cpu cycles
+def set_global_variables
+
+  $host = YAML.load_file '/var/tmp/host.yml'
+
+  $dbs = {}
+  $host['params']['clusters'].keys.each do |clustername|
+    cache_file_path = File.join(API_CACHE_DIR, clustername, 'dbs.json')
+    next unless File.exist?(cache_file_path)
+    $dbs[clustername] = JSON.parse IO.read(cache_file_path)
+  end
+
+  $dbs_by_name = {}
+  $dbs.each do |clustername, dbs|
+    $dbs_by_name[clustername] = {}
+    dbs.each do |db|
+      $dbs_by_name[clustername][db['name']] = db
+    end
+  end
+
+  $rladmin_status = {}
+  $host['params']['clusters'].keys.each do |clustername|
+    cache_file_path = File.join(API_CACHE_DIR, clustername, 'rladmin_status.json')
+    next unless File.exist?(cache_file_path)
+    $rladmin_status[clustername] = JSON.parse IO.read(cache_file_path)
+  end
+
+end
+
+begin
+
+  set_global_variables
+
+  TOUCH_CRITICAL = '/tmp/touched_by_raas_checks_runner_when_critical_failure'
+  FileUtils.touch(TOUCH_CRITICAL, :mtime => Time.now - 2*3600) unless File.exist?(TOUCH_CRITICAL)
+
+  logpath = ARGV[0]
+  raise "specify a logpath" if logpath.nil?
+  $logger = Logger.new(logpath)
+  $logger.info "raas_checks_runner"
+  monitord_agent_config = YAML.load_file('/var/groupon/monitord/config.yml')
+  monitoring_cluster = monitord_agent_config['cluster']
+  results_uri = URI.parse(monitord_agent_config['results_url'])
+  rlec_mons = JSON.parse IO.read('/var/groupon/raas_mon/rlec_mons.json')
+  check_names = get_check_names(rlec_mons)
+
+  check_names.each do |check_name|
+    fork {
+      runner = ChecksRunner.new(check_name, monitoring_cluster, results_uri, rlec_mons)
+      runner.load_checks
+      runner.run
+    }
+  end
+
+rescue
+  FileUtils.touch TOUCH_CRITICAL
+  $logger.error $!
+end
+
+# checks_runner start processing at second 10, duration: 60s, +10s grace = 80
+sleep 80
+$logger.info "sending KILL from pid=#{$$}"
+Process.kill('KILL', 0)
