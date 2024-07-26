@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : eu.raas-proximity-prod.grpn
+Shards limit : 16
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+RnJ2gyWtA7lbdK0wpTffzx+YxHga8PhSGygDMzG6VWTSM4xsi2aLx6Dnwx6O
+We2vtSYCkESCxytjZUKjQFx32znDn3K5CxIdHy5qVNiCfOYruZcZMAfvX3hQ
+nDQ89aFRyd9mN1B1pbamSyh7ZvS8EEaa4+hAwSi83V4hBWjK1UnSIChKwbnj
+UP9KK2gQI2RQitWOR7cuTpRCgQRfSQsnXhCo2CqGd7oVNRv4akuNsXxQdaSM
+YVVSqAuEtUK2z7u+08YSczO7NJT7OB8JCl1wG5vn3iGFLISjxDJ2F85WFz8x
+tsUZPulk1RL5V5QAucIYMlWUoWUp/jVmSQ7Ph4PmNw==
+----- LICENSE END -----
+
+

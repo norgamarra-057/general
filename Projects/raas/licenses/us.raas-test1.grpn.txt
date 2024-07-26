@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : us.raas-test1.grpn
+Shards limit : 410
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+JXjJ+bmGkxl5WUkaqrriB1U+WLI2aJcHYKa0i5Ax4bYVSNcALo3RW+0eZK7j
+9EzxAybJ0nXo02pTDawPM+67y9MO+6s/rTDKzIreuk2M4NkXh1h1WyIN39E4
+GmjHAFfd0OzJ2Cx/YnrYCQ/IfryvaRPC1jUElUv3Npk27dp/nrm6Z7Mh7Kpn
+hTSrW/Zrmo6pcuUsBG/7hM4PIfNRo7N45knb19jycuBsY57Q/7+Oo1NM/qFz
+z8nKIEET6vHQugWIjG+6F5huIx6pe79JDmJ2UPX+4/MXzT/RmHM4xuBJ+YXx
+nlq9Vi/jZ3b6wQCwmsLj3VtJatFuhWScYbhsh2rBTA==
+----- LICENSE END -----
+
+

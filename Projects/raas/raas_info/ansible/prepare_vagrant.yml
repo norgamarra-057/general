@@ -1,0 +1,44 @@
+---
+- name: upload custom NetworkManager dns config
+  copy:
+    src: uploads/NetworkManager.groupon.conf
+    dest: /usr/lib/NetworkManager/conf.d/groupon.conf
+  become: true
+  become_user: root
+- name: restart NetworkManager
+  systemd:
+    state: restarted
+    name: NetworkManager
+  become: true
+  become_user: root
+- name: install mariadb-server (drop-in replacement for MySQL)
+  yum:
+    name: mariadb-server
+  become: true
+  become_user: root
+- name: systemd enable mariadb-server
+  systemd:
+    enabled: yes
+    name: mariadb
+  become: true
+  become_user: root
+- name: systemd start mariadb-server
+  systemd:
+    state: started
+    name: mariadb
+  become: true
+  become_user: root
+- name: install MySQL-python (ansible mysql_db module dep)
+  yum:
+    name: MySQL-python
+  become: true
+  become_user: root
+- name: Create database raas_info_dev
+  mysql_db:
+    login_user: root
+    name: raas_info_dev
+    state: present
+- name: create /var/groupon/ dir
+  file: "state=directory path=/var/groupon mode=0755"
+  become: true
+  become_user: root

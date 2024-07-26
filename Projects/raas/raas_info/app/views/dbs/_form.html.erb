@@ -1,0 +1,72 @@
+<%= form_with(model: db, local: true) do |form| %>
+  <% if db.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(db.errors.count, "error") %> prohibited this db from being saved:</h2>
+
+      <ul>
+      <% db.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :rl_id %>
+    <%= form.number_field :rl_id, id: :db_rl_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, id: :db_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :engine %>
+    <%= form.text_field :engine, id: :db_engine %>
+  </div>
+
+  <div class="field">
+    <%= form.label :status %>
+    <%= form.text_field :status, id: :db_status %>
+  </div>
+
+  <div class="field">
+    <%= form.label :num_shards %>
+    <%= form.number_field :num_shards, id: :db_num_shards %>
+  </div>
+
+  <div class="field">
+    <%= form.label :placement %>
+    <%= form.text_field :placement, id: :db_placement %>
+  </div>
+
+  <div class="field">
+    <%= form.label :replication %>
+    <%= form.text_field :replication, id: :db_replication %>
+  </div>
+
+  <div class="field">
+    <%= form.label :persistence %>
+    <%= form.text_field :persistence, id: :db_persistence %>
+  </div>
+
+  <div class="field">
+    <%= form.label :endpoint_host %>
+    <%= form.text_field :endpoint_host, id: :db_endpoint_host %>
+  </div>
+
+  <div class="field">
+    <%= form.label :endpoint_port %>
+    <%= form.number_field :endpoint_port, id: :db_endpoint_port %>
+  </div>
+
+  <div class="field">
+    <%= form.label :cluster_id %>
+    <%= form.text_field :cluster_id, id: :db_cluster_id %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

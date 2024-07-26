@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : dub1.raas-tpis-prod.grpn
+Shards limit : 16
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+V7tAqq2Uu/n0QUFBKYpNac8X9TUAIX2z02+EOkSAspuj7dNp7QfJtYBeLbMB
+zWAWsYGnDzf/nHvBxgeHa/nEM7ypJGKqdPePA7/yGoNrdHa7UBxbZsD7uKWp
+DiZqoPNEy9V4uRW5fDr82PWnpkoVyh6mFnfrLpRbU9+dVzXsjRYL7fKuTF7T
+iyciyUzXO8GpPQZzaF6HhCWjjD5rugOVtR7yUl+wGOwWzR+OWeDfQw2dEu1q
+0uFjL+gGCNYcqdVDnSwqpAQJZUPL6TNc1QOU2LprX5Eg79TZCFbmBZ67TFJm
+PEI/yhw2zdysmT1HfdKO1oczGLWFwiQhakEtQb0prw==
+----- LICENSE END -----
+
+

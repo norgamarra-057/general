@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: yes
+  become_user: "{{ deploy_user }}"
+  vars:
+    rbenv_ruby_version: 2.5.0
+  tasks:
+    - name: check if this is a new vagrant host
+      stat: path=/var/groupon
+      register: var_groupon
+    - import_tasks: prepare_vagrant.yml
+      when: not (var_groupon.stat.isdir is defined and var_groupon.stat.isdir)
+    - name: check ruby {{ rbenv_ruby_version }} is installed
+      shell: "bash -lc 'rbenv versions | grep {{ rbenv_ruby_version }}' | wc -l"
+      register: ruby_installed
+      changed_when: false
+    - import_tasks: install_ruby.yml
+      when: ruby_installed.stdout == "0"
+    - name: check rails app is installed
+      stat: path=/var/groupon/www
+      register: rails_app_dir
+    - import_tasks: prepare_capistrano.yml
+      when: not (rails_app_dir.stat.isdir is defined and rails_app_dir.stat.isdir)
+    - import_tasks: puma_startup.yml

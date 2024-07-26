@@ -1,0 +1,13 @@
+/var/groupon/log/redis/*.log {
+    daily
+    missingok
+    copytruncate
+    rotate 7
+    compress
+    notifempty
+    dateext
+    dateformat -%Y%m%d.%s
+    extension gz
+    delaycompress
+    maxsize 100M
+}

@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : dub1.raas-relevance-rt-prod.grpn
+Shards limit : 300
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+UrVuMZ8LEJHwye/5N7jzQPwuesAqqYSGhf9xQ/2EscblO6sUaqxrMSc6ql7u
+NQQ+rUo8xfVVmhpS6z55/RN6mpkH5PBC9mEeqFCmpWS4g3SubpVMnM4TRXzb
+LWE9QIj5lS9CfdgrMIR4kPunG6Od2+Nc0RXMbXUBIkx6ogUM9R0DgBMfZZUq
+gkT75b7HSVo71wBdV8wSRVAi5Cu2LlsWkscOY3GmZPCxq6YfvfIdbHFdn151
+NEb77r9CJIZhdhtLZ0Xe0R+Unc2v2j/po7v2yDk/mSiUQHXw9wYkfJ336tAI
+Pkf5vftRx43xSGwc7uR/SVyKpY3+kAsMoo7B4aZBwA==
+----- LICENSE END -----
+
+

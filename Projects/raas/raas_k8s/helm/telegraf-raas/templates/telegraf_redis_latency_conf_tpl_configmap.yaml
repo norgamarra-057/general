@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-redis-latency-conf-tpl
+data:
+  redis_latency.conf.tpl: |-
+{{ .Files.Get "files/redis_latency.conf.tpl" | indent 4 }}

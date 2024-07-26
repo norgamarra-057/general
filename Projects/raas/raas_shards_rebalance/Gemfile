@@ -1,0 +1,6 @@
+source 'http://rubygems'
+# source 'http://rubygems.snc1'
+# source 'https://rubygems.org'
+
+gem 'minitest', '5.8.4'
+

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-redis-conf-tpl
+data:
+  redis.conf.tpl: |-
+{{ .Files.Get "files/redis.conf.tpl" | indent 4 }}

@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    dalli (2.7.10)
+    dalli-elasticache (0.2.0)
+      dalli (>= 1.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  dalli (= 2.7.10)
+  dalli-elasticache (= 0.2.0)
+
+BUNDLED WITH
+   1.17.2

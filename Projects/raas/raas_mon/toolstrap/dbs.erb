@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RaaS - Info</title>
+  <link rel="stylesheet" href="toolstrap/stylesheets/toolstrap.css">
+  <link rel="stylesheet" href="toolstrap/stylesheets/icon-font.css">
+</head>
+<body class="panel-in full-height full-width" style="display:inline-block">
+
+  <header class="header header-blue">
+    <div class="row">
+      <div class="twelve columns">
+        <span aria-hidden="true" class="icon-logo-g pull-left"></span>
+        <h1 class="pull-left">RaaS</h1>
+      </div>
+    </div>
+  </header>
+
+  <div class="main row">
+    <section class="twelve columns">
+
+      <table id="dblist" class="table-row-hover" style="white-space:nowrap;">
+        <caption>RaaS Databases</caption>
+        <thead>
+          <tr>
+            <th>cluster <a href="dbs1.html"><span title="icon-arrow-up" class="icon-arrow-up"></span></a></th>
+            <th>db <a href="dbs2.html"><span title="icon-arrow-up" class="icon-arrow-up"></span></a></th>
+            <th>uid</th>
+            <th>host</th>
+            <th>max GB</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>colo</th>
+            <th>env</th>
+            <th>eviction<sup>a</sup></th>
+            <th>shards<sup>b</sup></th>
+            <th>aof_load<sup>c</sup></th>
+            <th>aof GB<sup>d</sup></th>
+            <th>clustering</th>
+            <th>persistence</th>
+            <th>replica</th>
+            <th>type</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <td colspan="21"><sup>a</sup> Eviction <a href="https://redislabs.com/redis-enterprise-documentation/database-configuration/database-eviction-policy/">policies</a> </td>
+          </tr>
+          <tr>
+            <td colspan="21"><sup>b</sup> Number of shards, not counting replica</td>
+          </tr>
+          <tr>
+            <td colspan="21"><sup>c</sup> Maximum time shard’s AOF reload should take (seconds)</td>
+          </tr>
+          <tr>
+            <td colspan="21"><sup>d</sup> Maximum size for shard’s AOF file </td>
+          </tr>
+        </tfoot>
+        <tbody>
+          <% for @h in @dbs %>
+          <tr>
+            <td><%= @h['cluster'] %></td>
+            <td><%= @h['name'] %></td>
+            <td><%= @h['uid'] %></td>
+            <td><%= @h['hostname'] %></td>
+            <td><%= (@h['memory_size'].to_f/1024**3).round(2) %></td>
+            <td><a href="https://<%= @h['cluster'] %>:8443">RedisUI</a></td>
+            <td><a href="https://groupon.wavefront.com/dashboard/raas#(g:(d:7200,c:off,l:!t,ls:!t,w:'2h'),p:(db:(d:Label,f:SOURCE,l:db,m:(Label:<%= @h['name'] %>.<%= @h['cluster'] %>),q:'ts(monitord.rlec_db_stats.instantaneous_ops_per_sec)')))">wavefront</a></td>
+            <td><a href="https://thruk-<%= @h['colo'] %>.groupondev.com/thruk/cgi-bin/status.cgi?host=<%= @h['name'] %>.<%= @h['cluster'] %>">nagios</a></td>
+            <td><a href='https://jira.groupondev.com/issues/?jql=project%20%3DDATA%20AND%20labels%20in%20(raas-new-db)%20AND%20text%20~%20"<%= @h['hostname'] %>"'>jira</a></td>
+            <td><% if @h['resque_web'] %><a href="<%= @h['resque_web'] %>">resque</a><% end %></td>
+            <td><%= @h['colo'] %></td>
+            <td><%= @h['env'] %></td>
+            <td><%= @h['eviction_policy'] %></td>
+            <td><%= @h['shards_count'] %></td>
+            <td><%= @h['data_persistence']=='aof' ? @h['max_aof_load_time'] : '-' %></td>
+            <td><%= @h['data_persistence']=='aof' ? (@h['max_aof_file_size'].to_f/1024**3).round(2) : '-' %></td>
+            <td><%= @h['sharding'] %></td>
+            <td><%= @h['data_persistence']=='disabled' ? '-' : @h['data_persistence'] %></td>
+            <td><%= @h['sync']=='enabled' ? 'Y' : '-' %></td>
+            <td><%= @h['type'] %></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+<script src="toolstrap/javascripts/toolstrap.js"></script>
+<script src="toolstrap/javascripts/jquery.floatThead.min.js"></script>
+<script type="text/javascript">
+var $table = $('#dblist');
+$table.floatThead();
+</script>
+
+</body>
+</html>

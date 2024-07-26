@@ -1,0 +1,1 @@
+curl -s http://raas-info.snc1/dbs2.html| egrep -o 'redis-.*\.grpn|memcached-.*\.grpn'| cut -d. -f1 | cut -d- -f2 | sort -un | bc -l| grep -v '^0$' | awk 'BEGIN{candidate=0}{if(candidate == 0 || $0 == candidate || "10050" == candidate) candidate = $0+1; if($0 > candidate) { print candidate; exit }}'

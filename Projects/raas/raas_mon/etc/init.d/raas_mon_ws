@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# daemonplate info:
+# https://github.groupondev.com/data/daemonplate
+source /usr/local/etc/init.d/daemonplate
+
+restart() {
+    stop
+    sleep 2 # give some time to release http port
+    start
+}
+
+DAEMON_START_CMD="/usr/local/bin/raas_mon_ws >> /var/groupon/log/raas_mon/raas_mon_ws.log 2>&1"
+DAEMON_PIDFILE="/var/run/raas_mon_ws.pid"
+DAEMON_STOP_CMD='eval (pkill -P $(cat /var/run/raas_mon_ws.pid) || kill $(cat /var/run/raas_mon_ws.pid)) && rm /var/run/raas_mon_ws.pid'
+cli_handler $*

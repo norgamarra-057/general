@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-memcached-conf-tpl
+data:
+  memcached.conf.tpl: |-
+{{ .Files.Get "files/memcached.conf.tpl" | indent 4 }}

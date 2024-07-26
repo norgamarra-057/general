@@ -1,0 +1,2383 @@
+---
+colo: snc1
+hardware:
+  cpus: 2
+  disk: 65
+  mem: 7.5
+  rack: SNC2.R7.10
+  type: VM
+  unit: 29
+  vc: access1-2-7-10.snc1
+  vmhost: vmhost539-prod.snc1
+hostclass: raas_mon-2016.11.29_17.28
+hostname: raas-mon1
+id: raas-mon1.snc1
+interfaces:
+  eth0:
+    inet:
+    - 10.22.140.176/24
+    mac: 52:54:d0:05:12:08
+notify:
+- raas-alerts@groupon.com:
+    notify_on:
+    - critical
+    - unknown
+    - warning
+    - ok
+notify_host:
+- raas-pager@groupon.com
+- darwin-alerts@groupon.com
+ops_params:
+  configuration_management: roller
+  environment: production
+  lifecycle: live
+  subservices:
+  - raas::mon
+os_config: centos66_generic_vm-2015.09.30_13.21
+owners:
+- raas-team@groupon.com
+params:
+  clusters:
+    snc1.raas-shared1-uat.grpn:
+      dbs:
+        redis-13997.snc1.raas-shared1-uat.grpn:
+          non_pagers:
+          - pablox@groupon.com
+          pagers:
+          - pabloy@groupon.com
+          name: lba-uat
+          uid: 7
+          port: '13997'
+          memory_size: 107374182
+        redis-11420.snc1.raas-shared1-uat.grpn:
+          name: ghostdb-uat
+          uid: 6
+          port: '11420'
+          memory_size: 107374182
+        redis-10535.snc1.raas-shared1-uat.grpn:
+          name: sportal-cache-uat
+          uid: 5
+          port: '10535'
+          memory_size: 107374182
+        redis-18500.snc1.raas-shared1-uat.grpn:
+          name: sportal-sidekiq-uat
+          uid: 4
+          port: '18500'
+          memory_size: 107374182
+        redis-13239.snc1.raas-shared1-uat.grpn:
+          name: dealestate-resque-uat
+          uid: 2
+          port: '13239'
+          memory_size: 644245094
+        redis-19695.snc1.raas-shared1-uat.grpn:
+          name: dealestate-configuration-uat
+          uid: 1
+          port: '19695'
+          memory_size: 107374182
+        redis-14582.snc1.raas-shared1-uat.grpn:
+          name: goods-stores-test
+          uid: 8
+          port: '14582'
+          memory_size: 107374182
+      non_pagers:
+      - raas-alerts@groupon.com
+      pagers:
+      - raas-alerts@groupon.com
+    us.raas-badges-prod.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      - relevance-runtime@groupon.com
+      pagers:
+      - darwin-alerts@groupon.com
+      dbs:
+        redis-19328.us.raas-badges-prod.grpn:
+          name: Badges
+          uid: 1
+          port: '19328'
+          memory_size: 10737418240
+    us.raas-badges-staging.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      - relevance-runtime@groupon.com
+      pagers:
+      - relevance-runtime@groupon.com
+      dbs:
+        redis-18874.us.raas-badges-staging.grpn:
+          name: BadgesStaging
+          uid: 2
+          port: '18874'
+          memory_size: 5368709120
+    us.raas-dealestate-prod.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      - dealestate-alerts@groupon.com
+      pagers:
+      - dealestate-alerts@groupon.com
+      dbs:
+        redis-13239.us.raas-dealestate-prod.grpn:
+          name: dealestate-resque
+          uid: 2
+          port: '13239'
+          memory_size: 644245094
+        redis-19695.us.raas-dealestate-prod.grpn:
+          name: dealestate-configuration
+          uid: 1
+          port: '19695'
+          memory_size: 107374182
+    us.raas-dealestate-staging.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      - dealestate-alerts@groupon.com
+      pagers:
+      - dealestate-alerts@groupon.com
+      dbs:
+        redis-11564.us.raas-dealestate-staging.grpn:
+          name: dealestate-resque-staging
+          uid: 3
+          port: '11564'
+          memory_size: 644245094
+        redis-17541.us.raas-dealestate-staging.grpn:
+          name: dealestate-configuration-staging
+          uid: 1
+          port: '17541'
+          memory_size: 107374182
+    us.raas-ghost-staging.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      - ghost@groupon.com
+      pagers:
+      - ghost@groupon.com
+      dbs:
+        redis-19361.us.raas-ghost-staging.grpn:
+          name: ghostdb-staging
+          uid: 5
+          port: '19361'
+          memory_size: 214748365
+    us.raas-rapt-prod.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      - rapt-notify@groupon.com
+      pagers:
+      - rapt-notify@groupon.com
+      dbs:
+        redis-12298.us.raas-rapt-prod.grpn:
+          name: sportal-sidekiq
+          uid: 2
+          port: '12298'
+          memory_size: 107374182
+        redis-13921.us.raas-rapt-prod.grpn:
+          name: sportal-cache
+          uid: 1
+          port: '13921'
+          memory_size: 107374182
+    us.raas-rapt-staging.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      - rapt-notify@groupon.com
+      pagers:
+      - rapt-notify@groupon.com
+      dbs:
+        redis-14382.us.raas-rapt-staging.grpn:
+          name: sportal-cache-staging
+          uid: 2
+          port: '14382'
+          memory_size: 107374182
+        redis-19318.us.raas-rapt-staging.grpn:
+          name: sportal-sidekiq-staging
+          uid: 1
+          port: '19318'
+          memory_size: 107374182
+    us.raas-test1.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      pagers:
+      - raas-alerts@groupon.com
+      dbs:
+        redis-17014.us.raas-test1.grpn:
+          name: test1
+          uid: 1
+          port: '17014'
+          memory_size: 107374182
+    us.raas-test3.grpn:
+      non_pagers:
+      - raas-alerts@groupon.com
+      pagers:
+      - raas-alerts@groupon.com
+      dbs:
+        redis-19393.us.raas-test3.grpn:
+          name: netflow
+          uid: 1
+          port: '19393'
+          memory_size: 966367641600
+  foreman:
+    skip_system_users: true
+  monitoring_cluster: raas_mon
+  ntp_servers:
+  - ns1
+  - ns2
+  redislabs_test_app:
+    redishost: redis-17014.us.raas-test1.grpn
+    redisport: 17014
+resolv:
+  nameservers:
+  - 127.0.0.1
+  - 10.20.8.33
+  - 10.20.10.53
+  options: timeout:2 attempts:4
+users:
+- akaminski:
+    sudo: true
+- ansandoval:
+    sudo: true
+- asalinas:
+    sudo: true
+- asutherland:
+    sudo: true
+- awestphal:
+    sudo: true
+- bbloxsom:
+    sudo: true
+- blopulisa:
+    sudo: true
+- bwix:
+    sudo: true
+- c_cstearns:
+    sudo: true
+- c_mbarrie:
+    sudo: true
+- cathair:
+    sudo: true
+- cbovalis:
+    sudo: true
+- chaynie:
+    sudo: true
+- chinh:
+    sudo: true
+- claver:
+    sudo: true
+- cllanca:
+    sudo: true
+- coaustin:
+    sudo: true
+- daniel.schroeder:
+    sudo: true
+- dchang:
+    sudo: true
+- dgligorov:
+    sudo: true
+- dminor:
+    sudo: true
+- dnowacki:
+    sudo: true
+- eweathers:
+    sudo: true
+- fschubert:
+    sudo: true
+- ganglia
+- glopezfernandez:
+    sudo: true
+- gtuteja:
+    sudo: true
+- hammer:
+    sudo: true
+- hchatha:
+    sudo: true
+- henri:
+    sudo: true
+- jdetke:
+    sudo: true
+- jhuckabay:
+    sudo: true
+- jian:
+    sudo: true
+- jonathon:
+    sudo: true
+- jsotelo:
+    sudo: true
+- juan:
+    sudo: true
+- jyou:
+    sudo: true
+- kdajka:
+    sudo: true
+- kdeleon:
+    sudo: true
+- lcarrera:
+    sudo: true
+- ldunne:
+    sudo: true
+- lharris:
+    sudo: true
+- logstash
+- martin.vetter:
+    sudo: true
+- memcached
+- mharpalani
+- monitord
+- msubramanian:
+    sudo: true
+- mwogan:
+    sudo: true
+- nexpose
+- nico.kramer:
+    sudo: true
+- nleskiw:
+    sudo: true
+- nlong:
+    sudo: true
+- nolofsson:
+    sudo: true
+- nsaid:
+    sudo: true
+- ops_automation:
+    sudo: true
+- pablo:
+    sudo: true
+- palvarezbarreir:
+    sudo: true
+- postdrop
+- postfix
+- pradko:
+    sudo: true
+- psoncek:
+    sudo: true
+- pstaikow:
+    sudo: true
+- rbenoit:
+    sudo: true
+- richie:
+    sudo: true
+- rjosey:
+    sudo: true
+- rpenugonda:
+    sudo: true
+- rprillinger:
+    sudo: true
+- rrivest:
+    sudo: true
+- ruben.lohaus:
+    sudo: true
+- rvalin:
+    sudo: true
+- rvenkatesh:
+    sudo: true
+- saurabh:
+    sudo: true
+- sblaurock:
+    sudo: true
+- sdurant:
+    sudo: true
+- sfox:
+    sudo: true
+- smalpani:
+    sudo: true
+- smei:
+    sudo: true
+- splunk
+- sre_deploy
+- ssawulski:
+    sudo: true
+- sshoukathali:
+    sudo: true
+- vchalco:
+    sudo: true
+- vutran:
+    sudo: true
+- wkadlubowski:
+    sudo: true
+monitors:
+  rlec_cluster_alerts:
+  - max_check_attempts: 3
+    notify: &18
+    - &1
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=snc1.raas-shared1-uat.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  - max_check_attempts: 3
+    notify: &19
+    - &2
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &3
+      relevance-runtime@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - darwin-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-badges-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  - max_check_attempts: 3
+    notify: &20
+    - &4
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &5
+      relevance-runtime@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - relevance-runtime@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-badges-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  - max_check_attempts: 3
+    notify: &21
+    - &6
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &7
+      dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-dealestate-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  - max_check_attempts: 3
+    notify: &22
+    - &8
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &9
+      dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-dealestate-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  - max_check_attempts: 3
+    notify: &23
+    - &10
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &11
+      ghost@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - ghost@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-ghost-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  - max_check_attempts: 3
+    notify: &24
+    - &12
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &13
+      rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-rapt-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  - max_check_attempts: 3
+    notify: &25
+    - &14
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &15
+      rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-rapt-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  - max_check_attempts: 3
+    notify: &26
+    - &16
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-test1.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-test1.grpn
+  - max_check_attempts: 3
+    notify: &27
+    - &17
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_cluster_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_cluster_alerts --clusterdomain=us.raas-test3.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t cluster_*=0"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_license:
+  - notify: &28
+    - *1
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=snc1.raas-shared1-uat.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  - notify: &29
+    - *2
+    - *3
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-badges-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  - notify: &30
+    - *4
+    - *5
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-badges-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  - notify: &31
+    - *6
+    - *7
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-dealestate-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  - notify: &32
+    - *8
+    - *9
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-dealestate-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  - notify: &33
+    - *10
+    - *11
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-ghost-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  - notify: &34
+    - *12
+    - *13
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-rapt-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  - notify: &35
+    - *14
+    - *15
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-rapt-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  - notify: &36
+    - *16
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-test1.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-test1.grpn
+  - notify: &37
+    - *17
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_license
+    shell_command: "/usr/local/libexec/redislabs/check_license --clusterdomain=us.raas-test3.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t days_to_expiration=60:30"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_nodes_alerts:
+  - max_check_attempts: 3
+    notify: *18
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=snc1.raas-shared1-uat.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  - max_check_attempts: 3
+    notify: *19
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-badges-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  - max_check_attempts: 3
+    notify: *20
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-badges-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  - max_check_attempts: 3
+    notify: *21
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-dealestate-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  - max_check_attempts: 3
+    notify: *22
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-dealestate-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  - max_check_attempts: 3
+    notify: *23
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-ghost-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  - max_check_attempts: 3
+    notify: *24
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-rapt-prod.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  - max_check_attempts: 3
+    notify: *25
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-rapt-staging.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  - max_check_attempts: 3
+    notify: *26
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-test1.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-test1.grpn
+  - max_check_attempts: 3
+    notify: *27
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_nodes_alerts
+    shell_command: "/usr/local/libexec/redislabs/check_nodes_alerts --clusterdomain=us.raas-test3.grpn.
+      --user=redis@groupon.com --pass=groupon123 -t n*=0"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_changes_cluster:
+  - max_check_attempts: 1
+    notify: *28
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  - max_check_attempts: 1
+    notify: *29
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-badges-prod.grpn"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  - max_check_attempts: 1
+    notify: *30
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-badges-staging.grpn"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  - max_check_attempts: 1
+    notify: *31
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-dealestate-prod.grpn"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  - max_check_attempts: 1
+    notify: *32
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-dealestate-staging.grpn"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  - max_check_attempts: 1
+    notify: *33
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-ghost-staging.grpn"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  - max_check_attempts: 1
+    notify: *34
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-rapt-prod.grpn"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  - max_check_attempts: 1
+    notify: *35
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-rapt-staging.grpn"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  - max_check_attempts: 1
+    notify: *36
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-test1.grpn"
+    spoof_host: nil:us.raas-test1.grpn
+  - max_check_attempts: 1
+    notify: *37
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_cluster
+    shell_command: "/usr/local/libexec/redislabs/check_changes_cluster --clustername=us.raas-test3.grpn"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_changes_dbs:
+  - max_check_attempts: 1
+    notify: *28
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  - max_check_attempts: 1
+    notify: *29
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-badges-prod.grpn"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  - max_check_attempts: 1
+    notify: *30
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-badges-staging.grpn"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  - max_check_attempts: 1
+    notify: *31
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-dealestate-prod.grpn"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  - max_check_attempts: 1
+    notify: *32
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-dealestate-staging.grpn"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  - max_check_attempts: 1
+    notify: *33
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-ghost-staging.grpn"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  - max_check_attempts: 1
+    notify: *34
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-rapt-prod.grpn"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  - max_check_attempts: 1
+    notify: *35
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-rapt-staging.grpn"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  - max_check_attempts: 1
+    notify: *36
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-test1.grpn"
+    spoof_host: nil:us.raas-test1.grpn
+  - max_check_attempts: 1
+    notify: *37
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_dbs
+    shell_command: "/usr/local/libexec/redislabs/check_changes_dbs --clustername=us.raas-test3.grpn"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_quorum_node:
+  - notify: *28
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  - notify: *29
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-badges-prod.grpn"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  - notify: *30
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-badges-staging.grpn"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  - notify: *31
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-dealestate-prod.grpn"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  - notify: *32
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-dealestate-staging.grpn"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  - notify: *33
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-ghost-staging.grpn"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  - notify: *34
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-rapt-prod.grpn"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  - notify: *35
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-rapt-staging.grpn"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  - notify: *36
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-test1.grpn"
+    spoof_host: nil:us.raas-test1.grpn
+  - notify: *37
+    run_every: 600
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_quorum_node
+    shell_command: "/usr/local/libexec/redislabs/check_quorum_node --clustername=us.raas-test3.grpn"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_db_alerts_sportal_cache_uat:
+    max_check_attempts: 3
+    notify: &39
+    - &38
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=sportal-cache-uat
+      --dbid=5 -t bdb_*=0 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_aof_params_sportal_cache_uat:
+    max_check_attempts: 3
+    notify: &40
+    - *38
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=sportal-cache-uat
+      --dbid=5 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_redisconn_sportal_cache_uat:
+    notify: *39
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-10535.snc1.raas-shared1-uat.grpn
+      --port 10535 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_resolv_sportal_cache_uat:
+    notify: *39
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-10535.snc1.raas-shared1-uat.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_stats_sportal_cache_uat:
+    notify: *39
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=sportal-cache-uat
+      --dbid=5 --clusterdomain=snc1.raas-shared1-uat.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_endpoints_sportal_cache_uat:
+    max_check_attempts: 1
+    notify: *40
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=sportal-cache-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_shards_sportal_cache_uat:
+    max_check_attempts: 1
+    notify: *40
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=sportal-cache-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_alerts_ghostdb_uat:
+    max_check_attempts: 3
+    notify: &42
+    - &41
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=ghostdb-uat
+      --dbid=6 -t bdb_*=0 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_aof_params_ghostdb_uat:
+    max_check_attempts: 3
+    notify: &43
+    - *41
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=ghostdb-uat
+      --dbid=6 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_redisconn_ghostdb_uat:
+    notify: *42
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-11420.snc1.raas-shared1-uat.grpn
+      --port 11420 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_resolv_ghostdb_uat:
+    notify: *42
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-11420.snc1.raas-shared1-uat.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_stats_ghostdb_uat:
+    notify: *42
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=ghostdb-uat
+      --dbid=6 --clusterdomain=snc1.raas-shared1-uat.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_endpoints_ghostdb_uat:
+    max_check_attempts: 1
+    notify: *43
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=ghostdb-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_shards_ghostdb_uat:
+    max_check_attempts: 1
+    notify: *43
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=ghostdb-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_alerts_dealestate_resque_uat:
+    max_check_attempts: 3
+    notify: &45
+    - &44
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=dealestate-resque-uat
+      --dbid=2 -t bdb_*=0 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_aof_params_dealestate_resque_uat:
+    max_check_attempts: 3
+    notify: &46
+    - *44
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=dealestate-resque-uat
+      --dbid=2 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_redisconn_dealestate_resque_uat:
+    notify: *45
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-13239.snc1.raas-shared1-uat.grpn
+      --port 13239 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_resolv_dealestate_resque_uat:
+    notify: *45
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-13239.snc1.raas-shared1-uat.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_stats_dealestate_resque_uat:
+    notify: *45
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=dealestate-resque-uat
+      --dbid=2 --clusterdomain=snc1.raas-shared1-uat.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=547608329:579820584,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_endpoints_dealestate_resque_uat:
+    max_check_attempts: 1
+    notify: *46
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=dealestate-resque-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_shards_dealestate_resque_uat:
+    max_check_attempts: 1
+    notify: *46
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=dealestate-resque-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_alerts_lba_uat:
+    max_check_attempts: 3
+    notify: &48
+    - &47
+      pablox@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - pabloy@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=lba-uat
+      --dbid=7 -t bdb_*=0 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_aof_params_lba_uat:
+    max_check_attempts: 3
+    notify: &49
+    - *47
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=lba-uat
+      --dbid=7 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_redisconn_lba_uat:
+    notify: *48
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-13997.snc1.raas-shared1-uat.grpn
+      --port 13997 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_resolv_lba_uat:
+    notify: *48
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-13997.snc1.raas-shared1-uat.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_stats_lba_uat:
+    notify: *48
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=lba-uat --dbid=7
+      --clusterdomain=snc1.raas-shared1-uat.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_endpoints_lba_uat:
+    max_check_attempts: 1
+    notify: *49
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=lba-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_shards_lba_uat:
+    max_check_attempts: 1
+    notify: *49
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=lba-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_alerts_goods_stores_test:
+    max_check_attempts: 3
+    notify: &51
+    - &50
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=goods-stores-test
+      --dbid=8 -t bdb_*=0 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_aof_params_goods_stores_test:
+    max_check_attempts: 3
+    notify: &52
+    - *50
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=goods-stores-test
+      --dbid=8 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_redisconn_goods_stores_test:
+    notify: *51
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-14582.snc1.raas-shared1-uat.grpn
+      --port 14582 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_resolv_goods_stores_test:
+    notify: *51
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-14582.snc1.raas-shared1-uat.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_stats_goods_stores_test:
+    notify: *51
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=goods-stores-test
+      --dbid=8 --clusterdomain=snc1.raas-shared1-uat.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_endpoints_goods_stores_test:
+    max_check_attempts: 1
+    notify: *52
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=goods-stores-test
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_shards_goods_stores_test:
+    max_check_attempts: 1
+    notify: *52
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=goods-stores-test
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_alerts_sportal_sidekiq_uat:
+    max_check_attempts: 3
+    notify: &54
+    - &53
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=sportal-sidekiq-uat
+      --dbid=4 -t bdb_*=0 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_aof_params_sportal_sidekiq_uat:
+    max_check_attempts: 3
+    notify: &55
+    - *53
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=sportal-sidekiq-uat
+      --dbid=4 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_redisconn_sportal_sidekiq_uat:
+    notify: *54
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-18500.snc1.raas-shared1-uat.grpn
+      --port 18500 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_resolv_sportal_sidekiq_uat:
+    notify: *54
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-18500.snc1.raas-shared1-uat.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_stats_sportal_sidekiq_uat:
+    notify: *54
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=sportal-sidekiq-uat
+      --dbid=4 --clusterdomain=snc1.raas-shared1-uat.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_endpoints_sportal_sidekiq_uat:
+    max_check_attempts: 1
+    notify: *55
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=sportal-sidekiq-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_shards_sportal_sidekiq_uat:
+    max_check_attempts: 1
+    notify: *55
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=sportal-sidekiq-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_alerts_dealestate_configuration_uat:
+    max_check_attempts: 3
+    notify: &57
+    - &56
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=dealestate-configuration-uat
+      --dbid=1 -t bdb_*=0 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_aof_params_dealestate_configuration_uat:
+    max_check_attempts: 3
+    notify: &58
+    - *56
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=dealestate-configuration-uat
+      --dbid=1 --clusterdomain=snc1.raas-shared1-uat.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_redisconn_dealestate_configuration_uat:
+    notify: *57
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-19695.snc1.raas-shared1-uat.grpn
+      --port 19695 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_resolv_dealestate_configuration_uat:
+    notify: *57
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-19695.snc1.raas-shared1-uat.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_stats_dealestate_configuration_uat:
+    notify: *57
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=dealestate-configuration-uat
+      --dbid=1 --clusterdomain=snc1.raas-shared1-uat.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_endpoints_dealestate_configuration_uat:
+    max_check_attempts: 1
+    notify: *58
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=dealestate-configuration-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_changes_db_shards_dealestate_configuration_uat:
+    max_check_attempts: 1
+    notify: *58
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=dealestate-configuration-uat
+      --clustername=snc1.raas-shared1-uat.grpn"
+    spoof_host: nil:snc1.raas-shared1-uat.grpn
+  rlec_db_alerts_badges:
+    max_check_attempts: 3
+    notify: &61
+    - &59
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &60
+      relevance-runtime@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - darwin-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=Badges --dbid=1
+      -t bdb_*=0 --clusterdomain=us.raas-badges-prod.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  rlec_db_aof_params_badges:
+    max_check_attempts: 3
+    notify: &62
+    - *59
+    - *60
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=Badges
+      --dbid=1 --clusterdomain=us.raas-badges-prod.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  rlec_db_redisconn_badges:
+    notify: *61
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-19328.us.raas-badges-prod.grpn
+      --port 19328 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  rlec_db_resolv_badges:
+    notify: *61
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-19328.us.raas-badges-prod.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  rlec_db_stats_badges:
+    notify: *61
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=Badges --dbid=1
+      --clusterdomain=us.raas-badges-prod.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=9126805504:9663676416,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  rlec_changes_db_endpoints_badges:
+    max_check_attempts: 1
+    notify: *62
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=Badges
+      --clustername=us.raas-badges-prod.grpn"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  rlec_changes_db_shards_badges:
+    max_check_attempts: 1
+    notify: *62
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=Badges
+      --clustername=us.raas-badges-prod.grpn"
+    spoof_host: nil:us.raas-badges-prod.grpn
+  rlec_db_alerts_badgesstaging:
+    max_check_attempts: 3
+    notify: &65
+    - &63
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &64
+      relevance-runtime@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - relevance-runtime@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=BadgesStaging
+      --dbid=2 -t bdb_*=0 --clusterdomain=us.raas-badges-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  rlec_db_aof_params_badgesstaging:
+    max_check_attempts: 3
+    notify: &66
+    - *63
+    - *64
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=BadgesStaging
+      --dbid=2 --clusterdomain=us.raas-badges-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  rlec_db_redisconn_badgesstaging:
+    notify: *65
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-18874.us.raas-badges-staging.grpn
+      --port 18874 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  rlec_db_resolv_badgesstaging:
+    notify: *65
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-18874.us.raas-badges-staging.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  rlec_db_stats_badgesstaging:
+    notify: *65
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=BadgesStaging
+      --dbid=2 --clusterdomain=us.raas-badges-staging.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=4563402752:4831838208,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  rlec_changes_db_endpoints_badgesstaging:
+    max_check_attempts: 1
+    notify: *66
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=BadgesStaging
+      --clustername=us.raas-badges-staging.grpn"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  rlec_changes_db_shards_badgesstaging:
+    max_check_attempts: 1
+    notify: *66
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=BadgesStaging
+      --clustername=us.raas-badges-staging.grpn"
+    spoof_host: nil:us.raas-badges-staging.grpn
+  rlec_db_alerts_dealestate_resque:
+    max_check_attempts: 3
+    notify: &69
+    - &67
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &68
+      dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=dealestate-resque
+      --dbid=2 -t bdb_*=0 --clusterdomain=us.raas-dealestate-prod.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_aof_params_dealestate_resque:
+    max_check_attempts: 3
+    notify: &70
+    - *67
+    - *68
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=dealestate-resque
+      --dbid=2 --clusterdomain=us.raas-dealestate-prod.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_redisconn_dealestate_resque:
+    notify: *69
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-13239.us.raas-dealestate-prod.grpn
+      --port 13239 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_resolv_dealestate_resque:
+    notify: *69
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-13239.us.raas-dealestate-prod.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_stats_dealestate_resque:
+    notify: *69
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=dealestate-resque
+      --dbid=2 --clusterdomain=us.raas-dealestate-prod.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=547608329:579820584,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_changes_db_endpoints_dealestate_resque:
+    max_check_attempts: 1
+    notify: *70
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=dealestate-resque
+      --clustername=us.raas-dealestate-prod.grpn"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_changes_db_shards_dealestate_resque:
+    max_check_attempts: 1
+    notify: *70
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=dealestate-resque
+      --clustername=us.raas-dealestate-prod.grpn"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_alerts_dealestate_configuration:
+    max_check_attempts: 3
+    notify: &73
+    - &71
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &72
+      dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=dealestate-configuration
+      --dbid=1 -t bdb_*=0 --clusterdomain=us.raas-dealestate-prod.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_aof_params_dealestate_configuration:
+    max_check_attempts: 3
+    notify: &74
+    - *71
+    - *72
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=dealestate-configuration
+      --dbid=1 --clusterdomain=us.raas-dealestate-prod.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_redisconn_dealestate_configuration:
+    notify: *73
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-19695.us.raas-dealestate-prod.grpn
+      --port 19695 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_resolv_dealestate_configuration:
+    notify: *73
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-19695.us.raas-dealestate-prod.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_stats_dealestate_configuration:
+    notify: *73
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=dealestate-configuration
+      --dbid=1 --clusterdomain=us.raas-dealestate-prod.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_changes_db_endpoints_dealestate_configuration:
+    max_check_attempts: 1
+    notify: *74
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=dealestate-configuration
+      --clustername=us.raas-dealestate-prod.grpn"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_changes_db_shards_dealestate_configuration:
+    max_check_attempts: 1
+    notify: *74
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=dealestate-configuration
+      --clustername=us.raas-dealestate-prod.grpn"
+    spoof_host: nil:us.raas-dealestate-prod.grpn
+  rlec_db_alerts_dealestate_resque_staging:
+    max_check_attempts: 3
+    notify: &77
+    - &75
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &76
+      dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=dealestate-resque-staging
+      --dbid=3 -t bdb_*=0 --clusterdomain=us.raas-dealestate-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_aof_params_dealestate_resque_staging:
+    max_check_attempts: 3
+    notify: &78
+    - *75
+    - *76
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=dealestate-resque-staging
+      --dbid=3 --clusterdomain=us.raas-dealestate-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_redisconn_dealestate_resque_staging:
+    notify: *77
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-11564.us.raas-dealestate-staging.grpn
+      --port 11564 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_resolv_dealestate_resque_staging:
+    notify: *77
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-11564.us.raas-dealestate-staging.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_stats_dealestate_resque_staging:
+    notify: *77
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=dealestate-resque-staging
+      --dbid=3 --clusterdomain=us.raas-dealestate-staging.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=547608329:579820584,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_changes_db_endpoints_dealestate_resque_staging:
+    max_check_attempts: 1
+    notify: *78
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=dealestate-resque-staging
+      --clustername=us.raas-dealestate-staging.grpn"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_changes_db_shards_dealestate_resque_staging:
+    max_check_attempts: 1
+    notify: *78
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=dealestate-resque-staging
+      --clustername=us.raas-dealestate-staging.grpn"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_alerts_dealestate_configuration_staging:
+    max_check_attempts: 3
+    notify: &81
+    - &79
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &80
+      dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - dealestate-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=dealestate-configuration-staging
+      --dbid=1 -t bdb_*=0 --clusterdomain=us.raas-dealestate-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_aof_params_dealestate_configuration_staging:
+    max_check_attempts: 3
+    notify: &82
+    - *79
+    - *80
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=dealestate-configuration-staging
+      --dbid=1 --clusterdomain=us.raas-dealestate-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_redisconn_dealestate_configuration_staging:
+    notify: *81
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-17541.us.raas-dealestate-staging.grpn
+      --port 17541 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_resolv_dealestate_configuration_staging:
+    notify: *81
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-17541.us.raas-dealestate-staging.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_stats_dealestate_configuration_staging:
+    notify: *81
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=dealestate-configuration-staging
+      --dbid=1 --clusterdomain=us.raas-dealestate-staging.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_changes_db_endpoints_dealestate_configuration_staging:
+    max_check_attempts: 1
+    notify: *82
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=dealestate-configuration-staging
+      --clustername=us.raas-dealestate-staging.grpn"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_changes_db_shards_dealestate_configuration_staging:
+    max_check_attempts: 1
+    notify: *82
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=dealestate-configuration-staging
+      --clustername=us.raas-dealestate-staging.grpn"
+    spoof_host: nil:us.raas-dealestate-staging.grpn
+  rlec_db_alerts_ghostdb_staging:
+    max_check_attempts: 3
+    notify: &85
+    - &83
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &84
+      ghost@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - ghost@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=ghostdb-staging
+      --dbid=5 -t bdb_*=0 --clusterdomain=us.raas-ghost-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  rlec_db_aof_params_ghostdb_staging:
+    max_check_attempts: 3
+    notify: &86
+    - *83
+    - *84
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=ghostdb-staging
+      --dbid=5 --clusterdomain=us.raas-ghost-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  rlec_db_redisconn_ghostdb_staging:
+    notify: *85
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-19361.us.raas-ghost-staging.grpn
+      --port 19361 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  rlec_db_resolv_ghostdb_staging:
+    notify: *85
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-19361.us.raas-ghost-staging.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  rlec_db_stats_ghostdb_staging:
+    notify: *85
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=ghostdb-staging
+      --dbid=5 --clusterdomain=us.raas-ghost-staging.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=182536110:193273528,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  rlec_changes_db_endpoints_ghostdb_staging:
+    max_check_attempts: 1
+    notify: *86
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=ghostdb-staging
+      --clustername=us.raas-ghost-staging.grpn"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  rlec_changes_db_shards_ghostdb_staging:
+    max_check_attempts: 1
+    notify: *86
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=ghostdb-staging
+      --clustername=us.raas-ghost-staging.grpn"
+    spoof_host: nil:us.raas-ghost-staging.grpn
+  rlec_db_alerts_sportal_sidekiq:
+    max_check_attempts: 3
+    notify: &89
+    - &87
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &88
+      rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=sportal-sidekiq
+      --dbid=2 -t bdb_*=0 --clusterdomain=us.raas-rapt-prod.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_aof_params_sportal_sidekiq:
+    max_check_attempts: 3
+    notify: &90
+    - *87
+    - *88
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=sportal-sidekiq
+      --dbid=2 --clusterdomain=us.raas-rapt-prod.grpn. --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_redisconn_sportal_sidekiq:
+    notify: *89
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-12298.us.raas-rapt-prod.grpn
+      --port 12298 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_resolv_sportal_sidekiq:
+    notify: *89
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-12298.us.raas-rapt-prod.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_stats_sportal_sidekiq:
+    notify: *89
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=sportal-sidekiq
+      --dbid=2 --clusterdomain=us.raas-rapt-prod.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_changes_db_endpoints_sportal_sidekiq:
+    max_check_attempts: 1
+    notify: *90
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=sportal-sidekiq
+      --clustername=us.raas-rapt-prod.grpn"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_changes_db_shards_sportal_sidekiq:
+    max_check_attempts: 1
+    notify: *90
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=sportal-sidekiq
+      --clustername=us.raas-rapt-prod.grpn"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_alerts_sportal_cache:
+    max_check_attempts: 3
+    notify: &93
+    - &91
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &92
+      rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=sportal-cache
+      --dbid=1 -t bdb_*=0 --clusterdomain=us.raas-rapt-prod.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_aof_params_sportal_cache:
+    max_check_attempts: 3
+    notify: &94
+    - *91
+    - *92
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=sportal-cache
+      --dbid=1 --clusterdomain=us.raas-rapt-prod.grpn. --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_redisconn_sportal_cache:
+    notify: *93
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-13921.us.raas-rapt-prod.grpn
+      --port 13921 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_resolv_sportal_cache:
+    notify: *93
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-13921.us.raas-rapt-prod.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_stats_sportal_cache:
+    notify: *93
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=sportal-cache
+      --dbid=1 --clusterdomain=us.raas-rapt-prod.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_changes_db_endpoints_sportal_cache:
+    max_check_attempts: 1
+    notify: *94
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=sportal-cache
+      --clustername=us.raas-rapt-prod.grpn"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_changes_db_shards_sportal_cache:
+    max_check_attempts: 1
+    notify: *94
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=sportal-cache
+      --clustername=us.raas-rapt-prod.grpn"
+    spoof_host: nil:us.raas-rapt-prod.grpn
+  rlec_db_alerts_sportal_cache_staging:
+    max_check_attempts: 3
+    notify: &97
+    - &95
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &96
+      rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=sportal-cache-staging
+      --dbid=2 -t bdb_*=0 --clusterdomain=us.raas-rapt-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_aof_params_sportal_cache_staging:
+    max_check_attempts: 3
+    notify: &98
+    - *95
+    - *96
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=sportal-cache-staging
+      --dbid=2 --clusterdomain=us.raas-rapt-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_redisconn_sportal_cache_staging:
+    notify: *97
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-14382.us.raas-rapt-staging.grpn
+      --port 14382 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_resolv_sportal_cache_staging:
+    notify: *97
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-14382.us.raas-rapt-staging.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_stats_sportal_cache_staging:
+    notify: *97
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=sportal-cache-staging
+      --dbid=2 --clusterdomain=us.raas-rapt-staging.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_changes_db_endpoints_sportal_cache_staging:
+    max_check_attempts: 1
+    notify: *98
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=sportal-cache-staging
+      --clustername=us.raas-rapt-staging.grpn"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_changes_db_shards_sportal_cache_staging:
+    max_check_attempts: 1
+    notify: *98
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=sportal-cache-staging
+      --clustername=us.raas-rapt-staging.grpn"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_alerts_sportal_sidekiq_staging:
+    max_check_attempts: 3
+    notify: &101
+    - &99
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - &100
+      rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - rapt-notify@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=sportal-sidekiq-staging
+      --dbid=1 -t bdb_*=0 --clusterdomain=us.raas-rapt-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_aof_params_sportal_sidekiq_staging:
+    max_check_attempts: 3
+    notify: &102
+    - *99
+    - *100
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=sportal-sidekiq-staging
+      --dbid=1 --clusterdomain=us.raas-rapt-staging.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_redisconn_sportal_sidekiq_staging:
+    notify: *101
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-19318.us.raas-rapt-staging.grpn
+      --port 19318 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_resolv_sportal_sidekiq_staging:
+    notify: *101
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-19318.us.raas-rapt-staging.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_stats_sportal_sidekiq_staging:
+    notify: *101
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=sportal-sidekiq-staging
+      --dbid=1 --clusterdomain=us.raas-rapt-staging.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_changes_db_endpoints_sportal_sidekiq_staging:
+    max_check_attempts: 1
+    notify: *102
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=sportal-sidekiq-staging
+      --clustername=us.raas-rapt-staging.grpn"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_changes_db_shards_sportal_sidekiq_staging:
+    max_check_attempts: 1
+    notify: *102
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=sportal-sidekiq-staging
+      --clustername=us.raas-rapt-staging.grpn"
+    spoof_host: nil:us.raas-rapt-staging.grpn
+  rlec_db_alerts_test1:
+    max_check_attempts: 3
+    notify: &104
+    - &103
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=test1 --dbid=1
+      -t bdb_*=0 --clusterdomain=us.raas-test1.grpn. --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-test1.grpn
+  rlec_db_aof_params_test1:
+    max_check_attempts: 3
+    notify: &105
+    - *103
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=test1
+      --dbid=1 --clusterdomain=us.raas-test1.grpn. --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-test1.grpn
+  rlec_db_redisconn_test1:
+    notify: *104
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-17014.us.raas-test1.grpn
+      --port 17014 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-test1.grpn
+  rlec_db_resolv_test1:
+    notify: *104
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-17014.us.raas-test1.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-test1.grpn
+  rlec_db_stats_test1:
+    notify: *104
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=test1 --dbid=1
+      --clusterdomain=us.raas-test1.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=91268054:96636763,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-test1.grpn
+  rlec_changes_db_endpoints_test1:
+    max_check_attempts: 1
+    notify: *105
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=test1
+      --clustername=us.raas-test1.grpn"
+    spoof_host: nil:us.raas-test1.grpn
+  rlec_changes_db_shards_test1:
+    max_check_attempts: 1
+    notify: *105
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=test1
+      --clustername=us.raas-test1.grpn"
+    spoof_host: nil:us.raas-test1.grpn
+  rlec_db_alerts_netflow:
+    max_check_attempts: 3
+    notify: &107
+    - &106
+      raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+        - warning
+        - ok
+    - raas-alerts@groupon.com:
+        notify_on:
+        - critical
+        - unknown
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_alerts_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_alerts --dbname=netflow
+      --dbid=1 -t bdb_*=0 --clusterdomain=us.raas-test3.grpn. --user=redis@groupon.com
+      --pass=groupon123"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_db_aof_params_netflow:
+    max_check_attempts: 3
+    notify: &108
+    - *106
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_aof_params_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_aof_params --dbname=netflow
+      --dbid=1 --clusterdomain=us.raas-test3.grpn. --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_db_redisconn_netflow:
+    notify: *107
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_redisconn_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_connection.rb --host redis-19393.us.raas-test3.grpn
+      --port 19393 -t time_open=1:2,time_command=2:3"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_db_resolv_netflow:
+    notify: *107
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_resolv_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_resolution.rb --dbname redis-19393.us.raas-test3.grpn
+      -t ns_nodes=1:0,resolv_time*=0.1:0.2"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_db_stats_netflow:
+    notify: *107
+    run_every: 60
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_db_stats_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_db_stats --dbname=netflow --dbid=1
+      --clusterdomain=us.raas-test3.grpn. -t avg_latency=40000:50000,avg_read_latency=40000:50000,avg_write_latency=40000:50000,used_memory=821412495360:869730877440,evicted_objects=1:1000
+      --user=redis@groupon.com --pass=groupon123"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_changes_db_endpoints_netflow:
+    max_check_attempts: 1
+    notify: *108
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_endpoints_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_endpoints --dbname=netflow
+      --clustername=us.raas-test3.grpn"
+    spoof_host: nil:us.raas-test3.grpn
+  rlec_changes_db_shards_netflow:
+    max_check_attempts: 1
+    notify: *108
+    run_every: 540
+    runbook_url: https://confluence.groupondev.com/display/RED/redislabs+Manual#redislabsManual-nagiosalert-rlec_changes_shards_<dbname>
+    shell_command: "/usr/local/libexec/redislabs/check_changes_shards --dbname=netflow
+      --clustername=us.raas-test3.grpn"
+    spoof_host: nil:us.raas-test3.grpn

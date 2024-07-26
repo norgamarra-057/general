@@ -1,0 +1,9 @@
+create_directory '/var/groupon/rl_api/', 'root:root', 0100 # DATA-6165
+
+create_directory '/var/groupon/raas/api_cache', 'root:root'
+create_directory '/var/groupon/raas/db_configs_backup', 'root:root'
+
+add_cron_job '* * * * * /usr/local/bin/lockrun --lockfile=/tmp/raas_api_cache.lockrun -- sh -c /usr/local/bin/raas_api_cache >> /var/groupon/log/raas_api_cache.log 2>&1', 'root'
+
+add_cron_job '0 * * * * /usr/local/bin/lockrun --lockfile=/tmp/redislabs_backup_db_configs.lockrun -- sh -c /usr/local/bin/redislabs_backup_db_configs >> /var/groupon/log/redislabs_backup_db_configs.log 2>&1', 'root'
+add_cron_job '0 * * * * /usr/bin/find /var/groupon/raas/db_configs_backup -type f -mtime +7 -delete > /dev/null 2>&1', 'root'

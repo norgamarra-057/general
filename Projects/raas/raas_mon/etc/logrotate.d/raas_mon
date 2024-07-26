@@ -1,0 +1,11 @@
+/var/groupon/log/raas_mon/*.log {
+    copytruncate
+    compress
+    delaycompress
+    dateext
+    extension gz
+    missingok
+    notifempty
+    rotate 30
+    daily
+}

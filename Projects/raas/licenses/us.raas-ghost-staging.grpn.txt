@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : us.raas-ghost-staging.grpn
+Shards limit : 64
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+U8J0lNo3k92DHPVZKPvMLU0RqCnVrx2z9bLlZ2hP38MeZkxOEoTlH4PPDqtm
+suuwRzujetHs4qe7w8+QtPlgt1a5ET9B/fiMAXJhdWJMm6ptaQ6vqJnlnB1k
+3aOlT37isGFV0qltS+TYt29OiqXMbrVrchiPO95pugrLVkjLXQ4YYwVNTY+N
+aaW47lpiGfKjbx65aeUFa7kmTNyJ89hY3NAIyUhWcfJNeU2D1WQOFvGlxU59
+pvnVWSoQzC0IGzrSs9Pib6Izki27x1pjtDdB7cVTIo8pV/Ki04AStXSHsB3V
+GZ0oKTyiPenbVReVYoZNgk4x/jJQ/rVz2J2/xhpFCg==
+----- LICENSE END -----
+
+

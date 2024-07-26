@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : snc1.raas-goods-inventory-service-prod.grpn
+Shards limit : 24
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+E2X2dZFM5V3JvRPUZD6aeHCPQok2ak6NOuymdnlTfmdACwOQEnztsce6KX5B
+H6L8McWUWsKcYeuA/8hGnxdsoP1bVfj/+Z0M+tQyX7VbVcnUzThJbr62cT1j
+3xKWfYZMvf6/DG7cp7Bfoq+Q98JeWoTD+k4mXrBM+YfVGbXNKfnMtHagTs04
+sAZDSsVVbjA1KPMoV8WjwOPp9b4Kn6UAgbGd5BPogLdsnR8/307h0kzMURZV
+oRvT1jkdBaI4ojB1lwJMSe5tPyHYUkRIF+0pZRW21g1HHPZJ/7deL9nm9lEQ
+94lV4c9zeirfx2Zf8Tvf4DH1xOPjBT0aGJAH84i0Cw==
+----- LICENSE END -----
+
+

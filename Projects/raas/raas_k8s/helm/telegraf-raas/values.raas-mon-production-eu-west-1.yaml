@@ -1,0 +1,5 @@
+namespace: raas-mon-production
+deployEnv: production
+region: eu-west-1
+environment: production
+influx_url: http://metrics-gateway-vip.dub1:80

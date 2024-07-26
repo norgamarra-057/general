@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : dub1.raas-watson-eventstore-tier2-prod.grpn
+Shards limit : 400
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+MrPcrbQyr0wdHAuQxB0WsiHfz9z+a1pIYiW6RLkA36JYzaMVMV3XL2NZoAJh
+vDkL+o2L6bsBjdoJ42CfECtHd4/7cwl8h0XyPbYW+zeWz3RfKcFp1raQQbPI
+BgpysdCs4HV8CUjc60CZpL8ZoFUvsT++CwKZaI5Hg27gOu5gOqAyDc/ZA3Dn
+aMdfamp5UdP1E6CrtEbf2fGPx2DnfU6NGYkUkUYeFoE+RhPIYIyd7+9pgVM2
+uhUBNs3ZALRUV7+VfBT3h7rLHghP+CJ30D4eHkJ9uXwPjucxhw09/Og3JHFl
+d0sl6Frk3Mrp1F+9pTyCYpzcSl41awmMDpabBCCg8Q==
+----- LICENSE END -----
+
+

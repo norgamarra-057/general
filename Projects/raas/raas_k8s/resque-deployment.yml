@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resque
+  labels:
+    app.kubernetes.io/part-of: raas
+    app.kubernetes.io/component: resque
+    app.kubernetes.io/instance: test
+  annotations:
+    com.groupon.conveyor.policies/skip-probes: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: raas
+      app.kubernetes.io/component: resque
+      app.kubernetes.io/instance: test
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: raas
+        app.kubernetes.io/component: resque
+        app.kubernetes.io/instance: test
+    spec:
+      containers:
+      - name: resque
+        image: docker.groupondev.com/raas-resque:v0.5
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+        command: ["resque-web"]
+        args: ["--no-launch", "--foreground", "-p", "5678", "-r", "{{RESQUE}}", "resque_config.rb"]

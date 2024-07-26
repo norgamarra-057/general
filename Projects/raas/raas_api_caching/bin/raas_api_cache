@@ -1,0 +1,325 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'json'
+require 'open-uri'
+require 'timeout'
+require 'openssl'
+require 'fileutils'
+require 'logger'
+
+API_TIMEOUT = 15
+API_CACHE_DIR = '/var/groupon/raas/api_cache'
+RAAS_INFO_DIR = '/var/groupon/raas_mon/raas_info'
+
+def cache_grpn_dns
+  grpn_dns = fetch_grpn_dns
+  atomic_write(API_CACHE_DIR, 'grpn.dns', grpn_dns, is_json=false)
+rescue
+  $logger.error $!
+end
+
+def fetch_cluster(cluster)
+  cluster_dir = File.join(API_CACHE_DIR,cluster)
+  cluster_raas_info_dir = File.join(RAAS_INFO_DIR,cluster)
+
+  FileUtils.mkdir cluster_dir unless File.exist?(cluster_dir)
+  FileUtils.mkdir_p cluster_raas_info_dir unless File.exist?(cluster_raas_info_dir)
+
+  # CRITICAL calls
+  begin
+    cluster_alerts = fetch_api(cluster, "/v1/cluster/alerts")
+    atomic_write(cluster_dir, 'cluster_alerts.json', cluster_alerts)
+
+    dbs_stats = fetch_api(cluster, "/v1/bdbs/stats?interval=10sec&stime=#{stime_2m_back}")
+    dbs_stats_by_uid = Hash[dbs_stats.map{|a| a['uid']}.zip(dbs_stats)] # dbs_stats is an array :(
+    atomic_write(cluster_dir, 'dbs_stats.json', dbs_stats)
+
+    endpoints_stats = fetch_api(cluster, "/v1/endpoints/stats?interval=10sec&stime=#{stime_2m_back}")
+    atomic_write(cluster_dir, 'endpoints_stats.json', endpoints_stats)
+    endpoint_stats_by_uid = Hash[endpoints_stats.map{|a| a['uid']}.zip(endpoints_stats)] # endpoints_stats is an array :(
+    # endpoint's uid is of the form <db_uid:endpoint_uid>, e.g. "11:1:1"
+    # let's group by db uid:
+    db_endpoints_stats_by_uid = {}
+    endpoint_stats_by_uid.each do |k,v|
+      db_uid = k.split(':').first
+      db_endpoints_stats_by_uid[db_uid] ||= {}
+      db_endpoints_stats_by_uid[db_uid][k] = v
+    end
+
+    dbs_alerts = fetch_api(cluster, "/v1/bdbs/alerts")
+    atomic_write(cluster_dir, 'dbs_alerts.json', dbs_alerts)
+
+    nodes_alerts = fetch_api(cluster, "/v1/nodes/alerts")
+    atomic_write(cluster_dir, 'nodes_alerts.json', nodes_alerts)
+
+    dbs = fetch_api(cluster, "/v1/bdbs")
+    atomic_write(cluster_dir, 'dbs.json', dbs)
+    atomic_write(cluster_raas_info_dir, 'dbs_clean.json', clean_dbs(dbs)) # copy for raas-info
+
+    dbs.each do |db|
+      db_dir = File.join(cluster_dir, db['name'])
+      FileUtils.mkdir db_dir unless File.exist?(db_dir)
+      db_alerts = dbs_alerts[db['uid'].to_s]
+      db_stats = dbs_stats_by_uid[db['uid'].to_s]
+      db_endpoints_stats = db_endpoints_stats_by_uid[db['uid'].to_s]
+      atomic_write(db_dir, 'db.json', db)
+      atomic_write(db_dir, 'db_stats.json', db_stats)
+      atomic_write(db_dir, 'db_endpoints_stats.json', db_endpoints_stats)
+      atomic_write(db_dir, 'db_alerts.json', db_alerts)
+    end
+
+    nodes_ps = fetch_redis_nodes_ps(cluster_dir)
+    dbs_cputime = calc_dbs_cputime(nodes_ps, dbs)
+    atomic_write(cluster_dir, 'dbs_cputime.json', dbs_cputime)
+  rescue
+    $logger.error "cluster=#{cluster} e=\"#{$!}\""
+    $logger.error $!
+    FileUtils.touch TOUCH_CRITICAL
+  end
+
+  # NON-CRITICAL calls
+  begin
+    node_host_file = JSON.parse fetch_http("http://#{cluster}:1875/host")
+    atomic_write(cluster_dir, 'node_host_file.json', node_host_file)
+
+    ccs_nodes = JSON.parse fetch_http("http://#{cluster}:4001/ccs_nodes")
+    atomic_write(cluster_dir, 'ccs_nodes.json', ccs_nodes)
+
+    license = fetch_api(cluster, "/v1/license")
+    atomic_write(cluster_dir, 'license.json', license)
+
+    shards_stats = fetch_api(cluster, "/v1/shards/stats?interval=10sec&stime=#{stime_2m_back}")
+    shards_stats_by_uid = Hash[shards_stats.map{|a| a['uid']}.zip(shards_stats)] # shards_stats is an array :(
+    atomic_write(cluster_dir, 'shards_stats_by_uid.json', shards_stats_by_uid)
+
+    rladmin_status = fetch_rladmin_status(cluster)
+    atomic_write(cluster_dir, 'rladmin_status.json', rladmin_status)
+    atomic_write(cluster_raas_info_dir, 'rladmin_status.json', rladmin_status) # copy for raas-info
+  rescue
+    $logger.error $!
+    FileUtils.touch TOUCH_WARNING
+  end
+
+end
+
+def fetch_redis_nodes_ps(cluster_dir)
+  nodes_ps = {}
+  ccs_nodes = JSON.parse(IO.read(File.join(cluster_dir, 'ccs_nodes.json')))
+  ccs_nodes.each do |k, node|
+    next if node['max_redis_servers']=='0' # quorum nodes
+    ps_redislabs = fetch_http("http://#{node['addr']}:4001/ps_redislabs")
+    nodes_ps[node['addr']] = ps_redislabs
+  end
+  nodes_ps
+end
+
+def get_shards_cputime(nodes_ps)
+  shards_cputime = {}
+  nodes_ps.each do |node_ip, ps_redislabs|
+    ps_redislabs.each_line do |line|
+      # 00:43:39 /opt/redislabs/bin/redis-server-3.0 /var/opt/redislabs/redis/redis-56.conf *:20972
+      next unless line.include?('/opt/redislabs/bin/redis-server-')
+      parts = line.split
+      next unless parts.size == 4
+      time = parse_ps_time(parts[0])
+      shard = File.basename(parts[2]).split('.').first.split('-').last
+      shards_cputime[shard] = time
+    end
+  end
+  shards_cputime
+end
+
+def calc_dbs_cputime(nodes_ps, dbs)
+  shards_cputime = get_shards_cputime(nodes_ps)
+  dbs_cputime = {}
+  dbs.each do |db|
+    db_shards_cpu_time = {}
+    db['shard_list'].each do |shard|
+      db_shards_cpu_time[shard] = shards_cputime[shard.to_s]
+    end
+    dbs_cputime[db['name']] = db_shards_cpu_time
+  end
+  dbs_cputime
+end
+
+def parse_ps_time(time)
+  # e.g. 00:43:39
+  hours, mins, secs = time.split(':')
+  # e.g. 1-01:25:45
+  days, hours = hours.split('-') if hours.include?('-')
+  secs.to_i + 60*mins.to_i + 3600*hours.to_i + 86400*days.to_i
+end
+
+def stime_2m_back
+  (Time.now - 120).strftime('%Y-%m-%dT%H:%M:00Z') # 120 just to ensure we'll get 60s back
+end
+
+def atomic_write(dir, filename, data, is_json=true)
+  file_path = File.join(dir, filename)
+  $logger.info "writing=#{file_path}"
+  tmp_path = "#{file_path}.#{$$}"
+  IO.write(tmp_path, is_json ? data.to_json : data)
+  FileUtils.mv(tmp_path, file_path)
+end
+
+def fetch_grpn_dns
+  grpn_contents = fetch_http('http://config/colo/grpn/dnsv2_zone/grpn')
+  raise "unknown syntax" unless grpn_contents.start_with?('$TTL')
+  filtered_contents = []
+  grpn_contents.each_line do |line|
+    # ex: us.raas-redis-prod                                 IN NS         raas-redis-prod-ns1.snc1.
+    next unless line.include?('NS')
+    filtered_contents << line
+  end
+  filtered_contents.join
+end
+
+def fetch_rladmin_status(cluster)
+  status_output = fetch_http "http://#{cluster}:4001/rladmin_status"
+
+  # Ex output:
+  # CLUSTER NODES:
+  # NODE:ID ROLE   ADDRESS       EXTERNAL_ADDRESS SHARDS CORES FREE_RAM        VERSION         RACK-ID    STATUS
+  # node:1  master 10.22.233.241                  6      8     27.54GB/29.38GB 4.3.0-230.rhel6 SNC2-R3-14 OK
+  # node:2  slave  10.22.218.185                  2      8     28.35GB/29.38GB 4.3.0-230.rhel6 SNC2-R6-20 OK
+  # node:3  slave  10.22.218.236                  8      8     27.41GB/29.38GB 4.3.0-230.rhel6 SNC2-R5-22 OK
+
+  # DATABASES:
+  # DB:ID NAME   TYPE  STATUS SHARDS REPLICATION PERSISTENCE ENDPOINT
+  # db:1  Badges redis active 8      enabled     aof         redis-19328.us.raas-badges-prod.grpn:19328
+
+  # ENDPOINTS:
+  # DB:ID            NAME          ID                     NODE          ROLE
+  # db:1             Badges        endpoint:1             node:1        slave
+  # db:1             Badges        endpoint:2             node:3        master
+
+  # SHARDS:
+  # DB:ID       NAME    ID         NODE    ROLE    SLOTS       USED_MEMORY   STATUS
+  # db:1        Badges  redis:1    node:3  slave   1-512       20.68MB       OK
+  # db:1        Badges  redis:2    node:2  master  1-512       25.2MB        OK
+  # db:1        Badges  redis:3    node:3  slave   513-1024    19.87MB       OK
+  # db:1        Badges  redis:4    node:2  master  513-1024    24.05MB       OK
+  # db:1        Badges  redis:5    node:1  slave   1025-1536   22.1MB        OK
+  # ...
+
+  status = {}
+  h1 = h2 = nil
+  garbage = true
+  status_output.each_line do |line|
+    line.strip!
+    next if line.empty?
+    # DATA-4848, ex: error: cluster is not responding, please try again.
+    raise "rladmin status on #{cluster} #{line}" if line.start_with?('error:')
+
+    garbage = false if line == 'CLUSTER NODES:' # rladmin status extra all outputs an unparseable/garbage header
+    next if garbage
+
+    if line[0] =~ /[A-Z]/ # header line
+      if line.end_with?(':') # Ex "SHARDS:"
+        h1 = line[0..-2]
+        status[h1] = []
+      else
+        h2 = line.split # Ex "DB:ID       NAME    ID         NODE    ROLE    SLOTS       USED_MEMORY   STATUS"
+        h2.delete('EXTERNAL_ADDRESS') if h1 == 'CLUSTER NODES' # N/A at Groupon, bugfix (DATA-3473)
+      end
+    else
+      # Ex "db:1        Badges  redis:1    node:3  slave   1-512       20.68MB       OK"
+      line[0]='' if line.start_with?('*') if h1 == 'CLUSTER NODES' # may have a star at the beginning of the line indicating the current node
+      status[h1].push(Hash[h2.zip(line.split)])
+    end
+  end
+  # DATA-4848, SHARDS timeout without contents
+  raise "rladmin status on #{cluster}" if (!status['SHARDS'] || status['SHARDS'].empty?)
+  status
+end
+
+def fetch_http(url)
+  $logger.info "fetch_http=#{url}"
+  Timeout::timeout(API_TIMEOUT) {
+    open(url) { |f| f.read }
+  }
+end
+
+def fetch_api(cluster, path)
+  api_port = 9443
+  url = "https://#{cluster}:#{api_port}#{path}"
+  $logger.info "fetch_api=#{url}"
+  Timeout::timeout(API_TIMEOUT) {
+    JSON.parse open(url, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE,
+      http_basic_authentication: [$api_credentials['username'] , $api_credentials['password']],
+      "Content-type" => "application/json") { |f| f.read }
+  }
+end
+
+$api_credentials = nil
+def api_credentials
+  return $api_credentials if $api_credentials
+  credentials_file = '/var/groupon/rl_api/creds.json'
+  unless File.exist?(credentials_file)
+    # token created by pablo@ using https://github.groupondev.com/settings/tokens
+    github_api_token = '5278ee79df5486a0fc73d91129de69603135ac2f'
+    credentials = JSON.parse open("https://raw.github.groupondev.com/data/raas-secrets/master/raas-mon-credentials.json",
+      "User-Agent" => 'raas-mon',
+      ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE,
+      http_basic_authentication: [github_api_token, "x-oauth-basic"]).read
+    atomic_write(File.dirname(credentials_file), File.basename(credentials_file), credentials)
+    File.chmod(0400, credentials_file) # DATA-6165
+  end
+  $api_credentials = JSON.parse IO.read(credentials_file)
+end
+
+def clean_dbs(dbs)
+  res = []
+  dbs.each do |db|
+    clean = db.clone
+    clean.delete_if{|k,v| k.start_with?('authentication_')}
+    res << clean
+  end
+  res
+end
+
+$logger = Logger.new(STDOUT)
+
+# add Thread ID to logs
+def msg2str(msg)
+  case msg
+  when ::String
+    msg
+  when ::Exception
+    "#{ msg.message } (#{ msg.class })\n" <<
+      (msg.backtrace || []).join("\n")
+  else
+    msg.inspect
+  end
+end
+$logger.formatter = proc do |severity, datetime, progname, msg|
+  # ex:
+  # I, [2017-08-11T09:28:52.318420 #23977.70278440999420]  INFO -- : starting
+  "#{severity[0]}, [#{datetime.strftime('%Y-%m-%dT%H:%M:%S.%6N')} ##{Process.pid}.#{Thread.current.object_id}]  #{severity} -- : #{msg2str(msg)}\n"
+end
+
+$logger.info "starting"
+
+$api_credentials = api_credentials
+
+TOUCH_CRITICAL = '/tmp/touched_by_raas_api_cache_when_critical_failure'
+TOUCH_WARNING = '/tmp/touched_by_raas_api_cache_when_warning_failure'
+[TOUCH_WARNING, TOUCH_CRITICAL].each do |f|
+  FileUtils.touch(f, :mtime => Time.now - 2*3600) unless File.exist?(f)
+end
+
+begin
+  # configboy roller pkg keeps host.yml up to date
+  clusters = YAML.load_file('/var/tmp/host.yml')['params']['clusters'].keys
+  threads = []
+  clusters.each do |cluster|
+    threads << Thread.new { fetch_cluster(cluster) }
+  end
+  threads.each(&:join)
+  cache_grpn_dns
+  $logger.info "done"
+  FileUtils.touch '/tmp/touched_by_raas_api_cache_when_run_successfully'
+rescue
+  $logger.error $!
+end

@@ -1,0 +1,67 @@
+<div class="main row">
+  <section class="twelve columns">
+
+    <form method="get">
+    <div class="row">
+      <div class="two columns">
+        <h3><%= link_to('DBs', dbs_path) %></h3>
+      </div>
+      <div class="ten columns">
+        <input name="filter" type="text" placeholder="dbname, endpoint, port or cluster" class="four" autofocus="autofocus">
+        <input type="submit" value="filter">
+      </div>
+    </div>
+    </form>
+
+    <table id="raas-info-list" class="table-row-hover" style="white-space:nowrap;">
+
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th colspan="9"></th>
+          <th>Endpoint</th>
+          <th>Engine</th>
+          <th>Max</th>
+          <th>shards</th>
+          <th>Proxy policy</th>
+          <th>Eviction</th>
+          <th>Service</th>
+          <th>Team</th>
+          <th>Repl</th>
+          <th>OSS Cluster</th>
+          <th>Disk</th>
+          <th>ID</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @dbs.each do |db| %>
+          <tr>
+            <td><%= db.name %></td>
+            <td><%= link_to image_tag('redislabs', size: '25', style: "max-width: none;"), "https://#{db.cluster.name}:8443/#/bdb/tabs/conf/#{db.rl_id}", target: :_blank %></td>
+            <td><%= link_to image_tag('wavefront_logo', size: '25', style: "max-width: none;"), "https://groupon.wavefront.com/dashboards/raas#(g:(d:7200,c:off,l:!t,ls:!t,w:'2h'),p:(db:(d:Label,f:SOURCE,l:db,m:(Label:'#{db.name}.#{db.cluster.name}'),q:'ts(monitord.rlec_db_stats.instantaneous_ops_per_sec)')))", target: :_blank, title: 'wavefront' %></td>
+            <td><%= link_to image_tag('nagios', size: '25', style: "max-width: none;"), "https://thruk-#{db.cluster.colo}.groupondev.com/thruk/cgi-bin/status.cgi?host=#{db.name}.#{db.cluster.name}", target: :_blank, title: 'nagios' %></td>
+            <td><%= link_to image_tag('jira', size: '25', style: "max-width: none;"), "https://jira.groupondev.com/issues/?jql=project%20%3DDATA%20AND%20labels%20in%20(raas-new-db)%20AND%20text%20~%20#{db.endpoint_host}", target: :_blank, title: 'jira' %></td>
+            <td><%= link_to(image_tag('resque', size: '25', style: "max-width: none;"), db.resque_web, target: :_blank, title: 'resque') if db.resque_web %></td>
+            <td><%= link_to('cluster', clusters_path(id: db.cluster.id)) %></td>
+            <td><%= link_to('shards', shards_path(db_id: db.id)) %></td>
+            <td><%= link_to('neighbors', dbs_path(neighbors_of: db.id), title: 'neighbors') %></td>
+            <td><%= link_to('MM', dbs_path(crdt_guid: db.crdt_guid)) if db.crdt_guid.present? %></td>
+            <td><%= db.endpoint_host %></td>
+            <td><%= "#{db.engine} (#{db.engine_version})" %></td>
+            <td><%= number_to_human_size(db.memory_limit) %></td>
+            <td><%= db.num_shards==1 ? '1⃣' : db.num_shards %></td>
+            <td><%= db.proxy_policy %></td>
+            <td><%= db.eviction_policy %></td>
+            <td><%= link_to(db.service, "https://services.groupondev.com/services/#{db.service}", target: :_blank) if db.service %></td>
+            <td><%= db.team %></td>
+            <td><%= '🔄' if db.sync == 'enabled' %></td>
+            <td><%= '🎯' if db.oss_cluster %></td>
+            <td><%= db.persistence unless db.persistence=='disabled' %></td>
+            <td><%= db.rl_id %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </section>
+</div>

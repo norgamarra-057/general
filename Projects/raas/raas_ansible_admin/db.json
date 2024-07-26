@@ -1,0 +1,28 @@
+{
+  "type": "redis",
+  "name": "geo-bhoomi-cache2",
+  "memory_size": 21474836480,
+  "oss_cluster": false,
+  "port": 10090,
+  "shards_count": 5,
+  "sharding": true,
+  "shards_placement": "sparse",
+  "proxy_policy": "all-master-shards",
+  "eviction_policy": "volatile-lru",
+  "authentication_redis_pass": "",
+  "rack_aware": true,
+  "email_alerts": false,
+  "replication": true,
+  "data_persistence": "disabled",
+  "aof_policy": "appendfsync-every-sec",
+  "max_aof_file_size": 8589934592,
+  "max_aof_load_time": 60,
+  "shard_key_regex": [
+    {
+      "regex": ".*\\{(?<tag>.*)\\}.*"
+    },
+    {
+      "regex": "(?<tag>.*)"
+    }
+  ]
+}

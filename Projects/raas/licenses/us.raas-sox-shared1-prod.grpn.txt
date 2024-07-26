@@ -1,0 +1,15 @@
+License Owner: Groupon
+Cluster Name : us.raas-sox-shared1-prod.grpn
+Shards limit : 20
+Valid        : 2020-07-22T00:00:00Z-2021-07-31T00:00:00Z
+
+----- LICENSE START -----
+cI/i6jG+JabkxuF+aydVij/kGNHWtWRXwXAorPQQ27IO2BzPoNT8ORITDW3i
+Io5RtivAM4Yy7jl7I+kp6UvLFUzUnIK0CyHFx0qFXsZ76DU/HUJEYKNHV4g8
+4eM33nSMhWM5sz/8CBeOLvCGOTROh7z+4pXpYjsf38De5Pzqs8Iha1qKmASQ
+pk6aqFdEMhesD3sNM18CTXUsjvRVzjq2AVpuh39ss9FAcfTDL4//QsC4WZRe
+eZSHMCLaQ/ddoaXAQd2UcmN2tln4lPzaI+laAyzQAijSJWtAQrgKa23e9Yd3
+CzwycK+PvlA2z/aNkBss79xzgEDDXTBCXdmclsEiCQ==
+----- LICENSE END -----
+
+
