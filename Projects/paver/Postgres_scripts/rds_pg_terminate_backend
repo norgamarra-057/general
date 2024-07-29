@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+function find_session {
+    Vip="$1"
+    Session="$2"
+    result=$(psql -x -p 5432 -h $Vip -t -U gds_admin -d postgres -c "select * from pg_stat_activity where pid=$Session")
+    echo "***************************************************Session Info:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+if [ $# -lt 2 ]; then
+    echo 'too few arguments given'
+    exit 1
+fi
+if [ $# -gt 2 ]; then
+    echo 'too many arguments'
+    exit 1
+fi
+
+    vip="$1"
+    session="$2"
+
+
+    find_session ${vip} ${session}
+
+
+while true; do
+    read -p "Do you want to kill this session? " yn
+    case $yn in
+        [Yy]* ) psql -U gds_admin -d postgres -h $vip -c "select pg_terminate_backend($session)";exit;;
+        [Nn]* ) exit;;
+        * ) echo "yes/no.";;
+    esac
+done
+[root@gds-prod-gcp1 sbin]# cat rds_pg_terminate_backend
+#!/usr/bin/env bash
+
+function find_session {
+    Vip="$1"
+    Session="$2"
+    result=$(psql -x -p 5432 -h $Vip -t -U gds_admin -d postgres -c "select * from pg_stat_activity where pid=$Session")
+    echo "***************************************************Session Info:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+if [ $# -lt 2 ]; then
+    echo 'too few arguments given'
+    exit 1
+fi
+if [ $# -gt 2 ]; then
+    echo 'too many arguments'
+    exit 1
+fi
+
+    vip="$1"
+    session="$2"
+
+
+    find_session ${vip} ${session}
+
+
+while true; do
+    read -p "Do you want to kill this session? " yn
+    case $yn in
+        [Yy]* ) psql -U gds_admin -d postgres -h $vip -c "select pg_terminate_backend($session)";exit;;
+        [Nn]* ) exit;;
+        * ) echo "yes/no.";;
+    esac
+done

@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+function find_database {
+    Vip="$1"
+    result=$(psql -p 5432 -h $Vip -t -U gds_admin -d postgres -c "select datname from pg_stat_database where datname not in ('template0','template1','postgres','rdsadmin') order by 1")
+    echo "***************************************************Available databases:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+function find_repl_status_subscription {
+    Vip="$1"
+    Dbname="$2"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select now(),* from pg_stat_subscription where subname like 'my_sub_${dbname}'")
+    echo "***************************************************Pg_stat_subscription status:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+
+function find_repl_status_replication {
+    Vip="$1"
+    Dbname="$2"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select now(),pg_current_wal_lsn(),* from pg_stat_replication where application_name like 'my_sub_${dbname}'")
+    echo "***************************************************Pg_stat_replication status:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+function find_users_status {
+    Vip="$1"
+    Dbname="$2"
+    Dbname=$(echo "$Dbname" | sed 's/_stg$//')
+    echo "$Dbname"
+    result=$(psql -p 5432 -h $Vip -d postgres -t -U gds_admin -c "select rolname,rolcanlogin from pg_roles where rolname like '%${Dbname}%'")
+    echo "***************************************************Users login status:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+function find_sessions {
+    Vip="$1"
+    Dbname="$2"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -U gds_admin -c "select pid,usename,application_name,client_addr,backend_start,query_start,state,query from pg_stat_activity where datname='${Dbname}' and usename not in ('gds_admin','postgres')")
+    echo "***************************************************Sessions:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+
+if [ $# -lt 1 ]; then
+    echo 'no argument given'
+    exit 1
+elif [ $# -gt 2 ]; then
+    echo 'too many arguments'
+    exit 1
+fi
+
+    vip="$1"
+    dbname="$2"
+
+    if [ -z "${dbname}" ]; then find_database ${vip}; else echo "dbname is set to '$dbname'"; fi
+    if [ -z "${dbname}" ]; then read -p "Enter database name: " dbname; fi
+
+    find_repl_status_subscription ${vip} ${dbname}
+    find_repl_status_replication ${vip} ${dbname}
