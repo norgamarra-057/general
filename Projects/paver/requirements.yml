@@ -1,0 +1,16 @@
+# Groupon github.groupondev.com
+- src: git+ssh://git@github.groupondev.com/gds/gds-mysql-ha
+  version: master
+  name: gds-mysql-ha
+
+- src: git+ssh://git@github.groupondev.com/gds/gds-mysql-server
+  version: master
+  name: gds-mysql-server
+
+- src: git+ssh://git@github.groupondev.com/gds/gds-mysql-scripts
+  version: master
+  name: gds-mysql-scripts
+
+- src: git+ssh://git@github.groupondev.com/gds/check_mk
+  version: master
+  name: check_mk

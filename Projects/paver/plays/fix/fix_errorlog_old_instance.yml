@@ -1,0 +1,86 @@
+---
+###################################################
+# fix path errorlog. GDS-12747
+#
+# Description:  This playbook is for fix a problem with old instances with a bad path of errorlog.
+#
+# Parameters:  node=SLAVE_FOR_RESTART slave=SLAVE_CONNECTED_TO_SLAVE.
+#
+# Example: ansible-playbook -i inventory/gds-test plays/fix/fix_errorlog_old_instance.yml -e "node=gds-snc1-test-db002m1.snc1 slave=gds-snc1-test-db002s1.snc1 instance=taxonomy_prod"
+#
+# Notes:  1. Playbook will stop replication on slave.
+#         2. Stop mysql on target instance.
+#         3. move the master-bin logs from log to binlog.
+#         4. move the slave-relay-bin from log to binlog.
+#         5. Star mysql on target instance.
+#         6. Start the replication on the Slave server.
+#
+###################################################
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+          - instance is defined
+          - slave is defined
+
+- name: Check parameters
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - include: "{{ playbook_dir }}/../mysql/tasks/facts.yml"
+    - include: "{{ playbook_dir }}/../mysql/tasks/playback_facts.yml"
+      when: playback_enabled
+    - include: "{{ playbook_dir }}/../mysql/tasks/playback_status.yml"
+      when: playback_enabled
+    - include: "{{ playbook_dir }}/../mysql/tasks/mysqlstatus.yml"
+    - include: "{{ playbook_dir }}/../mysql/tasks/connections.yml"
+
+
+
+- name: Stop Slave instance={{ instance }} Host={{ node }}  
+  hosts: "{{ slave }}"
+  gather_facts: false
+  tasks:
+    - name: Stop Slave
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "Stop Slave"
+
+
+- name: Restart instance={{ instance }} Host={{ node }}
+  hosts: "{{ node }}"
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Stop instance
+      runit:
+        name: "{{ instance }}-{{ gds_instance_group }}-mysql"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: killed
+
+    - name: Move master-bin logs
+      shell: mv /var/groupon/percona/{{ instance }}/log/master-bin.* /var/groupon/percona/{{ instance }}/binlog/
+      ignore_errors: true
+
+    - name: Move slave-relay-bin logs
+      shell: mv /var/groupon/percona/{{ instance }}/log/slave-relay-bin.* /var/groupon/percona/{{ instance }}/binlog/
+      ignore_errors: true
+
+    - name: Start instance
+      runit:
+        name: "{{ instance }}-{{ gds_instance_group }}-mysql"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: restarted
+
+- name: Restart replication on Slave
+  hosts: "{{ slave }}"
+  gather_facts: false
+  tasks:
+    - name: Restart Slave
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "Start Slave"

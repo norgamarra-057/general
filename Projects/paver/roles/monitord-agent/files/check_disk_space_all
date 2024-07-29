@@ -1,0 +1,113 @@
+#!/usr/local/bin/ruby
+
+require 'rubygems'
+require 'monitoring_script_multithreshold'
+
+class CheckDiskSpace < MonitoringScriptMultithreshold
+  OPTIONS = {
+    :verbose  => { :text => "Verbose", :short => "V", :type => :bool },
+  }
+
+  SERVICE_NAME = "disk_space"
+  SERVICE_DESC = "Report disk free space"
+  PRIMARY_METRIC = "free"
+
+  MAGS = [
+    ["T",1024.0**4],
+    ["G",1024.0**3],
+    ["M",1024.0**2],
+    ["K",1024.0],
+  ]
+
+  def mag_to_b(str)
+    number_part = str.to_f
+    letter_part = str.gsub(%r{[0-9.]}, "").upcase
+    MAGS.each do |mag,mult|
+      if mag == letter_part
+        return number_part * mult
+      end
+    end
+    return number_part
+  end
+
+  def b_to_mag(kb)
+    MAGS.each do |mag,mult|
+      si = kb / mult
+      if si >= 1
+        return "%0.2f%s" % [si, mag]
+      end
+    end
+    return "%0.2fK" % [kb]
+  end
+
+  def service_check
+    # find 'mount'
+    mounts = [ "/bin/mount", "/sbin/mount" ]
+    mount = nil
+    mounts.each do |mount_candidate|
+      if File.exist? mount_candidate
+        mount = mount_candidate
+        break
+      end
+    end
+    if mount.nil?
+      raise "Cannot find mount in [#{mounts.join(",")}]"
+    end
+    # find 'df'
+    dfs = [ "/usr/local/bin/df", "/bin/df" ]
+    df = nil
+    dfs.each do |df_candidate|
+      if File.exist? df_candidate
+        df = df_candidate
+        break
+      end
+    end
+    if df.nil?
+      raise "Cannot find df in [#{dfs.join(",")}]"
+    end
+
+    dirs = []
+    handle = IO.popen("#{mount}")
+    handle.each_line do |line|
+      if matches = line.match(%r{^/[^ ]+ on ([^ ]+)})
+        next if matches[1] == "/proc"
+        dirs.push(matches[1])
+      end
+    end
+
+    if options[:verbose]
+      puts "Dirs: #{dirs.join(", ")}"
+    end
+
+    min_free_pct = 100
+
+    dirs.each do |path|
+      unless File.exist? path
+        raise "Nonexistent path #{path}"
+      end
+
+      pathname = path[1..-1].downcase.gsub("/","_")
+      pathname = "root" if pathname == ""
+
+      handle = IO.popen("#{df} -Pk #{path}")
+
+      handle.each_line do |line|
+        line_arr = line.split
+        next unless line_arr[5].match %r{^/}
+        ttl_b  = line_arr[1].to_i * 1024
+        used_b = line_arr[2].to_i * 1024
+        free_b = line_arr[3].to_i * 1024
+        set_metric("#{pathname}_used", used_b)
+        set_metric("#{pathname}_free", free_b)
+        free_pct = 100 * free_b / (used_b + free_b)
+        if free_pct < min_free_pct
+          min_free_pct = free_pct
+        end
+        set_metric("#{pathname}_free_pct", free_pct)
+      end
+    end
+    set_metric("min_free_pct", min_free_pct)
+    evaluate_thresholds
+  end
+end
+CheckDiskSpace.new.run!

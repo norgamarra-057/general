@@ -1,0 +1,43 @@
+#!/usr/local/bin/bash
+
+mysql_bin="/usr/local/bin/mysql"
+mysqlbinlog_bin="/usr/local/bin/mysqlbinlog"
+local_binlog_path="{{ local_binlog_path }}"
+from_host="{{ from_host }}"
+from_port={{ from_port | default(3306) }}
+from_replication_user="{{ from_replication_user | default("replication") }}"
+from_replication_password="{{ from_replication_password | default("GaSxrz1twblgEyl") }}"
+from_utility_user="{{ from_utility_user | default("dba_util") }}"
+from_utility_password="{{ from_utility_password | default("TTvktI5g-utF") }}"
+
+function get_first_binlog_file() {
+  remote_mysql_cmd="${mysql_bin} --silent --silent -h${from_host} -u${from_utility_user} -p${from_utility_password} -P${from_port}"
+
+  start_log=`find ${local_binlog_path} -mindepth 1 -maxdepth 1 -type f | tail -1`
+  if [ k${start_log} != 'k' ]
+  then
+    mv ${start_log} ${start_log}.restarted
+    start_log_name=`basename ${start_log}`
+  else
+    start_log_name=`${remote_mysql_cmd} -e "show binary logs;" | head -1 | awk '{print $1}'`
+  fi
+
+  echo ${start_log_name}
+}
+
+function stream_binlogs() {
+  first_binlog_file=$1
+  cd ${local_binlog_path}
+  ${mysqlbinlog_bin} \
+    --raw \
+    --read-from-remote-server \
+    --stop-never \
+    --host ${from_host} \
+    --port ${from_port} \
+    -u${from_replication_user} \
+    -p${from_replication_password} \
+    ${first_binlog_file}
+}
+
+stream_from=`get_first_binlog_file`
+stream_binlogs ${stream_from}

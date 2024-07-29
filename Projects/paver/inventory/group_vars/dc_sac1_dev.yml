@@ -1,0 +1,17 @@
+---
+dns:
+  domain: sac1
+  domains:
+    - dub1
+    - snc1
+    - snc2
+  search: sac1
+  zones:
+    '.':
+      nameservers:
+        - 10.32.116.4
+        - 10.32.132.4
+consul_dc: sac1
+consul_join_server1: gds-admin01.sac1
+consul_join_server2: gds-admin02.sac1
+consul_join_server3: gds-web01.sac1

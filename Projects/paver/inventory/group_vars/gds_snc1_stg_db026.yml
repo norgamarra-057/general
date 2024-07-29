@@ -1,0 +1,108 @@
+---
+gds_carp_peers:
+  - 10.23.38.250  # gds-snc1-stg-db026m1
+  - 10.23.38.251  # gds-snc1-stg-db026s1
+  - 10.23.39.250  # gds-snc1-stg-db026m1
+  - 10.23.39.251  # gds-snc1-stg-db026s1
+
+gds_carp_interfaces:
+  - vlan338
+  - vlan339
+
+gds_instance_group: gds_snc1_stg_db026
+gds_monitor_cluster_type: gds_postgresql
+
+gds_instances:
+  # qa_refund_svc_stg: # GDS-13019 # decom # GDS-33871 
+  # merch_rept_files_stg: # GDS-13102 # decom  #  GDS-33871
+  # cronus_stg: # GDS-12977 # decommissioned
+  # mds_merchand_tag_stg: # GDS-13033 # decom # GDS-33871
+  # sem_stg: # GDS-18326 # decom # GDS-33871
+  # hydradb_stg: # GDS-13383 # decom # GDS-33871
+  # giftcard_svc_stg: # GDS-13354 # decom # GDS-33871
+  # erin_stg: # GDS-13775 # decom # GDS-33871
+  # atl_jira_stg: # GDS-13812 # decom # GDS-33871
+  # ingestion_jtier_stg: # GDS-13779 # decom # GDS-33871__SOX__
+  # clo_cis_stg: # GDS-14049 # decom # GDS-33871
+  # checkoff_stg: # GDS-14074 # decom # GDS-33871 
+  # voucher_ssearch_stg: # GDS-14141 # decom # GDS-33871
+  # mls_sentinel_stg: # GDS-14438 # decom # GDS-33871
+  # email_campaign_stg: #GDS-14526 # decom # GDS-33871
+  # reg_cons_log_stg: #GDS-14829 # decom # GDS-33871
+  # grodd_stg: #GDS-15046 # decom # GDS-33871
+  # cert_auth_stg: #GDS-15071 # decom # GDS-33871
+  # sem_blacklisting_stg: #GDS-15096 # decom # GDS-33871
+  # activiti_stg: #GDS-15273 # GDS-33871 # decom
+  # conveyor_api_stg: #GDS-15271 # decom # GDS-33871
+  # cmdb_stg: # GDS-15354 # decom # GDS-33871
+  # partner_arbt_map_stg: # GDS-15426 # decom # GDS-33871 __SOX__
+  # oxygen_stg: # GDS-15407 # decom # GDS-33871 
+  # crosslinker_stg: # GDS-15703 # decom # GDS-33871
+  # keyword_kb_stg: # GDS-15720 # decom # GDS-33871
+  #  olympus_stg: # GDS-15949 #Decomm GDS-32735#
+  # display_leadgen_stg: # GDS-16028 # decom # GDS-33871
+  # market_ticketing_stg: # GDS-16399 # decom # GDS-33871
+  # mktg_feed_service_stg: # GDS-16455 # decom # GDS-33871
+  # raasmon2_stg: # GDS-16439 # decom # GDS-33871
+  # merch_lifecycle_stg: # GDS-17052 # decom # GDS-33871 
+  # coupons_inventory_stg: # GDS-17102 # decom # GDS-33871
+  # history_service_stg: # GDS-17219 # decom # GDS-33871
+  # Decommed - GDS-29230  item_auth_stg: # GDS-17232
+  # control_center_stg: # GDS-17230 # decom # GDS-33871
+  # goods_inv_emea_stg: # GDS-17316 # decom # GDS-33871
+  # metro_draft_stg: # GDS-17454 # decomm
+  # mkttag_service_stg: # GDS-17471 # decom # GDS-33871
+  # campaign_alert_stg: # GDS-17598 # decom # GDS-33871
+
+  # destroyed GDS-26349  pgb_backend_stg: # GDS-17651 __SOX__
+
+  # seo_columbus_stg: # GDS-17851 # decom # GDS-33871
+  # performer_service_stg: # GDS-17890 # decom # GDS-33871
+  # airflow_stg: # GDS-18498 # Decom # GDS-33871
+  # delivery_est_stg: # GDS-18867 # decom # GDS-33871 
+  # merch_backend_conf_stg: # GDS-18847 # decom # GDS-33871
+  # epds_stg: # GDS-19026 # decom # GDS-33871
+  # gdt_auto_stg: # GDS-19150 # decom # GDS-33871
+  # ada_stg: # GDS-19127 # decom # GDS-33871
+  # mecs_stg: # GDS-19241 # decom # GDS-33871
+  # delivery_notif_stg: # GDS-19299 # decom # GDS-33871
+  # mbus_sigint_cnf_stg: # GDS-19500 # decom # GDS-33871
+  # merch_rept_vouch_stg: # GDS-19530 # decom # GDS-33871
+  # airflow2_stg: # GDS-19688 # GDS-31839 decommissioned#
+  # appreviewbot_stg: # GDS-19696 # Decom # GDS-33871
+  # airflow4_stg: # GDS-19690 # Decom # GDS-33871
+  # airflow5_stg: # GDS-19691 # decom # GDS-33871
+  # airflow3_stg: # GDS-19689 #decomm 31805 #
+  # hbw_signature_stg: # GDS-19735 # decom # GDS-33871
+  # sulu_stg: # GDS-19735 # decom # GDS-33871
+  # goods_promo_mgr_stg: # GDS-19850 # decom # GDS-33871
+  # program_enroll_stg: # GDS-19803 # decom # GDS-33871 
+  # campaign_perform_stg: # GDS-20029 # decom # GDS-33871
+  # dsp_airflow_cids_stg: # GDS-20284 # decom # GDS-33871
+  # getaways_chan_mgr_stg: # GDS-20349 # decom # GDS-33871 
+  # crm_regla_stg: # GDS-9852 # decom # GDS-33871
+  # merchant_analytics_stg: # decom # GDS-33871
+  #consumer_location_stg: # GDS-20450 #Decom # GDS-32822
+  # decision_engine_stg: # GDS-20517 # decom # GDS-33871
+  # fcpa_stg: # GDS-20649 # decom # GDS-33871
+  # imadmin_stg: # GDS-20748 # decom # GDS-33871
+  #pctest_stg: # Priyanka's test instance # decommissioned #
+#  dsp_airflow_fraud_stg: # GDS-20829 # GDS-31806 # Decommissioned 
+
+# destroyed GDS-26190  isochrones_stg: # GDS-20793
+
+# destroyed GDS-29943  goods_insights_stg: # GDS-20903
+
+  # mls_deal_index_stg: # GDS-20984 # decom # GDS-33871 
+  # goods_deletion_stg: # GDS-21087 # decom # GDS-33871
+  # deryan_stg: # GDS-21108  # decom # GDS-33871
+  # bareos_backup_stg: # GDS-21173 # decom # GDS-33871 
+  # epods_stg: # GDS-21558 # decom # GDS-33871
+  # awx_a_stg: # GDS-21161 # decom # GDS-33871
+  # awx_b_stg: # GDS-21718 # decom # GDS-33871
+  # deal_perf_v2_stg: # GDS-22775 # decom # GDS-33871
+  # del_service_emea_stg: # GDS-22906 # decom # GDS-33871
+  #dpp_airflow_ads_stg: # GDS-23059 # decomm # GDS-31962
+
+  #merch_change_mgmt_stg  : # GDS-24284 # decomm
+  # customfieldsval_stg  : # GDS-24920 # decom # GDS-33871

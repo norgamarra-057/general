@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+function lookup_port {
+    conf="$1"
+    cat "${conf}" | grep 'port =' | awk '{ print $3}'
+}
+
+function find_database {
+    currentinstance=$(grep -A1 "${port}" /etc/check_mk/postgres.cfg)
+    dbname=$(echo "$currentinstance" | grep "dbname=" | sed -e 's/dbname=//')
+}
+
+function find_conns {
+
+    files=$(ls /var/groupon/postgresql/data94/*/data/postgresql.conf 2>/dev/null)
+    for f in ${files}; do
+    instance=$(dirname ${f} | sed 's/.*-//' | sed 's/.data*//')
+    port=$(lookup_port ${f})
+    echo "------------------------------------------------------------------------------------------------------------------"
+    find_database ${port}
+    echo "${instance}   ${port}"
+    psql -t -U postgres -p ${port} -d $dbname -c 'select * from dba.pgbouncer_ses_view_clients union select * from dba.pgbouncer_trx_view_clients'
+    echo "------------------------------------------------------------------------------------------------------------------"
+    done
+}
+
+find_conns

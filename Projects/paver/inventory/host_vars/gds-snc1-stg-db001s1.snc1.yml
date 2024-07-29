@@ -1,0 +1,11 @@
+---
+gds_cluster: gds_prod_snc1_db004
+
+percona_client_version: '5.6.19.67.0'
+percona_server_version: '5.6.19.67.0'
+percona_version: '56'
+percona_toolkit_version: 2.2.6
+
+innodb_io_capacity_force: 15000
+innodb_lru_scan_depth_force: 1000
+auto_increment_offset_force: 1

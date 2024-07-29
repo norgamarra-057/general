@@ -1,0 +1,26 @@
+---
+# Register service status for Postgresql instance
+- hosts: 
+    - "{{ node }}"
+  become: yes
+  gather_facts: false
+  tasks: 
+  - name: See if Postgresql service exists
+    stat:
+      path: "{{ postgresql_service_dir }}"
+    register: postgresql_service
+    check_mode: yes
+    changed_when: false
+
+  - name: See if Postgresql service data dir exists
+    stat:
+      path: "{{ postgresql_pgdata_dir }}"
+    register: postgresql_service_data
+    check_mode: yes
+    changed_when: false
+
+  - name: Register Postgresql instance status
+    shell: sv status {{ postgresql_service_dir }} | cut -d':' -f1
+    register: postgresql_service_status
+    when: postgresql_service.stat is defined and postgresql_service.stat.isdir
+    changed_when: false

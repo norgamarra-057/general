@@ -1,0 +1,16 @@
+{
+    "service": {
+    "name": "{{ consul_instance_name }}",
+    "port": {{ gds_instances[instance_name].ports.postgresql_raw }},
+    "token": "a632a83a-0a3b-9632-3eb6-7716e36b9655"
+    },
+    "checks": [
+        {
+            "id": "{{ consul_instance_name }}-live",
+            "name": "{{ consul_instance_name }}",
+            "notes": "Postgres health check for {{ consul_instance_name }}",
+            "script": "{{ consul_service_dir }}/etc/check_postgres.pl --assume-prod --action=dbstats --datadir {{ postgresql_data_dir }} --port={{ gds_instances[instance_name].ports.postgresql_raw }}",
+            "interval": "10s"
+        }
+    ]
+}

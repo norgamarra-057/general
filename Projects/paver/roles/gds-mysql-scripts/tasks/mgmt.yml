@@ -1,0 +1,11 @@
+---
+- name: Deploy instance management scripts
+  tags:
+    - mysql-scripts
+  copy:
+    dest: "/usr/local/sbin/{{ item }}"
+    src: "mgmt/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0750
+  with_items: "{{instance_mgmt_scripts}}"

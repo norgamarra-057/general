@@ -1,0 +1,295 @@
+Index: sys/cddl/contrib/opensolaris/uts/common/fs/zfs/arc.c
+===================================================================
+--- sys/cddl/contrib/opensolaris/uts/common/fs/zfs/arc.c	(revision 279931)
++++ sys/cddl/contrib/opensolaris/uts/common/fs/zfs/arc.c	(working copy)
+@@ -190,6 +190,15 @@
+ extern int zfs_prefetch_disable;
+ 
+ /*
++ * KD 2015-02-10
++ * We have to be able to test for UIO use inside the arc allocator.
++ * NOTE: DO NOT MODIFY HERE!
++ */
++extern int zio_use_uma;
++extern int zfs_dynamic_write_buffer;
++
++
++/*
+  * The arc has filled available memory and has now warmed up.
+  */
+ static boolean_t arc_warm;
+@@ -212,7 +221,7 @@
+ arc_free_target_init(void *unused __unused)
+ {
+ 
+-	zfs_arc_free_target = vm_pageout_wakeup_thresh;
++	zfs_arc_free_target = vm_pageout_wakeup_thresh + ((cnt.v_free_target - vm_pageout_wakeup_thresh) / 2);
+ }
+ SYSINIT(arc_free_target_init, SI_SUB_KTHREAD_PAGE, SI_ORDER_ANY,
+     arc_free_target_init, NULL);
+@@ -233,7 +242,9 @@
+ SYSCTL_INT(_vfs_zfs, OID_AUTO, arc_shrink_shift, CTLFLAG_RW,
+     &arc_shrink_shift, 0,
+     "log2(fraction of arc to reclaim)");
+-
++SYSCTL_INT(_vfs_zfs, OID_AUTO, dynamic_write_buffer, CTLFLAG_RWTUN,
++    &zfs_dynamic_write_buffer, 0,
++    "Dynamically restrict dirty data when memory is low");
+ /*
+  * We don't have a tunable for arc_free_target due to the dependency on
+  * pagedaemon initialisation.
+@@ -2635,6 +2646,28 @@
+ extern kmem_cache_t	*zio_data_buf_cache[];
+ extern kmem_cache_t	*range_seg_cache;
+ 
++static void __used
++reap_arc_caches()
++{
++	size_t          i;
++	kmem_cache_t            *prev_cache = NULL;
++	kmem_cache_t            *prev_data_cache = NULL;
++
++	for (i = 0; i < SPA_MAXBLOCKSIZE >> SPA_MINBLOCKSHIFT; i++) {
++		if (zio_buf_cache[i] != prev_cache) {
++			prev_cache = zio_buf_cache[i];
++			kmem_cache_reap_now(zio_buf_cache[i]);
++		}
++		if (zio_data_buf_cache[i] != prev_data_cache) {
++			prev_data_cache = zio_data_buf_cache[i];
++			kmem_cache_reap_now(zio_data_buf_cache[i]);
++		}
++	}
++	kmem_cache_reap_now(buf_cache);
++	kmem_cache_reap_now(hdr_cache);
++	kmem_cache_reap_now(range_seg_cache);
++}
++
+ static void __noinline
+ arc_kmem_reap_now(arc_reclaim_strategy_t strat)
+ {
+@@ -2666,19 +2699,7 @@
+ 	if (strat == ARC_RECLAIM_AGGR)
+ 		arc_shrink();
+ 
+-	for (i = 0; i < SPA_MAXBLOCKSIZE >> SPA_MINBLOCKSHIFT; i++) {
+-		if (zio_buf_cache[i] != prev_cache) {
+-			prev_cache = zio_buf_cache[i];
+-			kmem_cache_reap_now(zio_buf_cache[i]);
+-		}
+-		if (zio_data_buf_cache[i] != prev_data_cache) {
+-			prev_data_cache = zio_data_buf_cache[i];
+-			kmem_cache_reap_now(zio_data_buf_cache[i]);
+-		}
+-	}
+-	kmem_cache_reap_now(buf_cache);
+-	kmem_cache_reap_now(hdr_cache);
+-	kmem_cache_reap_now(range_seg_cache);
++	reap_arc_caches();
+ 
+ #ifdef sun
+ 	/*
+@@ -2697,11 +2718,29 @@
+ 	clock_t			growtime = 0;
+ 	arc_reclaim_strategy_t	last_reclaim = ARC_RECLAIM_CONS;
+ 	callb_cpr_t		cpr;
++	int			autoreap = 0;
+ 
+ 	CALLB_CPR_INIT(&cpr, &arc_reclaim_thr_lock, callb_generic_cpr, FTAG);
+ 
+ 	mutex_enter(&arc_reclaim_thr_lock);
+ 	while (arc_thread_exit == 0) {
++
++#ifdef _KERNEL
++/* KD 2015-02-10
++ * Protect against UMA free memory bloat.  We already do this on a low-memory
++ * basis in the allocator; it has to happen there rather than here due to
++ * response time considerations.  Make the call here once every 10 passes as
++ * well; this reclaims unused UMA buffers every 10 seconds on an idle system
++ * and more frequently if the reclaim thread gets woken up by low RAM
++ * conditions.
++ */
++		if ((zio_use_uma) && (autoreap++ == 10)) {
++			autoreap = 0;
++			DTRACE_PROBE(arc__reclaim_timed_reap);
++			reap_arc_caches();
++		}
++#endif /* _KERNEL */
++
+ 		if (arc_reclaim_needed()) {
+ 
+ 			if (arc_no_grow) {
+@@ -2889,6 +2928,19 @@
+ 			arc_space_consume(size, ARC_SPACE_DATA);
+ 		} else {
+ 			ASSERT(type == ARC_BUFC_DATA);
++#ifdef _KERNEL
++/* KD 2015-02-10
++ * It would be nice if we could leave this to the arc_reclaim thread.
++ * Unfortunately we cannot; the test has to be done here as well, because
++ * under heavy I/O demand we can grab enough RAM fast enough to induce
++ * nasty oscillation problems.  Fortunately we only need to call this when
++ * the system is under reasonably-severe memory stress.
++ */
++			if (zio_use_uma && (ptob(cnt.v_free_count) + size < ptob(cnt.v_free_target))) {
++				DTRACE_PROBE3(arc__alloc_lowmem_reap, int, cnt.v_free_count, int, size, int, cnt.v_free_target);
++				reap_arc_caches();
++			}
++#endif /* _KERNEL */
+ 			buf->b_data = zio_data_buf_alloc(size);
+ 			ARCSTAT_INCR(arcstat_data_size, size);
+ 			atomic_add_64(&arc_size, size);
+Index: sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu_tx.c
+===================================================================
+--- sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu_tx.c	(revision 279931)
++++ sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu_tx.c	(working copy)
+@@ -42,6 +42,8 @@
+ typedef void (*dmu_tx_hold_func_t)(dmu_tx_t *tx, struct dnode *dn,
+     uint64_t arg1, uint64_t arg2);
+ 
++extern	int	zio_use_uma;	/* Needs to be visible; DO NOT MODIFY! */
++int	zfs_dynamic_write_buffer = 1;	/* Dynamically tune writes */
+ 
+ dmu_tx_t *
+ dmu_tx_create_dd(dsl_dir_t *dd)
+@@ -1058,7 +1060,7 @@
+ {
+ 	dsl_pool_t *dp = tx->tx_pool;
+ 	uint64_t delay_min_bytes =
+-	    zfs_dirty_data_max * zfs_delay_min_dirty_percent / 100;
++	    zfs_dirty_data_max_internal * zfs_delay_min_dirty_percent / 100;
+ 	hrtime_t wakeup, min_tx_time, now;
+ 
+ 	if (dirty <= delay_min_bytes)
+@@ -1070,11 +1072,11 @@
+ 	 * have to handle the case of it being >= the max, which could
+ 	 * cause a divide-by-zero if it's == the max.
+ 	 */
+-	ASSERT3U(dirty, <, zfs_dirty_data_max);
++	ASSERT3U(dirty, <, zfs_dirty_data_max_internal);
+ 
+ 	now = gethrtime();
+ 	min_tx_time = zfs_delay_scale *
+-	    (dirty - delay_min_bytes) / (zfs_dirty_data_max - dirty);
++	    (dirty - delay_min_bytes) / (zfs_dirty_data_max_internal - dirty);
+ 	if (now > tx->tx_start + min_tx_time)
+ 		return;
+ 
+@@ -1279,6 +1281,7 @@
+ dmu_tx_assign(dmu_tx_t *tx, txg_how_t txg_how)
+ {
+ 	int err;
++	static	uint64_t	last_max;
+ 
+ 	ASSERT(tx->tx_txg == 0);
+ 	ASSERT(txg_how == TXG_WAIT || txg_how == TXG_NOWAIT ||
+@@ -1291,6 +1294,42 @@
+ 	if (txg_how == TXG_WAITED)
+ 		tx->tx_waited = B_TRUE;
+ 
++#ifdef _KERNEL
++	/*
++	 * KD 2014-09-22
++	 * If UMA is enabled it can only return a previously-used block
++	 * of identical size to what it had out before.  If it's not the
++	 * same size it will allocate a new one.  This is a problem because
++	 * dirty_data_max is the total dirty write data allowed out at any
++	 * given time, but with UMA on that can multiply by the number of
++	 * different block sizes (!!) requested in terms of free RAM that
++	 * is left allocated but unused.  For this reason never allow
++	 * dirty_data_max to exceed the difference between the paging
++	 * threshold and the current free memory, with a minimum of 256MB.
++	 * This throttles "burst" allocations and prevents the system from
++	 * choking during times of high write I/O demand.
++	 *
++	 * We allow this to be turned off if you want with
++	 * "vfs.zfs_dynamic_write_buffer=0", which can be done in real time.
++	 *
++	 * Note that we work on the zfs_dirty_data_max_internal variable,
++	 * because the user may set zfs_dirty_data_max himself and we must
++	 * must honor that as a hard cap so it remains a usable tunable value.
++	 */
++	if (zio_use_uma & zfs_dynamic_write_buffer) {
++		zfs_dirty_data_max_internal = 1 << 28;
++		zfs_dirty_data_max_internal = MAX(zfs_dirty_data_max_internal, ptob(cnt.v_free_count - cnt.v_free_target));
++		zfs_dirty_data_max_internal = MIN(zfs_dirty_data_max_internal, zfs_dirty_data_max);
++		zfs_dirty_data_max_internal = MIN(zfs_dirty_data_max_internal, zfs_dirty_data_max_max);
++		if (last_max != (zfs_dirty_data_max_internal / (1024 * 1024))) {
++			last_max = zfs_dirty_data_max_internal / (1024 * 1024);
++			DTRACE_PROBE1(dmu__tx_dirty, uint64_t, last_max);
++		}
++	} else {
++		zfs_dirty_data_max_internal = zfs_dirty_data_max;
++	}
++#endif /* _KERNEL */
++
+ 	while ((err = dmu_tx_try_assign(tx, txg_how)) != 0) {
+ 		dmu_tx_unassign(tx);
+ 
+@@ -1321,7 +1360,7 @@
+ 		 * space.
+ 		 */
+ 		mutex_enter(&dp->dp_lock);
+-		while (dp->dp_dirty_total >= zfs_dirty_data_max)
++		while (dp->dp_dirty_total >= zfs_dirty_data_max_internal)
+ 			cv_wait(&dp->dp_spaceavail_cv, &dp->dp_lock);
+ 		uint64_t dirty = dp->dp_dirty_total;
+ 		mutex_exit(&dp->dp_lock);
+Index: sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dsl_pool.c
+===================================================================
+--- sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dsl_pool.c	(revision 279931)
++++ sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dsl_pool.c	(working copy)
+@@ -97,8 +97,11 @@
+ /*
+  * zfs_dirty_data_max will be set to zfs_dirty_data_max_percent% of all memory,
+  * capped at zfs_dirty_data_max_max.  It can also be overridden in /etc/system.
++ * We also dynamically tune during low memory, honoring the sysctl set, so
++ * internal comparisons are against zfs_dirty_data_max_internal.
+  */
+ uint64_t zfs_dirty_data_max;
++uint64_t zfs_dirty_data_max_internal;
+ uint64_t zfs_dirty_data_max_max = 4ULL * 1024 * 1024 * 1024;
+ int zfs_dirty_data_max_percent = 10;
+ 
+@@ -547,7 +550,7 @@
+ 	 * Note: we signal even when increasing dp_dirty_total.
+ 	 * This ensures forward progress -- each thread wakes the next waiter.
+ 	 */
+-	if (dp->dp_dirty_total <= zfs_dirty_data_max)
++	if (dp->dp_dirty_total <= zfs_dirty_data_max_internal)
+ 		cv_signal(&dp->dp_spaceavail_cv);
+ }
+ 
+@@ -726,7 +729,7 @@
+ dsl_pool_need_dirty_delay(dsl_pool_t *dp)
+ {
+ 	uint64_t delay_min_bytes =
+-	    zfs_dirty_data_max * zfs_delay_min_dirty_percent / 100;
++	    zfs_dirty_data_max_internal * zfs_delay_min_dirty_percent / 100;
+ 	boolean_t rv;
+ 
+ 	mutex_enter(&dp->dp_lock);
+Index: sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/dsl_pool.h
+===================================================================
+--- sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/dsl_pool.h	(revision 279931)
++++ sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/dsl_pool.h	(working copy)
+@@ -50,6 +50,7 @@
+ struct dsl_scan;
+ 
+ extern uint64_t zfs_dirty_data_max;
++extern uint64_t zfs_dirty_data_max_internal;
+ extern uint64_t zfs_dirty_data_max_max;
+ extern uint64_t zfs_dirty_data_sync;
+ extern int zfs_dirty_data_max_percent;
+Index: sys/vm/vm_object.c
+===================================================================
+--- sys/vm/vm_object.c	(revision 279931)
++++ sys/vm/vm_object.c	(working copy)
+@@ -1628,7 +1628,7 @@
+ 					p = next;
+ 					continue;
+ 				}
+-				VM_OBJECT_WLOCK(backing_object);
++				VM_OBJECT_WUNLOCK(backing_object);
+ 				VM_OBJECT_WUNLOCK(object);
+ 				VM_WAIT;
+ 				VM_OBJECT_WLOCK(object);

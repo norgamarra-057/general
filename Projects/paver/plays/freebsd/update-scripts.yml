@@ -1,0 +1,6 @@
+---
+- name: Update gds-mysql-scripts
+  hosts: gds_all
+  become: yes
+  roles:
+    - gds-mysql-scripts

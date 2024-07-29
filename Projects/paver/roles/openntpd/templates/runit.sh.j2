@@ -1,0 +1,10 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst -v\
+    -e /var/service/openntpd/env \
+    -m {{ 80 * 1024 * 1024 }} \
+  /usr/local/sbin/ntpd -d \
+    -s \
+    -f /var/service/openntpd/ntpd.conf

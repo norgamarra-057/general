@@ -1,0 +1,21 @@
+---
+# Register service status for MySQL instance
+
+- name: Decommission | MySQL | See if MySQL service is defined
+  stat:
+    path: "{{ mysql_service_path }}"
+  register: mysql_service
+  changed_when: false
+
+- name: Decommission | MySQL | See if MySQL service data dir exists
+  stat:
+    path: "{{ pt_heartbeat_service_data_path }}"
+  register: mysql_service_data
+  changed_when: false
+
+- name: Decommission | MySQL | Register MySQL instance status
+  shell: sv status {{ mysql_service_data_path }} | cut -d':' -f1
+  register: mysql_service_status
+  when: mysql_service_data.stat.isdir is defined and mysql_service_data.stat.isdir
+  changed_when: false
+

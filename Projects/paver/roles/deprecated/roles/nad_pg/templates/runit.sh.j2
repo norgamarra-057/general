@@ -1,0 +1,27 @@
+#!/bin/sh --
+exec 2>&1
+set -e
+
+/usr/bin/env -i \
+  /usr/local/sbin/chpst \
+    -e {{ nad_pg_service_dir }}/env \
+    -u {{ nad_username }}:{{ nad_groupname }} \
+  /usr/local/sbin/nad \
+    -c {{ nad_config_dir }} \
+    --apiprotocol http \
+    --apiport 8080 \
+    --apihost circonus-api02.snc1 \
+    --authtoken {{ nad_api_key }} \
+    --apiverbose \
+    --target {{ ansible_hostname }}.{{ ansible_domain }} \
+    --brokerid {{ circonus_broker_id }} \
+    --configfile /var/groupon/service/nad_pg/etc/nad_pg.config
+
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst \
+    -e {{ nad_pg_service_dir }}/env \
+    -u {{ nad_username }}:{{ nad_groupname }} \
+  /usr/local/sbin/nad \
+    -c {{ nad_config_dir }} \
+    -p 2611 

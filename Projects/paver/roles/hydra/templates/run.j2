@@ -1,0 +1,5 @@
+#!/bin/sh --
+
+set -e
+exec /usr/local/sbin/chpst -e ./env \
+    /opt/hydra/bin/hydra -d {% if hydra_type == 'server' %} -s {% endif %} -c "/var/service/hydra-{{ hydra_type }}/hydra-{{ hydra_type }}.yml"

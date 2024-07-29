@@ -1,0 +1,14 @@
+---
+gds_carp_peers:
+  - 10.30.32.226  # gds-snc1-prod-db161m1
+  - 10.30.32.227  # gds-snc1-prod-db161s1
+  - 10.30.33.226  # gds-snc1-prod-db161m1
+  - 10.30.33.227  # gds-snc1-prod-db161s1
+gds_carp_interfaces:
+  - vlan332
+  - vlan333
+gds_instance_group: gds_prod_snc1_db161
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  orders_prod: # GDS-3185  # __SOX__ - Decommed GDS-35811

@@ -1,0 +1,12 @@
+---
+- name: splunkd restart
+  command: /usr/local/sbin/sv term /var/service/splunkd
+
+- name: splunkd log restart
+  command: /usr/local/sbin/sv term /var/service/splunkd/log
+
+- name: splunkweb restart
+  command: /usr/local/sbin/sv term /var/service/splunkweb
+
+- name: splunkweb log restart
+  command: /usr/local/sbin/sv term /var/service/splunkweb/log

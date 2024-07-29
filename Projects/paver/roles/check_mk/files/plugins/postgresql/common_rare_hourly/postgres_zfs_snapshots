@@ -1,0 +1,40 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_zfs_snapshots>>>'
+for Port in $Ports; do
+    dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+    echo "Port $Port - $dbname"
+
+    HOURS=24
+    TIME_NOW=$(date +'%s')
+    TWENTYFOUR_HOUR=$(($HOURS * 60 * 60))
+    DELTA=$(($TIME_NOW - $TWENTYFOUR_HOUR))
+
+    database_folder=$(psql -p $Port -AtF ";" -U postgres -c "show data_directory;")
+    birthday_of_data_dir=$(stat -f '%B' $database_folder)
+
+    if [ -n "$DELTA" ] && [ -n "$birthday_of_data_dir" ] && [ "$DELTA" -gt "$birthday_of_data_dir" ]; then
+        zfs_info=$(echo "$database_folder" | xargs -n1 zfs list -p -r -t snapshot -o name,creation)
+        get_snapshots=$(echo "$zfs_info" | awk -v now="$TIME_NOW" -v twenty_four_h="$TWENTYFOUR_HOUR" '$2 >= (now - twenty_four_h)' | sed -n '1!p')
+        echo "$get_snapshots" | wc -l | awk '{print $NF}'
+    else
+        echo "None: $birthday_of_data_dir"
+    fi
+    sleep 0.5
+done

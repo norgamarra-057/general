@@ -1,0 +1,128 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.30.24.246 # gds-snc1-prod-db008m1
+  - 10.30.24.247 # gds-snc1-prod-db008s1
+  - 10.30.25.246 # gds-snc1-prod-db008m1
+  - 10.30.25.247 # gds-snc1-prod-db008s1
+
+gds_carp_interfaces:
+  - vlan324
+  - vlan325
+
+gds_instance_group: gds_prod_snc1_db008
+gds_monitor_cluster_type: gds_postgresql
+# List of all GDS instances in this timeline
+gds_instances:
+  mobile-notification:
+    type: postgresql
+    dbnames:
+      - mobile_notification_push_token_prod
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60002
+    master_vip: 10.30.24.76
+    slave_vips:
+      - 10.30.25.76
+    replication_ips:
+      - 10.22.142.228
+      - 10.22.142.65
+    dba_account_name: mobile_notification_push_token_dba
+    app_account_name: mobile_notification_push_token_app
+    dba_src_cidrs:
+      - 10.20.81.250/32
+      - 10.20.91.161/32
+      - 10.20.91.235/32
+      - 10.20.130.11/32
+      - 10.20.130.177/32
+      - 10.20.130.77/32
+      - 10.20.131.250/32
+      - 10.20.131.61/32
+      - 10.20.132.17/32
+      - 10.20.132.45/32
+      - 10.20.132.88/32
+      - 10.22.70.12/32
+      - 10.22.70.181/32
+      - 10.22.70.69/32
+      - 10.20.87.125/32 # mobilenotifications-proximity-app3.snc1
+      - 10.22.109.90/32
+      - 10.20.91.108/32
+      - 10.22.134.123/32
+      - 10.20.131.215/32
+      - 10.22.109.105/32   #mobile-token1.snc1
+      - 10.20.131.187/32   #mobile-token2.snc1
+      - 10.22.140.53/32   #mobile-token3.snc1
+      - 10.22.70.60/32   #mobile-token4.snc1
+      - 10.20.71.135/32  # mobileutil.snc1
+      - 10.22.237.131/32   #mobilenotifications-dispatcher5.snc1
+      - 10.22.152.238/32   #mobilenotifications-dispatcher6.snc1
+      - 10.20.91.194/32   #mobilenotifications-dispatcher7.snc1
+      - 10.22.150.56/32   #mobilenotifications-dispatcher8.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.218.30/32 # mobile-token5.snc1
+      - 10.22.67.118/32 # mobile-token6.snc1
+      - 10.22.233.137/32 # mobile-token7.snc1
+      - 10.22.233.126/32 # mobile-token8.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.81.250/32
+      - 10.20.91.161/32
+      - 10.20.91.235/32
+      - 10.20.130.11/32
+      - 10.20.130.177/32
+      - 10.20.130.77/32
+      - 10.20.131.250/32
+      - 10.20.131.61/32
+      - 10.20.132.17/32
+      - 10.20.132.45/32
+      - 10.20.132.88/32
+      - 10.22.70.12/32
+      - 10.22.70.181/32
+      - 10.22.70.69/32
+      - 10.20.87.125/32 # mobilenotifications-proximity-app3.snc1
+      - 10.22.109.90/32
+      - 10.20.91.108/32
+      - 10.22.109.105/32   #mobile-token1.snc1
+      - 10.20.131.187/32   #mobile-token2.snc1
+      - 10.22.140.53/32   #mobile-token3.snc1
+      - 10.22.70.60/32   #mobile-token4.snc1
+      - 10.20.71.135/32  # mobileutil.snc1
+      - 10.22.237.131/32   #mobilenotifications-dispatcher5.snc1
+      - 10.22.152.238/32   #mobilenotifications-dispatcher6.snc1
+      - 10.20.91.194/32   #mobilenotifications-dispatcher7.snc1
+      - 10.22.150.56/32   #mobilenotifications-dispatcher8.snc1
+      - 10.22.71.74/32   #token-service-utility1.snc1
+      - 10.22.150.38/32   #token-service-utility2.snc1
+      - 10.20.130.78/32   #token-service-utility3.snc1
+      - 10.22.237.244/32   #token-service-utility4.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.218.30/32 # mobile-token5.snc1
+      - 10.22.67.118/32 # mobile-token6.snc1
+      - 10.22.233.137/32 # mobile-token7.snc1
+      - 10.22.233.126/32 # mobile-token8.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20003
+      pgbouncer_session: 20004
+      postgresql_raw: 20005
+    extra_variables:
+      shared_buffers: 72GB
+      default_pool_size: 100
+      maintenance_work_mem: 3GB
+      work_mem: 10MB
+      wal_keep_segments: 15000
+      max_connections: 200
+      logging_collector: 'on'
+      checkpoint_segments: 500

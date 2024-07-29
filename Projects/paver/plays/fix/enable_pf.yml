@@ -1,0 +1,14 @@
+---
+- name: Enable pf
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Check pf status
+      shell: "pfctl -si | grep ^Status | awk '{ print $2 }' | grep Enabled"
+      register: pf_check
+      changed_when: false
+      ignore_errors: true
+
+    - name: Enable pf
+      shell: "pfctl -e"
+      when: pf_check|failed

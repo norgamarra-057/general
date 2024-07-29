@@ -1,0 +1,5 @@
+- hosts: gds_all
+#  gather_facts: no
+  become: yes
+  roles:
+    - { role: hydra }

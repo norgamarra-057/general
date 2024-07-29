@@ -1,0 +1,3 @@
+#!/bin/sh --
+QUERY="select ( pl.connections / gv.max_connections ) * 100 as percentage_used_connections from ( select count(*) as connections from information_schema.processlist ) as pl,  ( select VARIABLE_VALUE as max_connections from information_schema.global_variables where variable_name = 'MAX_CONNECTIONS' ) as gv"
+/usr/local/bin/mysql  -P {{ gds_instances[instance_name].ports.mysqld }} --socket=/var/groupon/percona/{{instance_name}}/mysql.sock -e "$QUERY" -s -N | awk '{ printf("perc_used_conn\tL\t%d\n",$1); }'

@@ -1,0 +1,6 @@
+---
+- hosts: gds_sac1_stg_db022
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+# all further entries destroyed GDS-29035 SAC1 only

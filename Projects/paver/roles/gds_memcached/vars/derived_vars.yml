@@ -1,0 +1,4 @@
+---
+memcached_path: '/var/service/memcached-{{ gds_cluster }}'
+memcached_user: nobody
+memcached_group: nobody

@@ -1,0 +1,224 @@
+Script started on Thu Mar 31 14:53:56 2022
+mojamal has logged on pts/10 from tmux(6529).%0.
+root has logged on pts/11 from tmux(80207).%0.
+asutherland has logged on pts/12 from mosh [69740].
+ramas has logged on pts/15 from tmux(64734).%13.
+root has logged on pts/19 from tmux(80207).%2.
+ramas has logged on pts/2 from tmux(64734).%11.
+ramas has logged on pts/21 from tmux(64734).%19.
+jdoenhardt has logged on pts/23 from tmux(64395).%0.
+ramas has logged on pts/24 from tmux(64734).%22.
+ramas has logged on pts/25 from tmux(64734).%18.
+ksatyamurthy has logged on pts/27 from b4.snc1.
+cyadav has logged on pts/29 from tmux(50484).%2.
+root has logged on pts/3 from tmux(80207).%1.
+ramas has logged on pts/30 from tmux(64734).%17.
+pchatterjee has logged on pts/31 from tmux(36573).%0.
+msubramanian has logged on pts/32 from tmux(77171).%1.
+cyadav has logged on pts/34 from tmux(50484).%4.
+ramas has logged on pts/35 from tmux(64734).%16.
+c_wayang has logged on pts/36 from 10.20.84.30.
+msubramanian has logged on pts/37 from tmux(77171).%2.
+msubramanian has logged on pts/38 from tmux(77171).%4.
+ramas has logged on pts/39 from tmux(64734).%12.
+msubramanian has logged on pts/40 from tmux(77171).%5.
+ramas has logged on pts/43 from tmux(64734).%20.
+tseifert has logged on pts/46 from tmux(25338).%0.
+root has logged on pts/48 from tmux(22257).%1.
+tseifert has logged on pts/51 from tmux(25338).%1.
+c_litowle has logged on pts/53 from 10.224.14.24.
+ramas has logged on pts/55 from tmux(64734).%15.
+mojamal has logged on pts/56 from tmux(6529).%2.
+ramas has logged on pts/57 from tmux(64734).%14.
+ramas has logged on pts/58 from tmux(64734).%10.
+bwix has logged on pts/6 from tmux(37966).%0.
+asutherland has logged on pts/67 from 10.36.1.214 via mosh [98713].
+ragarwal has logged on pts/68 from tmux(32273).%2.
+mojamal has logged on pts/69 from tmux(6529).%1.
+ragarwal has logged on pts/7 from tmux(32273).%0.
+cyadav has logged on pts/71 from tmux(50484).%1.
+root has logged on pts/74 from tmux(22257).%0.
+ramas has logged on pts/8 from tmux(64734).%21.
+ragarwal has logged on pts/9 from b4.snc1.
+root has logged on ttyu1 from local.
+[J14:53 [1mksatyamurthy[m@gds-admin01 % bash 
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:02[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:08[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+git pull 
+Already up-to-date.
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:14[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+exit
+[J14:54 [1mksatyamurthy[m@gds-admin01 % cat[K[K[Kls -ltr
+total 79338
+-rw-r--r--   1 ksatyamurthy  ops      3721 Oct 21  2019 README.md
+lrwxr-xr-x   1 ksatyamurthy  ops        22 Oct 21  2019 gds_instances.yml@ -> plays/pg_instances.yml
+drwxr-xr-x   4 ksatyamurthy  ops         5 Oct 21  2019 library/
+-rw-r--r--   1 ksatyamurthy  ops       441 Oct 21  2019 requirements.yml
+-rw-r--r--   1 ksatyamurthy  ops      2538 Oct 21  2019 release_strategy.md
+-rwxr-xr-x   1 ksatyamurthy  ops       374 Oct 21  2019 setup.sh*
+drwxr-xr-x   2 ksatyamurthy  ops        18 Oct 21  2019 filter_plugins/
+drwxr-xr-x   2 ksatyamurthy  ops         4 Oct 21  2019 callback_plugins/
+-rw-r--r--   1 ksatyamurthy  ops       773 Jan 31  2020 ansible.cfg
+-rw-r--r--   1 ksatyamurthy  ops       583 May  6  2020 site.yml
+drwxr-xr-x   3 ksatyamurthy  ops         4 Oct 16  2020 docs/
+drwxr-xr-x  67 ksatyamurthy  ops        67 Sep  7  2021 roles/
+drwxr-xr-x   4 ksatyamurthy  ops        34 Jan 22 12:52 bin/
+drwxr-xr-x   4 ksatyamurthy  ops        21 Jan 22 12:52 inventory/
+-rw-r--r--   1 ksatyamurthy  ops         0 Mar  4 12:47 desc
+drwxr-xr-x   3 ksatyamurthy  ops        22 Mar  4 12:47 templates/
+drwxr-xr-x   2 ksatyamurthy  ops         7 Mar 22 09:56 catalog/
+drwxr-xr-x  15 ksatyamurthy  ops        36 Mar 31 13:55 plays/
+-rw-r--r--   1 ksatyamurthy  ops  40452223 Mar 31 14:47 ansible.log
+-rw-r--r--   1 ksatyamurthy  ops        43 Mar 31 14:53 gds33862_stg_db011_mysql_full_destroy.log
+[J14:54 [1mksatyamurthy[m@gds-admin01 % cat gds33862_stg_db011_mysql_full_destroy.log
+Script started on Thu Mar 31 14:53:56 2022
+mojamal has logged on pts/10 from tmux(6529).%0.
+root has logged on pts/11 from tmux(80207).%0.
+asutherland has logged on pts/12 from mosh [69740].
+ramas has logged on pts/15 from tmux(64734).%13.
+root has logged on pts/19 from tmux(80207).%2.
+ramas has logged on pts/2 from tmux(64734).%11.
+ramas has logged on pts/21 from tmux(64734).%19.
+jdoenhardt has logged on pts/23 from tmux(64395).%0.
+ramas has logged on pts/24 from tmux(64734).%22.
+ramas has logged on pts/25 from tmux(64734).%18.
+ksatyamurthy has logged on pts/27 from b4.snc1.
+cyadav has logged on pts/29 from tmux(50484).%2.
+root has logged on pts/3 from tmux(80207).%1.
+ramas has logged on pts/30 from tmux(64734).%17.
+pchatterjee has logged on pts/31 from tmux(36573).%0.
+msubramanian has logged on pts/32 from tmux(77171).%1.
+cyadav has logged on pts/34 from tmux(50484).%4.
+ramas has logged on pts/35 from tmux(64734).%16.
+c_wayang has logged on pts/36 from 10.20.84.30.
+msubramanian has logged on pts/37 from tmux(77171).%2.
+msubramanian has logged on pts/38 from tmux(77171).%4.
+ramas has logged on pts/39 from tmux(64734).%12.
+msubramanian has logged on pts/40 from tmux(77171).%5.
+ramas has logged on pts/43 from tmux(64734).%20.
+tseifert has logged on pts/46 from tmux(25338).%0.
+root has logged on pts/48 from tmux(22257).%1.
+tseifert has logged on pts/51 from tmux(25338).%1.
+c_litowle has logged on pts/53 from 10.224.14.24.
+ramas has logged on pts/55 from tmux(64734).%15.
+mojamal has logged on pts/56 from tmux(6529).%2.
+ramas has logged on pts/57 from tmux(64734).%14.
+ramas has logged on pts/58 from tmux(64734).%10.
+bwix has logged on pts/6 from tmux(37966).%0.
+asutherland has logged on pts/67 from 10.36.1.214 via mosh [98713].
+ragarwal has logged on pts/68 from tmux(32273).%2.
+mojamal has logged on pts/69 from tmux(6529).%1.
+ragarwal has logged on pts/7 from tmux(32273).%0.
+cyadav has logged on pts/71 from tmux(50484).%1.
+root has logged on pts/74 from tmux(22257).%0.
+ramas has logged on pts/8 from tmux(64734).%21.
+ragarwal has logged on pts/9 from b4.snc1.
+root has logged on ttyu1 from local.
+[J14:53 [1mksatyamurthy[m@gds-admin01 % bash 
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:02[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:08[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+git pull 
+Already up-to-date.
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:14[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+exit
+[J14:54 [1mksatyamurthy[m@gds-admin01 % cat[K[K[Kls -ltr
+total 79338
+-rw-r--r--   1 ksatyamurthy  ops      3721 Oct 21  2019 README.md
+lrwxr-xr-x   1 ksatyamurthy  ops        22 Oct 21  2019 gds_instances.yml@ -> plays/pg_instances.yml
+drwxr-xr-x   4 ksatyamurthy  ops         5 Oct 21  2019 library/
+-rw-r--r--   1 ksatyamurthy  ops       441 Oct 21  2019 requirements.yml
+-rw-r--r--   1 ksatyamurthy  ops      2538 Oct 21  2019 release_strategy.md
+-rwxr-xr-x   1 ksatyamurthy  ops       374 Oct 21  2019 setup.sh*
+drwxr-xr-x   2 ksatyamurthy  ops        18 Oct 21  2019 filter_plugins/
+drwxr-xr-x   2 ksatyamurthy  ops         4 Oct 21  2019 callback_plugins/
+-rw-r--r--   1 ksatyamurthy  ops       773 Jan 31  2020 ansible.cfg
+-rw-r--r--   1 ksatyamurthy  ops       583 May  6  2020 site.yml
+drwxr-xr-x   3 ksatyamurthy  ops         4 Oct 16  2020 docs/
+drwxr-xr-x  67 ksatyamurthy  ops        67 Sep  7  2021 roles/
+drwxr-xr-x   4 ksatyamurthy  ops        34 Jan 22 12:52 bin/
+drwxr-xr-x   4 ksatyamurthy  ops        21 Jan 22 12:52 inventory/
+-rw-r--r--   1 ksatyamurthy  ops         0 Mar  4 12:47 desc
+drwxr-xr-x   3 ksatyamurthy  ops        22 Mar  4 12:47 templates/
+drwxr-xr-x   2 ksatyamurthy  ops         7 Mar 22 09:56 catalog/
+drwxr-xr-x  15 ksatyamurthy  ops        36 Mar 31 13:55 plays/
+-rw-r--r--   1 ksatyamurthy  ops  40452223 Mar 31 14:47 ansible.log
+-rw-r--r--   1 ksatyamurthy  ops        43 Mar 31 14:53 gds33862_stg_db011_mysql_full_destroy.log
+[J14:54 [1mksatyamurthy[m@gds-admin01 % [J14:54 [1mksatyamurthy[m@gds-admin01 % cat gds33862_stg_db011_mysql_full_destroy.log
+Script started on Thu Mar 31 14:53:56 2022
+mojamal has logged on pts/10 from tmux(6529).%0.
+root has logged on pts/11 from tmux(80207).%0.
+asutherland has logged on pts/12 from mosh [69740].
+ramas has logged on pts/15 from tmux(64734).%13.
+root has logged on pts/19 from tmux(80207).%2.
+ramas has logged on pts/2 from tmux(64734).%11.
+ramas has logged on pts/21 from tmux(64734).%19.
+jdoenhardt has logged on pts/23 from tmux(64395).%0.
+ramas has logged on pts/24 from tmux(64734).%22.
+ramas has logged on pts/25 from tmux(64734).%18.
+ksatyamurthy has logged on pts/27 from b4.snc1.
+cyadav has logged on pts/29 from tmux(50484).%2.
+root has logged on pts/3 from tmux(80207).%1.
+ramas has logged on pts/30 from tmux(64734).%17.
+pchatterjee has logged on pts/31 from tmux(36573).%0.
+msubramanian has logged on pts/32 from tmux(77171).%1.
+cyadav has logged on pts/34 from tmux(50484).%4.
+ramas has logged on pts/35 from tmux(64734).%16.
+c_wayang has logged on pts/36 from 10.20.84.30.
+msubramanian has logged on pts/37 from tmux(77171).%2.
+msubramanian has logged on pts/38 from tmux(77171).%4.
+ramas has logged on pts/39 from tmux(64734).%12.
+msubramanian has logged on pts/40 from tmux(77171).%5.
+ramas has logged on pts/43 from tmux(64734).%20.
+tseifert has logged on pts/46 from tmux(25338).%0.
+root has logged on pts/48 from tmux(22257).%1.
+tseifert has logged on pts/51 from tmux(25338).%1.
+c_litowle has logged on pts/53 from 10.224.14.24.
+ramas has logged on pts/55 from tmux(64734).%15.
+mojamal has logged on pts/56 from tmux(6529).%2.
+ramas has logged on pts/57 from tmux(64734).%14.
+ramas has logged on pts/58 from tmux(64734).%10.
+bwix has logged on pts/6 from tmux(37966).%0.
+asutherland has logged on pts/67 from 10.36.1.214 via mosh [98713].
+ragarwal has logged on pts/68 from tmux(32273).%2.
+mojamal has logged on pts/69 from tmux(6529).%1.
+ragarwal has logged on pts/7 from tmux(32273).%0.
+cyadav has logged on pts/71 from tmux(50484).%1.
+root has logged on pts/74 from tmux(22257).%0.
+ramas has logged on pts/8 from tmux(64734).%21.
+ragarwal has logged on pts/9 from b4.snc1.
+root has logged on ttyu1 from local.
+[J14:53 [1mksatyamurthy[m@gds-admin01 % bash 
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:02[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:08[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+git pull 
+Already up-to-date.
+[38;5;168mThu Mar 31[38;5;15m, [38;5;227m14:54:14[38;5;15m: [38;5;196mksatyamurthy[38;5;15m@gds-admin01.snc1:[38;5;39m~/paver[38;5;15m 0 >
+exit
+[J14:54 [1mksatyamurthy[m@gds-admin01 % cat[K[K[Kls -ltr
+total 79338
+-rw-r--r--   1 ksatyamurthy  ops      3721 Oct 21  2019 README.md
+lrwxr-xr-x   1 ksatyamurthy  ops        22 Oct 21  2019 gds_instances.yml@ -> plays/pg_instances.yml
+drwxr-xr-x   4 ksatyamurthy  ops         5 Oct 21  2019 library/
+-rw-r--r--   1 ksatyamurthy  ops       441 Oct 21  2019 requirements.yml
+-rw-r--r--   1 ksatyamurthy  ops      2538 Oct 21  2019 release_strategy.md
+-rwxr-xr-x   1 ksatyamurthy  ops       374 Oct 21  2019 setup.sh*
+drwxr-xr-x   2 ksatyamurthy  ops        18 Oct 21  2019 filter_plugins/
+drwxr-xr-x   2 ksatyamurthy  ops         4 Oct 21  2019 callback_plugins/
+-rw-r--r--   1 ksatyamurthy  ops       773 Jan 31  2020 ansible.cfg
+-rw-r--r--   1 ksatyamurthy  ops       583 May  6  2020 site.yml
+drwxr-xr-x   3 ksatyamurthy  ops         4 Oct 16  2020 docs/
+drwxr-xr-x  67 ksatyamurthy  ops        67 Sep  7  2021 roles/
+drwxr-xr-x   4 ksatyamurthy  ops        34 Jan 22 12:52 bin/
+drwxr-xr-x   4 ksatyamurthy  ops        21 Jan 22 12:52 inventory/
+-rw-r--r--   1 ksatyamurthy  ops         0 Mar  4 12:47 desc
+drwxr-xr-x   3 ksatyamurthy  ops        22 Mar  4 12:47 templates/
+drwxr-xr-x   2 ksatyamurthy  ops         7 Mar 22 09:56 catalog/
+drwxr-xr-x  15 ksatyamurthy  ops        36 Mar 31 13:55 plays/
+-rw-r--r--   1 ksatyamurthy  ops  40452223 Mar 31 14:47 ansible.log
+-rw-r--r--   1 ksatyamurthy  ops        43 Mar 31 14:53 gds33862_stg_db011_mysql_full_destroy.log
+[J14:54 [1mksatyamurthy[m@gds-admin01 % [J14:54 [1mksatyamurthy[m@gds-admin01 % ^Dexit
+
+Script done on Thu Mar 31 14:54:49 2022

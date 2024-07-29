@@ -1,0 +1,6 @@
+---
+- name: Deploy SuperMicro's IPMICFG utility
+  hosts: gds_all
+  become: yes
+  roles:
+    - ipmicfg

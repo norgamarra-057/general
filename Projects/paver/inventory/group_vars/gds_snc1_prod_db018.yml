@@ -1,0 +1,17 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.30.24.238 # gds-snc1-prod-db018m1
+  - 10.30.24.239 # gds-snc1-prod-db018s1
+  - 10.30.25.238 # gds-snc1-prod-db018m1
+  - 10.30.25.239 # gds-snc1-prod-db018s1
+
+gds_instance_group: gds_prod_snc1_db018
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan324
+  - vlan325
+# List of all GDS instances in this timeline
+gds_instances:
+  #ugc_prod:# Decom #GPROD-199172

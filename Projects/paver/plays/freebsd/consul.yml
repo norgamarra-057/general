@@ -1,0 +1,5 @@
+- name: Install gds-consul-agent role
+  hosts: gds_all
+  become: yes
+  roles:
+    - { role: gds-consul-agent }

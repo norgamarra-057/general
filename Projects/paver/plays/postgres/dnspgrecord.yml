@@ -1,0 +1,29 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - assert:
+        that:
+          - inst is defined
+          - ipaddress is defined
+
+- name: dns 
+  gather_facts: False
+  become: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Create DNS A record Staging
+      command: >
+       gcloud --impersonate-service-account=grpn-sa-terraform-gds@prj-grp-central-sa-stable-66eb.iam.gserviceaccount.com
+       dns --project=prj-grp-gds-stable-63d2 record-sets create
+       {{ inst }}.gds.stable.gcp.groupondev.com.
+       --zone="dz-stable-sharedvpc01-gds-stable"
+       --type="A"
+       --ttl="300"
+       --rrdatas="{{ ipaddress }}"

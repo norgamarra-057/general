@@ -1,0 +1,5 @@
+- name: Install monitord on hosts
+  hosts: gds_all
+  become: yes
+  roles:
+    - monitord-agent

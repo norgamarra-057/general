@@ -1,0 +1,26 @@
+---
+gds_carp_peers:
+  - 10.34.185.232  # gds-sac1-stg-db022m1
+  - 10.34.185.233  # gds-sac1-stg-db022s1
+  - 10.34.161.232  # gds-sac1-stg-db022m1
+  - 10.34.161.233  # gds-sac1-stg-db022s1
+gds_carp_interfaces:
+  - vlan206
+  - vlan207
+gds_instance_group: gds_sac1_stg_db022
+gds_monitor_cluster_type: mix
+
+gds_instances:
+# destroyed SAC1 only GDS-29035  wilson_stg: # GDS-2367
+
+# destroyed SAC1 only GDS-29035  wilson_uat: # GDS-2369
+
+# destroyed SAC1 only GDS-29035  gds_test3: # GDS-14922
+
+# destroyed SAC1 only GDS-29035  gds_test4: # GDS-14922
+
+########### MySQL ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#####################
+########### Postgres vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv#####################
+# destroyed SAC1 only GDS-29035  gds_test1: # GDS-14899
+
+# destroyed SAC1 only GDS-29035  gds_test2: # GDS-1979

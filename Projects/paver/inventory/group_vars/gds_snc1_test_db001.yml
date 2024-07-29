@@ -1,0 +1,303 @@
+---
+gds_carp_peers:
+  - 10.24.124.62
+  - 10.24.124.189
+  - 10.24.125.62
+  - 10.24.125.189
+gds_carp_interfaces:
+  - vlan325
+  - vlan326
+#gds_instance_group: gds_snc1_test_db001
+gds_instance_group: demo
+gds_monitor_cluster_type: mix
+
+gds_instances:
+  orders_prod:
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 40
+      max_connections_force: 9000
+      max_user_connections_force: 8980
+      innodb_buffer_pool_size_mb_force: 200000
+      relay_log_recovery_force: ON
+      innodb_flush_neighbors_force: 0
+      log_slow_rate_limit: 11
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+    admin_redirect_peers:
+      - 10.22.142.10
+    type: mysql
+    dbnames:
+      - test1
+      - test2
+      - test3
+    write_origin: snc1
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-snc1-test-db001m1.snc1
+      - gds-snc1-test-db001s1.snc1
+      - gds-snc1-prod-db164s1.snc1
+    master_carp_interface: vlan325
+    slave_carp_interface: vlan326
+    vhid: 64
+    slave_vhid: 64
+    master_vip: 10.24.124.168
+    slave_vips:
+      - 10.24.125.168
+    replication_ips:
+      - 10.20.43.171 # gds-snc1-test-db001m1.snc1
+      - 10.20.43.167 # gds-snc1-test-db001s1.snc1
+      - 10.22.148.176 # gds-snc1-prod-db164s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17 # dev1.snc1
+      - 10.22.74.119 # gds-admin01.snc1
+      - 10.22.76.146 # db11.snc1
+      - 10.22.76.41/32 # db12.snc1
+      - 10.22.148.176/32 # gds-snc1-prod-db164s1.snc1
+    dba_account_name: gds_benchmark01_dba
+    ro_account_name: test01_sox
+    dba_src_cidrs:
+      - 10.20.32.17 # dev1.snc1
+    ports:
+      mysqld: 20001
+  gds_restore_test:
+    mysqld_options:
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+    admin_redirect_peers:
+      - 10.22.142.10
+    type: mysql
+    dbnames:
+      - test1
+    write_origin: snc1
+    firewall_priority: 150
+    unix_user: gds_uid60002
+    nodes:
+      - gds-snc1-test-db001m1.snc1
+      - gds-snc1-test-db001s1.snc1
+    master_carp_interface: vlan325
+    slave_carp_interface: vlan326
+    vhid: 65
+    slave_vhid: 65
+    master_vip: 10.24.124.65
+    slave_vips:
+      - 10.24.125.65
+    replication_ips:
+      - 10.20.43.171 # gds-snc1-test-db001m1.snc1
+      - 10.20.43.167 # gds-snc1-test-db001s1.snc1
+      - 10.22.148.176 # gds-snc1-prod-db164s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17 # dev1.snc1
+      - 10.22.74.119 # gds-admin01.snc1
+      - 10.22.76.146 # db11.snc1
+      - 10.22.76.41/32 # db12.snc1
+      - 10.22.148.176/32 # gds-snc1-prod-db164s1.snc1
+    dba_account_name: gds_restore_test_dba
+    dba_src_cidrs:
+      - 10.20.32.17 # dev1.snc1
+    ports:
+      mysqld: 20002
+  gds_snapshot_test:
+    mysqld_options:
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+    admin_redirect_peers:
+      - 10.22.142.10
+    type: mysql
+    dbnames:
+      - test1
+    write_origin: snc1
+    firewall_priority: 150
+    unix_user: gds_uid60003
+    nodes:
+      - gds-snc1-test-db001m1.snc1
+      - gds-snc1-test-db001s1.snc1
+    master_carp_interface: vlan325
+    slave_carp_interface: vlan326
+    vhid: 66
+    slave_vhid: 66
+    master_vip: 10.24.124.66
+    slave_vips:
+      - 10.24.125.66
+    replication_ips:
+      - 10.20.43.171 # gds-snc1-test-db001m1.snc1
+      - 10.20.43.167 # gds-snc1-test-db001s1.snc1
+      - 10.22.148.176 # gds-snc1-prod-db164s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17 # dev1.snc1
+      - 10.22.74.119 # gds-admin01.snc1
+      - 10.22.148.176/32 # gds-snc1-prod-db164s1.snc1
+    dba_account_name: gds_snapshot_test_dba
+    dba_src_cidrs:
+      - 10.20.32.17 # dev1.snc1
+    ports:
+      mysqld: 20003
+  gds_sandbox_test: # GDS-14965
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 2000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    write_origin: snc1
+    firewall_priority: 150
+    unix_user: gds_uid60004
+    nodes:
+      - gds-snc1-test-db001m1.snc1
+      - gds-snc1-test-db001s1.snc1
+      - demo-master.snc1
+      - demo-slave.snc1
+    master_carp_interface: vlan325
+    slave_carp_interface: vlan326
+    vhid: 67
+    slave_vhid: 67
+    master_vip: 10.24.124.67
+    slave_vips:
+      - 10.24.125.67
+    replication_ips:
+      - 10.20.43.171 # gds-snc1-test-db001m1.snc1
+      - 10.20.43.167 # gds-snc1-test-db001s1.snc1
+      - 10.22.148.132 # gds-snc1-prod-db057m1.snc1
+      - 10.22.148.46 # gds-snc1-prod-db057s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17 # dev1.snc1
+      - 10.22.74.119 # gds-admin01.snc1
+    dba_account_name: gds_sandbox
+    dba_src_cidrs:
+      - 10.20.32.17 # dev1.snc1
+    ports:
+      mysqld: 20004
+  gds_sandbox_prod: # GDS-14965
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 2000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    write_origin: snc1
+    firewall_priority: 150
+    unix_user: gds_uid60005
+    nodes:
+      - gds-snc1-test-db001m1.snc1
+      - gds-snc1-test-db001s1.snc1
+    master_carp_interface: vlan325
+    slave_carp_interface: vlan326
+    vhid: 68
+    slave_vhid: 68
+    master_vip: 10.24.124.68
+    slave_vips:
+      - 10.24.125.68
+    replication_ips:
+      - 10.20.43.171 # gds-snc1-test-db001m1.snc1
+      - 10.20.43.167 # gds-snc1-test-db001s1.snc1
+      - 10.22.148.132 # gds-snc1-prod-db057m1.snc1
+      - 10.22.148.46 # gds-snc1-prod-db057s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17 # dev1.snc1
+      - 10.22.74.119 # gds-admin01.snc1
+    dba_account_name: gds_sandbox
+    dba_src_cidrs:
+      - 10.20.32.17 # dev1.snc1
+    ports:
+      mysqld: 20005
+  gds_sandbox_demo: # GDS-14965
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 2000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    write_origin: snc1
+    firewall_priority: 150
+    unix_user: gds_uid60006
+    nodes:
+      - gds-snc1-test-db001m1.snc1
+      - gds-snc1-test-db001s1.snc1
+    master_carp_interface: vlan325
+    slave_carp_interface: vlan326
+    vhid: 68
+    slave_vhid: 68
+    master_vip: 10.24.124.68
+    slave_vips:
+      - 10.24.125.68
+    replication_ips:
+      - 10.20.43.171 # gds-snc1-test-db001m1.snc1
+      - 10.20.43.167 # gds-snc1-test-db001s1.snc1
+      - 10.22.148.132 # gds-snc1-prod-db057m1.snc1
+      - 10.22.148.46 # gds-snc1-prod-db057s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17 # dev1.snc1
+      - 10.22.74.119 # gds-admin01.snc1
+    dba_account_name: gds_sandbox
+    dba_src_cidrs:
+      - 10.20.32.17 # dev1.snc1
+    ports:
+      mysqld: 20006
+  pg_demo: # GDS-xxxx
+    type: postgresql
+    dbnames:
+      - pg_demo
+    schemas:
+      pg_demo:
+        - pg_demo_schema
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60007
+    master_vip: 10.24.124.69
+    slave_vips:
+      - 10.24.125.69
+    replication_ips:
+      - 10.20.43.171 # gds-snc1-test-db001m1.snc1
+      - 10.20.43.167 # gds-snc1-test-db001s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.32.17/32   # dev1.snc1
+    dba_account_name: pg_demo_dba
+    app_account_name: pg_demo_app
+    dba_src_cidrs:
+      - 10.20.32.17/32   # dev1.snc1
+    ports:
+      pgbouncer_txn: 20007
+      pgbouncer_session: 20008
+      postgresql_raw: 20009
+    extra_variables:

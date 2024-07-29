@@ -1,0 +1,52 @@
+---
+- name: nginx directories (read-only)
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+  with_items:
+    - "{{ nginx_runit_service_dir }}"
+    - "{{ nginx_runit_service_dir }}/env"
+    - "{{ nginx_runit_service_dir }}/log"
+
+- name: nginx runit | directory | svlogd
+  file:
+    path: "{{ nginx_runit_service_dir }}/log/main"
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+
+- name: nginx runit | environment
+  copy:
+    dest: "{{ nginx_runit_service_dir }}/env/PATH"
+    content: "/usr/local/bin:/usr/bin:/bin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nginx runit | log
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ nginx_runit_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: nginx runit | run
+  template:
+    src: run.sh.j2
+    dest: "{{ nginx_runit_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: nginx runit | enable
+  file:
+    src: "{{ nginx_runit_service_dir }}"
+    dest: "{{ nginx_runit_link_service_dir }}"
+    owner: root
+    group: wheel
+    state: link

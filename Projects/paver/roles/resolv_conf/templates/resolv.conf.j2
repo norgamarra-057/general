@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+{% if dns.search is defined %}
+search {{ dns.search }}
+{% endif -%}
+{% if dns.domain is defined %}
+domain {{ dns.domain }}
+{% endif -%}
+{% for ns in dns['zones']['.']['nameservers'] %}
+nameserver {{ ns }}
+{% endfor %}
+options ndots:1 timeout:2 attempts:4 no_tld_query

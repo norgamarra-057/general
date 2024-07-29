@@ -1,0 +1,9 @@
+---
+- name: Ops Monitoring - gmond | ganglia_cluster_name check
+  fail: 'msg="CONFIG ERROR: For Opsmon-ganglia, ganglia_cluster_name must be specified"'
+  when: ganglia_cluster_name is not defined
+
+- include_vars: ../vars/derived_vars.yml
+
+- include_tasks: FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'

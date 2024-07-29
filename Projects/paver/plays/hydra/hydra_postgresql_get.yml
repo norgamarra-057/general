@@ -1,0 +1,59 @@
+- hosts: gds_all
+  gather_facts: no
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+   - name: FreeBSD | run | get postgresql
+     shell: |
+       exec 2>&1
+       dc="$(echo "{{ inventory_hostname }}"|cut -d . -f 2)"
+       id="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d - -f 4)"
+       env="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d - -f 3)"
+       cluster="$(echo $id|head -c 5)"
+       type="$(echo $id|tail -c 3)"
+       in_recovery="$(psql -h localhost -p "{{ item.value.ports.postgresql_raw }}" -U postgres -c 'select pg_is_in_recovery()' -t -A)"
+       slaves="$(psql -h localhost -p "{{ item.value.ports.postgresql_raw }}" -U postgres -c 'select * from pg_stat_replication'|tail -n +3|grep "|"|sed 's/ *//g'|cut -d '|' -f 5|while read slave_ip; do echo -n "$(getent hosts $slave_ip|sed 's/  */ /g'|cut -d ' ' -f 2),"; done)"
+       if [ -f "/var/groupon/postgresql/data{{ postgresql_port_major }}/{{ gds_cluster }}-{{ item.key }}/data/recovery.conf" ]
+       then
+         has_recovery_file=true
+         master_ip=$(cat "/var/groupon/postgresql/data{{ postgresql_port_major }}/{{ gds_cluster }}-{{ item.key }}/data/recovery.conf"|grep primary_conninfo|sed "s/^.*host=\([^ ']*\).*$/\1/")
+       else
+         has_recovery_file=false
+       fi
+
+       echo -n "{{ item.key }},{{ inventory_hostname }},"
+       if [ "t" != "$in_recovery" ]
+       then
+         echo -n "TRUE,"
+       else
+         echo -n "FALSE,"
+       fi
+       if $has_recovery_file
+       then
+         echo -n "$(getent hosts $master_ip|sed 's/  */ /g'|cut -d ' ' -f 2),"
+       else
+         echo -n ","
+       fi
+       echo -n "\"$slaves\""
+       echo
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: item.value.type == 'postgresql' and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"
+

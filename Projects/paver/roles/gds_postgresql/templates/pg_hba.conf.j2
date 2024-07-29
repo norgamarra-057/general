@@ -1,0 +1,48 @@
+# PostgreSQL Client Authentication Configuration File
+# ===================================================
+#
+# Refer to the "Client Authentication" section in the PostgreSQL
+# documentation for a complete description of this file.  A short
+# synopsis follows.
+#
+# This file controls: which hosts are allowed to connect, how clients
+# are authenticated, which PostgreSQL user names they can use, which
+# databases they can access.  Records take one of these forms:
+#
+# local      DATABASE  USER  METHOD  [OPTIONS]
+# host       DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostssl    DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# hostnossl  DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+host    replication     postgres        127.0.0.1/32            trust
+{% for replication_ip in gds_instances[instance_name].replication_ips %}
+host    replication     postgres        {{ replication_ip }}/32              trust
+{% endfor %}
+{% for dbname in gds_instances[instance_name].dbnames %}
+host    {{ dbname }}     postgres       {{ gds_instances[instance_name].master_vip }}/32              trust
+{% endfor %}
+{% for slave_ip in gds_carp_peers %}
+host    postgres     postgres       {{ slave_ip }}/32              trust
+{% endfor %}
+{% for ip_slave in gds_instances[instance_name].slave_vips %}
+host    replication     postgres       {{ ip_slave }}/32              trust
+{% endfor %}
+{% for dbname in gds_instances[instance_name].dbnames %}
+{% for dba_cidr in gds_instances[instance_name].dba_src_cidrs %}
+host    {{ dbname }}     {{ gds_instances[instance_name].dba_account_name }}        {{ dba_cidr }}              md5
+{% endfor %}
+{% endfor %}
+{% for ip_carp in gds_carp_peers %}
+{% for dbname in gds_instances[instance_name].dbnames %}
+host    {{ dbname }}     postgres     {{ ip_carp }}/32              trust
+host    postgres     postgres       {{ ip_carp }}/32              trust
+{% endfor %}
+{% endfor %}

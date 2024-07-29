@@ -1,0 +1,27 @@
+###############################################################
+#  REPLICATION(READ) ONLY CLUSTER
+###############################################################
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.13.110.254 # gds-dub1-prod-db016m1
+  - 10.13.110.255 # gds-dub1-prod-db016s1
+  - 10.13.184.254 # gds-dub1-prod-db016m1
+  - 10.13.184.255 # gds-dub1-prod-db016s1
+
+gds_instance_group: gds_prod_dub1_db016
+gds_monitor_cluster_type: gds_postgresql
+# List of all GDS instances in this timeline
+
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+  
+gds_instances:
+  #rainbow_prod: # GDS-10036 #Decomm GDS-34366
+ # m3_place_service_prod: # GDS-12173
+  #menu_service_prod: # GDS-14276 # Decom #GDS-33660
+#  customfieldsapp_prod: # GDS-18955 #Decomm GDS-33182 #
+  # merch_back_cfg_prod: # GDS-19005 # GDS-33178 # decom
+  #deals_cluster_prod: # GDS-14928 #Decom #GPROD-196541
+#  gdt_automation_prod: # GDS-19712 #Decomm GDS-33164#

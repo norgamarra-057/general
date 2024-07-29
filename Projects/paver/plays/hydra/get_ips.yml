@@ -1,0 +1,20 @@
+- hosts: gds_all
+  gather_facts: no
+  become: no
+  vars:
+    outputs: []
+  tasks:
+   - name: FreeBSD | run | get IP
+     local_action: shell getent hosts "{{ inventory_hostname }}"
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ log_output.stdout_lines }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"
+

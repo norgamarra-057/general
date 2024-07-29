@@ -1,0 +1,10 @@
+#!/usr/local/bin/bash
+
+myhostip=$(ifconfig lagg0 | grep inet | awk -F ' ' '{ print $2 }')
+
+while sleep 1; do
+/usr/local/bin/psql --echo-queries -U postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ 
+gds_instances[instance].dbnames.0 }} -c "begin;delete from heartbeat.repl_status; insert into
+heartbeat.repl_status select * from pg_stat_replication where client_addr::text like '10.___.%' or application_name ilike 
+'%pglogical%' ;update heartbeat.repl_status set master_host='"$myhostip"';commit;"
+done

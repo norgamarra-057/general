@@ -1,0 +1,44 @@
+---
+###################################################
+# install_packages.yml
+#
+# Description:  This play is intended to install a list of command-line-provided packages, including Ansible modules
+#
+# Parameters:  -e "pkg_names=name_of_pkg" or -e '{ "pkg_names" : ["pkg1","pkg2"]}'
+#
+#              Parms can also be passed via a json file as -e "@pkg.json"  
+#
+#              Sample file:
+#              pkg_names:
+#                - MySQLdb
+#                - psycopg2            
+#              
+# Notes:  1. Use --limit or this playbook will run against ALL hosts.
+#         2. Requested pkg/module must be available to the destination server.
+# 
+# Examples:  ansible-playbook -i inventory plays/install_packages.yml -e "@pkg.json"
+#            ansible-playbook plays/install_packages.yml --limit gds-snc1-stg-db006 -e"pkg_names=MySQLdb"
+#            ansible-playbook plays/install_packages.yml -e '{ "pkg_names" : ["MySQLdb","psycopg2"]}'
+#
+###################################################
+
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - assert:
+        that:
+          - pkg_names is defined
+
+- name: Install packages/modules as needed
+  become: true
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Installing package/module
+      pkgng: 
+        name: "{{ item }}" 
+        state: present
+      with_items:
+        - "{{ pkg_names }}"

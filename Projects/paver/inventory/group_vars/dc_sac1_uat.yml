@@ -1,0 +1,20 @@
+---
+dns:
+  domain: sac1
+  domains:
+    - dub1
+    - snc1
+    - snc2
+  search: sac1
+  zones:
+    '.':
+      nameservers:
+        - 10.32.116.4
+        - 10.32.132.4
+consul_dc: sac1
+consul_servers:
+    - consul-server1-gds-hydra-testing.sac1
+    - consul-server2-gds-hydra-testing.sac1
+    - consul-server3-gds-hydra-testing.sac1
+    - consul-server4-gds-hydra-testing.sac1
+    - consul-server5-gds-hydra-testing.sac1

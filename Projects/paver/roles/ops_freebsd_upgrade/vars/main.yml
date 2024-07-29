@@ -1,0 +1,5 @@
+---
+custom_kernel_name: GRPN2015Q1
+custom_kernel_patches:
+  - freebsd_bug_187594.patch
+freebsd_version_number: 279931

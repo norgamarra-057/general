@@ -1,0 +1,118 @@
+---
+###################################################
+# legacy-to-daas.yml
+#
+# Description:  This play is intended to refresh/build a DaaS instance from a Legacy MySQL server
+#               It assumes that the source database is small enough to use mysqldump and 
+#               only a specific database is dumped, copied and reloaded.
+#
+# Parameters:  src_node=source_server src_db=source_database_to_copy 
+#              dest_node=dest_server dest_instance=instance_name_on_dest dest_db=dest_database_to_refresh [single_dest=yes]
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              src_node: gds-snc1-prod-db001s1.snc1
+#              src_db: client_id_production
+#              dest_node: gds-snc1-test-db001m1.snc1
+#              dest_instance: orders_prod
+#              dest_db: dminor
+#
+# Notes:  1. Destination database (dest_db) will be dropped and recreated.  
+#         2. Tables in mysql database will not be touched. (Unless that is the database that you have choosen to copy)
+#         3. single_dest is optional and is for those destition servers where there is only one MySQL instance running 
+#            and select_instance is not needed. Legacy systems only have one instance so it is assumed.
+#         4. Since you maybe using both production and staging/uat, use the following command line:
+#            ansible-playbook -i inventory plays/mysql/refresh-pre-prod.yml -e "@test.json"
+#         5. VERY IMPORTANT:  src_node must be listed in the inventory/legacy file or Ansible will not be able to find it.
+#
+###################################################
+
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - assert:
+        that:
+          - src_node is defined
+          - src_db is defined
+          - dest_node is defined
+          - dest_instance is defined
+          - dest_db is defined
+
+- name: Create Backup File from source and copy
+  become: true
+  hosts:
+    - "{{ src_node }}"
+  gather_facts: false
+  tasks:
+    - name: Create source backup location, if needed
+      file: path=/var/groupon/backup owner=root group=wheel mode=0777 state=directory
+
+    - name: mysqldump database
+      shell: mysqldump -ER {{ src_db }} > /var/groupon/backup/{{ src_db }}.sql || /usr/local/bin/mysqldump -ER {{ src_db }} > /var/groupon/backup/{{ src_db }}.sql
+
+    - name: Fetch dump file
+      fetch: src=/var/groupon/backup/{{ src_db }}.sql dest=/tmp/{{ dest_db }}.sql flat=yes fail_on_missing=yes
+
+    - name: Remove dump file on src
+      file: path=/var/groupon/backup/{{ src_db }}.sql state=absent
+
+    - name: Remove src backup location
+      file: path=/var/groupon/backup state=absent
+
+- name: Load backup on dest
+  become: true
+  hosts:
+    - "{{ dest_node }}"
+  gather_facts: false
+  tasks:
+    - name: Create dest backup location, if needed
+      file: path=/var/groupon/backup owner=root group=wheel mode=0777 state=directory
+
+    - name: Copy backup to dest
+      copy: src=/tmp/{{ dest_db }}.sql dest=/var/groupon/backup/{{ dest_db }}.sql owner=root group=wheel mode=0644 force=yes 
+
+    - name: Set dest instance
+      shell: /usr/local/sbin/mi.sh -s {{ dest_instance }}
+      ignore_errors: true
+      when: single_dest is not defined
+
+    - name: Get new dest instance
+      shell: /usr/local/sbin/mi.sh -g
+      ignore_errors: true
+      register: select_instance
+      when: single_dest is not defined
+
+    - name: Did the dest instance get set correctly?
+      fail: msg='Dest instance name not set to {{ dest_instance }}'
+      when: 
+        - single_dest is not defined
+        - select_instance.stdout != dest_instance
+
+    - name: Drop dest database to refresh
+      shell: mysql -e "DROP DATABASE {{ dest_db }}"
+      ignore_errors: true
+
+    - name: Create new dest database
+      shell: mysql -e "CREATE DATABASE {{ dest_db }}"
+
+    - name: Load backup into dest
+      shell: mysql -e "SOURCE /var/groupon/backup/{{ dest_db }}.sql" {{ dest_db }}
+
+    - name: Remove dump file on dest
+      file: path="/var/groupon/backup/{{ dest_db }}.sql" state=absent
+
+    - name: Remove src backup location
+      file: path=/var/groupon/backup state=absent
+
+- name: Clean up local copy
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Remove temporary fetch file
+      file: path=/tmp/{{ dest_db }}.sql state=absent
+

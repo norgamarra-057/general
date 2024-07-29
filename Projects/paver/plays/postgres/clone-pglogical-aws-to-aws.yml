@@ -1,0 +1,164 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - assert:
+        that:
+          - aws_host_master is defined
+          - db is defined
+          - aws_host_replica is defined
+          - admin_password is defined
+          - my_app_user is defined
+          - my_dba_user is defined
+
+
+- name: aws master
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Create .pgpass file
+      command: touch ~/.pgpass
+
+    - name: set proper mode for the .pgpass file
+      command: chmod 0600 ~/.pgpass
+
+    - name: Create config for the .pgpass file aws master
+      lineinfile: dest=~/.pgpass line="{{ aws_host_master }}:5432:*:gds_admin:{{ admin_password }}"
+
+    - name: Create config for the .pgpass file aws slave
+      lineinfile: dest=~/.pgpass line="{{ aws_host_replica }}:5432:*:gds_admin:{{ admin_password }}"
+
+    - name: Create extension
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "create extension if not exists pglogical"
+
+    - name: Check for missing primary keys
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "with my_Q1 as (SELECT n.nspname as schema,c.relname as table FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['heartbeat','pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ) select count(*) from my_Q1"
+      register: table_no_pks
+
+    - name: Check for missing unique constraints and indexes
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "with my_Q1 as (SELECT n.nspname as schema,c.relname as mytable FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['heartbeat','pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ), my_Q2 as (SELECT rel.relname FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname not in ('heartbeat','pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext') AND contype = 'u'), my_Q3 as(select tbl.relname as table_name from pg_index pgi join pg_class idx on idx.oid = pgi.indexrelid join pg_namespace insp on insp.oid = idx.relnamespace join pg_class tbl on tbl.oid = pgi.indrelid join pg_namespace tnsp on tnsp.oid = tbl.relnamespace where pgi.indisunique and tnsp.nspname not in ('heartbeat','pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext','pg_toast')) select count(*) from my_Q1 where mytable NOT in (select relname from my_Q2) and mytable NOT in (select table_name from my_Q3)" 
+      register: table_no_uniqs
+      when: table_no_pks.stdout|int > 0
+
+    - name: verify no uniqs are missing
+      fail: msg="Exiting ----------There are unique constraints missing"
+      when:  'table_no_pks.stdout|int > 0  and table_no_uniqs.stdout|int > 0'
+
+    - pause: prompt="There are primany keys missing but unique constraints/indexes exist. Please fix the replica identity or create the PK and then press ENTER to continue..."
+      when:  'table_no_pks.stdout|int > 0 and table_no_uniqs.stdout|int == 0'
+
+    - name: export globals
+      shell: pg_dumpall -U gds_admin -p 5432 -h {{ aws_host_master }} --no-role-passwords -g | grep '{{ db }}' > /tmp/{{ db }}_globals.sql
+      ignore_errors: yes
+
+    - name: export schema
+      shell: pg_dump -U gds_admin -N heartbeat -N pglogical -N pglogical_origin -N dba -F p -s -f /tmp/{{ db }}_schema.sql -p 5432 -h {{ aws_host_master }} {{ db }}
+
+    - name: find schemas
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "select schema_name from information_schema.schemata where schema_name not in ('heartbeat','dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Check if provider exists
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "select count(*) from pglogical.node_interface where if_name='{{ db }}_aws_provider'"
+      register: count_provider
+
+    - name: Create provider
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "SELECT pglogical.create_node(node_name := '{{ db }}_aws_provider', dsn := 'host=127.0.0.1 port=5432  dbname={{ db }} user=gds_admin password={{ admin_password }}')"
+      when:  count_provider.stdout|int  == 0
+
+    - name: Add tables
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "SELECT pglogical.replication_set_add_all_tables('default', '{ {{ item }} }'::text[])"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Add sequences
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "SELECT pglogical.replication_set_add_all_sequences('default', '{ {{ item }} }'::text[],true )"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+- name: Aws part slave
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - name: Import users
+      shell: psql -U gds_admin -d postgres -Atq -p 5432 -h {{ aws_host_replica }} < /tmp/{{ db }}_globals.sql
+      register: users_import
+      ignore_errors: yes
+
+    - name: Grant Role
+      shell: psql -U gds_admin -d postgres -Atq -p 5432 -h {{ aws_host_replica }} -c "grant {{ my_dba_user }} to gds_admin"
+      ignore_errors: yes
+
+    - name: Check if database exists
+      shell: psql -U gds_admin -d postgres -Atq -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pg_database where datname = '{{ db }}'"
+      register: count_database
+
+    - name: Create database
+      shell: psql -U gds_admin -d postgres -Atq -p 5432 -h {{ aws_host_replica }} -c "create database {{ db }}"
+      when: 'count_database.stdout|int == 0'
+
+    - name: Import schema
+      shell: psql -U gds_admin -Atq -d {{ db }} -p 5432 -h {{ aws_host_replica }} < /tmp/{{ db }}_schema.sql
+      register: db_import
+
+    - name: Create extension
+      shell: psql -U gds_admin -Atq -d {{ db }} -p 5432 -h {{ aws_host_replica }} -c "create extension if not exists pglogical"
+
+    - name: find schemas
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c "select schema_name from information_schema.schemata where schema_name not in ('heartbeat','dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Privileges 1/2
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "revoke insert,update,delete on all tables in schema {{ item }} from {{ my_app_user }}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Privileges 2/2
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "revoke update on all sequences in schema {{ item }} from {{ my_app_user }}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Check if subscriber exists
+      shell: psql -U gds_admin -Atq -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pglogical.node_interface where if_name='{{ db }}_rds_pg11_subscriber'"
+      register: count_subscriber
+
+    - name: Create subscriber
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c "SELECT pglogical.create_node(node_name := '{{ db }}_rds_pg11_subscriber', dsn := 'host=127.0.0.1 port=5432 dbname={{ db }} user=gds_admin password= {{ admin_password }}')" 
+      when:  count_subscriber.stdout|int  == 0
+
+    - name: Check if subscription exists
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pglogical.subscription where sub_name='{{ db }}_rds_pg11_subscription'"
+      register: count_subscription
+
+    - name: Create subscription
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c " SELECT pglogical.create_subscription(subscription_name := '{{ db }}_rds_pg11_subscription', provider_dsn := 'host={{ aws_host_master }} port=5432 dbname={{ db }} user=gds_admin password={{ admin_password }}', replication_sets := '{default}'::text[] );"
+      when:  count_subscription.stdout|int  == 0
+
+    - name: Show one-time replication status 
+      shell: psql -U gds_admin -Atq -d {{ db }} -p 5432 -h {{ aws_host_replica }} -c "SELECT subscription_name, status FROM pglogical.show_subscription_status();"
+      register: pglogical_repl_status
+    - debug: var=pglogical_repl_status.stdout
+
+
+- name: a play that runs entirely on the ansible host
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Delete the temp globals file
+      file: path=/tmp/{{ db }}_globals.sql state=absent
+
+    - name: Delete the temp schema file
+      file: path=/tmp/{{ db }}_schema.sql state=absent
+
+

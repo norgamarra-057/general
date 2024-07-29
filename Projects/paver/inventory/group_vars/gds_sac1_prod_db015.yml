@@ -1,0 +1,14 @@
+---
+gds_carp_peers:
+  - 10.32.86.226  # gds-sac1-prod-db015m1
+  - 10.32.86.227  # gds-sac1-prod-db015s1
+  - 10.32.80.226  # gds-sac1-prod-db015m1
+  - 10.32.80.227  # gds-sac1-prod-db015s1
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+gds_instance_group: gds_prod_sac1_db015
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+# deal_management_prod: # GDS-18175 - Decommed GDS-35811

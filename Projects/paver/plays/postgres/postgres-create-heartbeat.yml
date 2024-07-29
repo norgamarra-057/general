@@ -1,0 +1,102 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - target_host is defined
+          - instance is defined
+
+
+    - name: Upload heartbeat sql file
+      template: src=../../templates/pg_heartbeat.sql.j2 dest=/tmp/{{ instance }}_pg_heartbeat.sql mode=0644 force=yes
+
+    - name: Load sql
+      command: psql -U postgres -d {{gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -f /tmp/{{ instance }}_pg_heartbeat.sql
+      ignore_errors: True
+
+    - name: directories 1/2
+      file:
+        path="{{ item }}"
+        state=directory
+        owner=root
+        group=wheel
+        mode=0755
+      with_items:
+        - "/var/groupon/service/{{ instance }}-pg_heartbeat"
+        - "/var/groupon/service/{{ instance }}-pg_heartbeat/bin"
+        - "/var/groupon/service/{{ instance }}-pg_heartbeat/env"
+        - "/var/groupon/service/{{ instance }}-pg_heartbeat/etc"
+        - "/var/groupon/service/{{ instance }}-pg_heartbeat/log"
+
+    - name: directories 2/2
+      file:
+        path="/var/groupon/service/{{ instance }}-pg_heartbeat/log/main"
+        state=directory
+        owner=_log
+        group=_log
+        mode=0755
+        recurse=yes
+
+    - name: env path
+      copy: 
+        dest="/var/groupon/service/{{ instance }}-pg_heartbeat/env/PATH"
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+
+    - name: copy script
+      template:
+        dest="/var/groupon/service/{{ instance }}-pg_heartbeat/bin/pg_heartbeat.sh"
+        src=../../templates/pg_heartbeat.sh.j2
+
+    - name: log run
+      template:
+        dest="/var/groupon/service/{{ instance }}-pg_heartbeat/log/run"
+        mode=0744
+        src=../../templates/svlogd.sh.j2
+        owner=root
+        group=wheel
+
+    - name: log filesize to 100mb
+      template:
+        dest: "/var/groupon/service/{{ instance }}-pg_heartbeat/log/main/config"
+        mode: 0744
+        src: ../../templates/logconfig.j2
+        owner: _log
+        group: _log
+
+
+    - name: script run
+      template:
+        dest="/var/groupon/service/{{ instance }}-pg_heartbeat/run"
+        mode=0744
+        src=../../templates/hb_runit.sh.j2
+        owner=root
+        group=wheel
+
+    - name: runit enable
+      file:
+        src="/var/groupon/service/{{ instance }}-pg_heartbeat"
+        dest="/var/service/{{ instance }}-pg_heartbeat"
+        owner=root
+        group=wheel
+        state=link
+
+    - name: sleep for 2 seconds
+      wait_for:
+        timeout: 2
+
+    - name: Stop the service
+      shell: sv down /var/service/{{ instance }}-pg_heartbeat
+
+    - name: sleep for 2 seconds
+      wait_for:
+        timeout: 2
+
+    - name: Start the service
+      shell: sv up /var/service/{{ instance }}-pg_heartbeat

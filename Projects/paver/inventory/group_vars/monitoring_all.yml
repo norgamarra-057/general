@@ -1,0 +1,19 @@
+---
+# List of all SPLUNK Host Admins
+host_admins:
+  - glopezfernandez
+  - jonathon
+  - mhang
+  - pablo
+  - rolando
+  - schittenden
+
+host_zfs:
+  - { name: tank, mountpoint: none, compression: lz4, copies: 1, atime: 'off' }
+  - { name: tank/root, mountpoint: / }
+  - { name: tank/root/tmp, sync: disabled, recordsize: 4K }
+  - { name: tank/root/var }
+  - { name: tank/var, mountpoint: none }
+  - { name: tank/var/tmp, mountpoint: /var/tmp, sync: disabled, recordsize: 4K }
+  - { name: tank/var/groupon, mountpoint: /var/groupon }
+#  - { name: tank/var/groupon/splunk }

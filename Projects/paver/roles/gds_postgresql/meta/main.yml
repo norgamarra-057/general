@@ -1,0 +1,6 @@
+---
+dependencies:
+  - { role: postgresql-server }
+  - { role: gds_pgbouncer, pgbouncer_mode: session }
+  - { role: gds_pgbouncer, pgbouncer_mode: transaction }
+  - { role: check_mk, db_type: postgresql }

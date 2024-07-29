@@ -1,0 +1,6 @@
+---
+- name: collectd reload
+  command: /usr/local/sbin/sv hup {{ collectd_service_dir }}/
+
+- name: collectd log restart
+  command: /usr/local/sbin/sv hup "{{ collectd_service_dir }}/log/"

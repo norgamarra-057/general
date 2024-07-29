@@ -1,0 +1,16 @@
+---
+- name: Upgrade openntpd
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update pkg
+      shell: pkg update -f
+
+    - name: Ensure openntpd is installed
+      pkgng:
+        name: openntpd
+        state: present
+
+    - name: Upgrade openntpd
+      shell: pkg upgrade -y openntpd
+

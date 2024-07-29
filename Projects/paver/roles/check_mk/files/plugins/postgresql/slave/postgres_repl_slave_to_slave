@@ -1,0 +1,34 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_repl_slave_to_slave>>>'
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        OUTPUT="$(echo "SELECT case
+                        WHEN ((select count(*) from pg_stat_replication) >0)
+                        THEN (select pg_xlog_location_diff(pg_last_xlog_replay_location(),replay_location)
+                        AS result from pg_catalog.pg_stat_replication
+                        WHERE application_name = 'walreceiver'
+                        ORDER BY 1 desc limit 1)
+                        ELSE -1 end;" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' 2>/dev/null)"
+        echo "$OUTPUT"
+        sleep 0.5
+done

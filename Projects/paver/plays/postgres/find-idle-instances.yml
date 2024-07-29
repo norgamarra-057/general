@@ -1,0 +1,86 @@
+- name: Get master_host
+  gather_facts: False
+  sudo: true
+  hosts:
+    - '{{ master_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - master_host is defined
+          - slave_host is defined
+
+    - name: Delete the temp file
+      file: path=/etc/check_mk/unused_inst_check_{{ master_host }}.txt state=absent
+
+    - name: Get instance names
+      shell: ls /var/groupon/postgresql/data94/*/data/postgresql.conf | sed 's/.*{{ gds_cluster }}-//' | sed 's/.data\/postgresql.conf//' | awk '{print "  "$0":"}'  > /etc/check_mk/local_pginstances.yml
+      register: instance_names
+
+    - name: Add header1
+      shell: echo 'inst_name:' | cat - /etc/check_mk/local_pginstances.yml > /etc/check_mk/temp && mv /etc/check_mk/temp /etc/check_mk/local_pginstances.yml
+
+    - name: Add header2
+      shell: echo '---' | cat - /etc/check_mk/local_pginstances.yml > /etc/check_mk/temp && mv /etc/check_mk/temp /etc/check_mk/local_pginstances.yml
+
+    - fetch: src=/etc/check_mk/local_pginstances.yml dest=files/temp/ flat=yes validate_checksum=yes fail_on_missing=yes
+
+    - include_vars: "files/temp/local_pginstances.yml"
+
+    - name: Print
+      shell: | 
+        echo '|||||||||||||||||||||||||||||||' {{ item.key }} '|||||||||||||||||||||||||||||||' >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt 
+        echo "PGBOUNCER TRX conns:" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select count(t.*),t.user from dba.pgbouncer_trx_view_clients t where t.user not in ('gdsmon') group by 2 order by 1 desc" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        echo "PGBOUNCER SES conns:" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select count(t.*),t.user from dba.pgbouncer_ses_view_clients t where t.user not in ('gdsmon') group by 2 order by 1 desc" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt 
+        echo "Last archived WAL file:" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c " with my_Q1 as (select last_archived_wal as my_wal from pg_stat_archiver) select (pg_stat_file('pg_xlog/' || my_wal)).modification as last_wal_updated, now() - (pg_stat_file('pg_xlog/' || my_wal)).modification from my_Q1" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        echo "Last archived time:" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select last_archived_time from pg_stat_archiver; " >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt       
+        echo "DB size:" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select pg_size_pretty(pg_database_size('{{ gds_instances[item.key].dbnames.0 }}'))"  >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        echo "Last Vaccum/Analyze:" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select max(last_autovacuum) as last_vacuum,max(last_autoanalyze) as last_analyze from pg_catalog.pg_stat_user_tables"  >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+        echo "---------------------------------------------------" >> /etc/check_mk/unused_inst_check_{{ master_host }}.txt
+      with_dict: "{{inst_name}}"
+
+    - fetch: src=/etc/check_mk/unused_inst_check_{{ master_host }}.txt dest=files/temp/ flat=yes validate_checksum=yes fail_on_missing=yes
+
+- name: Get slave_host
+  gather_facts: False
+  sudo: true
+  hosts:
+    - '{{ slave_host }}'
+  tasks:
+
+    - name: Delete the temp file
+      file: path=/etc/check_mk/unused_inst_check_{{ slave_host }}.txt state=absent
+
+    - include_vars: "files/temp/local_pginstances.yml"
+
+    - name: Print
+      shell: |
+        echo '|||||||||||||||||||||||||||||||' {{ item.key }} '|||||||||||||||||||||||||||||||' >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        echo "PGBOUNCER TRX conns:" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select count(t.*),t.user from dba.pgbouncer_trx_view_clients t where t.user not in ('gdsmon') group by 2 order by 1 desc" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        echo "PGBOUNCER SES conns:" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select count(t.*),t.user from dba.pgbouncer_ses_view_clients t where t.user not in ('gdsmon') group by 2 order by 1 desc" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        echo "LAST APPLIED TRX:" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "SELECT CASE WHEN (select pg_is_in_recovery() = 'f') THEN NULL ELSE (SELECT now() - last_trx from dba.find_timestamp_of_last_trx) END" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        echo "DB size:" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select pg_size_pretty(pg_database_size('{{ gds_instances[item.key].dbnames.0 }}'))" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+        echo "---------------------------------------------------" >> /etc/check_mk/unused_inst_check_{{ slave_host }}.txt
+      with_dict: "{{inst_name}}"
+
+    - fetch: src=/etc/check_mk/unused_inst_check_{{ slave_host }}.txt dest=files/temp/ flat=yes validate_checksum=yes fail_on_missing=yes
+
+
+- name: a play that runs entirely on the ansible host
+  sudo: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Delete the temp file
+      file: path=files/temp/local_pginstances.yml state=absent
+

@@ -1,0 +1,35 @@
+create user {{ ro_account_name }} password '{{ ro_password }}' connection limit {{ ro_connection_limit }};
+
+{% set schema_list = schema_list|replace("[","") %}
+{% set schema_list = schema_list|replace("]",",") %}
+{% set schema_list = schema_list|replace(" ","") %}
+{% set schema_list = schema_list|replace("'","") %}
+
+alter user {{ ro_account_name }} set search_path={{ schema_list }}ext;
+
+{% for db in dbnames %}
+\c {{ db }} postgres
+
+grant usage on schema ext to {{ ro_account_name }};
+ 
+\c {{ db }} {{ dba_account_name }}
+
+{% for key,schema in schemas.iteritems() %}
+{% if key == db %}
+{% for schema2 in schema %}
+grant usage on schema {{ schema2 }} to {{ ro_account_name }};
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% for key,schema in schemas.iteritems() %}
+{% if key == db %}
+{% for schema2 in schema %}
+alter default privileges in schema {{ schema2 }} grant select on tables to {{ ro_account_name }};
+alter default privileges in schema {{ schema2 }} grant select on sequences to {{ ro_account_name }};
+grant select on all tables in schema {{ schema2 }} to {{ ro_account_name }};
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% endfor %}

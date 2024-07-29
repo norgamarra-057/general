@@ -1,0 +1,116 @@
+---
+gds_carp_peers:
+  - 10.23.32.252  # gds-snc1-stg-db042m1
+  - 10.23.32.253  # gds-snc1-stg-db042s1
+  - 10.23.33.252  # gds-snc1-stg-db042m1
+  - 10.23.33.253  # gds-snc1-stg-db042s1
+
+gds_carp_interfaces:
+  - vlan332
+  - vlan333
+
+gds_instance_group: gds_snc1_stg_db042
+gds_monitor_cluster_type: mix
+
+gds_instances:
+#  editorialwriters_stg: # GDS-3192 # decomm GDS-33864
+#  cart_stg: # GDS-3187 # decomm GDS-33864
+#  graphetor_stg: # GDS-3963 # decomm GDS-33864
+#  atlassian_jira_stg: # GDS-4043 # decomm GDS-33864
+#  dealmgmt_api_stg: # GDS-4063 # decomm GDS-33864
+#  testrail_stg: # GDS-4098 # decomm GDS-33864
+#  prodsa_config_stg: # GDS-4130 # decomm GDS-33864
+#  accounting_stg: # GDS-3195 # decomm GDS-33864
+#  orders_stg: # GDS- # decomm GDS-33864
+#  pwa_stg: # GDS-4282 # decomm GDS-33864
+#  geo_auto_test_stg: # GDS-4245 # decomm GDS-33864
+#  getaways_cont_uat: # GDS-4245 Decommissioned GDS-34122
+
+#  zendesk_stg: # GDS-4674 # decomm GDS-33864
+  po_mananger_stg: # GDS-4764 
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60020
+    nodes:
+      - gds-snc1-stg-db042m1.snc1
+      - gds-snc1-stg-db042s1.snc1
+    master_carp_interface: vlan332
+    slave_carp_interface: vlan333
+    vhid: 120
+    slave_vhid: 120
+    master_vip: 10.23.32.120
+    slave_vips:
+      - 10.23.33.120
+    replication_ips:
+      - 10.23.106.177 # gds-snc1-stg-db042m1.snc1
+      - 10.23.106.238  # gds-snc1-stg-db042s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.192.72/32   #si-pomanager-app1-staging.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.215.128.0/20 # us-west-1
+      - 10.215.130.0/20 # us-west-1
+    dba_account_name: po_manager_stg
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20020
+
+#  ob_appt_engine_stg: # GDS-4900 # decomm GDS-33864
+#  ob_engine_avail_stg: # GDS-4901 # decomm GDS-33864
+#  ob_engine_notif_stg: # GDS-4902 decommissioned GDS-31733
+#  ob_3rd_party_stg: # GDS-4903 # decomm GDS-33864
+
+#  birdcage_qa: # GDS-5030 Decommissioned GDS-34122
+
+  audience_uat: # GDS-4844 
+
+#  glsinbound_stg: # GDS-5137 # decomm GDS-33864
+# destroyed GDS-25550  artifactory_stg: # GDS-5365
+#  affiliate_track_stg: # GDS-5425 # decomm GDS-33864
+#  drinking_bird_stg: # GDS-5431 # decomm GDS-33864
+#  jira_stg: # GDS-5535 # decomm GDS-33864
+#  gtwy_larc_stg: # GDS-5662 # decomm GDS-33864
+# destroyed GDS-25822  editorial_content_stg: # GDS-5459
+#  audience_stg: # GDS-5807 # decomm GDS-33864
+#  item_master_stg: # GDS-5867 # decomm GDS-33864
+#  opswise_stg: # GDS-6137 # decomm GDS-33864
+#  reporting_stg: # GDS-6103 # decomm GDS-33864
+#  merchantdata_stg: # GDS-6280 # decomm GDS-33864
+#  voucher_inv_stg: # GDS-6264 # decomm GDS-33864
+#  arrowhead_stg: # GDS-6487 # decomm GDS-33864
+#  arrowhead_ui_stg: # GDS-6499 # decomm GDS-33864
+#  crm_msg_svc_stg: # GDS-6624 # decomm GDS-33864
+#  gdoop_hue_stg: # GDS-6698 # decomm GDS-33864
+#  getawaysbackpack_stg: # GDS-6566 # decomm GDS-33864
+#  deal_discuss_stg: # GDS-6463 # decomm GDS-33864
+#  goods_stg: # GDS-6938 # decomm GDS-33864
+#  social_raf_stg: # GDS-7006 # decomm GDS-33864
+#  getaways_invent_stg: # GDS-7009 # decomm GDS-33864
+#  gan_stg: # GDS-7015 # decomm GDS-33864
+
+########### DON'T ADD ANYMORE INSTANCES ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#####################
+########### MySQL ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#####################
+########### Postgres vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv#####################
+
+
+

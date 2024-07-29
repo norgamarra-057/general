@@ -1,0 +1,11 @@
+#
+# $FreeBSD: release/10.0.0/etc/ntp.conf 259975 2013-12-27 23:13:38Z delphij $
+#
+# Used only for ntpdate, see OpenNTPD's ntpd.conf
+server ns1 iburst
+server ns2 iburst
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict -6 ::1
+restrict 127.127.1.0

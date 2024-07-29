@@ -1,0 +1,13 @@
+---
+- name: Fix newsyslog /var/log/messages count
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Extend /var/log/messages count to 10 and size to 1000
+      replace:
+        dest: /etc/newsyslog.conf
+        regexp: '^(\/var\/log\/messages\s+644)\s+5\s+100\s+(@0101T\sJC)$'
+        replace: '\1  {{ item.count }}    {{ item.size }} \2'
+        backup: yes
+      with_items:
+        - { count: '10', size: '1000' }

@@ -1,0 +1,15 @@
+{% for instance in gds_instances %}
+{% if gds_instances[instance].type == 'mysql' -%}
+[{{ instance }}]
+{% if is_ro_master == 'true' %}
+vip={{ gds_instances[instance].master_vip }}
+{% elif inst_type == 'master' %}
+vip={{ gds_instances[instance].master_vip }}
+{% elif inst_type == 'slave' %}
+vip={{ gds_instances[instance].slave_vips.0 }}
+{% endif %}
+port={{ gds_instances[instance].ports.mysqld }}
+socket=/var/groupon/percona/{{ instance }}/mysql.sock
+
+{% endif %}
+{% endfor %}

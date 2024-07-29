@@ -1,0 +1,22 @@
+---
+# List of admins for GDS production instances
+host_admins:
+  - abedra
+  - c_dducos
+  - c_dguzmanburgos
+  - c_mboehm
+  - c_pboros
+  - c_ytrudeau
+  - chschneider
+  - cllanca
+  - fkalamidas
+  - jose.finotto
+  - juan
+  - jdoenhardt
+  - msubramanian
+  - pgbadger
+  - rlewon
+  - rbarabas
+  - rpenugonda
+  - smurillo
+  - schittenden

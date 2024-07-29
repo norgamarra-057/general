@@ -1,0 +1,236 @@
+BaseDir "/var/service/collectd/"
+PIDFile "/var/tmp/collectd.pid"
+
+Interval 10.0
+
+LoadPlugin cpu
+LoadPlugin load
+<LoadPlugin df>
+  Interval 3600
+</LoadPlugin>
+  
+<Plugin df>
+  ValuesPercentage true
+</Plugin>
+
+
+LoadPlugin cpu
+LoadPlugin load
+LoadPlugin memory
+LoadPlugin processes
+LoadPlugin users
+
+LoadPlugin csv
+<Plugin csv>
+  DataDir "/var/tmp/collectd_logs/"
+  StoreRates true
+</Plugin>
+
+LoadPlugin "aggregation"
+
+<Plugin "aggregation">
+  <Aggregation>
+    Plugin "cpu"
+    Type "cpu"
+    GroupBy "Host"
+    GroupBy "TypeInstance"
+    CalculateAverage true
+  </Aggregation>
+</Plugin>
+
+LoadPlugin "match_regex"
+
+<Chain "PostCache">
+  <Rule>
+    <Match regex>
+      Plugin "^cpu$"
+      PluginInstance "^[0-9]+$"
+    </Match>
+    <Target write>
+      Plugin "aggregation"
+    </Target>
+    Target stop
+  </Rule>
+  Target "write"
+</Chain>
+
+LoadPlugin PostgreSQL
+
+
+LoadPlugin mysql
+
+
+<Plugin "mysql">
+  <Database "alertRiskStg">
+    Host "localhost"
+    Socket "/var/groupon/percona/alert_risk_stg/mysql.sock"
+    MasterStats true
+  </Database>
+</Plugin>
+
+<Plugin postgresql>
+
+  <Query index_hit>
+    Statement "select (sum(idx_blks_hit) - sum(idx_blks_read)) / sum(idx_blks_hit) as index_hit_ratio from pg_statio_user_indexes;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-hit_ratio"
+      ValuesFrom index_hit_ratio
+    </Result>
+  </Query>
+
+  <Query is_slave>
+    Statement "select pg_is_in_recovery() is_slave ;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-is_slave"
+      ValuesFrom is_slave
+    </Result>
+  </Query>
+
+
+  <Query locks >
+    Statement " select count(*) as tot_locks from pg_locks where granted='f';"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-locks"
+      ValuesFrom tot_locks
+    </Result>
+  </Query>
+
+  <Query wraparound >
+    Statement " select max(age(datfrozenxid)) as wraparound from pg_database;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-wraparound"
+      ValuesFrom wraparound
+    </Result>
+  </Query>
+
+  <Query waiting >
+    Statement "select count(*) as waiting from pg_stat_activity where waiting;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-waiting"
+      ValuesFrom waiting
+    </Result>
+  </Query>
+
+  <Query real_transac >
+    Statement "select case when ((select count(*) from pg_stat_activity where state not in ('idle','idle in transaction') and query not ilike '%vacuum%' and pid <> pg_backend_pid()) > 0) then (select extract(epoch from (now() - xact_start)) as result from pg_stat_activity where state not in ('idle','idle in transaction') and query not ilike '%vacuum%' order by xact_start asc limit 1) else 0 end ;
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-real_transac"
+      ValuesFrom result
+    </Result>
+  </Query>
+
+  <Query repl_master >
+    Statement "SELECT pg_xlog_location_diff(write_location, replay_location) AS result FROM pg_catalog.pg_stat_replication WHERE 
+    application_name = 'walreceiver' ORDER BY 1 DESC LIMIT 1;;
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-repl_master"
+      ValuesFrom result
+    </Result>
+  </Query>
+
+
+  <Query repl_master >
+    Statement "SELECT pg_xlog_location_diff(write_location, replay_location) AS result FROM pg_catalog.pg_stat_replication WHERE 
+    application_name = 'walreceiver' ORDER BY 1 DESC LIMIT 1;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-repl_master"
+      ValuesFrom result
+    </Result>
+  </Query>
+
+  <Query repl_slave >
+    Statement "select case when pg_last_xlog_receive_location() = pg_last_xlog_replay_location() then 0 else extract (epoch from now() - pg_last_xact_replay_timestamp())::integer end as replication_lag_slave;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-repl_slave"
+      ValuesFrom result
+    </Result>
+  </Query>
+
+  <Query long_idle >
+    Statement "select case when ((select count(*) from pg_stat_activity where state='idle in transaction') >0) then (select extract(epoch from (now() - xact_start)) as result from pg_stat_activity where state='idle in transaction' order by xact_start asc limit 1) else 0 end;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-long_idle"
+      ValuesFrom result
+    </Result>
+  </Query>
+
+
+  <Query long_idle >
+    Statement "select case when ((select count(*) from pg_stat_activity where state='idle in transaction') >0) then (select extract(epoch from (now() - xact_start)) as result from pg_stat_activity where state='idle in transaction' order by xact_start asc limit 1) else 0 end;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-long_idle"
+      ValuesFrom result
+    </Result>
+  </Query>
+
+
+  <Query transac_states>
+    Statement "select state as  , count(*) as result from pg_stat_activity group by state;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-transac_states"
+      InstancesFrom state
+      ValuesFrom result
+    </Result>
+  </Query>
+
+
+ <Query db_info>
+    Statement "select datid as id, datname as name, numbackends as num_backends, xact_commit as commit, xact_rollback as rollback, blks_read as blks_read, blks_hit as blks_hit, tup_returned as tup_returned, tup_fetched as tup_fetched,tup_updated as tup_updated, tup_deleted as tup_deleted, pg_database_size(datname) as  datsize from pg_stat_database where datname='{{ gds_instances[instance_name]['dbnames'][0] }}' ;"
+    <Result>
+      Type counter 
+      InstancePrefix "CDDB-db_info"
+      ValuesFrom id
+      ValuesFrom name
+      ValuesFrom num_backends
+      ValuesFrom commit 
+      ValuesFrom rollback
+      ValuesFrom blks_read
+      ValuesFrom blks_hit
+      ValuesFrom tup_returned
+      ValuesFrom tup_fetched
+      ValuesFrom tup_updated
+      ValuesFrom tup_deleted
+      ValuesFrom datsize
+
+    </Result>
+  </Query>
+
+  <Database t_stardeals_db>
+    Host "localhost"
+    Port "20062"
+    User "postgres"
+    Password ""
+    Query index_hit
+    Query is_slave
+    Query locks
+    Query wraparound
+    Query waiting
+    Query real_transac
+    Query repl_master
+    Query repl_slave
+    Query long_idle 
+    Query transac_states
+    Query db_info
+  </Database>
+
+</Plugin>
+
+
+#LoadPlugin interface
+#
+#<Plugin interface>
+#    Interface "lagg0"
+#    IgnoreSelected false
+#</Plugin>

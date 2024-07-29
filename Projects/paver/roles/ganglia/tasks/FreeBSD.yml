@@ -1,0 +1,5 @@
+---
+- name: Ganglia | FreeBSD | ganglia-monitor-core
+  pkgng:
+    name="ganglia-monitor-core"
+    state=present

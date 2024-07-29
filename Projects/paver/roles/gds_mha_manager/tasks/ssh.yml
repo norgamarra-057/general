@@ -1,0 +1,32 @@
+---
+- name: Setup gds_mha .ssh directory
+  file:
+    name: /home/gds_mha/.ssh
+    state: directory
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0700
+
+- name: Setup gds_mha public key
+  copy:
+    src: mha_ssh/pub
+    dest: /home/gds_mha/.ssh/id_rsa.pub
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0600
+
+- name: Setup gds_mha authorized_keys
+  copy:
+    src: mha_ssh/pub
+    dest: /home/gds_mha/.ssh/authorized_keys
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0600
+
+- name: Setup gds_mha private key
+  copy:
+    src: mha_ssh/priv
+    dest: /home/gds_mha/.ssh/id_rsa
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0600

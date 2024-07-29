@@ -1,0 +1,13 @@
+---
+mydumper:
+  statement_size: "10000"
+  rows:           "10000"
+  threads:        "8"
+
+myloader:
+  sml_qpt:            "10000"
+  sml_threads:        "8"
+  med_qpt:            "25000"
+  med_threads:        "16"
+  lrg_qpt:            "50000"
+  lrg_threads:        "32"

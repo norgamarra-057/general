@@ -1,0 +1,16 @@
+---
+- name: Checks if the value of maxthreads is sufficient
+  hosts: gds_all
+  become: yes
+  vars:
+    - max_threads_sysctl_key: kern.threads.max_threads_per_proc
+    - threads_min: 8192
+  tasks:
+    - name: Obtain value for per process maxthreads
+      command: "sysctl -n {{ max_threads_sysctl_key }}"
+      register: maxthreads_current
+    - name: Validate maxthreads is above minimum
+      debug: msg="host maxthreads is below limit ({{ maxthreads_current.stdout }} < {{ threads_min }})"
+      when: maxthreads_current.stdout|int < threads_min|int
+
+

@@ -1,0 +1,14 @@
+---
+# Fail if database has application connections
+
+- name: Decommission | MySQL | Check for application connections
+  shell: mysql --defaults-file={{ instance_conf }} --silent --silent -e "select count(*) from information_schema.processlist where user not in ('system user','pt_heartbeat','root','repl', 'replication','event_scheduler');"
+  register: conn_check
+  when: mysql_service_status.stdout is defined and mysql_service_status.stdout == "run"
+  changed_when: false
+
+- name: Decommission | MySQL | Fail if there are application level connections
+  fail: 
+    msg: "The instance seems to have application level connections so failing deliberately"
+  when: conn_check.stdout is defined and conn_check.stdout != "0"
+

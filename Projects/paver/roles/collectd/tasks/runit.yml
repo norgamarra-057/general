@@ -1,0 +1,77 @@
+---
+- name: collectd | runit | directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+  with_items:
+    - "{{ collectd_service_dir }}"
+    - "{{ collectd_service_dir }}/env"
+    - "{{ collectd_service_dir }}/etc"
+    - "{{ collectd_service_dir }}/log"
+
+- name: collectd | runit | directories | log
+  file:
+    path: "{{ collectd_service_dir }}/log/main"
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+
+- name: collectd | runit | environment | PATH
+  copy:
+    dest: "{{ collectd_service_dir }}/env/PATH"
+    content: "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: collectd | config
+  template:
+    dest: "{{ collectd_service_dir }}/etc/collectd.config"
+    src: "collectd.config.j2"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: collectd | runit | log | run
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ collectd_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: collectd | runit | log | config
+  copy:
+    src: svlogd.config
+    dest: "{{ collectd_service_dir }}/log/main/config"
+    owner: _log
+    group: _log
+    mode: 0644
+  notify:
+    - collectd log restart
+
+- name: collectd | runit | run
+  template:
+    src: runit.sh.j2
+    dest: "{{ collectd_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  notify:
+    - collectd reload
+
+- name: collectd | runit | enable
+  file:
+    src: "{{ collectd_service_dir }}"
+    dest: "/var/service/collectd"
+    owner: root
+    group: wheel
+    state: link
+
+# FIXME(seanc@): do NOT hardcode ports like this, use a variable. CC jfinotto@
+#- name: wait for collectd to start
+#  wait_for: port=2609

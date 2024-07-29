@@ -1,0 +1,6 @@
+---
+- name: vlandev | create
+  command : "/sbin/ifconfig vlan{{ vlan }} create"
+
+- name: vlandev | interface address
+  command : "/sbin/ifconfig vlan{{ vlan }} alias {{ ops_carp['vlan' ~ vlan].anchor_address }}"

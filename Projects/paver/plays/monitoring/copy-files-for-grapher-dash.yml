@@ -1,0 +1,21 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Copy new perl script
+      copy:
+        src: ../../roles/check_mk/files/locals/postgresql/custom/check_postgres_new.pl
+        dest: "/usr/local/bin/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy new dbstats script
+      copy:
+        src: ../../roles/check_mk/files/locals/postgresql/custom/dbstats_delta.sh
+        dest: "/usr/local/bin/"
+        owner: root
+        group: wheel
+        mode: 0655

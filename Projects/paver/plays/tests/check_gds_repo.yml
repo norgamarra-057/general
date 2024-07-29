@@ -1,0 +1,12 @@
+---
+- name: Check if gds_repo is setup for all pg93 host
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Check if postgresql93 is installed
+      shell: pkg info | grep postgresql93
+      ignore_errors: yes
+      register: pkg_info_pg93
+    - name: Check if variable is configured
+      debug: var=gds_repo
+      when: pkg_info_pg93|success 

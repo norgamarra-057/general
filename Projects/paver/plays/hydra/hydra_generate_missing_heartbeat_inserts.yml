@@ -1,0 +1,47 @@
+- hosts: gds_all
+  become: yes
+  gather_facts: no 
+  vars:
+    outputs: []
+    datacenter: "{{ inventory_hostname | regex_replace('^.*\\.([^\\.]+)$', '\\1') }}"
+  tasks:
+   - name: FreeBSD | run | custom
+     shell: |
+       exec 2>&1
+       sql="$(
+       echo -n "SET sql_log_bin = 0;"
+       echo -n " INSERT INTO percona.heartbeat (server_id) SELECT s.server_id FROM ("
+       {% set not_first = false %}
+       {% for host in hostvars %}
+       {% if hostvars[host].gds_instances is defined and hostvars[host].gds_instances[item.key] is defined and hostvars[host].gds_instances[item.key].hydra is defined and hostvars[host].gds_instances[item.key].hydra.default_primary == default_primary|default(item.value.hydra.default_primary) %}
+       {% if not_first %}
+       echo -n " UNION ALL "
+       {% endif %}
+       {% set not_first = true %}
+       echo -n "SELECT inet_aton('$(host "{{ host }}"|cut -d ' ' -f 4)') AS server_id"
+       {% endif %}
+       {% endfor %}
+       echo -n ") AS s LEFT JOIN percona.heartbeat AS h ON (s.server_id = h.server_id) WHERE h.server_id IS NULL;"
+       echo -n " SET sql_log_bin = 1;"
+       )"
+       echo "$sql"
+       echo "$sql" | mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock || true
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances|default('{}') }}"
+     when: item.value.type == 'mysql' and item.value.hydra is defined and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"

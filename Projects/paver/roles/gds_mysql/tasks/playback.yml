@@ -1,0 +1,6 @@
+- name: determine if playback is enabled
+  set_fact:
+    playback_enabled: "{{ gds_instances[instance_name]['playback_enabled'] | default(false) }}"
+
+- include_tasks: playback_fact.yml
+  when: playback_enabled

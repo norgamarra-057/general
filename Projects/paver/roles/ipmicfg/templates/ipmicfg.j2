@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Wrapper around IPMICFG
+IPMICFG_DIR="{{ ipmicfg_dir }}"
+IPMICFG="${IPMICFG_DIR}/IPMICFG-Linux.x86"
+
+cd ${IPMICFG_DIR}
+${IPMICFG} $@
+cd - >/dev/null

@@ -1,0 +1,54 @@
+---
+gds_admin_hosts:
+  - 10.22.74.119/32  # gds-admin01.snc1
+  - 10.22.74.10/32   # gds-admin02.snc1
+  - 10.32.103.209/32 # gds-admin01.sac1
+  - 10.32.57.167/32  # gds-admin02.sac1
+  - 10.12.216.132/32 # gds-admin01.dub1
+  - 10.13.17.216/32  # gds-admin02.dub1
+  - 10.22.48.89/32   # gds-snc1-prod-db041s1.snc1
+
+gds_backup_hosts:
+  - 10.20.144.12/32  # delorean001m1.snc1
+  - 10.20.144.11/32  # delorean001s1.snc1
+  - 10.22.132.38/32  # delorean002m1.snc1
+  - 10.22.132.18/32  # delorean002s1.snc1
+  - 10.22.133.101/32 # delorean003m1.snc1
+  - 10.22.133.157/32 # delorean003s1.snc1
+  - 10.22.132.108/32 # delorean004m1.snc1
+  - 10.22.132.118/32 # delorean004s1.snc1
+  - 10.22.138.68/32  # delorean005m1.snc1
+  - 10.22.138.252/32 # delorean005s1.snc1
+  - 10.22.138.56/32  # delorean006m1.snc1
+  - 10.22.138.105/32 # delorean006s1.snc1
+  - 10.22.142.4/32   # delorean007m1.snc1
+  - 10.22.142.5/32   # delorean007s1.snc1
+  - 10.22.142.7/32   # delorean008m1.snc1
+  - 10.22.142.6/32   # delorean008s1.snc1
+  - 10.32.215.216/32 # delorean001m1.sac1
+  - 10.32.213.176/32 # delorean001s1.sac1
+  - 10.12.37.250/32  # delorean001m1.dub1
+  - 10.12.36.92/32   # delorean001s1.dub1
+  - 10.13.161.124/32 # delorean002m1.dub1
+  - 10.13.161.180/32 # delorean002s1.dub1
+
+check_mk_hosts:
+  - 10.23.80.5/32    # mon1-staging.snc1
+  - 10.23.74.6/32    # mon2-staging.snc1
+  - 10.32.55.143/32  # mon1.sac1
+  - 10.32.57.59/32   # mon2.sac1
+  - 10.12.137.113/32 # mon1.dub1
+  - 10.12.43.229/32  # mon2.dub1
+  - 10.22.132.12/32  # mon1.snc1
+  - 10.22.132.13/32  # mon2.snc1
+
+groupon_bastion_hosts:
+  - 10.20.200.20/32   # b3.snc1
+  - 10.20.200.21/32   # b4.snc1
+  - 10.32.74.73/32    # b2.sac1
+  - 10.32.69.78/32    # b1.sac1
+  - 10.12.32.9/32     # b1.dub1
+  - 10.12.64.90/32    # b2.dub1
+
+groupon_vulnscan_hosts:
+  - 10.20.98.12/32    # vulnscan1.snc1

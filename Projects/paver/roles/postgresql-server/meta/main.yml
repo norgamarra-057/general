@@ -1,0 +1,5 @@
+---
+dependencies:
+  - { role: runit }
+  - { role: ports, when: "ansible_os_family == 'FreeBSD'" }
+  - { role: postgresql-client }

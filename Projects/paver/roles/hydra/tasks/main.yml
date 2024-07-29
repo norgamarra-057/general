@@ -1,0 +1,351 @@
+---
+
+- name: FreeBSD | update | retrieve versions
+  become: yes
+  shell: |
+    exec 2>&1
+    {% if inventory_hostname.endswith('m1.' + datacenter) %}
+    curl -s "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace('_','-') }}/nodes/{{ item.value.hydra.ids[0] }}/version?raw=false"
+    {% else %}
+    curl -s "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace('_','-') }}/nodes/{{ item.value.hydra.ids[1] }}/version?raw=false"
+    {% endif %}
+  register: hydra_services_version
+  with_dict: "{{ gds_instances|default('{}') }}"
+  when: hydra_type == 'agent' and item.value.hydra is defined
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: FreeBSD | update | check Hydra already installed
+  become: yes
+  stat:
+    path: /var/service/hydra-{{ hydra_type }}
+  register: hydra_installed
+
+- name: FreeBSD | update | check Hydra version already installed
+  become: yes
+  stat:
+    path: "/opt/hydra-{{ hydra_version }}.tar.gz"
+  register: hydra_version_installed
+
+- name: FreeBSD | update | set pre update facts
+  become: yes
+  set_fact:
+    drop_mysql__hydra_timeline_table_before_version: "1.2.11"
+    drop_hydra__hydra_timeline_table_before_version: "1.2.16"
+    drop_instances_from_consul_before_version: "1.2.16"
+
+- name: FreeBSD | update | set update facts
+  become: yes
+  set_fact:
+    stop_hydra: "{{ (hydra_type == 'server' or hydra_services_version.results|selectattr('stdout_lines','defined')|map(attribute='stdout_lines')|map('first')|map('default','0')|map('version_compare',hydra_version,'!=')|map('string')|select('equalto','True')|list|length > 0) and hydra_installed.stat.exists }}"
+    start_hydra: "{{ ((hydra_type == 'server' or hydra_services_version.results|selectattr('stdout_lines','defined')|map(attribute='stdout_lines')|map('first')|map('default','0')|map('version_compare',hydra_version,'!=')|map('string')|select('equalto','True')|list|length > 0) and hydra_installed.stat.exists) or (not hydra_installed.stat.exists) }}"
+    reload_hydra: "{{ hydra_installed.stat.exists and hydra_type == 'agent' and hydra_services_version.results|selectattr('stdout_lines','defined')|map(attribute='stdout_lines')|map('first')|map('default','0')|map('version_compare',hydra_version,'!=')|map('string')|select('equalto','True')|list|length == 0 }}"
+
+- name: FreeBSD | update | debug update facts
+  become: yes
+  debug:
+    msg: "stop_hydra: {{ stop_hydra }} / start_hydra: {{ start_hydra }} / reload_hydra: {{ reload_hydra }}"
+
+- name: FreeBSD | check | if any instance is in failover fail
+  become: yes
+  shell: |
+    exec 2>&1
+    ! curl -s "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace('_','-') }}/leader?raw=false"|grep -q '"isManualFailover":true'
+  with_dict: "{{ gds_instances|default('{}') }}"
+  when: hydra_type == 'agent' and item.value.hydra is defined
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: FreeBSD | update | stop Hydra if already installed and version not existing
+  become: yes
+  shell: |
+    exec 2>&1
+    sv -w 60 stop /var/service/hydra-{{ hydra_type }} || sv kill /var/service/hydra-{{ hydra_type }}
+    sv stop /var/service/hydra-{{ hydra_type }}
+  when: stop_hydra
+
+- name: FreeBSD | update | drop instance from Consul if needed
+  become: yes
+  shell: |
+    exec 2>&1
+    curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace('_','-') }}/leader"
+    {% if inventory_hostname.endswith('m1.' + datacenter) %}
+    curl -s -X PUT "http://localhost:8500/v1/agent/service/deregister/{{ item.value.hydra.ids[0] }}"
+    curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace('_','-') }}/nodes/{{ item.value.hydra.ids[0] }}?recurse=true"
+    {% else %}
+    curl -s -X PUT "http://localhost:8500/v1/agent/service/deregister/{{ item.value.hydra.ids[1] }}"
+    curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace('_','-') }}/nodes/{{ item.value.hydra.ids[1] }}?recurse=true"
+    {% endif %}
+  with_dict: "{{ gds_instances|default('{}') }}"
+  when: stop_hydra and hydra_type == 'agent' and item.value.hydra is defined and hydra_services_version.results|selectattr('item.key', 'equalto', item.key)|map(attribute='stdout_lines')|first|default(['0'],true)|first|version_compare(drop_instances_from_consul_before_version, '<')
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: FreeBSD | update | drop table mysql.hydra_timeline if needed
+  become: yes
+  shell: |
+    exec 2>&1
+    {% if item.value.type == 'mysql' %}
+    read_only="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e "SHOW GLOBAL VARIABLES WHERE Variable_name = 'read_only'" -t -s -N|tail -n -2|head -n +1|sed 's/  *//g'|cut -d '|' -f 3)"
+    if [ "$read_only" == "OFF" ]
+    then
+      mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'DROP TABLE IF EXISTS mysql.hydra_timeline'
+    fi
+    {% else %}
+    in_recovery="$(psql -h localhost -p "{{ item.value.ports.postgresql_raw }}" -U postgres -c 'select pg_is_in_recovery()' -t -A)"
+    if [ "f" == "$in_recovery" ]
+    then
+      psql -h localhost -p "{{ item.value.ports.postgresql_raw }}" -U postgres -c 'DROP TABLE IF EXISTS mysql.hydra_timeline'
+    fi
+    {% endif %}
+  with_dict: "{{ gds_instances|default('{}') }}"
+  when: stop_hydra and hydra_type == 'agent' and item.value.hydra is defined and hydra_services_version.results|selectattr('item.key', 'equalto', item.key)|map(attribute='stdout_lines')|first|default(['0'], true)|first|version_compare(drop_mysql__hydra_timeline_table_before_version, '<')
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: FreeBSD | update | drop table hydra.hydra_timeline if needed
+  become: yes
+  shell: |
+    exec 2>&1
+    {% if item.value.type == 'mysql' %}
+    read_only="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e "SHOW GLOBAL VARIABLES WHERE Variable_name = 'read_only'" -t -s -N|tail -n -2|head -n +1|sed 's/  *//g'|cut -d '|' -f 3)"
+    if [ "$read_only" == "OFF" ]
+    then
+      mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'DROP TABLE IF EXISTS hydra.hydra_timeline'
+    fi
+    {% else %}
+    in_recovery="$(psql -h localhost -p "{{ item.value.ports.postgresql_raw }}" -U postgres -c 'select pg_is_in_recovery()' -t -A)"
+    if [ "f" == "$in_recovery" ]
+    then
+      psql -h localhost -p "{{ item.value.ports.postgresql_raw }}" -U postgres -c 'DROP TABLE IF EXISTS hydra.hydra_timeline'
+    fi
+    {% endif %}
+  with_dict: "{{ gds_instances|default('{}') }}"
+  when: stop_hydra and hydra_type == 'agent' and item.value.hydra is defined and hydra_services_version.results|selectattr('item.key', 'equalto', item.key)|map(attribute='stdout_lines')|first|default(['0'], true)|first|version_compare(drop_hydra__hydra_timeline_table_before_version, '<')
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: FreeBSD | install | Java SDK 8
+  become: yes
+  pkgng: name="{{ item }}" state=present
+  with_items: 
+  - openjdk8
+  - gtar
+
+- name: FreeBSD | install | opt directory
+  become: yes
+  file:
+    path: /opt
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: FreeBSD | install | get
+  become: yes
+  copy:
+    src: "hydra-{{ hydra_version }}.tar.gz"
+    dest: "/opt/hydra-{{ hydra_version }}.tar.gz"
+    remote_src: false
+
+- name: FreeBSD | install | unarchive
+  become: yes
+  shell: |
+    exec 2>&1
+    gtar xz -C /opt -f "/opt/hydra-{{ hydra_version }}.tar.gz"
+
+- name: FreeBSD | install | permissions
+  become: yes
+  file:
+    path: "/opt/hydra-{{ hydra_version }}"
+    state: directory
+    recurse: yes
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: FreeBSD | install | delete
+  become: yes
+  file:
+    path: "/opt/hydra"
+    state: absent
+
+- name: FreeBSD | install | move
+  become: yes
+  command: mv "/opt/hydra-{{ hydra_version }}" /opt/hydra
+
+- name: FreeBSD | install | fix bash path
+  become: yes
+  replace:
+    path: /opt/hydra/bin/hydra
+    regexp: '#!/bin/bash'
+    replace: '#!/usr/local/bin/bash'
+
+- name: FreeBSD | run | svlogd directory
+  become: yes
+  file:
+    path: /var/groupon/service/hydra-{{ hydra_type }}/log/main
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+    recurse: yes
+  changed_when: False
+
+- name: FreeBSD | run | directories (read-only)
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+  with_items:
+    - /var/groupon/service/hydra-{{ hydra_type }}
+    - /var/groupon/service/hydra-{{ hydra_type }}/bin
+    - /var/groupon/service/hydra-{{ hydra_type }}/env
+    - /var/groupon/service/hydra-{{ hydra_type }}/log
+
+- name: FreeBSD | install | get jks
+  become: yes
+  copy:
+    src: "{{ hydra_jks_file }}"
+    dest: "/var/groupon/service/hydra-server/hydra-server.jks"
+    remote_src: false
+    mode: 0400
+  when: hydra_type == 'server'
+
+- name: FreeBSD | setup | configuration
+  become: yes
+  template:
+    src: "hydra-{{ hydra_type }}.yml.j2"
+    dest: "/var/groupon/service/hydra-{{ hydra_type }}/hydra-{{ hydra_type }}.yml"
+    owner: root
+    group: wheel
+    mode: 0600
+
+- name: FreeBSD | setup | recovery.done for postgresql master
+  become: yes
+  template:
+    src: ../gds_postgresql_replication_create/templates/recovery.conf.j2
+    dest: "/var/groupon/postgresql/data{{ postgresql_port_major }}/{{ gds_cluster }}-{{ item.key }}/data/recovery.done"
+    owner: "{{ item.value.unix_user }}"
+    group: "{{ users[item.value.unix_user].group }}"
+    mode: 0640
+  with_dict: "{{ gds_instances|default('{}') }}"
+  when: hydra_type == 'agent' and item.value.hydra is defined and item.value.type == 'postgresql' and inventory_hostname.endswith('m1.' + datacenter)
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: FreeBSD | setup | postgresql control scripts
+  become: yes
+  template:
+    src: postgresql-{{ item }}.j2
+    dest: "/var/groupon/service/hydra-agent/postgresql-{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0744
+  with_items:
+    - start
+    - stop
+    - restart
+    - stonith
+    - demote
+  when: hydra_type == 'agent'
+
+- name: FreeBSD | setup | initial VIP check
+  become: yes
+  copy:
+    src: "check_vip.sh"
+    dest: "/var/groupon/service/hydra-agent/check_vip.sh"
+    remote_src: false
+  when: hydra_type == 'agent'
+
+- name: FreeBSD | run | environment
+  become: yes
+  copy: 
+    dest: /var/groupon/service/hydra-{{ hydra_type }}/env/PATH
+    content: "/usr/local/bin:/usr/bin:/bin:/opt/hydra/bin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: FreeBSD | run | environment variables
+  become: yes
+  template:
+    src: "{{ item }}.j2"
+    dest: "/var/groupon/service/hydra-{{ hydra_type }}/env/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0644
+  with_items:
+    - JAVA_OPTS
+    - JAVA_HOME
+
+- name: FreeBSD | run | script
+  become: yes
+  template:
+    src: run.j2
+    dest: "/var/groupon/service/hydra-{{ hydra_type }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: FreeBSD | run | log script
+  become: yes
+  template:
+    dest: /var/groupon/service/hydra-{{ hydra_type }}/log/run
+    mode: 0744
+    src: svlogd.sh.j2
+    owner: root
+    group: wheel
+  notify:
+    - hydra {{ hydra_type }} log restart
+
+- name: FreeBSD | run | hydra enable
+  become: yes
+  file:
+    src: /var/groupon/service/hydra-{{ hydra_type }}
+    dest: /var/service/hydra-{{ hydra_type }}
+    owner: root
+    group: wheel
+    state: link
+  notify:
+    - hydra {{ hydra_type }} start
+
+- name: FreeBSD | check_mk | Copy Checks
+  template:
+    src: "hydra_status.sh.j2"
+    dest: "/usr/lib/check_mk_agent/local/120/hydra_{{ hydra_type }}_status.sh"
+    owner: root
+    group: wheel
+    mode: 0655
+
+- name: FreeBSD | update | start service.
+  become: yes
+  shell: | 
+    exec 2>&1
+    sv -w 60 start /var/service/hydra-{{ hydra_type }}
+  when: start_hydra
+
+- name: FreeBSD | update | reload service.
+  become: yes
+  shell: | 
+    exec 2>&1
+    sv -w 60 reload /var/service/hydra-{{ hydra_type }}
+  when: reload_hydra
+
+- name: FreeBSD | update | update version
+  become: yes
+  shell: |
+    exec 2>&1
+    {% if inventory_hostname.endswith('m1.' + datacenter) %}
+    curl -s -X PUT "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace('_','-') }}/nodes/{{ item.value.hydra.ids[0] }}/version" -d '{{ hydra_version }}'
+    {% else %}
+    curl -s -X PUT "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace('_','-') }}/nodes/{{ item.value.hydra.ids[1] }}/version" -d '{{ hydra_version }}'
+    {% endif %}
+  with_dict: "{{ gds_instances|default('{}') }}"
+  when: hydra_type == 'agent' and item.value.hydra is defined
+  loop_control:
+    label: "{{ item.key }}"
+

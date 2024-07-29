@@ -1,0 +1,10 @@
+---
+- hosts: gds_snc1_prod_db063
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: hue_sac1_prod }
+  - { role: gds-mysql-ha, instance: oozie_sac1_prod }
+  - { role: gds-mysql-ha, instance: pitstop_prod }
+  - { role: gds-mysql-ha, instance: rele_airflow_prod }
+  - { role: gds-mysql-ha, instance: status_dashboard_prod }

@@ -1,0 +1,48 @@
+README 
+
+
+The help of the script :
+
+sh createdb.sh -h
+
+----------------------------------------------------------------------------
+Script to generate sql statements to create database
+ 
+options:
+-h, --help                show brief help
+ 
+Parameters :
+First place the department name
+Second place the application name
+Third place the environment type
+Fourth place the port of the instance that will be created the database
+ 
+Please execute the statements generated as postgres user.
+
+----------------------------------------------------------------------------
+
+
+Example with the following command : 
+sh createdb.sh gds opsddb stg 20015
+################ SQL STATEMENTS TO BE EXECUTED AS POSTGRES USER ################
+CREATE USER gds_opsddb_stg_dba PASSWORD '9b09cb4d718224918d1e9c975668743d' CONNECTION LIMIT 2;
+CREATE USER gds_opsddb_stg_app PASSWORD '12ab233fc644ed36a03ae99107ba06b3' CONNECTION LIMIT 10;
+CREATE DATABASE gds_opsddb_stg OWNER gds_opsddb_stg_dba;
+CREATE SCHEMA opsddb;
+ALTER SCHEMA opsddb OWNER TO gds_opsddb_stg_dba;
+ALTER USER gds_opsddb_stg_dba set search_path = opsddb;
+ALTER USER gds_opsddb_stg_app set search_path = opsddb;
+\q
+psql -U gds_opsddb_stg_dba -d gds_opsddb_stg -p 20015
+GRANT USAGE ON SCHEMA opsddb TO gds_opsddb_stg_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA opsddb GRANT SELECT,INSERT,UPDATE,DELETE ON TABLES TO gds_opsddb_stg_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA opsddb GRANT SELECT,UPDATE ON SEQUENCES TO gds_opsddb_stg_app;
+CREATE SCHEMA ext ;
+ALTER SCHEMA ext owner to  gds_opsddb_stg_dba;
+GRANT USAGE ON SCHEMA ext TO public ;
+GRANT USAGE ON SCHEMA ext TO gds_opsddb_stg_app;
+CREATE EXTENSION "citext" WITH SCHEMA ext;
+CREATE EXTENSION "hstore" WITH SCHEMA ext;
+CREATE EXTENSION "uuid-ossp" WITH SCHEMA ext;
+CREATE EXTENSION "pg_stat_statements" WITH SCHEMA ext;
+CREATE EXTENSION "cstore_fdw" WITH SCHEMA ext;

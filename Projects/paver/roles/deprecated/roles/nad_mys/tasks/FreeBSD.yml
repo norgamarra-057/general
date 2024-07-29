@@ -1,0 +1,180 @@
+---
+- name: nad_mys install
+  pkgng: name=gds-nad state=present
+
+- name: nad_mys | runit | directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+  with_items:
+    - "{{ nad_mys_service_dir }}"
+    - "{{ nad_mys_service_dir }}/env"
+    - "{{ nad_mys_service_dir }}/etc"
+    - "{{ nad_mys_service_dir }}/log"
+
+- name: nad_mys | runit | directories | log
+  file:
+    path: "{{ nad_mys_service_dir }}/log/main"
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+
+- name: nad_mys | runit | environment | NODE_PATH
+  copy:
+    dest: "{{ nad_mys_service_dir }}/env/NODE_PATH"
+    content: "/usr/local/lib/node_modules"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad_mys | runit | environment | PATH
+  copy:
+    dest: "{{ nad_mys_service_dir }}/env/PATH"
+    content: "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+
+- name: nad_mys | config
+  template:
+    dest: "{{ nad_mys_service_dir }}/etc/nad_mys.config"
+    src: "nad-{{ ansible_os_family }}.config.j2"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad_mys | runit | log | run
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ nad_mys_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: nad_mys | runit | log | config
+  copy:
+    src: svlogd.config
+    dest: "{{ nad_mys_service_dir }}/log/main/config"
+    owner: _log
+    group: _log
+    mode: 0644
+  notify:
+    - nad_mys log restart
+
+- name: nad_mys | runit | run
+  template:
+    src: runit.sh.j2
+    dest: "{{ nad_mys_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  notify:
+    - nad_mys reload
+
+- name: nad_mys| runit | enable
+  file:
+    src: "{{ nad_mys_service_dir }}"
+    dest: "/var/service/nad_mys"
+    owner: root
+    group: wheel
+    state: link
+
+- name: NAD | Mysql | create folder
+  file:
+    path: "/usr/local/etc/node-agent.d/mysql"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | Mysql | auto_inc
+  template:
+    src: mys_auto_inc.sh.j2
+    dest: "/usr/local/etc/node-agent.d/mysql/mys_autoinc_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | Mysql | generic
+  template:
+    src: mys_generic.sh.j2
+    dest: "/usr/local/etc/node-agent.d/mysql/mys_generic_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | Mysql | read only
+  template:
+    src: mys_read_only.sh.j2
+    dest: "/usr/local/etc/node-agent.d/mysql/mys_readony_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | Mysql | repl delay
+  template:
+    src: mys_repl_delay.sh.j2
+    dest: "/usr/local/etc/node-agent.d/mysql/mys_repldelay_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | Mysql | runthreads
+  template:
+    src: mys_run_threads.sh.j2
+    dest: "/usr/local/etc/node-agent.d/mysql/mys_runthreads_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | Mysql | slave
+  template:
+    src: mys_slave.sh.j2
+    dest: "/usr/local/etc/node-agent.d/mysql/mys_slave_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | Mysql |  used conn
+  template:
+    src: mys_used_conn.sh.j2
+    dest: "/usr/local/etc/node-agent.d/mysql/mys_usedconn_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+
+- name: nad_mys | config
+  template:
+    dest: "{{ nad_mys_service_dir }}/etc/nad_pg.config"
+    src: "nad-{{ ansible_os_family }}.config.j2"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad | Mysql | register var
+  shell: ls /usr/local/etc/node-agent.d/mysql/*.sh | xargs -n 1 basename
+  register: files_link
+  ignore_errors: true
+
+- name: NAD | Mysql | create symlinks
+  file:
+    src=/usr/local/etc/node-agent.d/mysql/{{ item }}
+    dest=/usr/local/etc/node-agent.d/{{ item }}
+    owner=root
+    group=wheel
+    state=link
+  with_items: "{{files_link.stdout_lines}}"
+
+- name: NAD | Mysql | create symlinks service dir 
+  file:
+    src={{ nad_mys_service_dir }}
+    dest=/var/service/nad_mys
+    owner=root
+    group=wheel
+    state=link

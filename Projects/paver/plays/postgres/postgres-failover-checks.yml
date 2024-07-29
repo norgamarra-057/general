@@ -1,0 +1,142 @@
+---
+- name: Master checks
+  gather_facts: False 
+  become: true
+  hosts: 
+    - '{{ target_master }}'
+  tasks:
+    - name: Find master VIP
+      shell: cat /etc/pf.conf.d/tables/{{ target_instance }}-vips.table | grep 10.30.{{ target_master_vlan }}.{{ target_vhid }}
+      register: vip_exists_master
+#    - debug: var=vip_exists_master.stdout
+    - name: verify it is the correct VIP
+      fail: msg="Exiting ----------VIP is not the correct one"
+      when:  vip_exists_master.stdout  ==  ""
+
+    - name: Find slave VIP
+      shell: cat /etc/pf.conf.d/tables/{{ target_instance }}-vips.table | grep 10.30.{{ target_slave_vlan }}.{{ target_vhid }}
+      register: vip_exists_slave
+#    - debug: var=vip_exists_slave.stdout
+    - name: verify it is the correct VIP
+      fail: msg="Exiting ----------VIP is not the correct one"
+      when:  vip_exists_slave.stdout  ==  ""
+
+
+    - name: Confirm rw_vip is on the master
+      shell: ifconfig vlan3{{ target_master_vlan }} | grep {{ target_vhid }} | grep MASTER
+      register: rw_vip_on_master
+#    - debug: var=rw_vip_on_master.stdout
+    - name: verify the rw vip is on the master
+      fail: msg="Exiting ----------rw VIP is not on the master"
+      when:  rw_vip_on_master.stdout  ==  ""
+
+    - name: Confirm ro_vip is not on the master
+      shell: ifconfig vlan3{{ target_slave_vlan }} | grep {{ target_vhid }} | grep BACKUP
+      register: ro_vip_on_master
+#    - debug: var=ro_vip_on_master.stdout
+    - name: verify the ro vip is not on the master
+      fail: msg="Exiting ----------ro VIP is on the master"
+      when:  ro_vip_on_master.stdout  ==  ""
+
+
+    - name: Confirm master is not in recovery
+      command: psql -U postgres -A -t -d {{ target_dbname }} -p 15432 -h 10.30.{{ target_master_vlan }}.{{ target_vhid }} -c "select pg_is_in_recovery()"
+      register: it_is_in_recovery
+#    - debug: var=it_is_in_recovery.stdout
+    - name: verify it's the master
+      fail: msg="Exiting ----------It is not a master database"
+      when:  it_is_in_recovery.stdout  ==  "t"
+
+    - name: Find if slave exists
+      command: psql -U postgres -A -t -d {{ target_dbname }} -p 15432 -h 10.30.{{ target_master_vlan }}.{{ target_vhid }} -c "select client_addr from pg_stat_replication"
+      register: slave_ip
+#    - debug: var=slave_ip.stdout
+    - name: verify slave exists
+      fail: msg="Exiting ----------Slave does not exist"
+      when:  slave_ip.stdout == ""
+
+    - name: Replication lag 
+      command: psql -U postgres -A -t -d {{ target_dbname }} -p 15432 -h 10.30.{{ target_master_vlan }}.{{ target_vhid }} -c "select pg_xlog_location_diff(write_location,replay_location) from pg_stat_replication"
+      register: replication_lag
+#    - debug: var=replication_lag.stdout
+    - name: verify replication lag is low
+      fail: msg="Exiting ----------Replication lag is high"
+      when:  replication_lag.stdout|int  >  50000000
+
+    - name: Data directory
+      command: psql -U postgres -A -t -d {{ target_dbname }} -p 15432 -h 10.30.{{ target_master_vlan }}.{{ target_vhid }} -c "show data_directory"
+      register: data_dir
+#    - debug: var=data_dir.stdout
+
+    - name: Owner of the data directory
+      shell: stat -f '%Su' {{ data_dir.stdout }}
+      register: owner_dir
+#    - debug: var=owner_dir.stdout
+
+
+    - name: Port number
+      command: psql -U postgres -A -t -d {{ target_dbname }} -p 15432 -h 10.30.{{ target_master_vlan }}.{{ target_vhid }} -c "show port"
+      register: port_no
+#    - debug: var=port_no.stdout
+
+    - name: Find if instance name is correct
+      shell: cat /var/groupon/postgresql/data94/gds*{{ target_instance }}/data/postgresql.conf | grep {{ port_no.stdout }}
+      register: instance_is_correct
+#    - debug: var=instance_is_correct.stdout
+    - name: verify it is the correct instance name
+      fail: msg="Exiting ----------Instance name is not the correct one"
+      when:  instance_is_correct.stdout  ==  ""
+
+- name: Slave checks
+  gather_facts: False 
+  become: true
+  hosts:
+    - '{{ target_slave }}'
+  tasks:    
+    - name: Find if IP is correct
+      shell: ifconfig lagg0 | grep {{ hostvars[target_master]['slave_ip']['stdout'] }}
+      register: ip_is_correct_slave
+#    - debug: var=ip_is_correct_slave.stdout
+    - name: verify it is the correct IP
+      fail: msg="Exiting ----------the IP of the slave is not the correct one"
+      when:  ip_is_correct_slave.stdout  ==  ""
+
+    - name: Confirm it's in recovery
+      command: psql -U postgres -A -t -d {{ target_dbname }} -p {{ hostvars[target_master]['port_no']['stdout'] }} -c "select pg_is_in_recovery()"
+      register: it_is_in_recovery_slave
+#    - debug: var=it_is_in_recovery_slave.stdout
+    - name: verify if it's the slave
+      fail: msg="Exiting ----------It is not a slave database"
+      when:  it_is_in_recovery_slave.stdout  ==  "f"
+
+    - name: Find master VIP
+      shell: cat /etc/pf.conf.d/tables/{{ target_instance }}-vips.table | grep 10.30.{{ target_master_vlan }}.{{ target_vhid }}
+      register: vip_exists_master
+#    - debug: var=vip_exists_master.stdout
+    - name: verify it is the correct VIP
+      fail: msg="Exiting ----------VIP is not the correct one"
+      when:  vip_exists_master.stdout  ==  ""
+
+    - name: Find slave VIP
+      shell: cat /etc/pf.conf.d/tables/{{ target_instance }}-vips.table | grep 10.30.{{ target_slave_vlan }}.{{ target_vhid }}
+      register: vip_exists_slave
+#    - debug: var=vip_exists_slave.stdout
+    - name: verify it is the correct VIP
+      fail: msg="Exiting ----------VIP is not the correct one"
+      when:  vip_exists_slave.stdout  ==  ""
+
+    - name: Confirm rw_vip is not on the slave
+      shell: ifconfig vlan3{{ target_master_vlan }} | grep {{ target_vhid }} | grep BACKUP
+      register: rw_vip_on_slave
+#    - debug: var=rw_vip_on_slave.stdout
+    - name: verify the rw vip is not on the slave
+      fail: msg="Exiting ----------rw VIP is on the slave"
+      when:  rw_vip_on_slave.stdout  ==  ""
+
+    - name: Confirm ro_vip is on the slave
+      shell: ifconfig vlan3{{ target_slave_vlan }} | grep {{ target_vhid }} | grep MASTER
+      register: ro_vip_on_slave
+#    - debug: var=ro_vip_on_slave.stdout
+    - name: verify the ro vip is on the slave
+      fail: msg="Exiting ----------ro VIP is not on the slave"
+      when:  ro_vip_on_slave.stdout  ==  ""

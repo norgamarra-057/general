@@ -1,0 +1,5 @@
+---
+- name: Start atop
+  service:
+    name: atop
+    state: running

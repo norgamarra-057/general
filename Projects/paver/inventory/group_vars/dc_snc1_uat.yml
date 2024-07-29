@@ -1,0 +1,17 @@
+---
+dns:
+  domain: snc1
+  domains:
+    - dub1
+    - snc1
+    - snc2
+  search: snc1
+  zones:
+    '.':
+      nameservers:
+        - 10.20.8.33
+        - 10.20.10.53
+consul_dc: snc1
+consul_join_server1: gds-admin01.snc1
+consul_join_server2: gds-admin02.snc1
+consul_join_server3: gds-web01.snc1

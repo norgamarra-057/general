@@ -1,0 +1,355 @@
+#!/usr/local/bin/ruby
+# ============================================================================
+# Copyright (c) 2011 Groupon.
+# ============================================================================
+
+require 'etc'
+require 'rubygems'
+require 'monitoring_script_multithreshold'
+require 'yaml'
+
+class CheckMySQL < MonitoringScriptMultithreshold
+  SERVICE_NAME = 'mysql'
+  SERVICE_DESC = 'Checker for mysql health'
+  PRIMARY_METRIC = 'mysql'
+
+  OPTIONS = {
+    :user      => { :text => "MySQL user",     :short => "U", :type => :string,  :required => false, :default => 'mysql' },
+    :host      => { :text => "MySQL hostname", :short => "H", :type => :string,  :required => false, :default => '127.0.0.1' },
+    :items     => { :text => "Cacti Items",    :short => "I", :type => :string,  :required => false, :default => 'a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,aa,ab,ac,ad,ae,af,ag,ah,ai,aj,ak,al,am,an,ao,ap,aq,ar,as,at,au,av,aw,ax,ay,az,b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,bc,bd,be,bf,bi,bj,bl,bm,bn,bo,bp,bq,br,bs,bt,bu,bv,bw,bx,by,bz,c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,ca,cb,cc,cd,ce,cf,cg,ch,ci,cj,ck,cl,cm,cn,co,cp,cq,cr,cs,ct,cu,cv,cx,cy,cz,d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,da,db,dc,dd,de,df,dg,dh,di,dj,dm,dn,do,dp,dq,dr,ds,dt,du,dv,dw,dx,dy,dz,e0,e1,e2,e3,e4,e5,e6,e7,e8,e9,ea,eb,ec,ed,ee,ef,eg,eh,ei,ej,ek,fn' },
+    :password  => { :text => "MySQL password", :short => "W", :type => :string,  :required => false, :default => "" },
+    :port      => { :text => "MySQL port",     :short => "P", :type => :string,  :required => false, :default => "3306" },
+    :ssl       => { :text => "Use SSL",        :short => "S", :type => :boolean, :required => false, :default => false },
+    :heartbeat => { :text => "mk-heartbeat table name",
+                                               :short => "E", :type => :string,  :required => false, :default => 'mk-heartbeat' },
+    :verbose   => { :text => "Verbose",        :short => "V", :type => :bool },
+  }
+
+  PHP = "/usr/local/bin/php"
+  SS_GET_MYSQL_STATS = "/usr/local/libexec/ss_get_mysql_stats.php"
+
+  # This mapping of long_name => short_name is sourced from
+  # better-cacti-templates/scripts/ss_get_mysql_stats.php:ss_get_mysql_stats()
+  SS_GET_MYSQL_STATS_ITEMS = {
+    'Key_read_requests'          => { :code => 'a0', :delta => true },
+    'Key_reads'                  => { :code => 'a1', :delta => true },
+    'Key_write_requests'         => { :code => 'a2', :delta => true },
+    'Key_writes'                 => { :code => 'a3', :delta => true },
+    'history_list'               => { :code => 'a4', },
+    'innodb_transactions'        => { :code => 'a5', :delta => true },
+    'read_views'                 => { :code => 'a6', },
+    'current_transactions'       => { :code => 'a7', },
+    'locked_transactions'        => { :code => 'a8', },
+    'active_transactions'        => { :code => 'a9', },
+    'pool_size'                  => { :code => 'aa', },
+    'free_pages'                 => { :code => 'ab', },
+    'database_pages'             => { :code => 'ac', },
+    'modified_pages'             => { :code => 'ad', },
+    'pages_read'                 => { :code => 'ae', :delta => true },
+    'pages_created'              => { :code => 'af', :delta => true },
+    'pages_written'              => { :code => 'ag', :delta => true },
+    'file_fsyncs'                => { :code => 'ah', :delta => true },
+    'file_reads'                 => { :code => 'ai', :delta => true },
+    'file_writes'                => { :code => 'aj', :delta => true },
+    'log_writes'                 => { :code => 'ak', :delta => true },
+    'pending_aio_log_ios'        => { :code => 'al', },
+    'pending_aio_sync_ios'       => { :code => 'am', },
+    'pending_buf_pool_flushes'   => { :code => 'an', },
+    'pending_chkp_writes'        => { :code => 'ao', },
+    'pending_ibuf_aio_reads'     => { :code => 'ap', },
+    'pending_log_flushes'        => { :code => 'aq', },
+    'pending_log_writes'         => { :code => 'ar', },
+    'pending_normal_aio_reads'   => { :code => 'as', },
+    'pending_normal_aio_writes'  => { :code => 'at', },
+    'ibuf_inserts'               => { :code => 'au', :delta => true },
+    'ibuf_merged'                => { :code => 'av', :delta => true },
+    'ibuf_merges'                => { :code => 'aw', :delta => true },
+    'spin_waits'                 => { :code => 'ax', :delta => true },
+    'spin_rounds'                => { :code => 'ay', :delta => true },
+    'os_waits'                   => { :code => 'az', :delta => true },
+    'rows_inserted'              => { :code => 'b0', :delta => true },
+    'rows_updated'               => { :code => 'b1', :delta => true },
+    'rows_deleted'               => { :code => 'b2', :delta => true },
+    'rows_read'                  => { :code => 'b3', :delta => true },
+    'Table_locks_waited'         => { :code => 'b4', :delta => true },
+    'Table_locks_immediate'      => { :code => 'b5', :delta => true },
+    'Slow_queries'               => { :code => 'b6', :delta => true },
+    'Open_files'                 => { :code => 'b7', },
+    'Open_tables'                => { :code => 'b8', },
+    'Opened_tables'              => { :code => 'b9', :delta => true },
+    'innodb_open_files'          => { :code => 'ba', },
+    'open_files_limit'           => { :code => 'bb', },
+    'table_cache'                => { :code => 'bc', },
+    'Aborted_clients'            => { :code => 'bd', :delta => true },
+    'Aborted_connects'           => { :code => 'be', :delta => true },
+    'Max_used_connections'       => { :code => 'bf', },
+    'Slow_launch_threads'        => { :code => 'bg', },
+    'Threads_cached'             => { :code => 'bh', },
+    'Threads_connected'          => { :code => 'bi', },
+    'Threads_created'            => { :code => 'bj', },
+    'Threads_running'            => { :code => 'bk', },
+    'max_connections'            => { :code => 'bl', },
+    'thread_cache_size'          => { :code => 'bm', },
+    'Connections'                => { :code => 'bn', :delta => true },
+    'slave_running'              => { :code => 'bo', },
+    'slave_stopped'              => { :code => 'bp', },
+    'Slave_retried_transactions' => { :code => 'bq', },
+    'slave_lag'                  => { :code => 'br', },
+    'Slave_open_temp_tables'     => { :code => 'bs', },
+    'Qcache_free_blocks'         => { :code => 'bt', },
+    'Qcache_free_memory'         => { :code => 'bu', },
+    'Qcache_hits'                => { :code => 'bv', :delta => true },
+    'Qcache_inserts'             => { :code => 'bw', :delta => true },
+    'Qcache_lowmem_prunes'       => { :code => 'bx', :delta => true },
+    'Qcache_not_cached'          => { :code => 'by', :delta => true },
+    'Qcache_queries_in_cache'    => { :code => 'bz', },
+    'Qcache_total_blocks'        => { :code => 'c0', },
+    'query_cache_size'           => { :code => 'c1', },
+    'Questions'                  => { :code => 'c2', :delta => true },
+    'Com_update'                 => { :code => 'c3', :delta => true },
+    'Com_insert'                 => { :code => 'c4', :delta => true },
+    'Com_select'                 => { :code => 'c5', :delta => true },
+    'Com_delete'                 => { :code => 'c6', :delta => true },
+    'Com_replace'                => { :code => 'c7', :delta => true },
+    'Com_load'                   => { :code => 'c8', :delta => true },
+    'Com_update_multi'           => { :code => 'c9', :delta => true },
+    'Com_insert_select'          => { :code => 'ca', :delta => true },
+    'Com_delete_multi'           => { :code => 'cb', :delta => true },
+    'Com_replace_select'         => { :code => 'cc', :delta => true },
+    'Select_full_join'           => { :code => 'cd', :delta => true },
+    'Select_full_range_join'     => { :code => 'ce', :delta => true },
+    'Select_range'               => { :code => 'cf', :delta => true },
+    'Select_range_check'         => { :code => 'cg', :delta => true },
+    'Select_scan'                => { :code => 'ch', :delta => true },
+    'Sort_merge_passes'          => { :code => 'ci', :delta => true },
+    'Sort_range'                 => { :code => 'cj', :delta => true },
+    'Sort_rows'                  => { :code => 'ck', :delta => true },
+    'Sort_scan'                  => { :code => 'cl', :delta => true },
+    'Created_tmp_tables'         => { :code => 'cm', :delta => true },
+    'Created_tmp_disk_tables'    => { :code => 'cn', :delta => true },
+    'Created_tmp_files'          => { :code => 'co', :delta => true },
+    'Bytes_sent'                 => { :code => 'cp', :delta => true },
+    'Bytes_received'             => { :code => 'cq', :delta => true },
+    'innodb_log_buffer_size'     => { :code => 'cr', },
+    'unflushed_log'              => { :code => 'cs', },
+    'log_bytes_flushed'          => { :code => 'ct', :delta => true },
+    'log_bytes_written'          => { :code => 'cu', :delta => true },
+    'relay_log_space'            => { :code => 'cv', },
+    'binlog_cache_size'          => { :code => 'cw', },
+    'Binlog_cache_disk_use'      => { :code => 'cx', },
+    'Binlog_cache_use'           => { :code => 'cy', },
+    'binary_log_space'           => { :code => 'cz', },
+    'innodb_locked_tables'       => { :code => 'd0', },
+    'innodb_lock_structs'        => { :code => 'd1', },
+    'State_closing_tables'       => { :code => 'd2', },
+    'State_copying_to_tmp_table' => { :code => 'd3', },
+    'State_end'                  => { :code => 'd4', },
+    'State_freeing_items'        => { :code => 'd5', },
+    'State_init'                 => { :code => 'd6', },
+    'State_locked'               => { :code => 'd7', },
+    'State_login'                => { :code => 'd8', },
+    'State_preparing'            => { :code => 'd9', },
+    'State_reading_from_net'     => { :code => 'da', },
+    'State_sending_data'         => { :code => 'db', },
+    'State_sorting_result'       => { :code => 'dc', },
+    'State_statistics'           => { :code => 'dd', },
+    'State_updating'             => { :code => 'de', },
+    'State_writing_to_net'       => { :code => 'df', },
+    'State_none'                 => { :code => 'dg', },
+    'State_other'                => { :code => 'dh', },
+    'Handler_commit'             => { :code => 'di', :delta => true },
+    'Handler_delete'             => { :code => 'dj', :delta => true },
+    'Handler_discover'           => { :code => 'dk', :delta => true },
+    'Handler_prepare'            => { :code => 'dl', :delta => true },
+    'Handler_read_first'         => { :code => 'dm', :delta => true },
+    'Handler_read_key'           => { :code => 'dn', :delta => true },
+    'Handler_read_next'          => { :code => 'do', :delta => true },
+    'Handler_read_prev'          => { :code => 'dp', :delta => true },
+    'Handler_read_rnd'           => { :code => 'dq', :delta => true },
+    'Handler_read_rnd_next'      => { :code => 'dr', :delta => true },
+    'Handler_rollback'           => { :code => 'ds', :delta => true },
+    'Handler_savepoint'          => { :code => 'dt', :delta => true },
+    'Handler_savepoint_rollback' => { :code => 'du', :delta => true },
+    'Handler_update'             => { :code => 'dv', :delta => true },
+    'Handler_write'              => { :code => 'dw', :delta => true },
+    'innodb_tables_in_use'       => { :code => 'dx', },
+    'innodb_lock_wait_secs'      => { :code => 'dy', },
+    'hash_index_cells_total'     => { :code => 'dz', },
+    'hash_index_cells_used'      => { :code => 'e0', },
+    'total_mem_alloc'            => { :code => 'e1', },
+    'additional_pool_alloc'      => { :code => 'e2', },
+    'uncheckpointed_bytes'       => { :code => 'e3', },
+    'ibuf_used_cells'            => { :code => 'e4', },
+    'ibuf_free_cells'            => { :code => 'e5', },
+    'ibuf_cell_count'            => { :code => 'e6', },
+    'adaptive_hash_memory'       => { :code => 'e7', },
+    'page_hash_memory'           => { :code => 'e8', },
+    'dictionary_cache_memory'    => { :code => 'e9', },
+    'file_system_memory'         => { :code => 'ea', },
+    'lock_system_memory'         => { :code => 'eb', },
+    'recovery_system_memory'     => { :code => 'ec', },
+    'thread_hash_memory'         => { :code => 'ed', },
+    'innodb_sem_waits'           => { :code => 'ee', },
+    'innodb_sem_wait_time_ms'    => { :code => 'ef', },
+    'Key_buf_bytes_unflushed'    => { :code => 'eg', },
+    'Key_buf_bytes_used'         => { :code => 'eh', },
+    'key_buffer_size'            => { :code => 'ei', },
+    'Innodb_row_lock_time'       => { :code => 'ej', :delta => true },
+    'Innodb_row_lock_waits'      => { :code => 'ek', :delta => true },
+    'Query_time_count_00'        => { :code => 'el', },
+    'Query_time_count_01'        => { :code => 'em', },
+    'Query_time_count_02'        => { :code => 'en', },
+    'Query_time_count_03'        => { :code => 'eo', },
+    'Query_time_count_04'        => { :code => 'ep', },
+    'Query_time_count_05'        => { :code => 'eq', },
+    'Query_time_count_06'        => { :code => 'er', },
+    'Query_time_count_07'        => { :code => 'es', },
+    'Query_time_count_08'        => { :code => 'et', },
+    'Query_time_count_09'        => { :code => 'eu', },
+    'Query_time_count_10'        => { :code => 'ev', },
+    'Query_time_count_11'        => { :code => 'ew', },
+    'Query_time_count_12'        => { :code => 'ex', },
+    'Query_time_count_13'        => { :code => 'ey', },
+    'Query_time_total_00'        => { :code => 'ez', },
+    'Query_time_total_01'        => { :code => 'fa', },
+    'Query_time_total_02'        => { :code => 'fb', },
+    'Query_time_total_03'        => { :code => 'fc', },
+    'Query_time_total_04'        => { :code => 'fd', },
+    'Query_time_total_05'        => { :code => 'fe', },
+    'Query_time_total_06'        => { :code => 'ff', },
+    'Query_time_total_07'        => { :code => 'fg', },
+    'Query_time_total_08'        => { :code => 'fh', },
+    'Query_time_total_09'        => { :code => 'fi', },
+    'Query_time_total_10'        => { :code => 'fj', },
+    'Query_time_total_11'        => { :code => 'fk', },
+    'Query_time_total_12'        => { :code => 'fl', },
+    'Query_time_total_13'        => { :code => 'fm', },
+    'slave_time_behind_master'   => { :code => 'fn', },
+  }
+
+  def write_curr_metrics(fname, metrics)
+    File.open(fname, "w") do |fh|
+      fh.write(metrics.to_yaml)
+    end
+  end
+
+  def service_check
+    # collect metrics from PHP script
+    args = [SS_GET_MYSQL_STATS]
+    args.push("--user", options[:user])
+    args.push("--host", options[:host])
+    args.push("--pass", options[:password])
+    args.push("--port", options[:port])
+    args.push("--mysql_ssl") if options[:ssl]
+    args.push("--heartbeat", options[:heartbeat]) if options[:heartbeat]
+    args.push("--nocache")
+    args.push("--items", options[:items]) # TODO set this
+
+    unless File.exist? SS_GET_MYSQL_STATS
+      set_message("Cannot find #{SS_GET_MYSQL_STATS}")
+      set_status(STATUS_UNKNOWN)
+      return
+    end
+
+    prev_metrics_filename = "/var/tmp/check_mysql.#{Etc.getpwuid(Process.euid).name}.#{options[:host]}.#{options[:port]}"
+
+    long_names = {}
+    SS_GET_MYSQL_STATS_ITEMS.each do |long_name, data|
+      long_names[data[:code]] = long_name
+    end
+
+    # initialize current metrics hash
+    curr_metrics = {
+      "ts" => Time.now.to_i
+    }
+
+    first_line = nil
+    # run php script to get data
+    puts [PHP, *args].join(" ") if options[:verbose]
+    run_command(PHP, *args) do |line|
+      first_line ||= line
+      line.split(" ").each do |pair|
+        puts pair if options[:verbose]
+        if matches = pair.match(/^([^:]+):(.*)/)  # <name>:<value>
+
+          long_name = long_names[matches[1]]
+          value = matches[2]
+
+          if long_name
+            curr_metrics[long_name.downcase] = value.to_f
+          end
+
+        end
+      end
+    end
+
+    unless curr_metrics.keys.length > 1
+      set_message(first_line.chomp)
+      set_status(STATUS_UNKNOWN)
+      return
+    end
+
+    # fetch metrics last state file
+    unless File.exist? prev_metrics_filename
+      set_message("First run detected.")
+      set_status(STATUS_UNKNOWN)
+      write_curr_metrics(prev_metrics_filename, curr_metrics)
+      return
+    end
+
+    prev_metrics = YAML.load_file(prev_metrics_filename)
+    unless prev_metrics
+      set_message("Invalid YAML in #{prev_metrics_filename}")
+      set_status(STATUS_UNKNOWN)
+      write_curr_metrics(prev_metrics_filename, curr_metrics)
+      return
+    end
+
+    prev_metrics_ts = prev_metrics["ts"].to_i
+    unless prev_metrics_ts || prev_metrics_ts >= Time.now.to_i
+      set_message("Invalid timestamp (ts key) in #{prev_metrics_filename}")
+      set_status(STATUS_UNKNOWN)
+      write_curr_metrics(prev_metrics_filename, curr_metrics)
+    end
+    prev_metrics_age = Time.now.to_i - prev_metrics_ts
+
+    SS_GET_MYSQL_STATS_ITEMS.each do |name, data|
+      name = name.downcase
+      if data[:delta] && curr_metrics[name] && prev_metrics[name]
+        delta = curr_metrics[name] - prev_metrics[name]
+        if delta >= 0
+          curr_metrics["#{name}_sec"] = delta / prev_metrics_age
+        end
+      end
+    end
+
+    write_curr_metrics(prev_metrics_filename, curr_metrics)
+
+    # special logic for adding a new metric for how close we are to max_connections
+    if curr_metrics['max_connections'] && curr_metrics['max_connections'] > 0
+      curr_metrics['connections_used_percentage'] = 100.0 * Float(curr_metrics['threads_connected']) / Float(curr_metrics['max_connections'])
+    else
+      curr_metrics['connections_used_percentage'] = 0
+    end
+
+    # set metrics including deltas to monitor metrics
+    curr_metrics.each do |name, val|
+      set_metric(name, val)
+    end
+
+    # special logic for detecting that replication has been stopped
+    slave_configured = !(@metrics['slave_running'] == -1 && @metrics['slave_stopped'] == -1)
+    slave_is_running = @metrics['slave_lag'] >= 0
+    if slave_configured && !slave_is_running
+      set_status(STATUS_CRITICAL)
+      set_message("Replication Is Not Running")
+    end
+
+    if options[:thresholds]
+      evaluate_thresholds
+    else
+      set_status(STATUS_OK)
+    end
+  end
+end
+CheckMySQL.new.run!

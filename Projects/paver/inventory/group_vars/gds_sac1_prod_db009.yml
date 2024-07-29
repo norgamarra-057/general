@@ -1,0 +1,99 @@
+---
+gds_carp_peers:
+  - 10.32.86.224  # gds-sac1-prod-db009m1
+  - 10.32.86.225  # gds-sac1-prod-db009s1
+  - 10.32.80.224  # gds-sac1-prod-db009m1
+  - 10.32.80.225  # gds-sac1-prod-db009s1
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+gds_instance_group: gds_prod_sac1_db009
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  custsvc_latam_prod: # GDS-1277 Decommed GPROD-159289
+
+#deal_book_service_prod: # GDS-1704
+
+  starman_prod: # GDS-1711
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60009
+    nodes:
+      - gds-sac1-prod-db009m1.sac1
+      - gds-sac1-prod-db009s1.sac1
+    master_carp_interface: vlan204
+    slave_carp_interface: vlan205
+    vhid: 19
+    slave_vhid: 19
+    master_vip: 10.32.86.19
+    slave_vips:
+      - 10.32.80.19
+    replication_ips:
+      - 10.32.114.127 # gds-sac1-prod-db009m1.sac1
+      - 10.32.114.154 # gds-sac1-prod-db009s1.sac1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.81.144/32  # merchant-data-starman-app1.snc1
+      - 10.20.112.60/32  # merchant-data-starman-app2.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: starman_prod_dba
+    dba_src_cidrs: 
+      - 10.20.81.144/32  # merchant-data-starman-app1.snc1
+      - 10.20.112.60/32  # merchant-data-starman-app2.snc1
+    ports:
+      mysqld: 20009
+    hydra:
+      ids:
+        - e242af8a-edf6-4cfb-9bc0-822396c4f85b
+        - 1928ed10-0500-d6e2-996c-240653e333e0
+      default_primary: gds-snc1-prod-db009m1.snc1
+      cascading:
+        gds-sac1-prod-db009m1.sac1:
+          gds-snc1-prod-db009s1.snc1: 10.22.142.162 # gds-snc1-prod-db009m1.snc1
+        gds-sac1-prod-db009s1.sac1:
+          gds-snc1-prod-db009m1.snc1: 10.22.142.190 # gds-snc1-prod-db009s1.snc1
+
+
+#destroyed  finch_experiments_prod: # GDS-1536 wrt GDS-31722
+
+
+  crm_msg_service_prod: # GDS-1492 : Decommissioned # GDS-31721
+
+
+#  getaways_content_prod: # GDS-1672 Decommissioned GDS-33737
+
+#  afl_portal_prod: # GDS-20293 : Decommissioned # GDS-31720
+
+# Decommed GDS-31725  merchant_trans_prod: # GDS-21938
+
+#destroyed  rta_analytics_prod: # GDS-23179 wrt GDS-31726
+
+# Decommed GDS-31723  groupon_sim_prod: # GDS-23253
+
+#  hindsight_prod: # GDS-25755 Decommissioned GDS-33738
+
+# card_purge_batch_prod: # GDS-26409
+
+#  testrail_prod: # GDS-1153
+#  phabricator_prod: # GDS-1103 :Decommissioned # GDS-30860
+#  booking_appoint_prod: # GDS-1191
+#  booking_avail_prod: # GDS-1191
+

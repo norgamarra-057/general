@@ -1,0 +1,14 @@
+---
+gds_carp_peers:
+  - 10.13.110.244  # gds-dub1-prod-db191m1
+  - 10.13.110.245  # gds-dub1-prod-db191s1
+  - 10.13.184.244  # gds-dub1-prod-db191m1
+  - 10.13.184.245  # gds-dub1-prod-db191s1
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+gds_instance_group: gds_prod_dub1_db191
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+# users_prod decommed GDS-35444

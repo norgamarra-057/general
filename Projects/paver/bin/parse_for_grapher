@@ -1,0 +1,169 @@
+#! /usr/bin/env python
+###################################################
+# parse_for_grapher
+#
+# Version:      1.2.0
+#
+# Descripton:   Parses group_vars files and produces CVS output of grpn VIP, rw VIP and grapher url to STDOUT.
+#
+# Usage:        parse_for_grapher [-i inventory-path] [ [-d snc1|sac1|dub1] [-t prod|stg|uat] [-l mysql|postgresql] | [-f "filename"] ] [-v] [-V]
+#
+# Optional arguments:
+#   -h, --help            show this help message and exit
+#   -i path_to_inventory_group_vars, --inventory path_to_inventory_group_vars
+#                         Override default inventory path to group_vars files
+#   -d {snc1,sac1,dub1}, --datacenter {snc1,sac1,dub1}
+#                         snc1|sac1|dub1
+#   -t {prod,stg,uat}, --type {prod,stg,uat}
+#                         prod|stg|uat
+#   -l {mysql,postgresql}, --limit {mysql,postgresql}
+#                         Limits instance type to MySQL or PostgreSQL.  Default is no limit.
+#   -f FILENAME, --filename FILENAME
+#                         Group_vars "filename". Can include a wildcard, but
+#                         must be quoted. Note: overrides -d and -t
+#   -v, --verbose         Display skipped files/instances. Default is do not
+#                         display
+#   -V, --version         displays version and exits
+#
+# Requirements: python 2.7
+#
+# Notes:        If no options provided, will default to every .yml file in the inventory/group_vars relative to the current path.
+#               Output format example: 
+#               prod-voucherinventory-rw-vip.us.daas.grpn,gds-snc1-prod-voucherinventory-rw-vip.snc1,https://grapher-snc1.groupondev.com/gds_mysql-snc1/gds-snc1-prod-db019m1-port20004
+###################################################
+
+# Import needed modules
+
+import yaml
+import sys
+import string
+import socket
+import argparse
+import glob
+import os
+
+# Default values
+Version = "1.2.0"
+inventory = "inventory/group_vars"
+datacenter = "*"
+type = "*"
+limit = "*"
+filename = "*"
+
+# Parse and load command line options
+parser = argparse.ArgumentParser(description="parse_for_grapher parses group_vars files and produces CVS output of grpn VIP, rw VIP and grapher url to STDOUT.  parse_for_grapher: [-i inventory-path] [ [-d snc1|sac1|dub1] [-t prod|stg|uat] | [-l mysql|postgresql] [-f \"filename\"] ] [-v]")
+
+parser.add_argument("-i", "--inventory", help="Override default inventory path to group_vars files", metavar='path_to_inventory_group_vars')
+parser.add_argument("-d", "--datacenter", help="snc1|sac1|dub1", choices=['snc1','sac1','dub1'])
+parser.add_argument("-t", "--type", help="prod|stg|uat", choices=['prod','stg','uat'])
+parser.add_argument("-l", "--limit", help="Limits instance type to MySQL or PostgreSQL.  Default is no limit.", choices=['mysql','postgresql'])
+parser.add_argument("-f", "--filename", help="group_vars \"filename\".  Can include a wildcard, but must be quoted.  Note: overrides -d and -t")
+parser.add_argument("-v", "--verbose", help="Display skipped files/instances. Default is do not display", action='store_true')
+parser.add_argument("-V", "--version", help="Displays version and exits.", action='store_true')
+args = parser.parse_args()
+
+if args.inventory:
+   inventory = args.inventory
+   inventory = inventory.rstrip('/')
+if args.datacenter:
+   datacenter = args.datacenter
+if args.type:
+   type = args.type
+if args.limit:
+   limit = args.limit
+if args.filename:
+   filename = args.filename 
+if args.version:
+   print "Version: " + Version
+   quit()
+
+# Build filename search path and name
+
+if filename == "*":
+   filename = inventory + "/gds_" + datacenter + "_" + type + "_db*.yml"
+else:
+   filename = inventory + "/" + filename
+   
+# Load all found files
+files = glob.glob(filename)
+
+for file in files:
+   stream = open(file,'r')
+   data = yaml.load(stream)
+   server = os.path.splitext(os.path.basename(file))[0]
+
+   # Get the type of prod, stg or uat. 'test' is ignored because the names are not standard
+   type_array = server.split("_")
+   type = type_array[2]
+   if type == "test":
+      continue
+
+   # Get the actual server name from the file name
+   server = string.replace(server,'_','-') + "m1"
+
+   # Process each instance on each file found
+   for instance in data['gds_instances'].keys():
+
+      # Extract db type
+      db_type = data['gds_instances'][instance]['type'] 
+
+      if db_type == "postgres":
+         db_type = "postgresql"
+
+      if limit != "*":
+         if limit != db_type:
+            continue
+
+      # Extract master_vip and port.
+      master_vip = data['gds_instances'][instance]['master_vip']
+      if db_type == "mysql":
+         port = str(data['gds_instances'][instance]['ports']['mysqld'])
+      else:
+         port = str(data['gds_instances'][instance]['ports']['postgresql_raw'])
+
+      # Do a reverse lookup on the master_vip to get the RW VIP
+      # Skip this instance if master_vip does not resolve
+      try:
+         fqdn_array = socket.gethostbyaddr(master_vip)
+      except:
+         if args.verbose:
+            print "file: " + file + ", instance: " + instance + ", master_vip: " + master_vip + " is not in DNS.  Skipping"
+         continue
+
+      # Rip everything apart to build the grpn vip, rw vip and grapher url
+      # and send it to STDOUT
+
+      # Convert '_' in instance name to '-' for comparison to DNS name
+      dns_instance = instance.replace("_","-") 
+      
+      # Remove type from end of dns_instance
+      if dns_instance.endswith("-prod"):
+         dns_instance = dns_instance.split("-prod")[0]
+      elif dns_instance.endswith("-stg"):
+         dns_instance = dns_instance.split("-stg")[0]
+      elif dns_instance.endswith("-uat"):
+         dns_instance = dns_instance.split("-uat")[0]
+
+      vip = fqdn_array[0]
+
+      try:
+         vip.index(dns_instance)
+      except:
+         if args.verbose:
+            print "file: " + file + ", instance: " + dns_instance + ", master_vip: " + vip + " instance and vip do not match.  Skipping"
+         continue
+
+      hostname1 = vip.split(".")
+      hostname2 = hostname1[0].split("-rw-vip")
+      grpn_array = hostname2[0].split("-",3)
+
+      if grpn_array[0] != 'gds':
+         if args.verbose:
+            print "file: " + file + ", instance: " + instance + ", master_vip: " + vip + " is not a valid GDS entry.  Skipping"
+         continue
+      dc = grpn_array[1]
+
+      grpn = type + "-" + dns_instance + "-rw-vip.us.daas.grpn"
+      url = "https://grapher-" + dc + ".groupondev.com/gds_" + db_type + "-" + dc + "/" + server + "-port" + port 
+      print grpn + "," + vip + "," + url
+   stream.close()

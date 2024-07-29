@@ -1,0 +1,3 @@
+---
+- include_tasks: FreeBSD.yml tags=check_mk
+  when: ansible_os_family == 'FreeBSD'

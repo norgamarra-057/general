@@ -1,0 +1,657 @@
+---
+###################################################
+# Name: gds_aws_clone role
+#
+# Description:  This role is intended to clone a large, on-premise MySQL database to an AWS Aurora Instance.
+#               There are no limitations on size.
+#
+# Parameters:  node=source_server 
+#              instance=instance_name_on_source [db=source_db_to_copy] [skip_db=source_db_to_skip] [replicate=yes] [preserve=yes] [skip_users=yes] [skip_drop=yes]
+#              endpoint=aws_endpoint [user=aws_user] [password=aws_password] [repl_pass=password] [overwrite=yes] [qpt=NNN] [threads=NNN]
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              node: gds-snc1-prod-db001s1.snc1
+#              instance: client_id_prod
+#              db: client_id_production
+#              endpoint: dminorauroramysql56-0.cz37pbquwh5j.us-west-1.rds.amazonaws.com
+#
+# Version:     1.7.0
+# Date:        2019-12-03
+#
+# Notes:  1. Endpoint databases will be dropped and recreated if overwrite=yes.  Default is abort migration.
+#         2. If db is not provided, all databases except information_schema, 
+#            mysql, performance_schema, sys, hydra, maatkit and tmp will be cloned.
+#         3. If db and skip_db are both provided, skip_db is ignored.
+#         4. Replication is setup by default.  Add replicate=no to override this.
+#         5. AWS endpoint user/pass order of operation.  
+#            1) Provided on command line 
+#            2) Optional .my.cnf in user's home directory on node (not the server the role is running on)
+#            3) Default, encrypted values in role.
+#         6. A decryption key MUST be provided for the role to run.  Add the key to ~/.vault on the server
+#            that the role is running from.
+#         7. Myloader parameters will be defaulted to the following, if not overwriten from the command line [qpt, threads]
+#            if DB size < 100 GB: --queries-per-transaction=10000 --threads=8 
+#            if DB size between 100 and 500 GB: --queries-per-transaction=25000 --threads=16
+#            if DB size > 500 GB: --queries-per-transaction=50000 --threads=32
+#         8. Dump files generated mydumper are deleted, by default, when the load finishes.
+#            Add preserve=yes to override this.
+#         9. Non-system MySQL users are dumped and loaded if they do not exist.  
+#            Add overwrite=yes to add, regardless.  Add skip_users=yes to skip processing users.
+#        10. Add skip_drop to leave GRANT DROP privs in place
+#
+###################################################
+
+- name: Get user names and passwords
+  block:
+    - name: Does ~/.my.cnf exist?
+      stat: 
+        path: ~/.my.cnf
+      register: my_cnf
+  
+    - name: Retrieve endpoint user, if ~/.my.cnf exists
+      shell: grep user ~/.my.cnf | cut -d= -f2
+      register: info
+      changed_when: false
+      when: my_cnf.stat.exists == true
+
+    - name: Set endpoint user
+      set_fact:
+        user: "{{ info.stdout | default(def_endpoint_user)}}"
+
+    - name: Retrieve endpoint password, if ~/.my.cnf exists
+      shell: grep password ~/.my.cnf | cut -d= -f2
+      register: info
+      changed_when: false
+      when: my_cnf.stat.exists == true
+
+    - name: Set endpoint password
+      set_fact:
+        password: "{{ info.stdout | default(def_endpoint_pass)}}"
+    
+    - name: Set repl_pass
+      set_fact:
+        repl_pass: "{{ repl_pass | default(def_repl_pass)}}"
+
+- name: Confirm connection to endpoint
+  shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' --connect-timeout=5 -BAN -e "SELECT 1"
+  changed_when: false
+  register: select_cmd
+  failed_when: select_cmd.rc != 0
+  
+- name: Build list of source databases to dump
+  block:
+    - set_fact:
+        skip_db_list: ",'{{ skip_db }}'"
+      when: skip_db is defined
+
+    - name: Get list of databases to dump, if db is not defined
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT schema_name FROM information_schema.SCHEMATA WHERE schema_name NOT IN ('information_schema','mysql','performance_schema','sys','hydra','maatkit','percona','tmp'{{skip_db_list|default()}})"
+      changed_when: false
+      become: true
+      register: src_db_raw
+
+    - name: Build db list
+      set_fact:
+        src_db_list: "{{ src_db_raw.stdout_lines }}"
+  when: db is not defined
+
+- name: Build list if db is defined
+  set_fact:
+    src_db_list: "['{{ db }}']"
+  when: db is defined
+
+- name: Check for non-innodb tables
+  block: 
+    - name: Build db search list
+      set_fact:
+        src_db_string: "{{ src_db_string|default() }} '{{ item }}',"
+      with_items: 
+        - "{{ src_db_list }}"
+
+    - name: Get rid of last comma
+      set_fact:
+        src_db_string: "{{ src_db_string[:-1] }}"
+
+    - name: Get count of non-innodb tables
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT count(*) FROM information_schema.tables WHERE engine != 'InnoDB' and table_schema IN ({{ src_db_string }})"
+      changed_when: false
+      register: non_innodb_count_raw
+
+    - name: Set count variable
+      set_fact:
+          non_innodb_count: "{{ non_innodb_count_raw.stdout|int }}"
+      
+    - name: Display non-innodb tables
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -A -e "SELECT table_schema, table_name, engine FROM information_schema.tables WHERE engine != 'InnoDB' and table_schema IN ({{ src_db_string }})"
+      changed_when: false
+      register: non_innodb_raw
+      when: non_innodb_count != "0"
+    
+    - name: Display tables
+      debug:
+        msg: "{{non_innodb_raw.stdout_lines|replace('\\t','     ')}}"
+      when: non_innodb_count != "0"
+        
+    - name: Are there non-innodb tables?
+      fail:
+        msg: "'{{ instance }}' contains non-innodb tables."
+      when: non_innodb_count != "0"  
+  become: true
+
+- name: Compare source and endpoint databases and users
+  block:
+    - name: Get list of endpoint database names
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -BAN -e "SELECT schema_name FROM information_schema.SCHEMATA WHERE schema_name NOT IN ('information_schema','mysql','performance_schema','sys','hydra','maatkit','percona','tmp')"      
+      changed_when: false
+      register: end_db_raw
+    
+    - name: Build db list
+      set_fact:
+        end_db_list: "{{ end_db_raw.stdout_lines }}"
+
+    - name: Compare database lists
+      fail: 
+        msg: "Cloning aborted, due to existing database(s) {{ src_db_list | intersect(end_db_list) }} on endpoint.  Use overwrite=yes" 
+      when: src_db_list | intersect(end_db_list) | length | int > 0
+
+    - name: Get list of source users
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT User FROM mysql.user WHERE User NOT IN ('gds_admin','checkmk_mon','replication')"
+      changed_when: false
+      register: src_user_raw
+      become: true
+
+    - name: Get list of endpoint users
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -BAN -e "SELECT User FROM mysql.user WHERE User NOT IN ('gds_admin','checkmk_mon','replication')"      
+      changed_when: false
+      register: end_user_raw
+      
+    - name: Set endpoint user list
+      set_fact:
+        end_user_list: "{{ end_user_raw.stdout_lines }}"
+
+    - name: Set source user list
+      set_fact:
+        src_user_list: "{{ src_user_raw.stdout_lines }}"
+
+    - name: Compare user lists
+      fail: 
+        msg: "Cloning aborted, due to existing users(s) {{ src_user_list | intersect(end_user_list) }} on endpoint.  Use overwrite=yes"
+      when: src_user_list | intersect(end_user_list) | length | int > 0
+  when: overwrite is not defined or overwrite|upper != "YES"
+
+- name: Verify Triggers, Routines and Users
+  block:
+    - name: Test dump of Triggers and Routines
+      shell:
+      args:
+        cmd: mysqldump -tdR -S/var/groupon/percona/{{ instance }}/mysql.sock {{ item }} > /dev/null
+      changed_when: false
+      with_items:
+        - "{{ src_db_list }}"
+  
+    - name: Test dump of Application Users
+      shell: 
+      args:
+        cmd: /usr/local/bin/pt-show-grants --noheader --ignore=root@localhost,root@%,root@127.0.0.1,dba_util@localhost,dba_util@%,dba_util@127.0.0.1,gds_mha@localhost,gds_mha@%,gds_mha@127.0.0.1,monitor@localhost,monitor@%,monitor@127.0.0.1,percona@localhost,percona@%,percona@127.0.0.1,playback_user@localhost,playback_user@%,playback_user@127.0.0.1,pt_heartbeat@localhost,pt_heartbeat@%,pt_heartbreat@127.0.0.1,replication@localhost,replication@%,replication@127.0.0.1,checkmk_mon@localhost,checkmk_mon@127.0.0.1,checkmk_mon@% -S/var/groupon/percona/{{ instance }}/mysql.sock > /dev/null
+      changed_when: false
+  become: true
+    
+- name: Get source database sizes
+  block:
+    - name: Build db size list for query
+      set_fact:
+        size_list: "{{ src_db_list | join(\"','\") }}"
+
+    - name: Get total size of databases
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BN -e "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) AS 'Size' FROM information_schema.tables WHERE table_schema IN ('{{ size_list }}')"
+      changed_when: false
+      register: db_size
+      become: true
+
+    - name: Report source database sizes
+      debug:
+        msg: "Database list: '{{ src_db_list | join(\"','\") }}', size: {{ db_size.stdout }} GB"
+        
+- name: Set default myloader limits
+  set_fact:
+    qpt: "{{ myloader.sml_qpt }}"
+    threads: "{{ myloader.sml_threads }}"
+
+- name: Override myloader limits when db is greater then 500 GB
+  set_fact:
+    qpt: "{{ myloader.lrg_qpt }}"
+    threads: "{{ myloader.lrg_threads }}"
+  when: db_size.stdout|float >= 500
+
+- name: Override myloader limits when db is between 100 and 500 GB
+  set_fact:
+    qpt: "{{ myloader.med_qpt }}"
+    threads: "{{ myloader.med_threads }}"
+  when: db_size.stdout|float > 100 and db_size.stdout|float < 500
+
+- name: Install mydumper/myloader, glib and py27-MySQLdb for FreeBSD 10
+  block:
+    - name: Install glib for mydumper/myloader
+      pkgng:
+        name: glib-2.46.2_2
+        state: present
+
+    - name: Install mydumper
+      copy:
+        src: mydumper-10
+        dest: /usr/local/sbin/mydumper
+        owner: root
+        group: wheel
+        mode: '0755'
+
+    - name: Install myloader
+      copy:
+        src: myloader-10
+        dest: /usr/local/sbin/myloader
+        owner: root
+        group: wheel
+        mode: '0755'
+  become: true
+  when: '"10" in ansible_distribution_release'
+
+- name: Install mydumper/myloader, glib and py27-MySQLdb for FreeBSD 12
+  block:
+    - name: Install mydumper/myloader 
+      pkgng:
+        name: mydumper
+        state: present
+  become: true
+  when: '"12" in ansible_distribution_release'
+
+- name: Set datetime value
+  set_fact:
+    dt: "{{ '%Y%m%d-%H%M%S' | strftime }}"
+
+- name: Remove previous dump files, if present
+  file: path=/var/groupon/percona/backup/{{ instance }}-{{ dt }} state=absent
+  become: true
+
+- name: Create source backup location
+  file: path=/var/groupon/percona/backup/{{ instance }}-{{ dt }} owner=root group=wheel mode=0777 state=directory
+  become: true
+
+- name: Build mydumper db list
+  set_fact:
+    myd_db_list: "{{ src_db_list | map('regex_replace', '(^.+)', '\\1[.]+') | list | join('|') }}"
+
+- name: Dump database(s)
+  shell: cd /var/groupon/percona/backup/{{ instance }}-{{ dt }} && /usr/local/sbin/mydumper --regex '{{ myd_db_list }}|percona' --statement-size {{ mydumper.statement_size }} --rows={{ mydumper.rows }} --compress --less-locking --logfile /tmp/{{ instance }}.log --threads {{ mydumper.threads }} --verbose 3 --socket /var/groupon/percona/{{ instance }}/mysql.sock --outputdir /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+  become: true
+
+- name: Remove DEFINER from views, if any
+  block:
+    - name: Uncompress view files
+      shell: cd /var/groupon/percona/backup/{{ instance }}-{{ dt }} && gunzip *-schema-view.sql.gz
+      
+    - name: Get list of views
+      find:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+        patterns: "*-schema-view.sql"
+      register: tables_list
+      
+    - name: Convert views, if any
+      replace:
+        path: "{{ item.path }}"
+        regexp: 'DEFINER=.+? '
+      with_items:
+        - "{{ tables_list.files }}"
+        
+    - name: Create source view location
+      file: path=/var/groupon/percona/backup/{{ instance }}-{{ dt }}-views owner=root group=wheel mode=0777 state=directory
+
+    - name: Move view files
+      shell: cd /var/groupon/percona/backup/{{ instance }}-{{ dt }} && mv *-schema-view.sql /var/groupon/percona/backup/{{ instance }}-{{ dt }}-views
+  
+  become: true
+  ignore_errors: true
+
+- name: Get source Replication information
+  block:      
+    - name: Get source database port
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BNe "SELECT @@port"
+      register: info
+      changed_when: false
+      become: true
+                
+    - name: Set port
+      set_fact:
+        port: "{{ info.stdout|int }}"
+
+    - name: Get source database MASTER_LOG_FILE
+      shell: grep --max-count=1 "Log:" /var/groupon/percona/backup/{{ instance }}-{{ dt }}/metadata | awk '{ print $2 }'
+      changed_when: false
+      register: info
+
+    - name: Set MASTER_LOG_FILE
+      set_fact:
+        file: "{{ info.stdout }}"
+
+    - name: Get source database MASTER_LOG_POS
+      shell: grep --max-count=1 "Pos:" /var/groupon/percona/backup/{{ instance }}-{{ dt }}/metadata | awk '{ print $2 }'
+      changed_when: false
+      register: info
+
+    - name: Set MASTER_LOG_POS
+      set_fact:
+        pos: "{{ info.stdout|int }}"
+
+    - name: Stop replication
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CALL mysql.rds_stop_replication"
+ 
+    - name: Wait for replication to stop
+      pause:
+        seconds: 5
+
+    - name: Reset replication
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CALL mysql.rds_reset_external_master"
+  ignore_errors: true
+  when: replicate is not defined or replicate|upper == "YES"
+
+- name: Drop endpoint database(s), if exists
+  shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "DROP DATABASE IF EXISTS {{ item }} "
+  with_items:
+    - "{{ src_db_list }}"
+    - 'percona'
+
+- name: Create endpoint database(s)
+  shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CREATE DATABASE IF NOT EXISTS {{ item }} "
+  with_items:
+    - "{{ src_db_list }}"
+    - 'percona'
+
+- name: Load Dump files into endpoint
+  shell: /usr/local/sbin/myloader --host={{ endpoint }} --user={{ user }} --password='{{ password }}' --directory=/var/groupon/percona/backup/{{ instance }}-{{ dt }} --queries-per-transaction={{ qpt }} --threads={{ threads }} --compress-protocol --verbose=3
+
+- name: Setup Replication
+  block:
+    - name: Setup replication
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CALL mysql.rds_set_external_master ('{{ node }}', {{ port }}, 'replication', '{{ repl_pass }}', '{{ file }}', {{ pos }}, 0)"
+
+    - name: Start replication
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CALL mysql.rds_start_replication"
+  when: replicate is not defined or replicate|upper == "YES"
+
+- name: Dump, Convert and Load Triggers
+  block:
+    - name: Dump Triggers
+      shell:
+      args:
+        cmd: mysqldump -td --add-drop-trigger --routines=false -S/var/groupon/percona/{{ instance }}/mysql.sock {{ item }} > {{ item }}.triggers.sql
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      with_items:
+        - "{{ src_db_list }}"
+
+    - name: Remove DEFINER 
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/{{ item }}.triggers.sql
+        regexp: 'DEFINER.+? '
+      with_items:
+        - "{{ src_db_list }}"
+    
+    - name: Remove beginning comment delimiter
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/{{ item }}.triggers.sql
+        regexp: '/\*!.+? '
+      with_items:
+        - "{{ src_db_list }}"
+    
+    - name: Remove ending comment delimiter
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/{{ item }}.triggers.sql
+        regexp: '\*/'
+      with_items:
+        - "{{ src_db_list }}"
+    
+    - name: Load Triggers
+      shell:
+      args:
+        cmd: cat {{ item }}.triggers.sql | mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A {{ item }}
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      become: false
+      with_items:
+        - "{{ src_db_list }}"
+  become: true
+  
+- name: Dump, Convert and Load Routines
+  block:
+    - name: Dump Routines
+      shell:
+      args:
+        cmd: mysqldump -tdR --skip-triggers -S/var/groupon/percona/{{ instance }}/mysql.sock {{ item }} > {{ item }}.routines.sql
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      with_items:
+        - "{{ src_db_list }}"
+        
+    - name: Remove DEFINER 
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/{{ item }}.routines.sql
+        regexp: 'DEFINER.+? '
+      with_items:
+        - "{{ src_db_list }}"
+        
+    - name: Load Routines
+      shell:
+      args:
+        cmd: cat {{ item }}.routines.sql | mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A {{ item }}
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      become: false
+      with_items:
+        - "{{ src_db_list }}"
+  become: true
+  
+- name: Load Views
+  shell:
+  args:
+    cmd: cat {{ item }}.*-schema-view.sql | mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A {{ item }}
+    chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}-views
+  with_items:
+      - "{{ src_db_list }}"
+  ignore_errors: true
+
+- name: Dump, Convert and Load Application users
+  block:
+    - name: Dump Application Users
+      shell: 
+      args:
+        cmd: /usr/local/bin/pt-show-grants --noheader --separate --ignore=root@localhost,root@%,root@127.0.0.1,dba_util@localhost,dba_util@%,dba_util@127.0.0.1,gds_mha@localhost,gds_mha@%,gds_mha@127.0.0.1,monitor@localhost,monitor@%,monitor@127.0.0.1,percona@localhost,percona@%,percona@127.0.0.1,playback_user@localhost,playback_user@%,playback_user@127.0.0.1,pt_heartbeat@localhost,pt_heartbeat@%,pt_heartbreat@127.0.0.1,replication@localhost,replication@%,replication@127.0.0.1,checkmk_mon@localhost,checkmk_mon@127.0.0.1,checkmk_mon@% -S/var/groupon/percona/{{ instance }}/mysql.sock > app_users.sql
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      changed_when: false
+
+    - name: Preserve Application Users file
+      shell:
+      args:
+        cmd: cp app_users.sql ../{{ instance }}-{{ dt }}.before.app_users.sql
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      ignore_errors: true
+    
+    - name: Look for global SELECT privs
+      shell:
+      args:
+        cmd: grep "GRANT SELECT ON \*\.\*" app_users.sql | awk '{print $6}'
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      changed_when: false
+      register: select_out
+
+    - set_fact:
+        select_lines: "{{ select_out.stdout_lines }}"
+
+    - name: Add SELECT on databases
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        line: "GRANT SELECT ON `{{ item[0] }}`.* TO {{ item[1] }};"
+        state: present
+      with_nested:
+        - "{{ src_db_list }}"
+        - "{{ select_lines }}"
+
+    - name: Convert Application Users - Remove global SELECT priv
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: 'GRANT SELECT ON \*\.\*'
+        replace: 'CREATE USER'
+
+    - name: Convert Application Users - Remove SUPER priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: '^GRANT SUPER'
+        state: absent
+
+    - name: Convert Application Users - Remove SHUTDOWN priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: '^GRANT SHUTDOWN'
+        state: absent
+
+    - name: Convert Application Users - Remove FILE priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: '^GRANT FILE'
+        state: absent
+
+    - name: Convert Application Users - Remove CREATE TABLESPACE priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: '^GRANT CREATE TABLESPACE'
+        state: absent
+      
+    - name: Convert Application Users - Remove DROP priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: '^GRANT DROP'
+        state: absent
+      when: skip_drop is not defined or skip_drop|upper != "YES"
+
+###############
+# Find users with Global ALL Privs and add REVOKE DROP, as needed.
+###############
+    - name: Look for ALL Privs and add REVOKE DROP, as needed.
+      shell: 
+      args:
+        cmd: grep "GRANT ALL PRIVILEGES ON " app_users.sql | awk '{print $5,"FROM",$7}'
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      changed_when: false
+      register: awk_out
+      when: skip_drop is not defined or skip_drop|upper != "YES"
+      
+    - set_fact:
+        revoke_lines: "{{ awk_out.stdout_lines|default() }}"
+      when: skip_drop is not defined or skip_drop|upper != "YES"
+      
+    - name: Add REVOKE DROP, as needed.
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        line: "REVOKE DROP ON {{ item }};"
+        state: present
+      with_items:
+        - "{{ revoke_lines }}"
+      when: skip_drop is not defined or skip_drop|upper != "YES"
+        
+##############
+# Find users with Global All Privs and convert to allowed list
+##############
+    - name: Create allowed global privs list
+      set_fact:
+        global_priv_list: ['CREATE USER','PROCESS','RELOAD','REPLICATION CLIENT','REPLICATION SLAVE','SHOW DATABASES']
+
+    - name: Get list of users with global privs
+      shell:
+      args:
+        cmd: grep "GRANT ALL PRIVILEGES ON \*\.\*" app_users.sql | awk '{print $7}'
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      changed_when: false
+      register: users_out
+
+    - set_fact:
+        users_list: "{{ users_out.stdout_lines|default() }}"
+
+    - name: Convert GRANT ALL PRIVILEGES on *.* to allowed global privs
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: 'GRANT ALL PRIVILEGES ON \*\.\* TO '
+        line: 'GRANT {{ item[0] }} ON *.* TO {{ item[1] }}'
+        state: present
+      with_nested: 
+        - "{{ global_priv_list }}"
+        - "{{ users_list }}"
+
+    - name: Replace remaining ALL PRIVS ON *.* and replace with GRANT USAGE, to preserv the pass
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: 'GRANT ALL PRIVILEGES ON \*\.\* TO '
+        replace: 'CREATE USER '
+      with_items: 
+        - "{{ users_list }}"
+  
+    - name: Replace remaining GRANT USAGE ON with CREATE USER
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: 'GRANT USAGE ON \*\.\* TO '
+        replace: 'CREATE USER '
+  
+    - name: Replace remaining BY PASSWORD with WITH mysql_native_password AS
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: 'BY PASSWORD '
+        replace: 'WITH mysql_native_password AS '
+  
+    - name: Remove remaining *.* and replace with database.* 
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}/app_users.sql
+        regexp: '\*\.\* TO '
+        replace: '{{ item[0].* }} TO '
+      with_nested: 
+        - "{{ src_db_list }}"
+        - "{{ global_priv_list }}"
+      when: item[1] not in global_priv_list
+  
+    - name: Confirm each line ends with a semi-colan
+      shell:
+      args:
+        cmd: sed 's/;//g' app_users.sql > tmp.sql; sed 's/$/;/' tmp.sql > app_users.sql
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+
+    - name: Preserve After Application Users file
+      shell:
+      args:
+        cmd: cp app_users.sql ../{{ instance }}-{{ dt }}.after.app_users.sql
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      ignore_errors: true
+        
+    - name: Load application users
+      shell: 
+      args:
+        cmd: cat app_users.sql | mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A mysql
+        chdir: /var/groupon/percona/backup/{{ instance }}-{{ dt }}
+      become: false
+      changed_when: false
+  become: true
+  when: skip_users is not defined or skip_users|upper != "YES"
+
+- name: Remove dump and view files
+  block:
+    - name: Remove dump files 
+      file: path=/var/groupon/percona/backup/{{ instance }}-{{ dt }} state=absent
+      
+    - name: Remove view files 
+      file: path=/var/groupon/percona/backup/{{ instance }}-{{ dt }}-views state=absent
+  become: true
+  when: preserve is not defined or preserve|upper != "YES"
+
+- name: Show replication status
+  block:
+    - name: Get replication status
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "SHOW SLAVE STATUS\G"
+      register: repl_stat
+
+    - name: Replication status
+      debug:
+        var=repl_stat.stdout_lines
+  when: replicate is not defined or replicate|upper == "YES"
+

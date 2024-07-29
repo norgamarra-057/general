@@ -1,0 +1,160 @@
+---
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - master_server is defined
+          - slave_server is defined
+          - instance is defined
+
+- name: Ensure master host level settings look OK
+  gather_facts: false
+  hosts:
+    - "{{ master_server }}"
+  tasks:
+    - set_fact:
+        master_instance: "{{ instance }}"
+
+
+    - set_fact:
+        master_instance_port: "{{ gds_instances[master_instance]['ports']['mysqld'] | int }}"
+
+    - set_fact:
+        master_port: "{{ master_instance_port }}"
+      when: master_port is not defined
+
+    - set_fact:
+        backup_stream_port: 9999
+      when: backup_stream_port is not defined
+
+    - assert:
+        that:
+          - gds_instance_group is defined
+          - master_port is defined
+
+- name: Ensure slave host level settings look OK
+  gather_facts: false
+  hosts:
+    - "{{ slave_server }}"
+  tasks:
+    - set_fact:
+        slave_instance: "{{ instance }}"
+
+    - set_fact:
+        slave_port: "{{ gds_instances[slave_instance]['ports']['mysqld'] | int }}"
+        slave_user: "{{ gds_instances[slave_instance]['unix_user'] }}"
+
+    - set_fact:
+        backup_stream_port: 9999
+      when: backup_stream_port is not defined
+      
+    - set_fact:
+        master_port: "{{ hostvars[master_server]['master_port'] }}"
+      when: master_port is not defined
+
+    - set_fact:
+        master_port: "{{ hostvars[master_server]['master_port'] }}"
+      when: master_port is not defined
+
+    - assert:
+        that:
+          - gds_instance_group is defined
+          - slave_port is defined
+          - slave_user is defined
+          - master_port is defined
+
+- name: Prepare slave
+  gather_facts: false
+  become: true
+  hosts:
+    - "{{ slave_server }}"
+  tasks:
+    - name: Stop slave MySQL server
+      runit: 
+        name: "{{ slave_instance }}-{{ gds_instance_group }}-mysql"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: killed
+    - name: Wipe slave binlog dir
+      shell: find /var/groupon/percona/{{ slave_instance }}/binlog/* -type f -exec rm -f '{}' \;
+      ignore_errors: true
+    - name: Wipe slave data dir
+      shell: find /var/groupon/percona/{{ slave_instance }}/data/* -type f -exec rm -f '{}' \;
+      ignore_errors: true
+    - name: Wipe slave log dir
+      shell: find /var/groupon/percona/{{ slave_instance }}/log/* -type f -exec rm -f '{}' \;
+      ignore_errors: true
+    - name: Wipe slave tmp dir
+      shell: find /var/groupon/percona/{{ slave_instance }}/tmp/* -type f -exec rm -f '{}' \;
+      ignore_errors: true
+
+    - name: Start socat listener
+      shell: cd /var/groupon/percona/{{ slave_instance }}/data && socat -u tcp4-listen:{{ backup_stream_port }} - | /usr/local/bin/xbstream -xv .
+      async: 86400
+      poll: 0
+
+- name: Stream from master
+  gather_facts: false
+  become: true
+  hosts:
+    - "{{ master_server }}"
+  tasks:
+    - name: stream backup
+      shell: /usr/local/bin/innobackupex --defaults-file=/var/service/{{ master_instance }}-{{ gds_instance_group }}-mysql/my.cnf --socket=/var/groupon/percona/{{ master_instance }}/mysql.sock --user=root --slave-info --stream=xbstream /var/tmp | socat -u - tcp4:{{ slave_server }}:{{ backup_stream_port }}
+
+- name: Start MySQL on slave
+  gather_facts: false
+  become: true
+  hosts:
+    - "{{ slave_server }}"
+  tasks:
+    - name: Temporarily disable slave start
+      ini_file:
+        path: "/var/service/{{ slave_instance }}-{{ gds_instance_group }}-mysql/my.cnf"
+        section: mysqld
+        option: skip-slave-start
+        value: 1
+        state: present
+        create: no
+    - name: Create slave apply log tmpdir location, if needed
+      file: path=/var/groupon/percona/tmp owner=root group=wheel mode=1777 state=directory
+    - name: run apply log
+      #shell: cd /var/groupon/percona/{{ slave_instance }}/data ; innobackupex  --apply-log .
+      shell: cd /var/groupon/percona/{{ slave_instance }}/data ; innobackupex --tmpdir=/var/groupon/percona/tmp --apply-log .
+    - name: chown to user
+      file:
+        path: /var/groupon/percona/{{ slave_instance }}/data/
+        owner: "{{ slave_user }}"
+        group: ops_gds_app 
+        recurse: yes
+    - name: Start MySQL server
+      runit:
+        name: "{{ slave_instance }}-{{ gds_instance_group }}-mysql"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: restarted
+    - name: Wait for mysql to start
+      wait_for: port={{ slave_port }}
+    - name: Get master_log_file
+      shell: cat /var/groupon/percona/{{ slave_instance }}/data/xtrabackup_binlog_info  | awk '{print $1}'
+      register: master_log_file
+    - name: Get master_log_pos
+      shell: cat /var/groupon/percona/{{ slave_instance }}/data/xtrabackup_binlog_info | awk '{print $2}'
+      register: master_log_pos
+    - name: Reset potential slave info
+      shell: mysql -S /var/groupon/percona/{{ slave_instance }}/mysql.sock -e "reset slave all;"
+    - name: Configure replication
+      shell: mysql -S /var/groupon/percona/{{ slave_instance }}/mysql.sock -e "change master to master_host='{{ master_server }}',master_user='replication',master_password='GaSxrz1twblgEyl',master_port={{ master_port }},master_log_file='{{ master_log_file.stdout }}',master_log_pos={{ master_log_pos.stdout }};"
+    - name: Start slave
+      shell: mysql -S /var/groupon/percona/{{ slave_instance }}/mysql.sock -e "start slave;"
+    - name: Re-enable slave start
+      ini_file:
+        path: "/var/service/{{ slave_instance }}-{{ gds_instance_group }}-mysql/my.cnf"
+        section: mysqld
+        option: skip-slave-start
+        state: absent
+        create: no
+

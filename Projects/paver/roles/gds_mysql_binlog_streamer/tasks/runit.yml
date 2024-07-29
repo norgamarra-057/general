@@ -1,0 +1,57 @@
+- name: GDS mysql binlog streamer | FreeBSD | runit | directories (read-only)
+  file:
+    path="{{ item }}"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - "{{ binlog_streamer_temp_service_dir }}"
+    - "{{ binlog_streamer_temp_service_dir }}/env"
+    - "{{ binlog_streamer_temp_service_dir }}/log"
+
+- name: GDS mysql binlog streamer | FreeBSD | runit | directory | svlogd
+  file:
+    path="{{ binlog_streamer_temp_service_dir }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+
+- name: GDS mysql binlog streamer | FreeBSD | runit | environment
+  copy:
+    dest="{{ binlog_streamer_temp_service_dir }}/env/PATH"
+    content="/usr/local/bin:/usr/bin:/bin"
+    owner=root
+    group=wheel
+    mode=0644
+
+- name: GDS mysql binlog streamer | FreeBSD | runit | log
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ binlog_streamer_temp_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: GDS mysql binlog streamer | FreeBSD | binlog streamer
+  template:
+    src: binlog_streamer.sh.j2
+    dest: /usr/local/bin/binlog_streamer_{{ stream_name }}.sh
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: GDS mysql binlog streamer | FreeBSD | runit | run
+  template:
+    src: runit.sh.j2
+    dest: "{{ binlog_streamer_temp_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: GDS mysql binlog streamer FreeBSD | runit | move service dir
+  command: creates="{{ binlog_streamer_service_dir }}" mv {{ binlog_streamer_temp_service_dir }} /var/service/
+
+# - name: GDS mysql binlog streamer FreeBSD | runit| remove temp service dir
+#   command: rm -rf {{ binlog_streamer_temp_service_dir }}

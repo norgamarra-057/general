@@ -1,0 +1,5 @@
+---
+gds_cluster: demo
+
+pgbouncer_version: '1.5.4_3'
+postgresql_port_major: '94'

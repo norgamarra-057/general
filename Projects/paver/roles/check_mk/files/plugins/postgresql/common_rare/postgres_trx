@@ -1,0 +1,134 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_trx>>>'
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        normal_out="$(echo "SELECT pg_is_in_recovery()
+                        AS is_slave,
+                        case WHEN ((select count(*)
+                        FROM pg_stat_activity
+                        WHERE state='active'
+                        AND query not ilike '%vacuum%'
+                        AND pid <> pg_backend_pid()) > 0)
+                        THEN (select abs(round(extract(epoch from (now() - xact_start))+1))
+                        FROM pg_stat_activity
+                        WHERE state='active'
+                        AND query not ilike '%vacuum%'
+                        ORDER BY xact_start asc limit 1)
+                        ELSE 0 end
+                        AS trx_time,
+                        case WHEN ((select count(*)
+                        FROM pg_stat_activity
+                        WHERE state='idle in transaction') >0)
+                        THEN (select abs(round(extract(epoch from (now() - xact_start))+1))
+                        FROM pg_stat_activity
+                        WHERE state='idle in transaction'
+                        ORDER BY xact_start asc limit 1)
+                        ELSE 0 end
+                        AS trx_idle,
+                        case WHEN ((select count(*)
+                        FROM pg_stat_activity
+                        WHERE state='idle in transaction') >0)
+                        THEN (select count(*)
+                        FROM pg_stat_activity
+                        WHERE state='idle in transaction')
+                        ELSE 0 end
+                        AS trx_idle_num,
+                        case WHEN ((select max(rolconnlimit)
+                        FROM pg_roles where rolname
+                        SIMILAR TO '%(app|jdbc|django|clojure)') > 0)
+                        THEN (select max(rolconnlimit)
+                        FROM pg_roles where rolname
+                        SIMILAR TO '%(app|jdbc|django|clojure)' )
+                        ELSE 0 end
+                        AS max_app;"|\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' 2>/dev/null \
+        | tr -s ' ')"
+        trx_time=$(echo "$normal_out" | awk '{print $2}')
+        trx_idle=$(echo "$normal_out" | awk '{print $3}')
+
+        if [[ "$trx_time" -eq "0" ]] && [[ "$trx_idle" -eq "0" ]]; then
+              echo "${normal_out}
+trx_time
+trx_idle"
+        else
+              if [[ "$trx_time" -gt 0 ]]; then
+                    ext_trx_time=$(echo "with my_extended_sessions
+                                         as (select pid,datname,usename,xact_start,query_start,query,addr
+                                         from dba.pids_clients_servers_trx
+                                         UNION select pid,datname,usename,xact_start,query_start,query,addr
+                                         from dba.pids_clients_servers_ses),
+                                         my_joined_sessions
+                                         as (select a.pid,a.datname,a.usename,a.xact_start,a.query_start,a.query,
+                                         case when b.addr is null
+                                         then 'direct'
+                                         else b.addr end
+                                         from pg_stat_activity a left outer join
+                                         my_extended_sessions b on a.pid = b.pid
+                                         where a.pid = (select pid from dba.find_oldest_trx_running))
+                                         select 'pid=' || pid || '\\n'
+                                         || 'database=' || datname || '\\n'
+                                         || 'user=' || usename || '\\n'
+                                         || 'trx_start=' || xact_start || '\\n'
+                                         || 'query_start=' || query_start || '\\n'
+                                         || 'query=' || query || '\\n'
+                                         || 'ip=' || addr
+                                         from my_joined_sessions;" |\
+                    psql -X -p ${Port} -U postgres --variable ON_ERROR_STOP=1 -d ${dbname} -A -t -F' ' |\
+                    awk '{printf "%s\\n", $0}')
+              else
+                    ext_trx_time=""
+              fi
+
+              if [[ "$trx_idle" -gt 0 ]]; then
+                    ext_trx_idle=$(echo "with my_extended_sessions
+                                         as (select pid,datname,usename,xact_start,query_start,query,addr
+                                         from dba.pids_clients_servers_trx
+                                         UNION select pid,datname,usename,xact_start,query_start,query,addr
+                                         from dba.pids_clients_servers_ses),
+                                         my_joined_sessions
+                                         as (select a.pid,a.datname,a.usename,a.xact_start,a.query_start,a.query,
+                                         case when b.addr is null
+                                         then 'direct'
+                                         else b.addr end
+                                         from pg_stat_activity a left outer join
+                                         my_extended_sessions b on a.pid = b.pid
+                                         where a.pid = (select pid from dba.find_oldest_idle_in_trx))
+                                         select 'pid=' || pid || '\\n'
+                                         || 'database=' || datname || '\\n'
+                                         || 'user=' || usename || '\\n'
+                                         || 'trx_start=' || xact_start || '\\n'
+                                         || 'query_start=' || query_start || '\\n'
+                                         || 'query=' || query || '\\n'
+                                         || 'ip=' || addr
+                                         from my_joined_sessions;" |\
+                    psql -X -p ${Port} -U postgres --variable ON_ERROR_STOP=1 -d ${dbname} -A -t -F' ' |\
+                    awk '{printf "%s\\n", $0}')
+              else
+                    ext_trx_idle=""
+              fi
+
+              echo "${normal_out}
+trx_time ${ext_trx_time}
+trx_idle ${ext_trx_idle}"
+        fi
+        sleep 0.5
+done

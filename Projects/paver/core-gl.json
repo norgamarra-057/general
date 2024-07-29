@@ -1,0 +1,5 @@
+srcpoint: 10.213.130.210
+endpoint: 10.182.192.218
+src_dbs: ["deal_catalog_production","deal_catalog_staging","inventory_replenishment_production","inventory_replenishment_staging","my_core_gl_us_621_stg","pricing_service_staging","pricing_service_test","pwa_stub_staging","voucher_inventory_production"]
+src_users: ["c_stg_usr_ro","cs_app","deal_catalog","deal_catalog_ro","deal_catalog_stg","deal_ecosys_user","deal_service","dps_test","goods","inv_replenish","keboola_ro","my_geekon_usr","orc_client_user","pwa_stub_staging","rds_vis_ro","replication","thepoint_db","vis_emstg_ro_ac","vis_rw_jtier","vis_rw_jtier2","vis_stg_ro_ac","vouchinvstg_user"]
+REPLICA_INST_NAME: my-core-gl-us-621-stg-0

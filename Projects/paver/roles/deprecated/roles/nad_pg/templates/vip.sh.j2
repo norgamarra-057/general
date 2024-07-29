@@ -1,0 +1,12 @@
+#!/bin/sh --
+HOSTNAME={{ ansible_hostname }}
+VIP_RW={{ gds_instances[instance_name].vip_rw }}
+VIP_RO={{ gds_instances[instance_name].vip_ro }}
+
+MASTER_OR_SLAVE=`echo $HOSTNAME | cut -c19 `
+
+if [ "$MASTER_OR_SLAVE" == "m" ];then
+        echo "$VIP_RW"
+else
+        echo "$VIP_RO"
+fi

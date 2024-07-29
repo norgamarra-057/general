@@ -1,0 +1,73 @@
+---
+- name: OpenSMTPD | FreeBSD | rc.conf | sendmail disable
+  service: name=sendmail state=stopped enabled=no
+
+- name: OpenSMTPD | FreeBSD | pkg | OpenSMTPd
+  pkgng: name=opensmtpd state=present
+
+- name: OpenSMTPD | FreeBSD | runit | directories (read-only)
+  file: path="{{ item }}" state=directory owner=root group=wheel mode=0755
+  with_items:
+    - /var/service/opensmtpd
+    - /var/service/opensmtpd/env
+    - /var/service/opensmtpd/log
+
+- name: OpenSMTPD | FreeBSD | runit | directories (writable)
+  file:
+    path=/var/service/opensmtpd/log/main
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+
+- name: OpenSMTPD | FreeBSD | runit | environment
+  copy: dest=/var/service/opensmtpd/env/PATH
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - opensmtpd restart
+
+- name: OpenSMTPD | FreeBSD | mailer.conf install
+  template:
+    dest=/etc/mail/mailer.conf
+    src=mailer.conf.j2
+  notify:
+    - opensmtpd restart
+
+- name: OpenSMTPD | FreeBSD | aliases install
+  template:
+    dest=/etc/mail/aliases
+    src=aliases.j2
+  notify:
+    - opensmtpd restart
+
+- name: OpenSMTPD | FreeBSD | config install
+  template:
+    dest=/var/service/opensmtpd/smtpd.conf
+    src=smtpd.conf.j2
+    validate='/usr/local/sbin/smtpd -n -f %s'
+  notify:
+    - opensmtpd restart
+
+- name: OpenSMTPD | FreeBSD | runit | log script
+  template:
+    dest=/var/service/openntpd/log/run
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - opensmtpd log restart
+
+- name: OpenSMTPD | FreeBSD | runit | run script
+  template:
+    dest=/var/service/opensmtpd/run
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - opensmtpd restart

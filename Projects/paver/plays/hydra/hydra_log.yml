@@ -1,0 +1,18 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+   outputs: []
+  tasks:
+   - name: FreeBSD | run | get log
+     shell: cat /var/service/hydra-agent/log/main/current {% if  target_instance is defined %} | grep "{{ target_instance|replace("_","-") }}" {% endif %}
+     register: log_output
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ log_output.stdout_lines }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       var: outputs
+

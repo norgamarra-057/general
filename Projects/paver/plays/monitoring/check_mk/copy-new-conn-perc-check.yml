@@ -1,0 +1,20 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Copy check
+      copy:
+        src: ../../../roles/check_mk/files/checks/postgresql/check_db_conn_pg_percentage
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+    - name: Copy local
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_conn_pg_percentage.sh
+        dest: "/usr/lib/check_mk_agent/local/120"
+        owner: root
+        group: wheel
+        mode: 0655

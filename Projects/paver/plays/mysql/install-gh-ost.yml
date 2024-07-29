@@ -1,0 +1,35 @@
+---
+#
+# usage: in a bash shell - ansible-playbook -i inventory/gds-production -l gds-sac1-prod* plays/mysql/install-gh-ost.yml --list-hosts
+# run: ansible-playbook -i inventory/gds-production -l gds-sac1-prod* plays/mysql/install-gh-ost.yml 
+# Current version of gh-ost: 1.0.48
+#
+- hosts: all
+  become: yes
+  become_user: root
+  become_method: sudo
+  serial: 4
+  gather_facts: False
+
+  tasks:
+    
+
+    - name: Copy gh-ost to /usr/local/bin/gh-ost 
+      copy:
+        src: /home/klarsen/gh-ost
+        dest: /usr/local/bin/gh-ost 
+        owner: root
+        group: wheel
+        mode: 0755
+      with_dict: "{{ gds_instances }}"
+      when: item.value.type == 'mysql'
+
+
+#    - name: Extract gh-ost gzipped file
+#      unarchive:
+#        creates: /usr/local/bin/gh-ost
+#        src: /home/klarsen/gh-ost-binary-freebsd-20190325215322.tar.gz
+#        dest: /usr/local/bin
+#        mode: 0755 
+#      with_dict: "{{ gds_instances }}"
+#      when: item.value.type == 'mysql'

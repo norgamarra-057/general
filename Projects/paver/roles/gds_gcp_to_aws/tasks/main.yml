@@ -1,0 +1,450 @@
+---
+###################################################
+# Name: gds_aws_to_aws role
+#
+# Description:  This role is intended to copy existing database(s) and user(s) from one RDS instance to another one.
+#
+# Parameters:  
+#   Required:  srcpoint=aws_source_endpoint {"src_dbs":["one","two","three"]} {"src_users":["user1","user2","user3"]} 
+#              endpoint=aws_destination_endpoint
+#   Optional:  replicate=yes preserve=yes skip_users=yes
+#              user=aws_user password=aws_password repl_pass=password overwrite=yes qpt=NNN threads=NNN
+#
+#              Parms can also be passed via a json file as -e "@test.json"
+#
+#              Sample file:
+#              srcpoint: vis-stg.cluster-ccoxqscq6x7v.us-west-1.rds.amazonaws.com mysql
+#              src_dbs: ["vis_stg","test12"]
+#              src_users: ["cs_app","the_point"]
+#              endpoint: dminorauroramysql56-0.cz37pbquwh5j.us-west-1.rds.amazonaws.com
+#
+# Version:     1.1.0
+# Date:        2021-01-27
+#
+# Notes:  1. Endpoint databases will be dropped and recreated if overwrite=yes.  Default is abort migration.
+#         2. src_dbs and src_users must be provided
+#         3. Replication is not setup by default.  Add replicate=yes to override this.
+#         4. AWS user/pass order of operation.  
+#            1) Provided on command line 
+#            2) Optional .my.cnf in user's home directory on node (not the server the role is running on)
+#            3) Default, encrypted values in role.
+#         5. A decryption key MUST be provided for the role to run.  Add the key to ~/.vault on the server
+#            that the role is running from.
+#         6. Myloader parameters will be defaulted to the following, if not overwriten from the command line [qpt, threads]
+#            if DB size < 100 GB: --queries-per-transaction=10000 --threads=8 
+#            if DB size between 100 and 500 GB: --queries-per-transaction=25000 --threads=16
+#            if DB size > 500 GB: --queries-per-transaction=50000 --threads=32
+#         7. Dump files generated mydumper are deleted, by default, when the load finishes.
+#            Add preserve=yes to override this.
+#
+###################################################
+
+- name: Get user names and passwords
+  block:
+    - name: Does ~/.my.cnf exist?
+      stat: 
+        path: ~/.my.cnf
+      register: my_cnf
+  
+    - name: Retrieve AWS user, if ~/.my.cnf exists
+      shell: grep user ~/.my.cnf | cut -d= -f2
+      register: info
+      changed_when: false
+      when: my_cnf.stat.exists == true
+
+    - name: Set AWS user
+      set_fact:
+        user: "{{ info.stdout | default(def_aws_user)}}"
+
+    - name: Retrieve AWS password, if ~/.my.cnf exists
+      shell: grep password ~/.my.cnf | cut -d= -f2
+      register: info
+      changed_when: false
+      when: my_cnf.stat.exists == true
+
+    - name: Set AWS password
+      set_fact:
+        password: "{{ info.stdout | default(def_aws_pass)}}"
+    
+    - name: Set repl_pass
+      set_fact:
+        repl_pass: "{{ repl_pass | default(def_repl_pass)}}"
+        
+- name: Are srcpoint and endpoint the same?
+  fail:
+    msg: "srcpoint '{{ srcpoint }}' and endpoint '{{ endpoint }}' must be different."
+  when: srcpoint == endpoint
+
+- name: Confirm connection to srcpoint
+  shell: mysql -h {{ srcpoint }} -u {{ user }} -p'{{ password }}' --connect-timeout=5 -BAN -e "SELECT 1"
+  changed_when: false
+  register: select_cmd
+  failed_when: select_cmd.rc != 0
+  
+- name: Confirm connection to endpoint
+  shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' --connect-timeout=5 -BAN -e "SELECT 1"
+  changed_when: false
+  register: select_cmd
+  failed_when: select_cmd.rc != 0
+  
+- name: Do source database(s) exist?
+  block:
+    - name: Build db list
+      set_fact:
+        src_dbs_list: "{{ src_dbs| join(\"','\") }}"
+
+    - name: Query srcpoint
+      shell: mysql -h {{ srcpoint }} -u {{ user }} -p'{{ password }}' -BAN -e "SELECT schema_name FROM information_schema.SCHEMATA WHERE schema_name IN ('{{ src_dbs_list }}')"
+      changed_when: false
+      register: src_dbs_out
+
+    - name: 
+      set_fact:
+        src_dbs_out_list: "{{ src_dbs_out.stdout_lines }}"
+
+    - name: Source database(s) requested
+      debug:
+        msg: "{{ src_dbs }}"
+
+    - name: Source database(s) on srcpoint
+      debug:
+        msg: "{{ src_dbs_out_list }}"
+
+    - name: Compare database lists
+      fail: 
+        msg: "Cloning aborted, due to database(s) not existing on srcpoint" 
+      when: src_dbs | difference(src_dbs_out_list) | length | int > 0
+
+- name: Do endpoint database(s) exist?
+  block:
+    - name: Build db list
+      set_fact:
+        end_dbs_list: "{{ src_dbs| join(\"','\") }}"
+
+    - name: Query endpoint
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -BAN -e "SELECT schema_name FROM information_schema.SCHEMATA WHERE schema_name IN ('{{ end_dbs_list }}')"
+      changed_when: false
+      register: end_dbs_out
+
+    - name:
+      set_fact:
+        end_dbs_out_list: "{{ end_dbs_out.stdout_lines }}"
+
+    - name: Source database(s) requested
+      debug:
+        msg: "{{ src_dbs }}"
+
+    - name: Existing database(s) on endpoint
+      debug:
+        msg: "{{ end_dbs_out_list }}"
+
+    - name: Compare database lists
+      fail:
+        msg: "Cloning aborted, due to database(s) existing on endpoint. Use overwrite=yes"
+      when: src_dbs | intersect(end_dbs_out_list) | length | int > 0
+
+  when: overwrite is not defined or (overwrite|upper != "YES" or overwrite == False)
+
+- name: Do srcpoint user(s) exit?
+  block:
+    - name: Remove host portition of src_users, if exists
+      set_fact:
+        trim_src_users: '{{ trim_src_users | default([]) + [item | regex_replace("^(.*)@[^@]*$", "\1")] }}' 
+      with_items: "{{ src_users }}"
+
+    - set_fact:
+        trim_src_users_list: "{{ trim_src_users | join(\"','\") }}"
+
+    - name: Query srcpoint
+      shell: mysql -h {{ srcpoint }} -u {{ user }} -p'{{ password }}' -BAN -e "SELECT distinct User FROM mysql.user WHERE User IN ('{{ trim_src_users_list }}')"
+      changed_when: false
+      register: src_users_out
+
+    - set_fact:
+        src_users_out_list: "{{ src_users_out.stdout_lines | join(\"','\") }}"
+  when: skip_users is not defined or (skip_users|upper != "YES" or skip_users == False)
+
+- name: Do endpoint user(s) exist?
+  block:
+    - name: Query endpoint
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -BAN -e "SELECT distinct User FROM mysql.user WHERE User IN ('{{ src_users_out_list }}')"
+      changed_when: false
+      register: end_users_out
+
+    - set_fact:
+        end_users_out_list: "{{ end_users_out.stdout_lines }}"
+
+    - name: Source user(s) requested
+      debug:
+        msg: "{{ src_users_out_list }}"
+
+    - name: Existing user(s) on endpoint
+      debug:
+        msg: "{{ end_users_out_list }}"
+
+    - name: Compare user(s) lists
+      fail:
+        msg: "Cloning aborted, due to user(s) existing on endpoint. Use overwrite=yes or skip_users=yes"
+      when: src_users_out_list | intersect(end_users_out_list) | length | int > 0
+  when: (skip_users is not defined or (skip_users|upper != "YES" or skip_users == False))
+
+- name: Get source database sizes
+  block:
+    - name: Build db size list for query
+      set_fact:
+        size_list: "{{ src_dbs | join(\"','\") }}"
+
+    - name: Get total size of databases
+      shell: mysql -h {{ srcpoint }} -u {{ user }} -p'{{ password }}' -BAN -e "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) AS 'Size' FROM information_schema.tables WHERE table_schema IN ('{{ size_list }}')"
+      changed_when: false
+      register: db_size
+
+    - name: Report source database sizes
+      debug:
+        msg: "Database list: '{{ size_list }}', size: {{ db_size.stdout }} GB"
+        
+- name: Set default myloader limits
+  set_fact:
+    qpt: "{{ myloader.sml_qpt }}"
+    threads: "{{ myloader.sml_threads }}"
+
+- name: Override myloader limits when db is greater then 500 GB
+  set_fact:
+    qpt: "{{ myloader.lrg_qpt }}"
+    threads: "{{ myloader.lrg_threads }}"
+  when: db_size.stdout|float >= 500
+
+- name: Override myloader limits when db is between 100 and 500 GB
+  set_fact:
+    qpt: "{{ myloader.med_qpt }}"
+    threads: "{{ myloader.med_threads }}"
+  when: db_size.stdout|float > 100 and db_size.stdout|float < 500
+
+- name: Set datetime and instance
+  set_fact:
+    dt: "{{ '%Y%m%d-%H%M%S' | strftime }}"
+    instance: "{{ src_dbs[0] }}"
+
+- pause:
+    prompt: |
+      Source: {{ srcpoint }}
+      Destination: {{ endpoint }}
+      Databases: {{ size_list }}, size: {{ db_size.stdout }} GB 
+      Users: {{ src_users_out_list|default('N/A') }}
+      Written to: /var/groupon/data/dump/{{ instance }}-{{ dt }}/
+      Overwrite: {{ overwrite|default('No') }}, Skip_users: {{ skip_users|default('No') }}
+      Preserve: {{ preserve|default('No') }}, Replicate: {{ replicate|default('No') }}
+      (ctrl+C then 'A' = abort, Enter to continue)
+
+- name: Remove previous dump files, if present
+  file:
+    path: /var/groupon/data/dump/{{ instance }}-{{ dt }}
+    state: absent
+  become: true
+
+- name: Create source backup location
+  file:
+    path: /var/groupon/data/dump/{{ instance }}-{{ dt }}
+    owner: root
+    group: gds
+    mode: 0770
+    state: directory
+  become: true
+
+- name: Retrieve users
+  block:
+    - name: Build users list
+      set_fact:
+        src_users_list: "{{ src_users| join(',') }}"
+
+    - name: Dump users from srcpoint
+      shell: pt-show-grants --noheader -h {{ srcpoint }}  -u {{ user }}  -p'{{ password }}' --only={{ trim_src_users_list }} > /var/groupon/data/dump/{{ instance }}-{{ dt }}.src_users.sql
+
+  when: (skip_users is not defined or (skip_users|upper != "YES" or skip_users == False)) or (overwrite is not defined or (overwrite|upper != "YES" or overwrite == False))
+
+- name: Build mydumper db list
+  set_fact:
+    myd_db_list: "{{ src_dbs | join('|') }}"
+
+- name: Dump database(s)
+  shell: cd /var/groupon/data/dump/{{ instance }}-{{ dt }} && /usr/bin/mydumper --regex '^({{ myd_db_list }})' --statement-size {{ mydumper.statement_size }} --rows {{ mydumper.rows }} --compress --no-locks --logfile /tmp/{{ instance }}.log --threads {{ mydumper.threads }} --verbose 3 -h {{ srcpoint }}  --outputdir /var/groupon/data/dump/{{ instance }}-{{ dt }} --triggers --routines --events
+
+- name: Get source Replication information
+  block:      
+    - name: Get source database MASTER_LOG_FILE
+      shell: grep --max-count=1 "Log:" /var/groupon/data/dump/{{ instance }}-{{ dt }}/metadata | awk '{ print $2 }'
+      changed_when: false
+      register: info
+
+    - name: Set MASTER_LOG_FILE
+      set_fact:
+        file: "{{ info.stdout }}"
+
+    - name: Get source database MASTER_LOG_POS
+      shell: grep --max-count=1 "Pos:" /var/groupon/data/dump/{{ instance }}-{{ dt }}/metadata | awk '{ print $2 }'
+      changed_when: false
+      register: info
+
+    - name: Set MASTER_LOG_POS
+      set_fact:
+        pos: "{{ info.stdout|int }}"
+
+    - name: Stop replication
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CALL mysql.rds_stop_replication"
+ 
+    - name: Wait for replication to stop
+      pause:
+        seconds: 2
+
+    - name: Reset replication
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CALL mysql.rds_reset_external_master"
+  ignore_errors: true
+  when: (replicate is defined and (replicate|upper == "YES" or replicate == True))
+
+- name: Find total size of schema files
+  shell: du -ch /var/groupon/data/dump/{{ instance }}-{{ dt }}/*-schema.sql.gz | grep total$
+  register: schema_files_size
+
+- name: Display total size of schema files
+  debug:
+    msg: "Total size of all schema files: {{ schema_files_size.stdout }}"
+
+
+- name: Decompress schema files
+  shell: |
+    for file in /var/groupon/data/dump/{{ instance }}-{{ dt }}/*-schema.sql.gz; do
+        gunzip "$file"
+    done
+  args:
+    warn: false
+
+- name: Remove double quotes from schema files
+  shell: |
+    for file in /var/groupon/data/dump/{{ instance }}-{{ dt }}/*-schema.sql; do
+       #sed -i 's/"//g' "$file"
+        sed -i 's/"/`/g' "$file"
+    done
+  args:
+    warn: false
+
+- name: Recompress schema files
+  shell: |
+    for file in /var/groupon/data/dump/{{ instance }}-{{ dt }}/*-schema.sql; do
+        gzip "$file"
+    done
+  args:
+    warn: false
+
+- name: Remove DEFINER
+  replace:
+    path: /var/groupon/data/dump/{{ instance }}-{{ dt }}/{{ item }}.routines.sql
+    regexp: 'DEFINER.+? '
+  become: true
+  ignore_errors: true
+  with_items:
+    - "{{ src_dbs }}"
+
+- name: Remove DEFINER from views, if any
+  block:
+    - name: Uncompress view files
+      shell: cd /var/groupon/data/dump/{{ instance }}-{{ dt }} && gunzip *-schema-view.sql.gz
+
+    - name: Get list of views
+      find:
+        path: /var/groupon/data/dump/{{ instance }}-{{ dt }}
+        patterns: "*-schema-view.sql"
+      register: tables_list
+
+    - name: Convert views, if any
+      replace:
+        path: "{{ item.path }}"
+        regexp: 'DEFINER=.+? '
+      with_items:
+        - "{{ tables_list.files }}"
+
+    - name: Create source view location
+      file: path=/var/groupon/data/dump/{{ instance }}-{{ dt }}-views owner=root group=wheel mode=0777 state=directory
+
+    - name: Move view files
+      shell: cd /var/groupon/data/dump/{{ instance }}-{{ dt }} && mv *-schema-view.sql /var/groupon/data/dump/{{ instance }}-{{ dt }}-views
+
+  become: true
+  ignore_errors: true
+
+- name: Load database(s) into endpoint
+  block:
+    - name: Drop endpoint database(s), if exists
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "DROP DATABASE IF EXISTS {{ item }} "
+      with_items:
+        - "{{ src_dbs }}"
+
+    - name: Create endpoint database(s)
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CREATE DATABASE IF NOT EXISTS {{ item }} "
+      with_items:
+        - "{{ src_dbs }}"
+
+    - name: Load Dump files into endpoint
+      shell: /usr/bin/myloader --host={{ endpoint }} --directory=/var/groupon/data/dump/{{ instance }}-{{ dt }} --queries-per-transaction={{ qpt }} --threads={{ threads }} --compress-protocol --verbose=3 > /var/groupon/data/dump/{{ instance }}.myloader.log 2>&1
+
+- name: Load Views into endpount
+  shell:
+  args:
+    cmd: cat {{ item }}.*-schema-view.sql | mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A {{ item }}
+    chdir: /var/groupon/data/dump/{{ instance }}-{{ dt }}-views
+  with_items:
+      - "{{ src_dbs }}"
+  ignore_errors: true
+
+- name: Setup Replication
+  block:
+    - name: Setup replication
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CALL mysql.rds_set_external_master ('{{ srcpoint }}', 3306, 'replication', '{{ repl_pass }}', '{{ file }}', {{ pos }}, 0)"
+
+    - name: Start replication
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "CALL mysql.rds_start_replication"
+
+    - name: Create replication user
+      mysql_user:
+        name: "replication"
+        password: "{{ repl_pass }}"
+        host: "%"
+        priv: "*.*:REPLICATION SLAVE,REPLICATION CLIENT"
+        login_user: "{{ user }}"
+        login_password: "{{ password }}"
+        login_host: "{{ endpoint }}"
+        state: present
+  when: (replicate is defined and (replicate|upper == "YES" or replicate == True)) 
+
+- name: Replace double quotes with backticks and specific text in user dump file
+  shell: |
+    sed -i 's/"/`/g' /var/groupon/data/dump/{{ instance }}-{{ dt }}.src_users.sql
+    sed -i 's/REQUIRE NONE PASSWORD EXPIRE DEFAULT ACCOUNT UNLOCK PASSWORD HISTORY DEFAULT PASSWORD REUSE INTERVAL DEFAULT PASSWORD REQUIRE CURRENT DEFAULT;/REQUIRE NONE PASSWORD EXPIRE DEFAULT ACCOUNT UNLOCK;/g' /var/groupon/data/dump/{{ instance }}-{{ dt }}.src_users.sql
+
+
+- name: Load source users
+  shell: 
+  args:
+    cmd: cat /var/groupon/data/dump/{{ instance }}-{{ dt }}.src_users.sql | mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A mysql
+  changed_when: false
+  when: (skip_users is not defined or (skip_users|upper != "YES" or skip_users == False))
+
+- name: Remove dump and view files 
+  block:
+    - name: 
+      file: path=/var/groupon/data/dump/{{ instance }}-{{ dt }} state=absent
+    - name: Remove view files
+      file: path=/var/groupon/data/dump/{{ instance }}-{{ dt }}-views state=absent
+  become: true
+  when: (preserve is not defined or (preserve|upper != "YES" or preserve == False))
+
+- name: Show replication status
+  block:
+    - name: Get replication status
+      shell: mysql -h {{ endpoint }} -u {{ user }} -p'{{ password }}' -A -e "SHOW SLAVE STATUS\G"
+      register: repl_stat
+
+    - name: Replication status
+      debug:
+        var=repl_stat.stdout_lines
+  when: (replicate is defined and (replicate|upper == "YES" or replicate == True))
+

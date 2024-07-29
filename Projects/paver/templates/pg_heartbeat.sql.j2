@@ -1,0 +1,7 @@
+create schema if not exists heartbeat;
+create table heartbeat.repl_status as select * from pg_stat_replication limit 0;
+alter table heartbeat.repl_status add column last_updated timestamp without time zone default now();
+alter table heartbeat.repl_status add column current_position_master pg_lsn default pg_current_xlog_location() not null;
+alter table heartbeat.repl_status add column master_host inet;
+alter table heartbeat.repl_status add primary key (current_position_master,client_port);
+

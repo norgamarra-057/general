@@ -1,0 +1,16 @@
+---
+- hosts: gds_dub1_prod_db007
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: pop_prod }
+  - { role: gds-mysql-ha, instance: custsvc_cscs_prod }
+  - { role: gds-mysql-ha, instance: mpp_offer }
+  - { role: gds-mysql-ha, instance: eurebro_hive_hue_prod }
+  - { role: gds-mysql-ha, instance: groupon_works_prod }
+  - { role: gds-mysql-ha, instance: gkb_prod }
+  - { role: gds-mysql-ha, instance: cyclops_india_prod }
+  - { role: gds-mysql-ha, instance: megatron_prod }
+  - { role: gds-mysql-ha, instance: editorialservice_prod }
+  - { role: gds-mysql-ha, instance: ssu_prod }
+  - { role: gds-mysql-ha, instance: goods_intl_prod }

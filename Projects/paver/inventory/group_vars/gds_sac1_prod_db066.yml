@@ -1,0 +1,416 @@
+---
+gds_carp_peers:
+  - 10.34.185.236 # gds-sac1-prod-db066m1
+  - 10.34.185.237 # gds-sac1-prod-db066s1
+  - 10.34.161.236 # gds-sac1-prod-db066m1
+  - 10.34.161.237 # gds-sac1-prod-db066s1
+gds_instance_group: gds_prod_sac1_db066
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan206
+  - vlan207
+# List of all GDS instances in this timeline
+gds_instances:
+  # performer_service_prod: #  GDS-17891 #decom # GPROD-188145
+  # display_leadgen_prod: #  GDS-16029 #Decom #GDS-35813
+  crosslinker_prod: #  GDS-16197
+    type: postgresql
+    dbnames:
+      - crosslinker_prod
+    schemas:
+      crosslinker_prod:
+        - crosslinker 
+    write_origin: sac1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60004
+    master_vip: 10.34.185.124
+    slave_vips:
+      - 10.34.161.124
+    replication_ips:
+      - 10.32.121.170  # gds-sac1-prod-db066m1
+      - 10.32.121.205 # gds-sac1-prod-db066s1
+      - 10.22.48.107  # gds-snc1-prod-db066m1
+      - 10.22.48.159 # gds-snc1-prod-db066s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.sac1
+      - 10.22.218.153/32   # brands-cross-linker-app1.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: crosslinker_prod_dba
+    app_account_name: crosslinker_prod_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.sac1
+      - 10.20.130.164/32   # dbclustermon2.sac1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.218.153/32   # brands-cross-linker-app1.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20009
+      pgbouncer_session: 20010
+      postgresql_raw: 20011
+    extra_variables:
+  #olympus_prod: #  GDS-16197  #Decom #GPROD-191810
+  #sandbox_pg_prod: #  GDS-16785 #Decom #GPROD-223727
+  #market_ticketing_prod: #  GDS-16808 #Decom #GPROD-197451
+  #mktg_feed_service_prod: #  GDS-16922 #Decom #GPROD-197448
+  #merch_lifecycle_prod: #  GDS-17061 #DEcom #GPROD-228532
+#  sonar_qube_prod: #  GDS-17174 #Decomm GDS-32166#
+
+# GDS-29230 Decomm  item_auth_prod: #  GDS-17233
+
+  control_center_prod: #  GDS-17231
+    type: postgresql
+    dbnames:
+      - control_center_prod
+    schemas:
+      control_center_prod:
+        - control_center
+    write_origin: sac1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60012
+    master_vip: 10.34.185.132
+    slave_vips:
+      - 10.34.161.132
+    replication_ips:
+      - 10.32.121.170  # gds-sac1-prod-db066m1
+      - 10.32.121.205 # gds-sac1-prod-db066s1
+      - 10.22.48.107  # gds-snc1-prod-db066m1
+      - 10.22.48.159 # gds-snc1-prod-db066s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.77.11/32 # pricing-control-center-jtier-app1.snc1
+      - 10.22.233.234/32 # pricing-control-center-jtier-app2.snc1
+      - 10.32.160.147/32 # pricing-control-center-jtier-app1.sac1
+      - 10.32.170.15/32 # pricing-control-center-jtier-app2.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: control_center_prod_dba
+    app_account_name: control_center_prod_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.77.11/32 # pricing-control-center-jtier-app1.snc1
+      - 10.22.233.234/32 # pricing-control-center-jtier-app2.snc1
+      - 10.32.160.147/32 # pricing-control-center-jtier-app1.sac1
+      - 10.32.170.15/32 # pricing-control-center-jtier-app2.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20033
+      pgbouncer_session: 20034
+      postgresql_raw: 20035
+    extra_variables:
+      max_connections: 210
+      default_pool_size: 200
+      app_connection_limit: 200
+#  faraday_prod: #  GDS-17297 # Decomm GDS-31592#
+  #history_service_prod: #  GDS-17348 #Decom #GPROD-197444
+  mkttag_service_prod: #  GDS-17479
+    type: postgresql
+    dbnames:
+      - mkttag_service_prod
+    schemas:
+      mkttag_service_prod:
+        - mkttag_service
+    write_origin: sac1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60015
+    master_vip: 10.34.185.135
+    slave_vips:
+      - 10.34.161.135
+    replication_ips:
+      - 10.32.121.170  # gds-sac1-prod-db066m1
+      - 10.32.121.205 # gds-sac1-prod-db066s1
+      - 10.22.48.107  # gds-snc1-prod-db066m1
+      - 10.22.48.159 # gds-snc1-prod-db066s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.233.104/32 # marketing-tagging-service-api1.snc1
+      - 10.22.219.160/32  # marketing-tagging-service-api2.snc1
+      - 10.32.158.137/32  # marketing-tagging-service-api1.sac1
+      - 10.32.76.14/32  # marketing-tagging-service-api2.sac1
+      - 10.22.138.12/32  # marketing-tagging-service-worker1.snc1
+      - 10.22.67.150/32  # marketing-tagging-service-worker2.snc1
+      - 10.32.112.97/32  # marketing-tagging-service-worker1.sac1
+      - 10.32.100.16/32  # marketing-tagging-service-worker2.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: mkttag_service_prod_dba
+    app_account_name: mkttag_service_prod_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.233.104/32 # marketing-tagging-service-api1.snc1
+      - 10.22.219.160/32  # marketing-tagging-service-api2.snc1
+      - 10.32.158.137/32  # marketing-tagging-service-api1.sac1
+      - 10.32.76.14/32  # marketing-tagging-service-api2.sac1
+      - 10.22.138.12/32  # marketing-tagging-service-worker1.snc1
+      - 10.22.67.150/32  # marketing-tagging-service-worker2.snc1
+      - 10.32.112.97/32  # marketing-tagging-service-worker1.sac1
+      - 10.32.100.16/32  # marketing-tagging-service-worker2.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20042
+      pgbouncer_session: 20043
+      postgresql_raw: 20044
+    extra_variables:
+      app_connection_limit: 20
+  campaign_alert_prod: #  GDS-17600
+    type: postgresql
+    dbnames:
+      - campaign_alert_prod
+    schemas:
+      campaign_alert:
+        - campaign_alert
+    write_origin: sac1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60016
+    master_vip: 10.34.185.136
+    slave_vips:
+      - 10.34.161.136
+    replication_ips:
+      - 10.32.121.170  # gds-sac1-prod-db066m1
+      - 10.32.121.205 # gds-sac1-prod-db066s1
+      - 10.22.48.107  # gds-snc1-prod-db066m1
+      - 10.22.48.159 # gds-snc1-prod-db066s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.217.162/32 # email-campaign-util1.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: campaign_alert_prod_dba
+    app_account_name: campaign_alert_prod_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.217.162/32 # email-campaign-util1.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20045
+      pgbouncer_session: 20046
+      postgresql_raw: 20047
+    extra_variables:
+  coupons_inventory_prod: #  GDS-17634
+    type: postgresql
+    dbnames:
+      - coupons_inventory_prod
+    schemas:
+      coupons_inventory_prod:
+        - coupons_inventory
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60017
+    master_vip: 10.34.185.137
+    slave_vips:
+      - 10.34.161.137
+    replication_ips:
+      - 10.22.48.107  # gds-snc1-prod-db066m1
+      - 10.22.48.159  # gds-snc1-prod-db066s1
+      - 10.32.121.170 # gds-sac1-prod-db066m1
+      - 10.32.121.205 # gds-sac1-prod-db066s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.22.216.43/32   # coupons-inventory-service1.snc1
+      - 10.22.109.33/32   # coupons-inventory-service2.snc1
+      - 10.22.77.139/32   # coupons-inventory-service3.snc1
+      - 10.22.67.100/32   # coupons-inventory-service4.snc1
+      - 10.32.100.247/32  # coupons-inventory-service1.sac1
+      - 10.32.174.203/32  # coupons-inventory-service2.sac1
+      - 10.32.69.242/32   # coupons-inventory-service3.sac1
+      - 10.32.223.74/32   # coupons-inventory-service4.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: coupons_inventory_dba
+    app_account_name: coupons_inventory_app
+    dba_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.216.43/32   # coupons-inventory-service1.snc1
+      - 10.22.109.33/32   # coupons-inventory-service2.snc1
+      - 10.22.77.139/32   # coupons-inventory-service3.snc1
+      - 10.22.67.100/32   # coupons-inventory-service4.snc1
+      - 10.32.100.247/32  # coupons-inventory-service1.sac1
+      - 10.32.174.203/32  # coupons-inventory-service2.sac1
+      - 10.32.69.242/32   # coupons-inventory-service3.sac1
+      - 10.32.223.74/32   # coupons-inventory-service4.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20048
+      pgbouncer_session: 20049
+      postgresql_raw: 20050
+    extra_variables:
+
+# destroyed GDS-26349   pgb_backend_prod: #  GDS-17650 __SOX__
+
+  seo_columbus_prod: #  GDS-17852
+    type: postgresql
+    dbnames:
+      - seo_columbus_prod
+    schemas:
+      seo_columbus_prod:
+        - seo_columbus 
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60019
+    master_vip: 10.34.185.139
+    slave_vips:
+      - 10.34.161.139
+    replication_ips:
+      - 10.22.48.107  # gds-snc1-prod-db066m1
+      - 10.22.48.159  # gds-snc1-prod-db066s1
+      - 10.32.121.170 # gds-sac1-prod-db066m1
+      - 10.32.121.205 # gds-sac1-prod-db066s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.22.137.5/32    # seo-columbus1.snc1
+      - 10.22.216.27/32   # seo-columbus2.snc1
+      - 10.22.217.175/32   # seo-columbus3.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: seo_columbus_prod_dba
+    app_account_name: seo_columbus_prod_app
+    dba_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.138.63/32   # cde-airflow1.snc1
+      - 10.22.137.5/32    # seo-columbus1.snc1
+      - 10.22.216.27/32   # seo-columbus2.snc1
+      - 10.22.217.175/32   # seo-columbus3.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20054
+      pgbouncer_session: 20055
+      postgresql_raw: 20056
+    extra_variables:
+   # airflow_prod: #  GDS-17860 #Decom #GDS-35813

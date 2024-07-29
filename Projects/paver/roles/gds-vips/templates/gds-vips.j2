@@ -1,0 +1,19 @@
+
+# {{ ansible_managed }}
+
+# GDS VIP configuration
+
+{% for instance in gds_instances.keys() %}
+{% set rw_addr = gds_instances[instance]['master_vip'] -%}
+{% set rw_vlan = gds_instances[instance]['master_carp_interface'] -%}
+{% set rw_vhid = gds_instances[instance]['vhid'] -%}
+{% set rw_pass = rw_passes[instance] -%}
+{% set ro_addr = gds_instances[instance]['slave_vips'][0] -%}
+{% set ro_vlan = gds_instances[instance]['slave_carp_interface'] -%}
+{% set ro_vhid = gds_instances[instance]['slave_vhid'] -%}
+{% set ro_pass = ro_passes[instance] -%}
+# {{ instance }}
+ifconfig_{{ rw_vlan }}_alias{{ rw_vhid }}="vhid {{ rw_vhid }} pass {{ rw_pass }} advbase {{ rw_base }} advskew {{ rw_skew }} alias {{ rw_addr }}/32"
+ifconfig_{{ ro_vlan }}_alias{{ ro_vhid }}="vhid {{ ro_vhid }} pass {{ ro_pass }} advbase {{ ro_base }} advskew {{ ro_skew }} alias {{ ro_addr }}/32"
+
+{% endfor %}

@@ -1,0 +1,78 @@
+{
+    "cluster" : {
+        "gds_prod_snc1_db001" : {
+            "carp" : {
+                "read-write" : {
+                    "password" : "asdf2",
+                    "ipv4" : "10.30.16.13/32",
+                    "vlan" : 317 /* optional */
+                },
+                "read-only" : {
+                    "password" : "qwer2",
+                    "ipv4" : "10.30.16.14/32",
+                    "vlan" : 317 /* optional */
+                }
+            }
+        },
+        "gds_prod_snc1_db002" : {
+            "carp" : {
+                "read-write" : {
+                    "password" : "asdf",
+                    "ipv4" : "10.30.16.10/32"
+                },
+                "read-only" : {
+                    "password" : "qwer",
+                    "ipv4" : "10.30.16.11/32"
+                }
+            }
+        }
+    },
+    "host" : {
+        "gds-snc1-prod-db001m1.snc1" : {
+            "vlans" : {
+                "316" : { "host-address" : "10.30.16.200/24" },
+                "317" : { "host-address" : "10.30.17.200/24" },
+                "318" : { "host-address" : "10.30.18.200/24" },
+                "319" : { "host-address" : "10.30.19.200/24" },
+                "320" : { "host-address" : "10.30.20.200/24" },
+                "321" : { "host-address" : "10.30.21.200/24" },
+                "322" : { "host-address" : "10.30.22.200/24" },
+                "323" : { "host-address" : "10.30.23.200/24" },
+            }
+        },
+        "gds-snc1-prod-db001s1.snc1" : {
+            "vlans" : {
+                "316" : { "host-address" : "10.30.16.201/24" },
+                "317" : { "host-address" : "10.30.17.201/24" },
+                "318" : { "host-address" : "10.30.18.201/24" },
+                "319" : { "host-address" : "10.30.19.201/24" },
+                "320" : { "host-address" : "10.30.20.201/24" },
+                "321" : { "host-address" : "10.30.21.201/24" },
+                "322" : { "host-address" : "10.30.22.201/24" },
+                "323" : { "host-address" : "10.30.23.201/24" },
+            }
+        },
+        "gds-snc1-prod-db002m1.snc1" : {
+            "vlans" : {
+                "316" : { "host-address" : "10.30.16.202/24" },
+                "317" : { "host-address" : "10.30.17.202/24" },
+                "318" : { "host-address" : "10.30.18.202/24" },
+                "319" : { "host-address" : "10.30.19.202/24" },
+                "320" : { "host-address" : "10.30.20.202/24" },
+                "321" : { "host-address" : "10.30.21.202/24" },
+                "322" : { "host-address" : "10.30.22.202/24" },
+                "323" : { "host-address" : "10.30.23.202/24" },
+            }
+        },
+    },
+    "instance_local_vips" : [
+            - {'10.30.16.11/32' : 'gds-snc1-mysqltest-test-instance1-localm.snc1'}
+            - {'10.30.16.12/32' : 'gds-snc1-mysqltest-test-instance1-locals.snc1'}
+    ],
+    "vips" : [
+            - { '10.30.16.13/32' : 'gds-snc1-mysqltest-test-instance1-rw-vip.snc1' },
+            - { '10.30.16.14/32' : 'gds-snc1-mysqltest-test-instance2-rw-vip.snc1' },
+            - { '10.30.17.13/32' : 'gds-snc1-mysqltest-test-instance1-ro-vip.snc1' },
+            - { '10.30.17.14/32' : 'gds-snc1-mysqltest-test-instance2-ro-vip.snc1' },
+    ],
+}

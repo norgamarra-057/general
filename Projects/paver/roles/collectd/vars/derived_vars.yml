@@ -1,0 +1,3 @@
+---
+# Directory used by runit for nad on this host
+collectd_service_dir: "/var/groupon/service/collectd"

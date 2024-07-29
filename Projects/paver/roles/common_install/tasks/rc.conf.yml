@@ -1,0 +1,49 @@
+---
+- name: Adjust common rc settings
+  lineinfile: 
+    dest: /etc/rc.conf
+    regexp: '^[#]*{{ item.name }}=.*'
+    line: '{{ item.name }}="{{ item.value }}"'
+  with_items:
+    - name: hostname
+      value: "{{ inventory_hostname }}"
+  notify:
+    - hostname
+
+- name: FreeBSD | moused stop
+  lineinfile: 
+    dest: /etc/rc.conf
+    regexp: '^[#]*{{ item.name }}=.*'
+    line: '{{ item.name }}="{{ item.value }}"'
+  with_items:
+    - name: moused_nondefault_enable
+      value: NO
+  notify:
+    - moused stop
+    - moused kill
+
+- name: FreeBSD | sendmail stop
+  service: name=sendmail state=stopped
+
+- name: FreeBSD | syslogd enable
+  lineinfile: 
+    dest: /etc/rc.conf
+    regexp: '^[#]*{{ item.name }}=.*'
+    line: '{{ item.name }}="{{ item.value }}"'
+  with_items:
+    - name: syslogd_enable
+      value: YES
+  notify:
+    - syslogd restart
+
+- name: FreeBSD | syslogd flags
+  lineinfile: 
+    dest: /etc/rc.conf
+    regexp: '^[#]*{{ item.name }}=.*'
+    line: '{{ item.name }}="{{ item.value }}"'
+  with_items:
+    - name: syslogd_flags 
+      value: '-ss -cc'
+  notify:
+    - syslogd restart
+

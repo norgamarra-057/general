@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# $FreeBSD$
+#
+# PROVIDE: mcelog
+# REQUIRE: DAEMON
+
+. /etc/rc.subr
+
+name=mcelog
+rcvar=mcelog_enable
+
+load_rc_config $name
+
+: ${mcelog_enable:=NO}
+
+pidfile=${mcelog_pidfile:-'/var/run/mcelog.pid'}
+logfile=${mcelog_logfile:-'/var/log/mcelog'}
+
+command="/usr/local/bin/mcelog"
+start_cmd="mcelog_start"
+
+mcelog_start()
+{
+   ${command} --daemon --logfile ${logfile} --pidfile ${pidfile}
+   _run_rc_postcmd
+}
+
+run_rc_command "$1"

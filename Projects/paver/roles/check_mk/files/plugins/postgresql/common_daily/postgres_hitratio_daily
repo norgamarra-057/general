@@ -1,0 +1,30 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+stamp=$(date +%s)
+lifetime=$(realpath $0 | egrep -o "[0-9]+")
+
+if [[ -z "${lifetime}" ]]; then
+  lifetime=60
+else
+  lifetime=$((lifetime + 60))
+fi
+
+echo "<<<postgres_hitratio_daily:cached(${stamp},${lifetime})>>>"
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        OUTPUT="$(echo "SELECT sum(blks_hit)
+              AS hit,
+              sum(blks_read)
+              AS read
+              FROM pg_stat_database;" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' 2>/dev/null)"
+        echo "$OUTPUT"
+        sleep 0.5
+done

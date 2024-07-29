@@ -1,0 +1,6 @@
+---
+- name: pgbouncer restart
+  command: /usr/local/sbin/sv term "{{ pgbouncer_path }}"
+
+- name: pgbouncer log restart
+  command: /usr/local/sbin/sv term "{{ pgbouncer_path }}/log"

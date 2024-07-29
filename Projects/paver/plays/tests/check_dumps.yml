@@ -1,0 +1,13 @@
+---
+- name: Check which machines have dumps
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Count number of cores in /var/crash
+      shell: sudo ls /var/crash | grep vmcore | wc -l
+      register: num_cores
+
+    - name: Do we have core dumps?
+      fail: msg="core dumps do not exist"
+      failed_when: num_cores.stdout | search("0") == True
+

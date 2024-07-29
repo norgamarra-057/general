@@ -1,0 +1,210 @@
+{
+    "graphs": {
+        "Memory": {
+            "style": "line",
+            "datapoints": [
+                {
+                    "name": "Memory Total",
+                    "metric_name": "vm`memory`total",
+                    "metric_type": "numeric",
+                    "axis": "l",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Memory Used",
+                    "metric_name": "vm`memory`used",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Memory Free",
+                    "metric_name": "vm`memory`free",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                }
+            ]
+        },
+        "Swap": {
+            "style": "line",
+            "datapoints": [
+                {
+                    "name": "Swap Total",
+                    "metric_name": "vm`swap`total",
+                    "metric_type": "numeric",
+                    "axis": "l",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Swap Used",
+                    "metric_name": "vm`swap`used",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Swap Free",
+                    "metric_name": "vm`swap`free",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                }
+            ]
+        },
+        "Network In lagg0": {
+            "style": "line",
+            "datapoints": [
+                {
+                    "name": "In Bytes",
+                    "metric_name": "if`lagg0`in_bytes",
+                    "metric_type": "numeric",
+                    "axis": "l",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "In Packets",
+                    "metric_name": "if`lagg0`in_packets",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "In Errors",
+                    "metric_name": "if`lagg0`in_errors",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                }
+            ]
+        },
+        "Network Out lagg0": {
+            "style": "line",
+            "datapoints": [
+                {
+                    "name": "Out Bytes",
+                    "metric_name": "if`lagg0`out_bytes",
+                    "metric_type": "numeric",
+                    "axis": "l",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Out Packets",
+                    "metric_name": "if`lagg0`out_packets",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Out Errors",
+                    "metric_name": "if`lagg0`out_errors",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                }
+            ]
+        },
+        "CPU": {
+            "style": "line",
+            "datapoints": [
+                {
+                    "name": "User",
+                    "metric_name": "cpu`user",
+                    "metric_type": "numeric",
+                    "axis": "l",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Kernel",
+                    "metric_name": "cpu`kernel",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Idle",
+                    "metric_name": "cpu`idle",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Wait IO",
+                    "metric_name": "cpu`wait_io",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                }
+            ]
+        }
+    },
+    "check": {
+        "type": "json:nad",
+        "period": 60,
+        "timeout": 10,
+        "metrics": {
+            "numeric": [
+{{ cpu_metrics.stdout }}
+{{disk_metrics.stdout}}
+{{fs_metrics.stdout}}
+{{if_metrics.stdout}}
+{{zfsinfo_metrics.stdout}}
+{{zpool_metrics.stdout}}
+{{vm_metrics.stdout}}
+		"test`test1:1:test1:test1"
+            ],
+            "text": []
+        },
+        "config": {
+            "port": 2609
+        }
+    }
+}

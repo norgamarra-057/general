@@ -1,0 +1,10 @@
+---
+- hosts: gds_sac1_prod_db021
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: cscs_prod }
+  - { role: gds-mysql-ha, instance: jira_prod }
+  - { role: gds-mysql-ha, instance: gwl_manager_prod }
+  - { role: gds-mysql-ha, instance: command_center_prod }
+

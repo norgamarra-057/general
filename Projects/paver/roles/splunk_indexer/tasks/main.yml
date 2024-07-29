@@ -1,0 +1,7 @@
+---
+- include_tasks: binaries.yml tags=splunk_binaries,splunk
+- include_tasks: deployment_app.yml tags=splunk_deployment_app,splunk
+- include_tasks: templates.yml tags=splunk_templates,splunk
+- include_tasks: first_start.yml tags=splunk_first_start,splunk
+- include_tasks: runit_splunkd.yml tags=splunk_runit_splunkd,splunk
+- include_tasks: runit_splunkweb.yml tags=splunk_runit_splunkweb,splunk

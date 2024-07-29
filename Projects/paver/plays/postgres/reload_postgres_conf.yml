@@ -1,0 +1,17 @@
+---
+- name: Validate global settings
+  hosts: 127.0.0.1 
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - server is defined
+
+- name: Reload Config
+  become: true
+  hosts:
+    - "{{ server }}"
+  tasks:
+    - name: Reload Status 
+      shell: bash
+      shell: for i in `grep port /var/groupon/service/postgresql-{{ gds_instance_group }}-*/data/postgresql.conf | grep 20 | awk '{print $3}'`; do  echo $i; psql -U postgres -d postgres -p $i -c "select pg_reload_conf()"; echo '\n'; done;

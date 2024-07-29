@@ -1,0 +1,25 @@
+
+
+
+- name: ensure user has access to database
+  postgresql_user: db=postgres login_user=pgsql name=testuser password=123 priv=ALL
+
+- name: ensure user has access to database
+  postgresql_user: db=postgres login_user=pgsql name=newuser password=123 priv=ALL
+
+
+- name: install database just db
+  postgresql_db: name=testdb  login_user=pgsql owner=testuser
+
+- name: create schema db
+  postgresql_schema: name=test  login_user=pgsql owner=testuser  login_db=testdb state=present
+
+- name: create schema db 2 
+  postgresql_schema: name=num2  login_user=pgsql owner=testuser login_db=testdb state=present
+
+- name: create schema db 3 
+  postgresql_schema: name=num3  login_user=pgsql owner=testuser login_db=testdb state=present
+- name: create schema db 1   
+  postgresql_schema: name=num1  login_user=pgsql owner=testuser login_db=testdb state=present
+
+

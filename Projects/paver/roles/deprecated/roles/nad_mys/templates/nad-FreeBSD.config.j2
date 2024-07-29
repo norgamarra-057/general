@@ -1,0 +1,118 @@
+{
+    "graphs": {
+
+{% for instance_name,instance in gds_instances.iteritems() %}
+   {%if gds_instances[instance_name].type == 'mysql' %}
+      "{{ instance_name }}": {
+            "style": "line",
+            "datapoints": [
+                {
+                    "name": "DB Auto Inc",
+                    "metric_name": "mys_autoinc_{{ instance_name }}`auto_inc",
+                    "metric_type": "numeric",
+                    "axis": "l",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Generic",
+                    "metric_name": "mys_generic_{{ instance_name }}`generic",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Replication",
+                    "metric_name": "mys_repldelay_{{ instance_name }}`repl_delay",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Threads running",
+                    "metric_name": "mys_runthreads_{{ instance_name }}`Threads_running",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Slave Running",
+                    "metric_name": "mys_slave_{{ instance_name }}`Slave_running",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Percentual Connections used",
+                    "metric_name": "mys_usedconn_{{ instance_name }}`perc_used_conn",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "PGstat Info",
+                    "metric_name": "pg_stat_{{ instance_name }}`info",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                }
+            ]
+        }
+{% if not loop.last %}
+    ,
+{% endif %}
+
+{% endif %}
+{% endfor %}
+    
+    },
+
+
+
+    "check": {
+        "type": "json:nad",
+        "period": 60,
+        "timeout": 10,
+        "metrics": {
+            "numeric": [
+
+{% for instance_name,instance in gds_instances.iteritems() %}
+{% if gds_instances[instance_name].type == 'mysql' %}
+            "mys_autoinc_{{ instance_name }}`auto_inc",
+            "mys_generic_{{ instance_name }}`generic",
+            "mys_readony_{{ instance_name }}`read_only",
+            "mys_repldelay_{{ instance_name }}`repl_delay",
+            "mys_runthreads_{{ instance_name }}`Threads_running",
+            "mys_slave_{{ instance_name }}`Slave_running",
+            "mys_usedconn_{{ instance_name }}`perc_used_conn",
+{% endif %}
+{% endfor %}
+		"test`test1:1:test1:test1"
+            ],
+            "text": []
+        },
+        "config": {
+            "port": 2610
+        }
+    }
+}

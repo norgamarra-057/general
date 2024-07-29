@@ -1,0 +1,14 @@
+- name: Find non-standard (not 10.1-STABLE) boxes
+  hosts: gds_all
+  become: yes
+  vars:
+    - standard_version: 10.1-STABLE
+  tasks:
+    - name: Obtain release
+      command: uname -r
+      changed_when: false
+      register: release_cmd
+
+    - name: Check if release matches our standard_version
+      fail: msg="box is not standard"
+      when: release_cmd.stdout | match(standard_version) == false

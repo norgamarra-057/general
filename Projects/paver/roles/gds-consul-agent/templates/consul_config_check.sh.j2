@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# Check config and raise critical error if it is not enabled
+
+function test_config ()
+{
+  /opt/consul/consul validate {{ consul_conf_file }} >/dev/null 2>&1
+  return $?
+}
+
+function consul_validate
+{
+  test_config
+  if [ $? -eq 0  ]; then
+    _status=$(/opt/consul/consul validate {{ consul_conf_file }} | awk '{print $3}' )
+  else
+    _status="Invalid config"
+  fi
+  case $_status in
+    "valid!")  echo "result=0; OK - Configuration is $_status"; _retcode=0 ;;
+            *)  echo "result=2; CRIT - Consul $_status"; _retcode=2 ;;
+  esac
+  return $_retcode
+}
+
+ServiceDescription="consul_config_check"
+Output=$(consul_validate)
+ExitCode=$?
+
+echo "$ExitCode $ServiceDescription $Output"
+exit 0

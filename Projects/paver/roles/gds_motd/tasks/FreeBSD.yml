@@ -1,0 +1,9 @@
+---
+- name: Setup maintenance script
+  copy:
+    src: gds-start-maint.sh
+    dest: /usr/local/bin/gds-start-maint
+    owner: root
+    group: wheel
+    mode: 0755
+

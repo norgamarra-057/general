@@ -1,0 +1,9 @@
+---
+- name: Replication check using generic SLAVE STATUS
+  hosts: gds_all
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Check slave status for each instance
+      shell: /usr/local/sbin/check_repl.sh
+      changed_when: false

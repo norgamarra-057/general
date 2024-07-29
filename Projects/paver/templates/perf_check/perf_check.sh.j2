@@ -1,0 +1,37 @@
+#!/bin/bash
+echo '##################################################################################################################################################'
+{% for instance in gds_instances.keys() %}
+{% if gds_instances[instance].type == 'postgresql' -%}
+echo '##################################################################################################################################################'
+echo  Instance: {{ instance }} Port:{{ gds_instances[instance].ports.postgresql_raw }} DB:{{ gds_instances[instance].dbnames.0 }}
+echo '##################################################################################################################################################'
+echo '##################################################################################################################################################'
+
+QUERY=`psql -U postgres -q -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "SELECT pg_is_in_recovery();"`
+if [ "$QUERY" = "f" ]; then
+	psql -U postgres -q -T -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "CREATE EXTENSION IF NOT EXISTS PG_STAT_STATEMENTS;" >> /dev/null
+fi
+echo PG_BLOAT
+psql -U postgres -q -T -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} < /usr/lib/check_mk_agent/pg_bloat.sql
+echo '##################################################################################################################################################'
+
+echo PG INDEX
+psql -U postgres -q -T -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} < /usr/lib/check_mk_agent/pg_index.sql
+echo '##################################################################################################################################################'
+
+echo PG INDEX DUPLICATED
+psql -U postgres -q -T -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} < /usr/lib/check_mk_agent/pg_index_dup.sql
+echo '##################################################################################################################################################'
+
+echo PG QUERY MORE EXECUTED STAT STATEMENTS
+psql -U postgres -q -T -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} < /usr/lib/check_mk_agent/pg_stat_1.sql
+echo '##################################################################################################################################################'
+
+echo PG QUERY MORE TIME CONSUMING STAT STATEMENTS
+psql -U postgres -q -T -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} < /usr/lib/check_mk_agent/pg_stat_2.sql
+echo '##################################################################################################################################################'
+
+{% endif %}
+{% endfor %}
+
+

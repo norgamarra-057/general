@@ -1,0 +1,6 @@
+---
+- name: Setup openntpd on hosts
+  hosts: gds_all
+  become: yes
+  roles:
+    - openntpd

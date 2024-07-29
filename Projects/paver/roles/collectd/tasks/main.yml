@@ -1,0 +1,28 @@
+---
+- name: collectd | OS-specific variables
+  tags:
+    - collectd
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "../defaults/{{ ansible_os_family }}.yml"
+    - "../defaults/defaults.yml"
+
+- name: collectd | derived variables
+  tags:
+    - collectd
+  include_vars: derived_vars.yml
+
+- name: collectd | service account
+  tags:
+    - collectd
+  include_tasks: user.yml
+
+- name: collectd | install
+  tags:
+    - collectd
+  include_tasks: FreeBSD.yml tags=collectd
+
+- name: collectd | runit
+  tags:
+    - collectd
+  include_tasks: runit.yml tags=collectd

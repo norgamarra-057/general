@@ -1,0 +1,23 @@
+---
+- name: Ensure /etc/rc.conf.local.d/ exists
+  file:
+    dest: /etc/rc.conf.local.d
+    state: directory
+    owner: root
+    group: wheel
+
+- name: Check if /etc/rc.conf.local.d/oldlocal exists
+  stat:
+    path: /etc/rc.conf.local.d/oldlocal
+  register: rc_local_check
+
+- name: Move old rc.conf.local to /etc/rc.conf.local.d/oldlocal
+  command: mv /etc/rc.conf.local /etc/rc.conf.local.d/oldlocal
+  when: rc_local_check.stat is defined and not rc_local_check.stat.exists
+
+- name: Disable VIPs in /etc/rc.conf.local.d/oldlocal
+  replace:
+    dest: /etc/rc.conf.local.d/oldlocal
+    regexp: '^(ifconfig_[a-z0-9]*_alias[1-9].*)'
+    replace: '#\1'
+  register: comment_old_vips

@@ -1,0 +1,39 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.22.182.236 # gds-snc1-prod-db062m1
+  - 10.22.182.237 # gds-snc1-prod-db062s1
+  - 10.22.183.236 # gds-snc1-prod-db062m1
+  - 10.22.183.237 # gds-snc1-prod-db062s1
+gds_instance_group: gds_prod_snc1_db062
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan334
+  - vlan335
+# List of all GDS instances in this timeline
+gds_instances:
+  #ambari_sac1_prod: #  GDS-13038 #Decom #GPROD-196345 
+  #mds_merchand_tag_prod: # GDS-13198 # Decom #GPROD-224369
+  #merch_rept_files_prod: # GDS-13104(Decommed)
+  # cronus_prod: # GDS-13043 # decomissioned #
+
+  #deals_cluster_prod: # GDS-13205 #Decom #GPROD-196541
+  #online_bookingcs_prod: # GDS-13321 #Decomm #GDS-34366
+  #ambari_sox_prod: # GDS-13527  #Decom #GPROD-196593
+#  conveyor_sac1_prod: # GDS-13781 #Decomm GDS-29822#
+  #clo_cis_prod: # GDS-14207 #Decom #GPROD-196273
+
+  # merch_change_mgmt_prod: # GDS-24285 # decomm
+  #keyword_kb_prod: # GDS-14222 #Decom #GPROD-196285
+  #reg_cons_log_prod: # GDS-15403 #Decom #GPROD-197886
+  # partner_attr_map_prod: # GDS-15425 __SOX__ # decommissioned#
+#  erin_prod: # GDS-14338
+  #email_campaign_prod: # GDS-14566 #Decom #GPROD-196585
+
+  #jira_prod: # GDS-14782 #Decom #GPROD-196568
+
+  # grodd_prod: # GDS-14817 # Decom # GDS-33573 
+  #sem_blacklist_prod: # GDS-15111 #Decom #GPROD-196275
+ 
+  #ambari_sac1_sox_prod: # GDS-14930 #Decomm GDS-34366

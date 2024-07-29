@@ -1,0 +1,12 @@
+---
+- name: Identify machines with no swap
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Obtain root disk names
+      shell: swapinfo
+      register: swap_info
+
+    - name: Check if there are atleast one swap partitions
+      fail: msg="fewer than 1 swap partition found"
+      when: swap_info.stdout | search('/dev/') == false

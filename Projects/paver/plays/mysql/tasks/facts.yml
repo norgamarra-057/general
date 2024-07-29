@@ -1,0 +1,23 @@
+---
+# Parameter checks
+
+- name: Decommission | MySQL | Set variables for instance 1 of 2
+  set_fact:
+    mysql_service_path: "/var/service/{{ instance }}-{{ gds_instance_group }}-mysql"
+    mysql_service_data_path: "/var/groupon/service/{{ instance }}-mysql"
+    pt_heartbeat_service_path: "/var/service/{{ instance }}-{{ gds_instance_group }}-pt_heartbeat-percona"
+    pt_heartbeat_service_data_path: "/var/groupon/service/{{ instance }}_pt-heartbeat_percona"
+    pt_heartbeat_service_runit_path: "{{ instance }}_pt-heartbeat_percona"
+    instance_path: "/var/groupon/percona/{{ instance }}"
+    instance_conf: "/root/.my.cnf-{{ instance }}"
+    instance_conf_link: "/root/{{ instance }}"
+    mha_conf: "/usr/home/gds_mha/{{ instance }}-mha.cnf"
+    
+- name: Decommission | MySQL | Set variables for instance 2 of 2
+  set_fact:
+    instance_path_list: "[ 'data', 'binlog', 'log', 'tmp' ]"
+
+- name: Decommission | Playback | Determine if playback is enabled
+  set_fact:
+    playback_enabled: "{{ gds_instances[instance]['playback_enabled'] | default(false) }}"
+

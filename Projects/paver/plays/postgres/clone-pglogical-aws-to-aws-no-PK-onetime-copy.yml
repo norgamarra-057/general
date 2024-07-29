@@ -1,0 +1,149 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - assert:
+        that:
+          - aws_host_master is defined
+          - db is defined
+          - aws_host_replica is defined
+          - admin_password is defined
+          - my_app_user is defined
+          - my_dba_user is defined
+
+- name: aws master
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Create .pgpass file
+      command: touch ~/.pgpass
+
+    - name: set proper mode for the .pgpass file
+      command: chmod 0600 ~/.pgpass
+
+    - name: Create config for the .pgpass file aws master
+      lineinfile: dest=~/.pgpass line="{{ aws_host_master }}:5432:*:gds_admin:{{ admin_password }}"
+
+    - name: Create config for the .pgpass file aws slave
+      lineinfile: dest=~/.pgpass line="{{ aws_host_replica }}:5432:*:gds_admin:{{ admin_password }}"
+
+    - name: Create extension
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "create extension if not exists pglogical"
+
+    - name: export globals
+      shell: pg_dumpall -U gds_admin -p 5432 -h {{ aws_host_master }} --no-role-passwords -g | grep '{{ db }}' > /tmp/{{ db }}_globals.sql
+
+    - name: export schema
+      shell: pg_dump -U gds_admin -N heartbeat -N pglogical -N pglogical_origin -N dba -F p -s -f /tmp/{{ db }}_schema.sql -p 5432 -h {{ aws_host_master }} {{ db }}
+
+    - name: find schemas
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "select schema_name from information_schema.schemata where schema_name not in ('heartbeat','dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Check if provider exists
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "select count(*) from pglogical.node_interface where if_name='{{ db }}_aws_provider'"
+      register: count_provider
+
+    - name: Create provider
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "SELECT pglogical.create_node(node_name := '{{ db }}_aws_provider', dsn := 'host=127.0.0.1 port=5432  dbname={{ db }} user=gds_admin password={{ admin_password }}')"
+      when:  count_provider.stdout|int  == 0
+
+    - name: Check if replication set exists
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "select count(*) from pglogical.replication_set where set_name='onetime'"
+      register: count_repl_set
+
+    - name: Create replication set
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "select pglogical.create_replication_set('onetime','f','f','f','t')"
+      when:  count_repl_set.stdout|int  == 0
+
+    - name: Add tables
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "SELECT pglogical.replication_set_add_all_tables('onetime', '{ {{ item }} }'::text[])"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Add sequences
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "SELECT pglogical.replication_set_add_all_sequences('onetime', '{ {{ item }} }'::text[],true )"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Set app user to nologin
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "alter user {{ my_app_user }} nologin"
+
+    - name: Set dba user to nologin
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "alter user {{ my_dba_user }} nologin"
+
+    - name: Kill remaining sessions
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_master }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid() and application_name not like 'pglogical%' and usename !='gds_admin' and datname = '{{ db }}' and usename in ('{{ my_dba_user }}','{{ my_app_user }}')"
+
+
+- name: Aws part slave
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - name: Import users
+      shell: psql -U gds_admin -d postgres -Atq -p 5432 -h {{ aws_host_replica }} < /tmp/{{ db }}_globals.sql
+      register: users_import
+
+    - name: Grant Role
+      shell: psql -U gds_admin -d postgres -Atq -p 5432 -h {{ aws_host_replica }} -c "grant {{ db }}_dba to gds_admin"
+
+    - name: Check if database exists
+      shell: psql -U gds_admin -d postgres -Atq -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pg_database where datname = '{{ db }}'"
+      register: count_database
+
+    - name: Create database
+      shell: psql -U gds_admin -d postgres -Atq -p 5432 -h {{ aws_host_replica }} -c "create database {{ db }}"
+      when: 'count_database.stdout|int == 0'
+
+    - name: Import schema
+      shell: psql -U gds_admin -Atq -d {{ db }} -p 5432 -h {{ aws_host_replica }} < /tmp/{{ db }}_schema.sql
+      register: db_import
+
+    - name: Create extension
+      shell: psql -U gds_admin -Atq -d {{ db }} -p 5432 -h {{ aws_host_replica }} -c "create extension if not exists pglogical"
+
+    - name: Check if subscriber exists
+      shell: psql -U gds_admin -Atq -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pglogical.node_interface where if_name='{{ db }}_rds_pg11_subscriber'"
+      register: count_subscriber
+
+    - name: Create subscriber
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c "SELECT pglogical.create_node(node_name := '{{ db }}_rds_pg11_subscriber', dsn := 'host=127.0.0.1 port=5432 dbname={{ db }} user=gds_admin password= {{ admin_password }}')" 
+      when:  count_subscriber.stdout|int  == 0
+
+    - name: Check if subscription exists
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pglogical.subscription where sub_name='{{ db }}_rds_pg11_subscription'"
+      register: count_subscription
+
+    - name: Create subscription
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c " SELECT pglogical.create_subscription(subscription_name := '{{ db }}_rds_pg11_subscription', provider_dsn := 'host={{ aws_host_master }} port=5432 dbname={{ db }} user=gds_admin password={{ admin_password }}', replication_sets := '{onetime}'::text[] );"
+      when:  count_subscription.stdout|int  == 0
+
+    - name: Show one-time replication status 
+      shell: psql -U gds_admin -Atq -d {{ db }} -p 5432 -h {{ aws_host_replica }} -c "SELECT subscription_name, status FROM pglogical.show_subscription_status();"
+      register: pglogical_repl_status
+    - debug: var=pglogical_repl_status.stdout
+
+
+- name: a play that runs entirely on the ansible host
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Delete the temp globals file
+      file: path=/tmp/{{ db }}_globals.sql state=absent
+
+    - name: Delete the temp schema file
+      file: path=/tmp/{{ db }}_schema.sql state=absent
+
+

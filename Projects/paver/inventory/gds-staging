@@ -1,0 +1,272 @@
+### -*- mode: conf; -*-#
+##
+### BEGIN: gds_stg_mysql_*
+###
+[gds_stg_mysql_masters_dub1]
+# Empty
+
+[gds_stg_admin_snc1]
+gds-admin01.snc1
+gds-admin02.snc1
+
+[gds_stg_mysql_masters_snc1]
+gds-snc1-uat-db003m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db032m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db005m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db007m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db027m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db029m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db011m1.snc1
+gds-snc1-stg-db012m1.snc1
+gds-snc1-stg-db022m1.snc1
+gds-snc1-uat-db029m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db032m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db042m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-test-db001m1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-test-db002m1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs" fw_hydra=true
+
+
+[gds_stg_mysql_masters_sac1]
+gds-sac1-stg-db022m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs" fw_hydra=true
+
+
+[gds_stg_mysql_masters_snc2]
+# empty
+
+[gds_stg_mysql_slaves_dub1]
+# empty
+
+[gds_stg_mysql_slaves_snc1]
+gds-snc1-uat-db003s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db005s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db007s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db027s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db029s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db011s1.snc1
+gds-snc1-stg-db012s1.snc1
+gds-snc1-stg-db022s1.snc1
+gds-snc1-uat-db029s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db032s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db042s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-test-db001s1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-test-db002s1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs" fw_hydra=true
+
+
+[gds_stg_mysql_slaves_sac1]
+gds-sac1-stg-db022s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs" fw_hydra=true
+
+[gds_stg_mysql_slaves_snc2]
+# empty
+
+[gds_stg_mysql_masters:children]
+gds_stg_mysql_masters_dub1
+gds_stg_mysql_masters_snc1
+gds_stg_mysql_masters_snc2
+gds_stg_mysql_masters_sac1
+
+[gds_stg_mysql_slaves:children]
+gds_stg_mysql_slaves_dub1
+gds_stg_mysql_slaves_snc1
+gds_stg_mysql_slaves_snc2
+gds_stg_mysql_slaves_sac1
+
+[gds_stg_mysql:children]
+gds_stg_mysql_masters
+gds_stg_mysql_slaves
+
+
+
+###
+### BEGIN: gds_stg_postgresql_*
+###
+[gds_stg_postgresql_masters_dub1]
+# empty
+
+[gds_stg_postgresql_masters_snc1]
+gds-snc1-uat-db002m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db004m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db006m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db011m1.snc1
+gds-snc1-stg-db012m1.snc1
+gds-snc1-stg-db022m1.snc1
+gds-snc1-stg-db026m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db028m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db032m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db042m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-test-db002m1.snc1
+
+[gds_stg_postgresql_masters_sac1]
+gds-sac1-stg-db022m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_stg_postgresql_masters_snc2]
+# empty
+
+[gds_stg_postgresql_slaves_dub1]
+# empty
+
+[gds_stg_postgresql_slaves_snc1]
+gds-snc1-uat-db002s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db004s1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db006s1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db011s1.snc1
+gds-snc1-stg-db012s1.snc1
+gds-snc1-stg-db022s1.snc1
+gds-snc1-stg-db026s1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db028s1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-uat-db032s1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-stg-db042s1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-test-db002s1.snc1
+
+[gds_stg_postgresql_slaves_sac1]
+gds-sac1-stg-db022s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_stg_postgresql_slaves_snc2]
+# empty
+
+[gds_stg_postgresql_masters:children]
+gds_stg_postgresql_masters_dub1
+gds_stg_postgresql_masters_snc1
+gds_stg_postgresql_masters_snc2
+
+[gds_stg_postgresql_slaves:children]
+gds_stg_postgresql_slaves_dub1
+gds_stg_postgresql_slaves_snc1
+gds_stg_postgresql_slaves_snc2
+
+[gds_stg_postgresql:children]
+gds_stg_postgresql_masters
+gds_stg_postgresql_slaves
+
+[gds_postgresql:children]
+gds_stg_postgresql
+
+
+###
+### BEGIN: GDS-wide aggregate groups
+###
+[gds_stg_masters:children]
+gds_stg_mysql_masters
+gds_stg_postgresql_masters
+
+[gds_stg_slaves:children]
+gds_stg_mysql_slaves
+gds_stg_postgresql_slaves
+
+[gds_stg_dbs:children]
+gds_stg_masters
+gds_stg_slaves
+
+[gds_stg_all:children]
+gds_stg_dbs
+
+[gds_all:children]
+gds_stg_all
+
+[FreeBSD:children]
+gds_stg_all
+
+[FreeBSD:vars]
+env=stg
+ansible_python_interpreter=/usr/local/bin/python2.7
+splunk_server=splunk-uat-indexers.snc1:9997
+
+###
+### BEGIN: GDS-replication domain groups
+###
+[gds_snc1_uat_db002]
+gds-snc1-uat-db002m1.snc1
+gds-snc1-uat-db002s1.snc1
+
+[gds_snc1_uat_db003]
+gds-snc1-uat-db003m1.snc1
+gds-snc1-uat-db003s1.snc1
+
+[gds_snc1_stg_db004]
+gds-snc1-stg-db004m1.snc1
+gds-snc1-stg-db004s1.snc1
+
+[gds_snc1_stg_db005]
+gds-snc1-stg-db005m1.snc1
+gds-snc1-stg-db005s1.snc1
+
+[gds_snc1_stg_db006]
+gds-snc1-stg-db006m1.snc1
+gds-snc1-stg-db006s1.snc1
+
+[gds_snc1_stg_db007]
+gds-snc1-stg-db007m1.snc1
+gds-snc1-stg-db007s1.snc1
+
+[gds_snc1_stg_db027]
+gds-snc1-stg-db027m1.snc1
+gds-snc1-stg-db027s1.snc1
+
+[gds_snc1_uat_db028]
+gds-snc1-uat-db028m1.snc1
+gds-snc1-uat-db028s1.snc1
+
+[gds_snc1_uat_db029]
+gds-snc1-uat-db029m1.snc1
+gds-snc1-uat-db029s1.snc1
+
+[gds_snc1_stg_db011]
+gds-snc1-stg-db011m1.snc1
+gds-snc1-stg-db011s1.snc1
+
+[gds_snc1_stg_db012]
+gds-snc1-stg-db012m1.snc1
+gds-snc1-stg-db012s1.snc1
+
+[gds_snc1_stg_db022]
+gds-snc1-stg-db022m1.snc1
+gds-snc1-stg-db022s1.snc1
+
+[gds_snc1_stg_db026]
+gds-snc1-stg-db026m1.snc1
+gds-snc1-stg-db026s1.snc1
+
+[gds_snc1_uat_db032]
+gds-snc1-uat-db032m1.snc1 
+gds-snc1-uat-db032s1.snc1 
+
+[gds_snc1_stg_db042]
+gds-snc1-stg-db042m1.snc1 
+gds-snc1-stg-db042s1.snc1 
+
+[gds_sac1_stg_db022]
+gds-sac1-stg-db022m1.sac1 
+gds-sac1-stg-db022s1.sac1 
+
+[gds_snc1_test_db002]
+gds-snc1-test-db002m1.snc1
+gds-snc1-test-db002s1.snc1
+
+[gds_snc1_stg_db011:children]
+
+[dc_dub1_stg:children]
+gds_stg_mysql_masters_dub1
+gds_stg_mysql_slaves_dub1
+gds_stg_postgresql_masters_dub1
+gds_stg_postgresql_slaves_dub1
+
+[dc_snc1_stg:children]
+gds_stg_mysql_masters_snc1
+gds_stg_mysql_slaves_snc1
+gds_stg_postgresql_masters_snc1
+gds_stg_postgresql_slaves_snc1
+
+[dc_snc2_stg:children]
+gds_stg_mysql_masters_snc2
+gds_stg_mysql_slaves_snc2
+gds_stg_postgresql_masters_snc2
+gds_stg_postgresql_slaves_snc2
+
+[dc_sac1_stg:children]
+gds_stg_mysql_masters_sac1
+gds_stg_mysql_slaves_sac1
+gds_stg_postgresql_masters_sac1
+gds_stg_postgresql_slaves_sac1
+
+[hydra_test:children]
+gds_snc1_test_db002
+gds_sac1_stg_db022

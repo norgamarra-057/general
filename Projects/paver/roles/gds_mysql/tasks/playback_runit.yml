@@ -1,0 +1,52 @@
+- name: Create playback runit service directory
+  file:
+    name: "{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0755
+    state: directory
+  with_items:
+    - "{{ playback_runit_service_dir }}"
+    - "{{ playback_runit_service_dir }}/env"
+    - "{{ playback_runit_service_dir }}/log"
+
+- name: Create playback runit log directory
+  file:
+    path: "{{ playback_runit_service_dir }}/log/main"
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+
+- name: Create runit service dir for playback
+  copy:
+    dest: "{{ playback_runit_service_dir }}/env/PATH"
+    content: "/usr/local/bin:/usr/bin:/bin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: Create svogd script for playback
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ playback_runit_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: Create run script for playback
+  template:
+    src: playback_run.sh.j2
+    dest: "{{ playback_runit_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: Enable runit service for playback
+  file:
+    src: "{{ playback_runit_service_dir }}"
+    dest: "{{ playback_runit_service_link_dir }}"
+    owner: root
+    group: wheel
+    state: link
+

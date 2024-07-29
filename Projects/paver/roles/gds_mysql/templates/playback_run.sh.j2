@@ -1,0 +1,267 @@
+#!/usr/local/bin/bash
+
+playback_user="{{ playback_user }}"
+playback_password="{{ playback_password }}"
+playback_schema="{{ playback_schema }}"
+playback_thread_pool_size="{{ playback_thread_pool_size}}"
+manage_mysql_slowlogd="{{ manage_mysql_slowlogd }}"
+mysql_user_connection_threshold="{{ user_connection_threshold }}"
+master_server="{{ playback_peer }}"
+mysql_slowlogd_port="{{ mysql_slowlogd_port }}"
+mysql_port="{{ mysql_port }}"
+mysql_socket="{{ mysql_socket }}"
+playback_connection_timeout="{{ playback_connection_timeout }}"
+
+mysql_binary='/usr/local/bin/mysql'
+mysql_cmd="${mysql_binary} --silent --silent -S ${mysql_socket}"
+mysql_slowlogd="/usr/local/bin/mysql_slowlogd"
+mysql_slow_log_file=`${mysql_cmd} -e 'select @@slow_query_log_file;'`
+wget_binary=/usr/local/bin/wget
+percona_playback_binary=/usr/local/bin/percona-playback
+current_unix_user=`whoami`
+mysql_users_excluded="'root','system user','replication','${playback_user}','mysql_admin','monitor'"
+
+function log_notice() {
+  echo "$@"
+}
+
+function log_error() {
+  echo "$@"
+}
+
+function check_playback_user() {
+  ${mysql_cmd} -u${playback_user} -p${playback_password} -e 'select 1;' > /dev/null 2>&1
+  if [ $? -ne 0 ]
+  then
+    log_error "Can't connect to MySQL with user ${playback_user}, it does not exist, check your configuration"
+    exit 1
+  fi
+}
+
+function check_root_mysql_connection() {
+  ${mysql_cmd} -e "select 1;" > /dev/null 2>&1
+  if [ $? -ne 0 ]
+  then
+    log_error "Can't connect to MySQL with root (expect to do that with a plain mysql command, so /root/.my.cnf should be in place), check configuration"
+    exit 1
+  fi
+}
+
+function determine_slow_log() {
+  max_slowlog_size=`${mysql_cmd} -e "select @@max_slowlog_size;"`
+  if [ $? -ne 0 ]
+  then
+    determine_slow_log
+  fi
+  if [ ${max_slowlog_size} -ne 0 ]
+  then
+    # Percona Server automatic slow log rotation is in place
+    ls -1 ${mysql_slow_log_file}* | tail -1
+  else
+    echo ${mysql_slow_log_file}
+  fi
+}
+
+function kill_old_slowlogd() {
+  slowlog_to_use="$1"
+  slowlog_dir="`dirname $1`"
+
+  # Kill old instances
+  pids_old_slowlogd=`pgrep -lf "${mysql_slowlogd} -p ${mysql_slowlogd_port} -f ${slowlog_dir}" | grep -v ${slowlog_to_use} | cut -d ' ' -f1`
+  [ -n "${pids_old_slowlogd}" ] && kill "${pids_old_slowlogd}"
+}
+
+function check_slowlogd() {
+  slowlog_to_use=`determine_slow_log`
+  pid_slowlogd=`pgrep -f "${mysql_slowlogd} -p ${mysql_slowlogd_port} -f ${slowlog_to_use}"`
+  if [ $? -eq 0 ]
+  then
+    echo "${pid_slowlogd}" 
+  else
+    kill_old_slowlogd "${slowlog_to_use}"
+    echo "not_running"
+  fi
+}
+
+function start_slowlogd() {
+  slowlog_to_use=`determine_slow_log`
+  ${mysql_slowlogd} -p ${mysql_slowlogd_port} -f ${slowlog_to_use} &
+  if [ $? -ne 0 ]
+  then
+    log_error "failed to start mysql_slowlogd"
+    exit 1
+  else
+    log_notice "Started using log file ${slowlog_to_use}"
+  fi
+}
+
+function kill_slowlogd() {
+  slowlogd_pid=`pgrep -f "${mysql_slowlogd} -p ${mysql_slowlogd_port} -f ${mysql_slow_log_file}"`
+  if [ k"${slowlogd_pid}" != 'k' ]
+  then
+    kill -9 "${slowlogd_pid}"
+    if [ $? -ne 0 ]
+    then
+      log_error "failed to kill mysql_slowlogd"
+      exit 1
+    fi
+  fi
+}
+
+function check_active_passive() {
+  check_user_query="select count(user) from information_schema.processlist where user not in (${mysql_users_excluded});"
+  mysql_user_connected=`echo "$check_user_query" | $mysql_cmd`
+  if [ $? -ne 0 ]
+  then
+    # If mysql connection can't be made, we threat the node as passive as it can't be source of cache replication
+    mysql_user_connected=0
+  fi
+
+  if [ $mysql_user_connected -ge $mysql_user_connection_threshold ] 
+  then
+    echo "active"
+  else
+    echo "passive"
+  fi
+}
+
+function check_playback() {
+  playback_pid=`pgrep -lf percona-playback | grep " ${mysql_port} "  | awk '{print $1}'`
+  if [ k"${playback_pid}" == 'k' ]
+  then
+    echo "not_running"
+  else
+    echo "${playback_pid}"
+  fi
+}
+
+function start_playback() {
+  ${wget_binary} -q -O - http://${master_server}:${mysql_slowlogd_port}/slow | \
+      ${percona_playback_binary} \
+      --mysql-host 127.0.0.1 \
+      --mysql-username ${playback_user} \
+      --mysql-password ${playback_password} \
+      --mysql-port ${mysql_port} \
+      --mysql-schema ${playback_schema} \
+      --query-log-stdin \
+      --dispatcher-plugin thread-pool \
+      --thread-pool-threads-count ${playback_thread_pool_size} \
+      --session-init-query "set innodb_fake_changes=1; set sql_log_bin=0;" > /dev/null 2>&1 &
+}
+
+function kill_playback() {
+  playback_pid=`pgrep -lf percona-playback | grep " ${mysql_port} "| awk '{print $1}'` 
+  if [ k"${playback_pid}" != 'k' ]
+  then
+    kill -9 "${playback_pid}"
+    if [ $? -ne 0 ]
+    then
+      log_error "failed to kill playback"
+      exit 1
+    fi
+  fi
+}
+
+function kill_playback_queries() {
+  threadids=`${mysql_cmd} -e "select id from information_schema.processlist where user='$playback_user';"`
+  for threadid in ${threadids}
+  do
+    ${mysql_cmd} -e "kill ${threadid};" > /dev/null 2>&1
+  done
+}
+
+function check_long_running_playback() {
+  newest_query_length=`${mysql_cmd} -e "select min(time) from information_schema.processlist where user='$playback_user';"`
+  if [ $? -ne 0 ]
+  then
+    log_error "Failed to determine the length of newest playback query."
+    exit 1
+  fi
+
+  if [ ${newest_query_length} == 'NULL' ]
+  then
+    newest_query_length=0
+  fi
+
+  if [ ${newest_query_length} -gt ${playback_connection_timeout} ]
+  then
+    log_notice "Playback stuck for too long, restarting... "
+    kill_playback_queries
+    kill_playback
+    sleep 1
+    start_playback
+  fi
+} 
+
+function cleanup() {
+  echo "Cleaning up"
+  kill_playback
+  kill_slowlogd
+  exit 0
+}
+
+trap cleanup INT TERM KILL
+
+check_playback_user
+check_root_mysql_connection
+check_long_running_playback
+
+while true
+do
+  check_long_running_playback
+  m_s=`check_active_passive`
+  case $m_s in 
+    "active")
+      if [ $manage_mysql_slowlogd -ne 0 ]
+      then
+        slowlogd_state=`check_slowlogd`
+        if [ $slowlogd_state == "not_running" ]
+        then
+          start_slowlogd
+          log_notice "State change: slowlogd started"
+        fi
+      fi
+  
+      playback_state=`check_playback`
+      if [ $playback_state != "not_running" ]
+      then
+        kill_playback
+        log_notice "State change: playback killed"
+      fi
+    ;;
+    "passive")
+      if [ $manage_mysql_slowlogd -ne 0 ]
+      then
+        slowlogd_state=`check_slowlogd`
+        if [ $slowlogd_state != "not_running" ]
+        then
+          kill_slowlogd
+          log_notice "State change: slowlogd killed"
+        fi
+      fi
+  
+      playback_state=`check_playback`
+      if [ $playback_state == "not_running" ]
+      then
+        start_playback
+        log_notice "State change: playback started"
+      else
+        num_playback_pids=`echo "${playback_pids}" | wc -w | awk '{print $NF}'`
+        if [ ${num_playback_pids} -ge 2 ]
+        then
+          log_notice "Too many playback processes, restarting."
+          kill_playback
+          sleep 1
+          start_playback
+        fi
+      fi
+    ;;
+    *)
+      echo "fail"
+      log_error "Could not determine if the node is active or passive."
+      exit 1
+    ;;
+  esac
+  sleep 1
+done
+

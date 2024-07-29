@@ -1,0 +1,9 @@
+---
+- name: Splunk Forwarder | remove instance configuration | inputs.conf
+  become: yes
+  replace:
+    path: /opt/splunkforwarder/etc/system/local/inputs.conf
+    regexp: '^# {{ instance }}+\n[^$\n]+[a-zA-Z = a-zA-Z\n|a-zA-Z:a-zA-Z\n]+'
+    replace: ''
+  ignore_errors: true
+  notify: "restart splunk"

@@ -1,0 +1,60 @@
+---
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+          - instance is defined
+          - database is defined
+          - table is defined
+
+- name: Ensure host level settings look OK
+  gather_facts: false
+  become: true
+  hosts:
+    - "{{ node }}"
+
+  tasks:
+
+    - name: Check if the file exist
+      shell: ls -latrh /var/groupon/percona/{{ instance }}/data/{{ database }}/{{ table }}.ibd
+      ignore_errors: yes
+      changed_when: False
+      no_log: True
+      register: file_check
+
+    - name: file info
+      debug: var=file_check.stdout
+      when: file_check.rc == 0
+
+    - name: Create the hardlink
+      file:
+        src: '/var/groupon/percona/{{ instance }}/data/{{ database }}/{{ table }}.ibd'
+        dest: '/var/groupon/percona/{{ instance }}/data/{{ database }}/hardlink_{{ table }}_KURT'
+        state: hard
+      register: hardlink
+      when:
+        - file_check.rc == 0
+
+    # - debug: var=hardlink
+
+    - name: DROP TABLE 
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "set sql_log_bin = 0; DROP TABLE IF EXISTS {{ database }}.{{ table }}"
+      register: drop_table
+      when:
+        - hardlink is succeeded
+        - file_check.rc == 0
+
+    # - debug: var=drop_table
+
+    - name: Remove hardlink
+      file: 
+        path: /var/groupon/percona/{{ instance }}/data/{{ database }}/hardlink_{{ table }}_KURT
+        state: absent
+      when: 
+        - file_check.rc == 0
+        - hardlink is succeeded
+        - drop_table is succeeded

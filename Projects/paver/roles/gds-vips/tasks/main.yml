@@ -1,0 +1,9 @@
+---
+- include_tasks: FreeBSD.yml
+  tags:
+    - vip
+    - vips
+    - gds-vips
+    - carp
+  when: ansible_os_family == 'FreeBSD'
+

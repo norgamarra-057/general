@@ -1,0 +1,5 @@
+---
+- name: Assemble configs
+  assemble:
+    dest: /etc/rc.conf.local
+    src: /etc/rc.conf.local.d

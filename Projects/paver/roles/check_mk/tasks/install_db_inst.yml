@@ -1,0 +1,193 @@
+---
+- set_fact:
+    plugins_db_inst: "{{ plugins[db_type][inst_type] | default([]) }}"
+    locals_db_inst: "{{ locals[db_type][inst_type] | default([]) }}"
+    locals_db_inst_pg_rare: "{{ locals['postgresql']['slave_rare'] | default([]) }}"
+    plugins_db_inst_pg_slave_rare: "{{ plugins['postgresql']['slave_rare'] | default([]) }}"
+    plugins_db_inst_pg_slave_rare_hourly: "{{ plugins['postgresql']['slave_rare_hourly'] | default([]) }}"
+    plugins_db_inst_mysql_slave_rare_hourly: "{{ plugins['mysql']['slave_rare_hourly'] | default([]) }}"
+    plugins_db_inst_mysql_slave_extra_rare: "{{ plugins['mysql']['slave_extra_rare'] | default([]) }}"
+    plugins_db_inst_mysql_slave_rare: "{{ plugins['mysql']['slave_rare'] | default([]) }}"
+    plugins_db_inst_pg_slave: "{{ plugins['postgresql']['slave'] | default([]) }}"
+    plugins_db_inst_pg_master: "{{ plugins['postgresql']['master'] | default([]) }}"
+    locals_db_inst_master: "{{ locals[db_type]['master'] | default([]) }}"
+    locals_db_inst_slave: "{{ locals[db_type]['slave'] | default([]) }}"
+    plugins_db_inst_master: "{{ plugins[db_type]['master'] | default([]) }}"
+    plugins_db_inst_slave: "{{ plugins[db_type]['slave'] | default([]) }}"
+    pg_scripts: "{{ pg_scripts | default([]) }}"
+
+- name: Copy pg scripts
+  template:
+    src: "pg_scripts/{{ item }}.j2"
+    dest: "/usr/local/sbin//{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'postgresql'
+  with_items: "{{ pg_scripts }}"
+
+
+- name: Copy plugins for db_type / inst_type
+  copy:
+    src: "plugins/{{ db_type }}/{{ inst_type }}/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  with_items: "{{ plugins_db_inst }}"
+
+
+- name: Copy rare plugins for db_type / inst_type
+  copy:
+    src: "plugins/{{ db_type }}/slave_rare/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_rare }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: inst_type == 'slave' and db_type == 'postgresql'
+  with_items: "{{ plugins_db_inst_pg_slave_rare }}"
+
+
+- name: Copy rare_hourly plugins for db_type / inst_type
+  copy:
+    src: "plugins/{{ db_type }}/slave_rare_hourly/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_rare_hourly }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: inst_type == 'slave' and db_type == 'postgresql'
+  with_items: "{{ plugins_db_inst_pg_slave_rare_hourly }}"
+
+- name: Copy rare_hourly plugins for db_type / inst_type 2
+  copy:
+    src: "plugins/{{ db_type }}/slave_rare_hourly/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_rare_hourly }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: inst_type == 'slave' and db_type == 'mysql'
+  with_items: "{{ plugins_db_inst_mysql_slave_rare_hourly }}"
+
+- name: Ensure target directory for mysql slave extra rare exists
+  file:
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequence_mysql_slave_extra_rare }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+  when: db_type == 'mysql'
+
+- name: Copy extra rare plugins for db_type / inst_type 2
+  copy:
+    src: "plugins/{{ db_type }}/slave_extra_rare/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequence_mysql_slave_extra_rare }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: inst_type == 'slave' and db_type == 'mysql'
+  with_items: "{{ plugins_db_inst_mysql_slave_extra_rare }}"
+
+- name: Copy rare plugins for db_type / inst_type 2
+  copy:
+    src: "plugins/{{ db_type }}/slave_rare/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_mysql_common_rare }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: inst_type == 'slave' and db_type == 'mysql'
+  with_items: "{{ plugins_db_inst_mysql_slave_rare }}"
+
+- name: Remove locals that are not proper for a slave
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/local/{{ frequency }}/{{ item }}'
+  when: inst_type == 'slave'
+  with_items: "{{ locals_db_inst_master }}"
+
+- name: Remove plugins that are not proper for a slave
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/plugins/{{ frequency }}/{{ item }}'
+  when: inst_type == 'slave'
+  with_items: "{{ plugins_db_inst_master }}"
+
+- name: Remove locals that are not proper for a master
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/local/{{ frequency }}/{{ item }}'
+  when: inst_type == 'master'
+  with_items: "{{ locals_db_inst_slave }}"
+
+- name: Remove plugins that are not proper for a master
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/plugins/{{ frequency }}/{{ item }}'
+  when: inst_type == 'master'
+  with_items: "{{ plugins_db_inst_slave }}"
+
+- name: Remove rare plugins that are not proper for a pg master 
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/plugins/{{ frequency_rare }}/{{ item }}'
+  when: inst_type == 'master' and db_type == 'postgresql'
+  with_items: "{{ plugins_db_inst_pg_slave_rare }}"
+
+
+- name: Remove rare_hourly plugins that are not proper for a pg master
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/plugins/{{ frequency_rare_hourly }}/{{ item }}'
+  when: inst_type == 'master' and db_type == 'postgresql'
+  with_items: "{{ plugins_db_inst_pg_slave_rare_hourly }}"
+
+
+- name: Remove rare_hourly plugins that are not proper for a mysql master
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/plugins/{{ frequency_rare_hourly }}/{{ item }}'
+  when: inst_type == 'master' and db_type == 'mysql'
+  with_items: "{{ plugins_db_inst_mysql_slave_rare_hourly }}"
+
+- name: Remove rare plugins that are not proper for a mysql master
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/plugins/{{ frequency_mysql_common_rare }}/{{ item }}'
+  when: inst_type == 'master' and db_type == 'mysql'
+  with_items: "{{ plugins_db_inst_mysql_slave_rare }}"
+
+- name: Remove extra rare plugins that are not proper for a mysql master
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/plugins/{{ frequence_mysql_slave_extra_rare }}/{{ item }}'
+  when: inst_type == 'master' and db_type == 'mysql'
+  with_items: "{{ plugins_db_inst_mysql_slave_extra_rare }}"
+
+- name: Remove seconds_behind_master which shouldnt exist on a master
+  file:
+        state=absent
+        path='/usr/lib/check_mk_agent/local/{{ frequency_mysql_common_rare }}/mysql_db_sec_b_mas.sh'
+  when: inst_type == 'master' and db_type == 'mysql'
+
+- name: Copy locals for db_type / inst_type
+  copy:
+    src: "locals/{{ db_type }}/{{ inst_type }}/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/local/{{ frequency }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  with_items: "{{ locals_db_inst }}"
+
+- name: get IP lagg0
+  shell: ifconfig lagg0 | grep 'inet' | awk -F ' ' '{ print $2 }' 
+  register: current_ip
+
+- name: Copy slave-to-slave if applicable
+  copy:
+    src: "locals/postgresql/custom/postgres_db_replication_slave_to_slave.sh"
+    dest: "/usr/lib/check_mk_agent/local/{{ frequency }}/"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'postgresql' and inst_type == 'slave' and current_ip.stdout | regex_search('10.22')
+

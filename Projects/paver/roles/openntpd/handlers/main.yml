@@ -1,0 +1,6 @@
+---
+- name: openntpd restart
+  command: /usr/local/sbin/sv term /var/service/openntpd
+
+- name: openntpd log restart
+  command: /usr/local/sbin/sv term /var/service/openntpd/log

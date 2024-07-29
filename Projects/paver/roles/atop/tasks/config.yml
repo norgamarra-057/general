@@ -1,0 +1,20 @@
+---
+- name: Configure atop in rc.conf
+  lineinfile:
+    dest: /etc/rc.conf
+    line: atop_enable="YES"
+    regexp: '^atop_enable=.*'
+
+- name: Set up log rotation
+  file:
+    dest: /var/cron/tabs/root
+    state: touch
+    owner: root
+    group: wheel
+    mode: 0600
+
+- name: Set up log rotation
+  lineinfile:
+    dest: /var/cron/tabs/root
+    line: '0 0 * * *    /usr/local/etc/rc.d/atop rotate >/dev/null'
+    regexp: '.*/usr/local/etc/rc.d/atop rotate'

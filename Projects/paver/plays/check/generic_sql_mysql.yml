@@ -1,0 +1,35 @@
+---
+- name: Generic Mysql sql 
+  hosts: gds_all
+  become: yes
+  tasks:
+    - assert:
+        that:
+          - query is defined
+          
+
+    - name: Copy generic sql execution
+      copy:
+        src: "../../roles/check_mk/files/checks/mysql/check_mysql_generic"
+        dest: "/usr/lib/check_mk_agent/check_mysql_generic"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: mys var
+      shell: "echo {{ query }} "
+      changed_when: false
+      register: mysvar
+      ignore_errors: yes
+
+    - debug: var=mysvar.stdout_lines
+
+    - name: mysql generic execution
+      shell: /compat/linux/bin/bash /usr/lib/check_mk_agent/check_mysql_generic -q "{{ query }}"
+      changed_when: false
+      register: mysql_generic
+      ignore_errors: yes
+
+    - debug: var=mysql_generic.stdout_lines
+
+

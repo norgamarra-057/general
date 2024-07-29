@@ -1,0 +1,24 @@
+---
+- name: Aws part replica
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - assert:
+        that:
+          - db is defined
+          - aws_host is defined
+
+    - name: Drop subscription
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host }} -c "drop subscription my_sub"
+
+    - name: Kill my sessions
+      shell: psql -U gds_admin -d postgres -At -p 5432 -h {{ aws_host }} -c "select pg_terminate_backend(pid) from pg_stat_activity where datname='{{ db }}' and usename='gds_admin'"
+
+    - name: Drop database
+      shell: psql -U gds_admin -d postgres -p 5432 -h {{ aws_host }} -c "drop database {{ db }}"
+
+
+

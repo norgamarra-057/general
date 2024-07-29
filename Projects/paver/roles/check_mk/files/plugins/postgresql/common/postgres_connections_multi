@@ -1,0 +1,46 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_connections_multi>>>'
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        OUTPUT="$(echo "WITH max_conns
+                        AS (SELECT max(rolconnlimit)
+                        AS max_app
+                        FROM pg_roles
+                        WHERE rolname
+                        SIMILAR TO '%(app|jdbc|django|clojure)'),
+                        current_conns
+                        AS (SELECT count(*)
+                        AS current_app
+                        FROM pg_stat_activity
+                        WHERE usename
+                        SIMILAR TO '%(app|jdbc|django|clojure)')
+                        SELECT case when (select count(*)
+                        FROM pg_roles
+                        WHERE rolname
+                        SIMILAR TO '%(app|jdbc|django|clojure)') = 0 then 0
+                        ELSE round(100*current_app/max_app) END
+                        AS conns
+                        FROM max_conns,current_conns;" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' 2>/dev/null)"
+        echo "$OUTPUT"
+        sleep 0.5
+done

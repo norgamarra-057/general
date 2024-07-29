@@ -1,0 +1,99 @@
+---
+- name: FreeBSD | directory | agent
+  file:
+    path="/var/groupon/monitord"
+    state=directory
+    owner=monitord
+    group="{{ foreman_groups[users['monitord'].group ].gid }}"
+    mode=0755
+    recurse=yes
+
+- name: FreeBSD | runit | directories (read-only)
+  file: path="{{ item }}" state=directory owner=root group=wheel mode=0755
+  with_items:
+    - /var/groupon/service/monitord_agent
+    - /var/groupon/service/monitord_agent/bin
+    - /var/groupon/service/monitord_agent/env
+    - /var/groupon/service/monitord_agent/log
+
+
+- name: FreeBSD | runit | svlogd directory
+  file:
+    path=/var/groupon/service/monitord_agent/log/main
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+  changed_when: False
+
+- name: FreeBSD | runit | nagios directory
+  file:
+    path=/var/spool/nagios
+    state=directory
+    owner=monitord
+    group="{{ foreman_groups[users['monitord'].group ].gid }}"
+    mode=0755
+
+- name: FreeBSD | runit | environment
+  copy: dest=/var/groupon/service/monitord_agent/env/PATH
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - monitord_agent restart
+
+- name: FreeBSD | runit | gen_monitord_config
+  template:
+    dest=/var/groupon/service/monitord_agent/gen_monitord_config
+    mode=0654
+    src=gen_monitord_config.sh.j2
+    owner=root
+    group="{{ foreman_groups[users['monitord'].group ].gid }}"
+  notify:
+    - monitord_agent restart
+
+- name: FreeBSD | runit | script
+  template:
+    dest=/var/groupon/service/monitord_agent/run2
+    mode=0755
+    src=runit2.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - monitord_agent restart
+
+- name: FreeBSD | runit | script
+  template:
+    dest=/var/groupon/service/monitord_agent/run
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - monitord_agent restart
+
+- name: FreeBSD | runit | log script
+  template:
+    dest=/var/groupon/service/monitord_agent/log/run
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - monitord_agent log restart
+
+- name: FreeBSD | runit | monitord cron
+  cron:
+    name="monitord-agent reload"
+    special_time=hourly
+    job="/usr/local/sbin/sv term /var/groupon/service/monitord_agent/"
+
+- name: FreeBSD | runit | monitord enable
+  file:
+    src: /var/groupon/service/monitord_agent
+    dest: /var/service/monitord_agent
+    owner: root
+    group: wheel
+    state: link

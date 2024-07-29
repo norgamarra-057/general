@@ -1,0 +1,5 @@
+---
+consul_data_dir: /var/groupon/consul
+consul_conf_dir: /usr/local/etc/consul.d
+consul_service_dir: /var/groupon/service/consul
+consul_port: 8301

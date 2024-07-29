@@ -1,0 +1,59 @@
+---
+###################################################
+# advbase_compare.yml
+#
+# Description:   This playbook pulls configured and running advbase settings for each configured instance.
+#                It then compares then and flags them with 'Out-of-Sync' if they are not equal. 
+#                It finishes by writing the 'report' to a local txt file on the box running the play 
+#                (default is /tmp/advbase_compare.txt).
+#
+# Usage:        ansible-playbook plays/check/get_advbase.yml -e "report_file=/tmp/all-the-stuff.txt"
+# become:       false
+# gather_facts: false
+# 
+# Parameters:   None required, but can limit to a particular group or host and can provide a unique report_dir location.
+#
+# Notes:        1. advbase settings that match will have Status: OK.  
+#               2. advbase settings that don't match will have Status: Out-of-Sync
+#               3. advbase settings that are not plumbed will be ignored
+###################################################
+
+- name: Generate Configured vs Running advbase Report
+  gather_facts: false
+  become: false
+  hosts: all
+  tasks:
+    - name: Create list of configured vhids
+      shell: grep vhid /etc/rc.conf.local | awk '{ print $2 }' | sort -uh
+      ignore_errors: true
+      changed_when: false
+      register: vhids
+
+    - name: Set Report file location
+      set_fact:
+        report_dir: "~"
+      when: report_dir is not defined
+
+    - name: Create Report file
+      set_fact:
+        report_file: "{{ report_dir }}/{{ inventory_hostname }}.txt"
+
+    - name: Initialize Report file
+      local_action: shell echo "Configured vs Running Advbase settings for {{ inventory_hostname }} at `date`" > {{ report_file }}
+      no_log: true
+
+    - name: Retrieve configured and running advbase settings
+      shell: echo "{{ item }}" ; cat /etc/rc.conf.local | grep 'vhid {{ item }}' | awk '{print "advbase:", $6, "advskew:", $8}' | sort -h --key=4 ; ifconfig | grep 'vhid {{ item }}' | grep advbase | awk '{print "advbase:", $6, "advskew:", $8}' | sort -h --key=4
+      with_items: "{{ vhids.stdout_lines }}"
+      ignore_errors: true
+      changed_when: false
+      register: advbase_values
+
+    - name: Generate Report
+      local_action: shell echo "Server{{':'}} {{ inventory_hostname }}, vhid{{':'}} {{ item['stdout_lines'][0] }}, Configured (MASTER){{':'}} '{{ item['stdout_lines'][1] }}', Configured (BACKUP){{':'}} '{{ item['stdout_lines'][2] }}', Running (MASTER){{':'}} '{{ item['stdout_lines'][3]|default('Not running') }}', Running (BACKUP){{':'}} '{{ item['stdout_lines'][4]|default('Not running') }}'" >> {{ report_file }}
+      with_items: "{{ advbase_values.results }}"
+      changed_when: false
+      no_log: true
+
+    - name: Report Generated
+      debug: msg="Generated{{':'}} {{ report_file }}"

@@ -1,0 +1,25 @@
+---
+- name: hostname
+  shell: /bin/hostname `/usr/sbin/sysrc -n hostname`
+
+- name: init reload
+  command: /bin/kill -HUP 1
+
+- name: moused kill
+  command: /bin/pkill moused
+  ignore_errors: True
+
+- name: moused stop
+  service: name=moused state=stopped
+
+- name: motd start
+  service: name=motd state=started
+
+- name: runit start
+  service: name=runsvdir state=started
+
+- name: syslogd reload
+  service: name=syslogd state=reloaded
+
+- name: syslogd restart
+  service: name=syslogd state=restarted

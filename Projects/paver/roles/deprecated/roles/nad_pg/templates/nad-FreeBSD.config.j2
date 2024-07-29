@@ -1,0 +1,196 @@
+{
+    "graphs": {
+
+
+
+{% for instance_name,instance in gds_instances.iteritems() %}
+{% if gds_instances[instance_name].type == 'postgresql' %}
+      "{{ vip_name }}": {
+            "style": "line",
+            "datapoints": [
+                {
+                    "name": "Index Hit Ratio",
+                    "metric_name": "pg_ind_{{ instance_name }}`hit_ratio",
+                    "metric_type": "numeric",
+                    "axis": "l",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Locks Granted",
+                    "metric_name": "pg_locks_{{ instance_name }}`is_granted",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Delay",
+                    "metric_name": "pg_repl_{{ instance_name }}`delay",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Delay master",
+                    "metric_name": "pg_repl_master_{{ instance_name }}`delay_master",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Delay Slave",
+                    "metric_name": "pg_repl_slave_{{ instance_name }}`delay_slave",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Slave status",
+                    "metric_name": "pg_slave_{{ instance_name }}`is_slave",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Transaction State",
+                    "metric_name": "pg_transac_state_{{ instance_name }}`state",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Txn Idle",
+                    "metric_name": "pg_txn_{{ instance_name }}`idle",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Txn Time",
+                    "metric_name": "pg_txn_{{ instance_name }}`time",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Wraparound",
+                    "metric_name": "pg_wait_{{ instance_name }}`wraparound",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                },
+                {
+                    "name": "Waiting Transanctions",
+                    "metric_name": "pg_wraparound_{{ instance_name }}`waiting_transactions",
+                    "metric_type": "numeric",
+                    "axis": "r",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": false,
+                    "alpha": "1"
+                }
+            ]
+        },
+
+{% endif %}
+
+{% endfor %}
+ 
+"a": {
+            "style": "line",
+            "datapoints": [
+                {
+                    "name": "a",
+                    "metric_name": "o",
+                    "metric_type": "numeric",
+                    "axis": "l",
+                    "stack": null,
+                    "derive": "counter",
+                    "hidden": true,
+                    "alpha": "1"
+                }
+	]
+	}   
+    },
+
+    "check": [
+{% for instance_name,instance in gds_instances.iteritems() %}
+{% if gds_instances[instance_name].type == 'postgresql' %}
+    {
+        "type": "json:nad",
+        "period": 60,
+        "timeout": 10,
+        "metrics": {
+            "numeric": [
+
+
+            "pg_ind_{{ instance_name }}`hit_ratio",
+            "pg_locks_{{ instance_name }}`is_granted",
+            "pg_repl_{{ instance_name }}`delay",
+            "pg_repl_master_{{ instance_name }}`delay_master",
+            "pg_repl_slave_{{ instance_name }}`delay_slave",
+            "pg_slave_{{ instance_name }}`is_slave",
+            "pg_stat_{{ instance_name }}`id",
+            "pg_stat_{{ instance_name }}`name",
+            "pg_stat_{{ instance_name }}`numbackends",
+            "pg_stat_{{ instance_name }}`xactCommit",
+            "pg_stat_{{ instance_name }}`xactRollback",
+            "pg_stat_{{ instance_name }}`blksRead",
+            "pg_stat_{{ instance_name }}`blksHit",
+            "pg_stat_{{ instance_name }}`tupReturned",
+            "pg_stat_{{ instance_name }}`tupFetched",
+            "pg_stat_{{ instance_name }}`tupUpdated",
+            "pg_stat_{{ instance_name }}`tupDeleted",
+            "pg_stat_{{ instance_name }}`dbSize",
+            "pg_transac_state_{{ instance_name }}`state_idle",
+            "pg_transac_state_{{ instance_name }}`state_active",
+            "pg_txn_{{ instance_name }}`idle",
+            "pg_txn_{{ instance_name }}`time",
+            "pg_wait_{{ instance_name }}`waiting_transactions",
+            "pg_wraparound_{{ instance_name }}`wraparound"
+		"test`test1:1:test1:test1"
+            ],
+            "text": []
+        },
+        "display_name": "{{ instance_name }}",
+        "config": {
+            "port": 2611
+        }
+    }
+    {% if not loop.last %}
+    ,
+    {% endif %}
+    ,
+{% endif %}
+{% endfor %}
+]
+}

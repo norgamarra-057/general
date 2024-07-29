@@ -1,0 +1,157 @@
+---
+###################################################
+# aws-copy-instance.yml
+#
+# Description:  This play is for copy a existing postgres database from DaaS to AWS RDS aws_host.
+#
+# Parameters:  daas_host=source_server
+#              instance=instance_name_on_source
+#              db=source_database_to_copy
+#              aws_host=aws_aws_host
+#              password=the_password_in_aws
+#              Parms can also be passed via a json file as -e "@test.json"
+#
+#             
+#             
+#             
+#             
+#
+#
+# Notes: 1. If db is not provided, all databases except 'template1','template0','postgres','hydra' will be dump.
+#        2. the password for the aws_host must be set using the var admin_password.
+###################################################
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+          - aws_host is defined
+          - admin_password is defined
+
+- name: Postgres | Generate Dump
+  become: true
+  hosts:
+    - "{{ daas_host }}"
+  gather_facts: false  
+  tasks:
+
+    - set_fact:
+        instance_port: "{{ gds_instances[instance]['ports']['postgresql_raw'] | int }}"
+        dba_account_name: "{{ gds_instances[instance]['dba_account_name'] }}"
+        app_account_name: "{{ gds_instances[instance]['app_account_name'] }}"
+      tags: dump,load
+
+    - name: Create tmp backup location, if needed
+      file: path=/var/groupon/postgresql/temp_dumps/{{ instance }} owner=root group=wheel mode=0777 state=directory
+      tags: dump
+
+    - name: Postgres | Get Databases
+      shell: psql -U postgres -p {{ instance_port }} -c "select datname from pg_database where not datname in  ('template1','template0','postgres','hydra','heartbeat')" -t -A
+      register: databases
+      changed_when: false
+      when: db is not defined
+      tags: dump,load
+
+    - set_fact:
+        db: "{{ databases.stdout_lines}}"
+      when: db is not defined
+      tags: dump,load
+
+    - debug: msg="List of databases {{ db }}"
+      tags: debug,dump
+
+    - name: pg_dump | Generate Dump
+      shell: |
+        exec 2>&1
+          pg_dump -N heartbeat -N pglogical -N pglogical_origin -N dba -h localhost -p {{ instance_port }} -U postgres -d {{ item }} -F c -b -f /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ item }}.dmp
+          echo "/var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ item }}.dmp" >> /var/groupon/postgresql/temp_dumps/{{ instance }}/{{ instance }}.info
+      register: backup
+      with_items: "{{ db }}"
+      tags: dump
+
+    - name: pg_dumpall | Generate Dump Roles
+      shell: pg_dumpall -g -h localhost -p {{ instance_port }} -U postgres > /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles.sql
+      tags: dump
+
+    - name: remove aws conflicting words 1/4
+      shell: sed -e 's/\<NOSUPERUSER\>//g' /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles.sql > /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles_temp.sql
+
+    - name: remove aws conflicting words 2/4
+      shell: sed -e 's/\<NOREPLICATION\>//g' /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles_temp.sql > /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles.sql
+
+    - name: remove aws conflicting words 4/4
+      shell: sed -e 's/\(CONNECTION\).*\( PASSWORD\)/\1\2/' /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles.sql > /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles_temp.sql
+
+    - name: remove aws conflicting words 4/4
+      shell: sed -e 's/\<CONNECTION\>//g' /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles_temp.sql > /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles.sql
+
+
+    - fetch:
+        src: /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ item }}.dmp
+        dest: files/temp/
+        flat: yes
+      with_items: "{{ db }}"
+
+    - fetch:
+        src: /var/groupon/postgresql/temp_dumps/{{ instance }}/AWS_{{ instance }}_roles.sql
+        dest: files/temp/
+        flat: yes
+
+
+- name: Aws part
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - set_fact:
+        db: "{{ hostvars[daas_host]['db'] }}"
+        my_dba_user: "{{ hostvars[daas_host]['dba_account_name'] }}"
+
+    - name: Create config for the .pgpass file
+      lineinfile: dest=~/.pgpass line="{{ aws_host }}:5432:*:gds_admin:{{ admin_password }}"
+
+    - name: Import users
+      shell: psql -U gds_admin -d postgres -At -p 5432 -h {{ aws_host }} < files/temp/AWS_{{ instance }}_roles.sql
+      ignore_errors: yes
+
+    - name: dba to gds_admin
+      shell: psql -U gds_admin -d postgres -p 5432 -h {{ aws_host }} -c "GRANT {{ my_dba_user }} TO gds_admin;"
+
+    - name: RDS Postgres | Check db exist.
+      shell: psql -h {{ aws_host }} -U gds_admin -d postgres -p 5432 -c "select exists(SELECT datname FROM pg_catalog.pg_database WHERE datname = '{{ item }}');" -t -A 
+      register: db_check
+      with_items: "{{ db }}"
+
+    - name: AWS Postgres | Creating Databases
+      shell: psql -h {{ aws_host }} -U gds_admin -d postgres -p 5432 -c "CREATE DATABASE {{ item.item }} owner {{ my_dba_user }};"
+      with_items: "{{ db_check.results }}"
+      when: 
+        - item.stdout == 'f'
+        - item.rc == 0
+
+    - name: AWS Postgres | load Dumps
+      shell: |
+        exec 2>&1
+          pg_restore -h {{ aws_host }} -U gds_admin -d {{ item }} -p 5432 -j 4 files/temp/AWS_{{ item }}.dmp
+      register: load
+      with_items: 
+        - "{{ db }}"
+      ignore_errors: yes
+
+    - debug: msg="{{item.stdout_lines}}"
+      with_items: "{{load.results}}"
+
+    - name: Delete the temp globals file
+      file: path=files/temp/AWS_{{ item }}.dmp state=absent
+      with_items: "{{ db }}"
+
+
+    - name: Delete the temp schema file
+      file: path=files/temp/AWS_{{ instance }}_roles.sql state=absent

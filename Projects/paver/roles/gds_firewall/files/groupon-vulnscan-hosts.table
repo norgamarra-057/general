@@ -1,0 +1,1 @@
+table <groupon-vulnscan-hosts> persist file "/etc/pf.conf.d/tables/groupon-vulnscan-hosts.table"

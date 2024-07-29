@@ -1,0 +1,21 @@
+---
+- name: GDS PostgreSQL Cluster | variable check | gds_cluster
+  fail: 'msg="CONFIG ERROR: For GDS PostgreSQL Clusters, gds_cluster must be specified in host_vars/{{ inventory_hostname }}.yml"'
+  when: gds_cluster is not defined or 'gds_cluster' not in hostvars[inventory_hostname]
+
+- name: GDS PostgreSQL Cluster | variable check | postgresql_raw
+  fail: 'msg="CONFIG ERROR: For GDS PostgreSQL Clusters, postgresql_raw must be specified"'
+  when: gds_instances[instance_name].ports.postgresql_raw is not defined
+
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "../defaults/{{ ansible_os_family }}.yml"
+    - "../defaults/defaults.yml"
+
+- include_vars: derived_vars.yml
+
+- stat: path="{{ postgresql_pgdata }}/PG_VERSION"
+  register: PGDATA_PG_VERSION_stat
+
+- import_tasks: FreeBSD.yml tags=postgres,postgresql
+  when: ansible_os_family == 'FreeBSD'

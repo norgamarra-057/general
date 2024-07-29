@@ -1,0 +1,40 @@
+---
+system_accounts:
+  - splunk
+
+splunk_fbsd_binary: splunk-6.1.2-213098-FreeBSD7-amd64.tgz
+
+# List of programs/packages that should exist on all SPLUNK machines
+host_packages:
+  - bash
+  - curl
+  # - git-core
+  - gnu-watch
+  - nano
+  - pbzip2
+  - pigz
+  - portmaster
+  - pstree
+  - python27
+  - ruby
+  - rubygem-rake
+  - screen
+  - tmux
+  - vim-lite
+  - wget
+  - zfs-stats
+  - zfsnap
+
+host_zfs:
+  - { name: tank, mountpoint: none, compression: lz4, copies: 1, atime: 'off' }
+  - { name: tank/root, mountpoint: / }
+  - { name: tank/root/tmp, sync: disabled, recordsize: 4K }
+  - { name: tank/root/var }
+  - { name: tank/var, mountpoint: none }
+  - { name: tank/var/tmp, mountpoint: /var/tmp, sync: disabled, recordsize: 4K }
+  - { name: tank/var/groupon, mountpoint: /var/groupon }
+  - { name: tank/var/groupon/splunk }
+
+splunk_license_server: https://splunk-frontend1.snc1:8089
+
+splunk_home_dir : /var/groupon/splunk

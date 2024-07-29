@@ -1,0 +1,321 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - daas_slave is defined
+          - instance is defined
+
+    - set_fact: 
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+
+    - name: check if database is defined
+      fail: msg="Exiting ---------database is not defined"
+      when:  my_db_name is not defined
+
+
+- name: Daas part (slave)
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_slave }}'
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+
+    - name: set parameters in the postgresql.conf
+      lineinfile:
+        dest: "/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/postgresql.conf"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: "^wal_level*", line: "wal_level = logical" }
+        - { regexp: "^max_replication_slots*", line: "max_replication_slots = 15" }
+        - { regexp: "^max_wal_senders*", line: "max_wal_senders = 15" }
+        - { regexp: "^max_worker_processes*", line: "max_worker_processes = 10" }
+        - { regexp: "^shared_preload_libraries*", line: "shared_preload_libraries = 'auto_explain,btree_gin,btree_gist,citext,dblink,dict_int,dict_xsyn,fuzzystrmatch,hstore,lo,ltree,pageinspect,passwordcheck,pg_buffercache,pgcrypto,pg_freespacemap,pgrowlocks,pg_stat_statements,pgstattuple,pg_trgm,postgres_fdw,tablefunc,tcn,unaccent,uuid-ossp,pglogical' #(change requires restart)" }
+
+    - name: Check if restart is actually needed 1/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='wal_level' and setting='logical'"
+      register: current_wal_level_count
+
+    - name: Check if restart is actually needed 2/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='shared_preload_libraries' and setting like '%pglogical'"
+      register: current_preload_libraries_count
+
+    - name: Check if restart is actually needed 3/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_wal_senders' and setting::int > 9"
+      register: max_wal_senders_count
+
+    - name: Check if restart is actually needed 4/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_replication_slots' and setting::int > 9"
+      register: max_replication_slots_count
+
+    - name: Check if restart is actually needed 5/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_worker_processes' and setting::int > 7"
+      register: max_worker_processes_count
+
+    - name: Update sources file
+      lineinfile:
+       dest: /etc/pf.conf.d/tables/{{ instance }}-srcs.table
+       regexp: "{{ item.regexp }}"
+       line: "{{ item.line }}"
+      with_items:
+       - { regexp: "^10.213.128.0/23*", line: "10.213.128.0/23" }
+       - { regexp: "^10.213.129.0/23*", line: "10.213.129.0/23" }
+       - { regexp: "^10.213.130.0/23*", line: "10.213.130.0/23" }
+       - { regexp: "^10.211.128.0/22*", line: "10.211.128.0/22" }
+       - { regexp: "^10.211.132.0/22*", line: "10.211.132.0/22" }
+       - { regexp: "^10.230.128.0/23*", line: "10.230.128.0/23" }
+       - { regexp: "^10.230.130.0/23*", line: "10.230.130.0/23" }
+       - { regexp: "^10.230.132.0/23*", line: "10.230.132.0/23" }
+       - { regexp: "^10.228.128.0/23*", line: "10.228.128.0/23" }
+       - { regexp: "^10.228.130.0/23*", line: "10.228.130.0/23" }
+       - { regexp: "^10.228.132.0/23*", line: "10.228.132.0/23" }
+       - { regexp: "^10.221.128.0/23*", line: "10.221.128.0/23" }
+       - { regexp: "^10.221.130.0/23*", line: "10.221.130.0/23" }
+       - { regexp: "^10.221.132.0/23*", line: "10.221.132.0/23" }
+       - { regexp: "^10.219.128.0/23*", line: "10.219.128.0/23" }
+       - { regexp: "^10.219.130.0/23*", line: "10.219.130.0/23" }
+       - { regexp: "^10.219.132.0/23*", line: "10.219.132.0/23" }
+
+
+
+    - name: Reload pf
+      shell: /etc/rc.d/pf reload
+
+    - name: Data directory
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c 'show data_directory'
+      register: data_dir
+
+
+    - name: Update pg_hba.conf 1
+      lineinfile:
+        dest: "{{ data_dir.stdout }}/pg_hba.conf"
+        line: "host    {{ my_db_name }}    gds_admin        {{ item }}              md5"
+      with_items:
+       - "10.213.128.0/23"
+       - "10.213.129.0/23"
+       - "10.213.130.0/23"
+       - "10.211.128.0/22"
+       - "10.211.132.0/22"
+       - "10.219.128.0/23"
+       - "10.219.130.0/23"
+       - "10.219.132.0/23"
+       - "10.230.128.0/23"
+       - "10.230.130.0/23"
+       - "10.230.132.0/23"
+       - "10.228.128.0/23"
+       - "10.228.130.0/23"
+       - "10.228.132.0/23"
+       - "10.221.128.0/23"
+       - "10.221.130.0/23"
+       - "10.221.132.0/23"
+
+    - name: Update pg_hba.conf 2
+      lineinfile:
+        dest: "{{ data_dir.stdout }}/pg_hba.conf"
+        line: "host    replication    gds_admin        {{ item }}              md5"
+      with_items:
+       - "10.213.128.0/23"
+       - "10.213.129.0/23"
+       - "10.213.130.0/23"
+       - "10.211.128.0/22"
+       - "10.211.132.0/22"
+       - "10.219.128.0/23"
+       - "10.219.130.0/23"
+       - "10.219.132.0/23"
+       - "10.230.128.0/23"
+       - "10.230.130.0/23"
+       - "10.230.132.0/23"
+       - "10.228.128.0/23"
+       - "10.228.130.0/23"
+       - "10.228.132.0/23"
+       - "10.221.128.0/23"
+       - "10.221.130.0/23"
+       - "10.221.132.0/23"
+
+    - name: Update pg_hba.conf 3
+      lineinfile:
+        dest: "{{ data_dir.stdout }}/pg_hba.conf"
+        line: "host    replication    gds_admin    127.0.0.1/32    trust"
+
+    - name: Reload Database
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_reload_conf()"
+
+    - name: Checkpoint
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "checkpoint"
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Restart database
+      shell: sv int /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Find if pid exists
+      stat: path=/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/postmaster.pid
+      register: is_postmaster_online
+      until: is_postmaster_online.stat.exists == True
+      retries: 1000
+      delay: 1
+
+
+- name: Daas part (master)
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_first_db: "{{ hostvars[daas_host]['my_first_db'] }}"
+
+
+    - name: set parameters in the postgresql.conf
+      lineinfile:
+        dest: "/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/postgresql.conf"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: "^wal_level*", line: "wal_level = logical" }
+        - { regexp: "^max_replication_slots*", line: "max_replication_slots = 15" }
+        - { regexp: "^max_wal_senders*", line: "max_wal_senders = 15" }
+        - { regexp: "^max_worker_processes*", line: "max_worker_processes = 10" }
+        - { regexp: "^shared_preload_libraries*", line: "shared_preload_libraries = 'auto_explain,btree_gin,btree_gist,citext,dblink,dict_int,dict_xsyn,fuzzystrmatch,hstore,lo,ltree,pageinspect,passwordcheck,pg_buffercache,pgcrypto,pg_freespacemap,pgrowlocks,pg_stat_statements,pgstattuple,pg_trgm,postgres_fdw,tablefunc,tcn,unaccent,uuid-ossp,pglogical' #(change requires restart)" }
+
+    - name: Check if restart is actually needed 1/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='wal_level' and setting='logical'"
+      register: current_wal_level_count
+
+    - name: Check if restart is actually needed 2/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='shared_preload_libraries' and setting like '%pglogical'"
+      register: current_preload_libraries_count
+
+    - name: Check if restart is actually needed 3/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_wal_senders' and setting::int > 9"
+      register: max_wal_senders_count
+
+    - name: Check if restart is actually needed 4/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_replication_slots' and setting::int > 9"
+      register: max_replication_slots_count
+
+    - name: Check if restart is actually needed 5/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_worker_processes' and setting::int > 7"
+      register: max_worker_processes_count
+
+    - name: Update sources file
+      lineinfile:
+       dest: /etc/pf.conf.d/tables/{{ instance }}-srcs.table
+       regexp: "{{ item.regexp }}"
+       line: "{{ item.line }}"
+      with_items:
+       - { regexp: "^10.213.128.0/23*", line: "10.213.128.0/23" }
+       - { regexp: "^10.213.129.0/23*", line: "10.213.129.0/23" }
+       - { regexp: "^10.213.130.0/23*", line: "10.213.130.0/23" }
+       - { regexp: "^10.211.128.0/22*", line: "10.211.128.0/22" }
+       - { regexp: "^10.211.132.0/22*", line: "10.211.132.0/22" }
+       - { regexp: "^10.230.128.0/23*", line: "10.230.128.0/23" }
+       - { regexp: "^10.230.130.0/23*", line: "10.230.130.0/23" }
+       - { regexp: "^10.230.132.0/23*", line: "10.230.132.0/23" }
+       - { regexp: "^10.228.128.0/23*", line: "10.228.128.0/23" }
+       - { regexp: "^10.228.130.0/23*", line: "10.228.130.0/23" }
+       - { regexp: "^10.228.132.0/23*", line: "10.228.132.0/23" }
+       - { regexp: "^10.221.128.0/23*", line: "10.221.128.0/23" }
+       - { regexp: "^10.221.130.0/23*", line: "10.221.130.0/23" }
+       - { regexp: "^10.221.132.0/23*", line: "10.221.132.0/23" }
+       - { regexp: "^10.219.128.0/23*", line: "10.219.128.0/23" }
+       - { regexp: "^10.219.130.0/23*", line: "10.219.130.0/23" }
+       - { regexp: "^10.219.132.0/23*", line: "10.219.132.0/23" }
+
+    - name: Reload pf
+      shell: /etc/rc.d/pf reload
+
+    - name: Data directory
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c 'show data_directory'
+      register: data_dir
+
+    - name: Update pg_hba.conf 1
+      lineinfile:
+        dest: "{{ data_dir.stdout }}/pg_hba.conf"
+        line: "host    {{ my_db_name }}    gds_admin        {{ item }}              md5"
+      with_items: 
+       - "10.213.128.0/23"
+       - "10.213.129.0/23"
+       - "10.213.130.0/23"
+       - "10.211.128.0/22"
+       - "10.211.132.0/22"
+       - "10.219.128.0/23"
+       - "10.219.130.0/23"
+       - "10.219.132.0/23"
+       - "10.230.128.0/23"
+       - "10.230.130.0/23"
+       - "10.230.132.0/23"
+       - "10.228.128.0/23"
+       - "10.228.130.0/23"
+       - "10.228.132.0/23"
+       - "10.221.128.0/23"
+       - "10.221.130.0/23"
+       - "10.221.132.0/23"
+
+    - name: Update pg_hba.conf 2
+      lineinfile:
+        dest: "{{ data_dir.stdout }}/pg_hba.conf"
+        line: "host    replication    gds_admin        {{ item }}              md5"
+      with_items:
+       - "10.213.128.0/23"
+       - "10.213.129.0/23"
+       - "10.213.130.0/23"
+       - "10.211.128.0/22"
+       - "10.211.132.0/22"
+       - "10.219.128.0/23"
+       - "10.219.130.0/23"
+       - "10.219.132.0/23"
+       - "10.230.128.0/23"
+       - "10.230.130.0/23"
+       - "10.230.132.0/23"
+       - "10.228.128.0/23"
+       - "10.228.130.0/23"
+       - "10.228.132.0/23"
+       - "10.221.128.0/23"
+       - "10.221.130.0/23"
+       - "10.221.132.0/23"
+
+    - name: Update pg_hba.conf 3
+      lineinfile:
+        dest: "{{ data_dir.stdout }}/pg_hba.conf"
+        line: "host    replication    gds_admin    127.0.0.1/32    trust"
+
+    - name: Reload Database
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_reload_conf()"
+
+    - name: Checkpoint
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "checkpoint"
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Restart database
+      shell: sv int /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Find if pid exists
+      stat: path=/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/postmaster.pid
+      register: is_postmaster_online
+      until: is_postmaster_online.stat.exists == True
+      retries: 1000
+      delay: 1
+

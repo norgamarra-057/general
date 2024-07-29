@@ -1,0 +1,5 @@
+---
+- name: PGBouncer | FreeBSD | packages | install pgbouncer
+  pkgng: name={{ item }} state=present
+  with_items:
+  - pgbouncer

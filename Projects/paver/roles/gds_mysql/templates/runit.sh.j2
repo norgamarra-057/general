@@ -1,0 +1,8 @@
+#!/bin/sh --
+exec 2>&1
+exec /usr/local/sbin/chpst \
+    -u {{ gds_instances[instance_name].unix_user }}:{{ users[gds_instances[instance_name].unix_user].group }} \
+  /usr/local/libexec/mysqld \
+    --defaults-file={{ percona_service_dir }}/my.cnf \
+    --basedir=/usr/local/bin \
+    --datadir={{ percona_datadir }}

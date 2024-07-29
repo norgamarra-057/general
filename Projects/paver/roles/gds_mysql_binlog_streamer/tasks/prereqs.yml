@@ -1,0 +1,7 @@
+- name: GDS mysql binlog streamer | create stream directory
+  file: 
+    name: "{{ local_binlog_path }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755

@@ -1,0 +1,20 @@
+---
+- name: Add swap to hosts
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Look for existing swap
+      shell: swapinfo | grep /dev
+      register: swap_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Find disks if swap is missing
+      shell: disklayout.py disks | egrep '400M2|186' | awk '{ print $1 }'
+      register: swap_disks_cmd
+      when: swap_check|failed
+
+    - name: Add disks
+      shell: "swapon /dev/{{ item }}"
+      with_items: swap_disks_cmd.stdout_lines
+      when: swap_check|failed

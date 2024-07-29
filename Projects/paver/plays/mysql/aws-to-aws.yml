@@ -1,0 +1,43 @@
+---
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Assert that required parameters are set
+      assert:
+        that:
+          - srcpoint is defined
+          - src_dbs is defined
+          - endpoint is defined
+
+    - name: Assert that additional parameters are set, if skip_users is not set
+      assert:
+        that:
+          - src_users is defined
+      when: skip_users is not defined or (skip_users|upper != "YES" or skip_users == False)
+
+- name: AWS To AWS Copy
+  gather_facts: true
+  become: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Check if running from GDS EC2 instance
+      uri:
+        url: http://169.254.169.254/latest/meta-data
+        timeout: 2
+      register: aws_uri_check
+      failed_when: False
+
+    - set_fact:
+        is_aws_environment: "{{ aws_uri_check.status == 200 }}"
+
+    - name: 
+      debug:
+        msg: "Note, play can ONLY run from a GDS EC2 instance: gds-prd-rds02.snc1, gds-prd-rds03.dub1 or gds-stg-rds01.snc1" 
+
+    - name: 
+      include_role:
+        name: gds_aws_to_aws
+      when: is_aws_environment 

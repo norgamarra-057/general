@@ -1,0 +1,10 @@
+---
+#- debug: msg="{{ item.key }} {{ item.value.gid }}" 
+#  with_dict: foreman_groups
+#
+#- fail: aaa
+
+- name: foreman | groups
+  shell: "/usr/sbin/pw groupadd {{ item.key }} -g {{ item.value.gid }}"
+  with_dict: foreman_groups
+  ignore_errors: true

@@ -1,0 +1,94 @@
+#!/usr/local/bin/ruby
+# ============================================================================
+
+require 'etc'
+require 'rubygems'
+require 'monitoring_script_multithreshold'
+require 'yaml'
+require 'mysql'
+
+class CheckMySQLAutoInc < MonitoringScriptMultithreshold
+  SERVICE_NAME = 'mysql_auto_increment_capacity'
+  SERVICE_DESC = 'Check remaining auto increment capacity of a MySQL server'
+  
+  OPTIONS = {
+    :database  => { :text => "MySQL database", :short => "D", :type => :string,  :required => false },
+    :host      => { :text => "MySQL hostname", :short => "H", :type => :string,  :required => false, :default => '127.0.0.1' },
+    :user      => { :text => "MySQL user",     :short => "U", :type => :string,  :required => false, :default => 'monitor' },
+    :password  => { :text => "MySQL password", :short => "W", :type => :string,  :required => false, :default => "" },
+    :port      => { :text => "MySQL port",     :short => "P", :type => :string,  :required => false, :default => "3306" },
+    :ssl       => { :text => "Use SSL",        :short => "S", :type => :boolean, :required => false, :default => false },
+    :verbose   => { :text => "Verbose",        :short => "V", :type => :bool },
+  }
+
+  def service_check
+    begin
+      @conn = Mysql.new(options[:host], options[:user], options[:password], options[:database], options[:port].to_i)
+    rescue Mysql::Error
+      set_message("Unable to connect to MySQL")
+      set_status(STATUS_CRITICAL)
+    end
+
+    innodb_stats_on_metadata_query = "SELECT @@innodb_stats_on_metadata as idbsomd"
+    result = @conn.query(innodb_stats_on_metadata_query)
+    row = result.fetch_hash()
+
+    raise 'Because of innodb_stats_on_metadata setting, this check will now exit' if row['idbsomd'] != "0"
+
+    autoinc_query = %Q(SELECT ROUND(MAX(AUTO_INCREMENT_RATIO)*100) as MAX_AUTO_INCREMENT_PERCENT
+      FROM (SELECT
+      TABLE_SCHEMA,
+      TABLE_NAME,
+      COLUMN_NAME,
+      DATA_TYPE,
+      COLUMN_TYPE,
+      IF(
+        LOCATE('unsigned', COLUMN_TYPE) > 0,
+        1,
+        0
+      ) AS IS_UNSIGNED,
+      (
+        CASE DATA_TYPE
+          WHEN 'tinyint' THEN 255
+          WHEN 'smallint' THEN 65535
+          WHEN 'mediumint' THEN 16777215
+          WHEN 'int' THEN 4294967295
+          WHEN 'bigint' THEN 18446744073709551615
+        END >> IF(LOCATE('unsigned', COLUMN_TYPE) > 0, 0, 1)
+      ) AS MAX_VALUE,
+      AUTO_INCREMENT,
+      AUTO_INCREMENT / (
+        CASE DATA_TYPE
+          WHEN 'tinyint' THEN 255
+          WHEN 'smallint' THEN 65535
+          WHEN 'mediumint' THEN 16777215
+          WHEN 'int' THEN 4294967295
+          WHEN 'bigint' THEN 18446744073709551615
+        END >> IF(LOCATE('unsigned', COLUMN_TYPE) > 0, 0, 1)
+      ) AS AUTO_INCREMENT_RATIO
+    FROM
+      INFORMATION_SCHEMA.COLUMNS
+      INNER JOIN INFORMATION_SCHEMA.TABLES USING (TABLE_SCHEMA, TABLE_NAME)
+    WHERE
+      TABLE_SCHEMA NOT IN ('mysql', 'INFORMATION_SCHEMA', 'performance_schema')
+      AND EXTRA='auto_increment')T;)
+    
+    result = @conn.query(autoinc_query)
+    row = result.fetch_hash()
+
+    # no columns with auto increment
+    if row.nil?
+      set_message("No auto increment fields to examine")
+      set_status(STATUS_OK)
+    else
+      set_metric('max_auto_increment_percent', row['MAX_AUTO_INCREMENT_PERCENT'])
+    end
+      
+    if options[:thresholds]
+      evaluate_thresholds
+    else
+      set_status(STATUS_OK)
+    end
+  end
+end
+CheckMySQLAutoInc.new.run!

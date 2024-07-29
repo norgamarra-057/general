@@ -1,0 +1,139 @@
+---
+gds_carp_peers:
+  - 10.32.124.224  # gds-sac1-prod-db174m1
+  - 10.32.124.225  # gds-sac1-prod-db174s1
+  - 10.32.125.224  # gds-sac1-prod-db174m1
+  - 10.32.125.225  # gds-sac1-prod-db174s1
+gds_carp_interfaces:
+  - vlan202
+  - vlan203
+gds_instance_group: gds_prod_sac1_db174
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  pwa_prod: # GDS-1868
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 60
+      max_connections_force: 8000
+      max_user_connections_force: 7980
+      innodb_buffer_pool_size_mb_force: 200000
+      innodb_thread_sleep_delay_force: 0
+      innodb_flush_neighbors_force: 0
+      long_query_time_force: 1
+      log_slow_rate_limit_force: 11
+      log_warnings_force: 2
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+      group_concat_max_len_force: 16384
+      relay_log_recovery_force: ON
+      expire_logs_days: 99
+    type: mysql
+    write_origin: sac1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-sac1-prod-db174m1.sac1
+      - gds-sac1-prod-db174s1.sac1
+    master_carp_interface: vlan202
+    slave_carp_interface: vlan203
+    vhid: 74
+    slave_vhid: 74
+    master_vip: 10.32.124.74
+    slave_vips:
+      - 10.32.125.74
+    replication_ips:
+      - 10.32.121.187 # gds-sac1-prod-db174m1.sac1
+      - 10.32.121.206 # gds-sac1-prod-db174s1.sac1
+      - 10.22.142.192 # gds-snc1-prod-db017m1.snc1
+      - 10.22.142.216 # gds-snc1-prod-db017s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.32.103.209/32  # gds-admin01.sac1
+      - 10.32.57.167/32  # gds-admin02.sac1
+      - 10.22.142.214/32 # gds-snc1-prod-db174m1.snc1
+      - 10.22.142.247/32 # gds-snc1-prod-db174s1.snc1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.20.41.97/32   # irb2.snc1
+      - 10.32.110.17/32   # darwin-prod-batch1-agg1.sac1
+      - 10.32.55.155/32   # darwin-prod-batch1-agg2.sac1
+      - 10.32.168.241/32   # darwin-prod-batch1-agg3.sac1
+      - 10.32.105.204/32   # darwin-prod-batch1-agg4.sac1
+      - 10.32.162.201/32   # darwin-prod-batch1-agg5.sac1
+      - 10.32.172.137/32   # darwin-prod-batch2-agg1.sac1
+      - 10.32.152.114/32   # darwin-prod-batch2-agg2.sac1
+      - 10.32.209.71/32   # darwin-prod-batch2-agg3.sac1
+      - 10.32.174.64/32   # darwin-prod-batch2-agg4.sac1
+      - 10.32.37.209/32   # darwin-prod-batch2-agg5.sac1
+      - 10.32.154.215/32   # darwin-indexer1.sac1
+      - 10.32.254.51/32   # orders-read-batch1.sac1
+      - 10.32.254.224/32   # orders-read-batch2.sac1
+      - 10.211.64.0/19   # conSub1
+      - 10.211.96.0/19   # conSub2
+      - 10.211.142.0/24   # conSub3
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: pwa_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 50.115.209.4/32   #b1.sac1
+      - 50.115.209.5/32   #b2.sac1
+    ports:
+      mysqld: 20001
+    playback_enabled: true
+    playback:
+      peers:
+        - node: gds-sac1-prod-db174m1.sac1
+          peer: gds-sac1-prod-db174s1.sac1
+        - node: gds-sac1-prod-db174s1.sac1
+          peer: gds-sac1-prod-db174m1.sac1
+      manage_mysql_slowlogd: 1
+      mysql_user_to_check: thepoint_db
+      user: playback_user
+      password: mee5pieK
+      schema: groupon_production
+      thread_pool_size: 100
+      user_connection_threshold: 15
+      playback_connection_timeout: 20
+      mysql_slowlogd_port: 30001
+    admin_redirect_peers:
+      - 10.22.142.192/32 # gds-snc1-prod-db017m1.snc1
+      - 10.22.142.216/32 # gds-snc1-prod-db017s1.snc1
+      - 10.22.142.214/32 # gds-snc1-prod-db174m1.snc1
+      - 10.22.142.247/32 # gds-snc1-prod-db174s1.snc1
+      - 10.20.41.97/32   # irb2.snc1
+      - 10.22.142.197/32 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.246/32 # gds-snc1-prod-db172s1.snc1
+      - 10.22.142.177/32 # gds-snc1-prod-db173m1.snc1
+      - 10.22.142.77/32 # gds-snc1-prod-db173s1.snc1
+      - 10.22.142.214/32 # gds-snc1-prod-db174m1.snc1
+      - 10.22.142.247/32 # gds-snc1-prod-db174s1.snc1
+      - 10.22.142.19/32   # gds-snc1-prod-db175m1.snc1
+      - 10.22.142.229/32   # gds-snc1-prod-db175s1.snc1
+      - 10.22.142.229/32 # gds-snc1-prod-db017m2.snc1
+      - 10.32.114.27/32  # gds-sac1-prod-db017m1.sac1
+      - 10.32.114.128/32  # gds-sac1-prod-db017s1.sac1
+      - 10.32.121.73/32   #gds-sac1-prod-db172m1.sac1
+      - 10.32.121.222/32   #gds-sac1-prod-db172s1.sac1
+      - 10.32.121.53/32   #gds-sac1-prod-db173m1.sac1
+      - 10.32.121.68/32   #gds-sac1-prod-db173s1.sac1
+      - 10.32.121.187/32   #gds-sac1-prod-db174m1.sac1
+      - 10.32.121.206/32   #gds-sac1-prod-db174s1.sac1
+      - 10.32.121.203/32   #gds-sac1-prod-db175m1.sac1
+      - 10.32.114.98/32   #gds-sac1-prod-db175s1.sac1
+      - 10.13.250.142/32 # gds-dub1-prod-db171m1.dub1
+      - 10.13.250.115/32  # gds-dub1-prod-db171s1.dub1
+      - 10.13.250.163/32   #gds-dub1-prod-db172m1.dub1
+      - 10.13.250.125/32   #gds-dub1-prod-db172s1.dub1
+      - 10.13.250.42/32   #gds-dub1-prod-db173m1.dub1
+      - 10.13.250.217/32   #gds-dub1-prod-db173s1.dub1

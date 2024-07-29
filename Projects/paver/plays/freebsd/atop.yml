@@ -1,0 +1,6 @@
+---
+- name: Setup atop on hosts
+  hosts: gds_all
+  become: yes
+  roles:
+    - atop

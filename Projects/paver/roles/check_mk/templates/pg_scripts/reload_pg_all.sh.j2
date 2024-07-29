@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+function lookup_port {
+    conf="$1"
+    cat "${conf}" | grep 'port =' | awk '{ print $3}'
+}
+
+function perform_reload {
+
+    files=$(ls /var/groupon/postgresql/data{{postgresql_port_major}}/*/data/postgresql.conf 2>/dev/null)
+    for f in ${files}; do
+    instance=$(dirname ${f} | sed 's/.*-//' | sed 's/.data*//')
+    port=$(lookup_port ${f})
+    echo "------------------------------------------------------------------------------------------------------------------"
+    echo "${instance}   ${port}"
+    psql -At -U postgres -p ${port} -c 'select pg_reload_conf()'
+    echo "------------------------------------------------------------------------------------------------------------------"
+    done
+}
+
+perform_reload

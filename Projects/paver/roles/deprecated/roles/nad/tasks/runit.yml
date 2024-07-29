@@ -1,0 +1,120 @@
+---
+- name: nad | runit | directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+  with_items:
+    - "{{ nad_service_dir }}"
+    - "{{ nad_service_dir }}/env"
+    - "{{ nad_service_dir }}/etc"
+    - "{{ nad_service_dir }}/log"
+
+- name: nad | runit | directories | log
+  file:
+    path: "{{ nad_service_dir }}/log/main"
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+
+- name: nad | runit | environment | NODE_PATH
+  copy:
+    dest: "{{ nad_service_dir }}/env/NODE_PATH"
+    content: "/usr/local/lib/node_modules"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad | runit | environment | PATH
+  copy:
+    dest: "{{ nad_service_dir }}/env/PATH"
+    content: "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad | register script cpu
+  shell: /bin/sh /usr/local/etc/node-agent.d/cpu.sh | awk -F' ' '{ printf("\t\t\"cpu`%s\",\n",$1); }'
+  register: cpu_metrics
+  ignore_errors: false
+
+- name: nad | register script disks
+  shell: /usr/local/etc/node-agent.d/disk.elf | awk -F' ' '{ printf("\t\t\"disk`%s\",\n",$1); }'
+  register: disk_metrics
+  ignore_errors: false
+
+- name: nad | register script fs
+  shell: /usr/local/etc/node-agent.d/fs.elf | awk -F' ' '{ printf("\t\t\"fs`%s\",\n",$1); }'
+  register: fs_metrics
+  ignore_errors: false
+
+- name: nad | register script if
+  shell: /bin/sh /usr/local/etc/node-agent.d/if.sh | awk -F' ' '{ printf("\t\t\"if`%s\",\n",$1); }'
+  register: if_metrics
+  ignore_errors: false
+
+- name: nad | register script vm
+  shell: /bin/sh /usr/local/etc/node-agent.d/vm.sh | awk -F' ' '{ printf("\t\t\"vm`%s\",\n",$1); }'
+  register: vm_metrics
+  ignore_errors: false
+
+- name: nad | register script zfsinfo
+  shell: /bin/sh /usr/local/etc/node-agent.d/zfsinfo.sh | awk -F' ' '{ printf("\t\t\"zfsinfo`%s\",\n",$1); }'
+  register: zfsinfo_metrics
+  ignore_errors: false
+
+- name: nad | register script zpool
+  shell: /bin/sh /usr/local/etc/node-agent.d/zpool.sh | awk -F' ' '{ printf("\t\t\"zpool`%s\",\n",$1); }'
+  register: zpool_metrics
+  ignore_errors: false
+
+- name: nad | config
+  template:
+    dest: "{{ nad_service_dir }}/etc/nad.config"
+    src: "nad-{{ ansible_os_family }}.config.j2"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad | runit | log | run
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ nad_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: nad | runit | log | config
+  copy:
+    src: svlogd.config
+    dest: "{{ nad_service_dir }}/log/main/config"
+    owner: _log
+    group: _log
+    mode: 0644
+  notify:
+    - nad log restart
+
+- name: nad | runit | run
+  template:
+    src: runit.sh.j2
+    dest: "{{ nad_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  notify:
+    - nad reload
+
+- name: nad | runit | enable
+  file:
+    src: "{{ nad_service_dir }}"
+    dest: "/var/service/nad"
+    owner: root
+    group: wheel
+    state: link
+
+# FIXME(seanc@): do NOT hardcode ports like this, use a variable. CC jfinotto@
+- name: wait for nad to start
+  wait_for: port=2609

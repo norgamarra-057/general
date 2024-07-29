@@ -1,0 +1,8 @@
+---
+- name: Deploy gds_mha sudoers
+  copy:
+    src: sudoers_gds_mha
+    dest: /usr/local/etc/sudoers.d/gds_mha
+    owner: root
+    group: wheel
+    mode: 0440

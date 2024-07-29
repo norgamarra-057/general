@@ -1,0 +1,8 @@
+#!/bin/sh --
+
+# Execute all backup jobs listed in {{ delorean_jobs_dir }}/daily in parallel
+
+set -e
+PARALLELISM=20
+
+find /var/groupon/delorean/jobs/daily/ -name '*.sh' -type f | /usr/local/bin/parallel -P ${PARALLELISM} exec

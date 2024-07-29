@@ -1,0 +1,15 @@
+---
+- name: pgbadger server
+  hosts: all
+  become: yes
+  vars:
+        lup1_instances:
+        - instance1
+        - instance2
+        - instance3,
+        snc1_instances:
+        - pg_test
+        - pg_test1
+        - pg_test2
+  roles:
+    - { role: pgbadger }

@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>GDS Cloud</title>
+<meta charset="utf-8">
+<!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css"/> -->
+<link rel="stylesheet" href="https://unpkg.com/mvp.css">
+<script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+<py-env>
+- pandas
+- paths:
+  - ./rds_instances_all_prod.csv
+  - ./rds_endpoints_all_prod.csv
+  - ./rds_node_terms.csv
+  - ./route53_cname.csv
+  - ./daas-migration.tsv
+</py-env>
+</head>
+<body>
+<h1>RDS inventory (us-west-1,us-west-2,eu-west-1) prod</h1>
+<!-- <input type="text" id="my-sqlquery"/> -->
+<textarea id="my-sqlquery" name="my-sqlquery"
+          rows="7" cols="240">
+-- grpn_rds_instances_raw
+-- grpn_rds_endpoints_raw
+-- aws_rds_node_terms_raw  | aws_rds_node_terms_vw
+--   engine 
+--   "attributes.regionCode"
+--   "attributes.instanceType"
+--          dollars_per_month
+-- grpn_r53_cname_raw
+-- daas_migration_raw
+</textarea>
+<button id="submit-button" type="submit" pys-onClick="my_output">Submit</button>
+<p id="csv"></p>
+<py-script>
+
+import pandas as pd
+import sqlite3
+
+pd.set_option('display.max_colwidth', None)
+pd.set_option("display.max_columns", 500)
+pd.options.display.max_rows = 5000
+
+conn = sqlite3.connect(":memory:")
+
+# Table1
+df=pd.read_csv("./rds_instances_all_prod.csv", sep='\t')
+df.to_sql("grpn_rds_instances_raw", conn, if_exists="replace")
+
+# Table2
+df=pd.read_csv("./rds_endpoints_all_prod.csv", sep='\t')
+df.to_sql("grpn_rds_endpoints_raw", conn, if_exists="replace")
+
+# Table3
+df=pd.read_csv("./rds_node_terms.csv")
+df.to_sql("aws_rds_node_terms_raw", conn, if_exists="replace")
+
+# Table4
+df=pd.read_csv("./route53_cname.csv")
+df.to_sql("grpn_r53_cname_raw", conn, if_exists="replace")
+
+# Table5
+df=pd.read_csv("./daas-migration.tsv", sep='\t')
+df.to_sql("daas_migration_raw", conn, if_exists="replace")
+
+
+rds_terms_df=pd.read_sql_query("""
+--create table aws_rds_node_terms_vw as 
+select art.*,
+case 
+when "attributes.databaseEngine"='MySQL' then 'mysql'
+when "attributes.databaseEngine"='PostgreSQL' then 'postgres'
+when "attributes.databaseEngine"='Aurora PostgreSQL' then 'aurora-postgresql'
+when "attributes.databaseEngine"='Aurora MySQL' then 'aurora-mysql'
+end engine
+,(art.priceperunit*24*30) dollars_per_month
+from aws_rds_node_terms_raw art;
+""",conn)
+
+rds_terms_df.to_sql("aws_rds_node_terms_vw", conn, if_exists="replace")
+
+
+def my_output(*args, **kwargs):
+  sql_query = Element('my-sqlquery').element.value
+  output_df=pd.read_sql_query(sql_query,conn)
+  csv=Element('csv')
+  Element('csv').element.innerHTML=''
+  csv.write(output_df)
+
+</py-script>
+</body>
+</html>
+

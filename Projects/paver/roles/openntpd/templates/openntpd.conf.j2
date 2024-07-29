@@ -1,0 +1,13 @@
+# $FreeBSD: head/net/openntpd/files/ntpd.conf 340872 2014-01-24 00:14:07Z mat $
+# See OpenNTPD's ntpd.conf(5)
+
+# Addresses to listen on (ntpd does not listen by default)
+#listen on *
+
+# sync to individually named server(s)
+server ns1
+server ns2
+
+# use a random selection of NTP Pool Time Servers
+# see http://support.ntp.org/bin/view/Servers/NTPPoolServers
+#servers pool.ntp.org

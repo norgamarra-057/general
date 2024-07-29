@@ -1,0 +1,102 @@
+package main
+
+import (
+    "bytes"
+    "log"
+    "os/exec"
+    "strconv"
+    "strings"
+    "os"
+    "encoding/json"
+     "fmt"
+//     "io/ioutil"
+    "net/http"
+    "crypto/tls"
+)
+
+type Process struct {
+    Entries int
+}
+
+func main() {
+    cmd := exec.Command("ipmitool", "sel", "info")
+    var out bytes.Buffer
+    cmd.Stdout = &out
+    err := cmd.Run()
+    if err != nil {
+        log.Fatal(err)
+    }
+    processes := make([]*Process, 0)
+    mycounter :=0
+    for {
+         line, err := out.ReadString('\n')
+         if err!=nil {
+            break;
+        }
+        mycounter++
+        //fmt.Printf("o counter einai %d\n",mycounter)
+        if mycounter < 3  {
+        continue;
+        }
+        if mycounter > 3  {
+        break;
+        }
+       
+        tokens := strings.Split(line, " ")
+        ft := make([]string, 0)
+        for _, t := range(tokens) {
+           if t!="" && t!="\t" {
+              ft = append(ft, t)
+            }
+        }
+
+            sz :=len(ft[2])
+	    if sz > 0 && ft[2][sz-1] == '\n' {
+	    ft[2] = ft[2][:sz-1]
+	    }
+
+        entries, err := strconv.Atoi(ft[2])
+        if err!=nil {
+            continue
+        }
+     
+
+        processes = append(processes, &Process{entries})
+ }
+
+    for _, p := range(processes) {
+       
+
+     m := &Process{
+          Entries: p.Entries}
+
+      b, err :=json.Marshal(m)
+      if err!=nil {
+           log.Fatal(err)
+      }
+
+     os.Stdout.Write(b)
+                in := strings.NewReader(string(b))
+
+                req, err := http.NewRequest("POST","https://10.20.98.116:43191/module/httptrap/0f086811-e406-4c21-be69-cc511910e7ea/rgew42", in)
+
+                req.Header.Set("Content-Type", "application/json")
+
+                tr := &http.Transport{
+                        TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+                }
+                client := &http.Client{Transport: tr}
+                resp, err := client.Do(req)
+                if err != nil {
+                        panic(err)
+                }
+                defer resp.Body.Close()
+
+                fmt.Println("response Status:", resp.Status)
+                fmt.Println("response Headers:", resp.Header)
+                //    body, _ := ioutil.ReadAll(resp.Body)
+                //    fmt.Println("response Body:", string(body))
+
+}
+
+}

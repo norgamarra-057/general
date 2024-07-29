@@ -1,0 +1,11 @@
+# Ansible managed
+# Master VIP
+{{ item.value.master_vip }}/32
+# Slave VIPs
+{% for ip in item.value.slave_vips %}
+{{ ip }}/32
+{% endfor %}
+# Extra IPs
+{% for cidr in item.value.firewall_permitted_src_cidrs %}
+{{ cidr }}
+{% endfor %}

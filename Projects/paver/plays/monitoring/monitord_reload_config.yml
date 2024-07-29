@@ -1,0 +1,34 @@
+---
+- name: Install monitord on hosts
+  hosts: gds_all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: FreeBSD | templates | render Mysql monitord config
+      template:
+        src=../../roles/monitord-agent/templates/monitord_config_mysql.conf.j2
+        dest=/var/groupon/monitord/config.yml
+        owner=monitord
+        group=_monitoring
+        mode=0444
+        backup=yes
+      when:  gds_monitor_cluster_type == "gds_mysql"
+      tags: configuration
+      notify:
+        - monitord_agent restart
+
+    - name: FreeBSD | runit | render Postgresql monitord config
+      template:
+        src=../templates/monitord_config_postgres.conf.j2
+        dest=/var/groupon/monitord/config.yml
+        owner=monitord
+        group=_monitoring
+        mode=0444
+        backup=yes
+      when:  gds_monitor_cluster_type == "gds_postgresql"
+      tags: configuration
+      notify:
+        - monitord_agent restart
+  handlers:
+    - name: monitord_agent restart
+      shell: sleep 3 && /usr/local/sbin/sv term /var/service/monitord_agent

@@ -1,0 +1,125 @@
+#!/usr/local/bin/bash
+#
+# check_iostat_bsd - Nagios device statistics check script (perfdata only)
+# version 1.0   14.11.2012
+# by Mikanoshi - iam@mikanoshi.name, http://en.mikanoshi.name
+# tested on FreeBDS 8.3
+#
+# This Nagios plugin is free software, and comes with ABSOLUTELY NO WARRANTY.
+# It may be used, redistributed and/or modified under the terms of the
+# GNU General Public Licence (see http://www.fsf.org/licensing/licenses/gpl.txt).
+
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+
+IOSTAT=`which iostat 2>/dev/null`
+AWK=`which awk 2>/dev/null`
+GREP=`which grep 2>/dev/null`
+TAIL=`which tail 2>/dev/null`
+
+TEMP="/var/spool/nagios/iostat.`date +'%s'`.tmp"
+GET_TPS=FALSE
+GET_TPS_READS=FALSE
+GET_TPS_WRITES=FALSE
+GET_READS=FALSE
+GET_WRITES=FALSE
+GET_DUR=FALSE
+COUNT=3
+RESULT=""
+RESULT_EXIT=$STATE_OK
+
+function usage {
+	printf "\nUsage: check_iostat_bsd -n <samples count> -d <device> -t|r|s|i|o|a\n"
+	printf "\nDevice: run iostat -x and find your device name in the first column, example: -d aacd0\n"
+	printf "	-n	Samples count (default=3, first is not taken into account)\n"
+	printf "	-r	read operations per second\n"
+	printf "	-s	write operations per second\n"
+	printf "	-t	IO transactions per second (read+write)\n"
+	printf "	-i	kilobytes read per second\n"
+	printf "	-o	kilobytes write per second\n"
+	printf "	-a	average duration of transactions, in milliseconds\n"
+	printf "\n	t, r, s, i, o, a parameters can be used in any combinations, e.g.:\n	check_iostat_bsd -n 5 -d aacd0 -t -r -s -i -o -a\n"
+}
+ 
+function doreturn {
+	rm -f $TEMP
+	echo $RESULT
+	exit $RESULT_EXIT
+}
+
+function doargs {
+	if (`test $# -gt 0`)
+	then
+		while getopts n:d:trsioah argcase "$@"
+		do
+			case $argcase in
+				d)	DEVICE=$OPTARG;;
+				n)	COUNT=$OPTARG;;
+				t)	GET_TPS=TRUE;;
+				r)	GET_TPS_READS=TRUE;;
+				s)	GET_TPS_WRITES=TRUE;;
+				i)	GET_READS=TRUE;;
+				o)	GET_WRITES=TRUE;;
+				a)	GET_DUR=TRUE;;
+				*)	usage
+					exit;;
+			esac
+		done
+	else
+		usage
+		exit
+	fi
+}
+
+doargs $@
+
+if [ ! -f $IOSTAT ] ; then
+	RESULT="ERROR: iostat cannot be found!"
+	RESULT_EXIT=$STATE_UNKNOWN
+	doreturn
+fi
+
+if [ $COUNT -ge 2 ] ; then
+	$IOSTAT -x -K $DEVICE 1 $COUNT | $GREP $DEVICE| $TAIL -`expr $COUNT - 1` > $TEMP
+else
+	RESULT="ERROR: Samples number must be > 1 (default 3)"
+	RESULT_EXIT=$STATE_UNKNOWN
+	doreturn
+fi
+
+if [ $GET_TPS = "TRUE" ] ; then
+	TPS=`cat $TEMP | $AWK '{ sum += $2 + $3 } END { print sum / NR } '`
+	PERF=" tps=$TPS;;;"
+fi
+
+if [ $GET_TPS_READS = "TRUE" ] ; then
+	TPSR=`cat $TEMP | $AWK '{ sum += $2 } END { print sum / NR } '`
+	PERF=$PERF" tpsr=$TPSR;;;"
+fi
+
+if [ $GET_TPS_WRITES = "TRUE" ] ; then
+	TPSW=`cat $TEMP | $AWK '{ sum += $3 } END { print sum / NR } '`
+	PERF=$PERF" tpsw=$TPSW;;;"
+fi
+
+if [ $GET_READS = "TRUE" ] ; then
+	READS=`cat $TEMP | $AWK '{ sum += $4} END { print sum / NR } '`
+	PERF=$PERF" reads="$READS"KB;;;"
+fi
+
+if [ $GET_WRITES = "TRUE" ] ; then
+	WRITES=`cat $TEMP | $AWK '{ sum += $5} END { print sum / NR } '`
+	PERF=$PERF" writes="$WRITES"KB;;;"
+fi
+
+if [ $GET_DUR = "TRUE" ] ; then
+	DUR=`cat $TEMP | $AWK '{ sum += $7} END { print sum / NR } '`
+	PERF=$PERF" svc_t=$DUR;;;"
+fi
+
+RESULT="OK - data received |$PERF"
+RESULT_EXIT=$STATE_OK
+
+doreturn

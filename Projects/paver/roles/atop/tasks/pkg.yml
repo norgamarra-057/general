@@ -1,0 +1,6 @@
+---
+- name: Install atop
+  pkgng:
+    name: atop
+    state: present
+

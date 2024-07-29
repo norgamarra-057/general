@@ -1,0 +1,10 @@
+---
+- hosts: gds_snc1_stg_db042
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: users_stg } 
+  - { role: gds-mysql-ha, instance: getaways_cont_uat } 
+  - { role: gds-mysql-ha, instance: po_mananger_stg } 
+  - { role: gds-mysql-ha, instance: birdcage_qa } 
+  - { role: gds-mysql-ha, instance: sem_flywheel_stg } 

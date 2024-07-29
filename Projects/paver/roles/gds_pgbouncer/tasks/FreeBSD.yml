@@ -1,0 +1,94 @@
+---
+- name: PgBouncer | FreeBSD | runit | directories (read-only)
+  file:
+    path="{{ item }}"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - "{{ pgbouncer_path }}"
+    - "{{ pgbouncer_path }}/bin"
+    - "{{ pgbouncer_path }}/env"
+    - "{{ pgbouncer_path }}/etc"
+    - "{{ pgbouncer_path }}/log"
+
+
+- name: PgBouncer | FreeBSD | runit | directories mode(writable)
+  file:
+    path="{{ pgbouncer_path }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+
+
+- name: PgBouncer | FreeBSD | runit | environment mode
+  copy: dest="{{ pgbouncer_path }}/env/PATH"
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - pgbouncer restart
+
+
+- name: PgBouncer | FreeBSD | config install mode
+  template:
+    dest="{{ pgbouncer_path }}/etc/pgbouncer.ini"
+    src=pgbouncer.ini.j2
+  notify:
+    - pgbouncer restart
+
+
+- name: PgBouncer | FreeBSD | pgbouncer.users
+  file:
+    path="{{ pgbouncer_path }}/etc/pgbouncer.users"
+    state=touch
+    owner=root
+    group=pgbouncer
+    mode=0640
+
+
+- name: PgBouncer | FreeBSD | runit | log script mode
+  template:
+    dest="{{ pgbouncer_path }}/log/run"
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - pgbouncer log restart
+
+- name: PgBouncer | FreeBSD | runit | run script mode
+  template:
+    dest="{{ pgbouncer_path }}/run"
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+  #notify:
+  #  - pgbouncer restart
+
+- name: PgBouncer | FreeBSD | copy cron script
+  template:
+    dest="{{ pgbouncer_path }}/bin/pgbouncer-auth.sh"
+    mode=0755
+    src=pgbouncer-auth.sh.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | pgbouncer | auth job cron
+  cron:
+    name="pgbouncer {{ pgbouncer_mode }} for {{ instance_name }}"
+    minute=*/15
+    job="{{ pgbouncer_path }}/bin/pgbouncer-auth.sh"
+
+- name: PostgreSQL | runit enable
+  file:
+    src="{{ pgbouncer_path }}"
+    dest="/var/service/pgbouncer-{{ gds_cluster }}-{{ instance_name }}-{{ pgbouncer_mode }}_mode"
+    owner=root
+    group=wheel
+    state=link

@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+function find_database {
+    Vip="$1"
+    result=$(psql -p 5432 -h $Vip -t -U gds_admin -d postgres -c "select datname from pg_stat_database where datname not in ('template0','template1','postgres','rdsadmin') order by 1")
+    echo "***************************************************Available databases:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+function find_heartbeat_entry {
+    Vip="$1"
+    Dbname="$2"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -U gds_admin -c "select last_updated from heartbeat.repl_status")
+    echo "***************************************************Reverse repl done on:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+function find_slave_info {
+    Vip="$1"
+    Dbname="$2"
+    result1=$(psql -p 5432 -h $Vip -d $Dbname -t -U gds_admin -c "select replay_lsn from pg_stat_replication where application_name like '${Dbname}%subscription' ")
+    echo "***************************************************Sleeping for 5 seconds..."
+    result_tmp=$(psql -p 5432 -h $Vip -d $Dbname -t -U gds_admin -c "select pg_sleep(5)")
+    result2=$(psql -p 5432 -h $Vip -d $Dbname -t -U gds_admin -c "select replay_lsn from pg_stat_replication where application_name like '${Dbname}%subscription'")
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select pg_wal_lsn_diff(REPLACE('${result2}',' ', '')::pg_lsn,REPLACE('${result1}', ' ', '')::pg_lsn) as diff")    
+    echo "***************************************************Logical replication running (if diff > 0):"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select * from pg_stat_replication where application_name like '${Dbname}%subscription'")
+    echo "***************************************************Logical slave:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+if [ $# -lt 1 ]; then
+    echo 'no argument given'
+    exit 1
+elif [ $# -gt 2 ]; then
+    echo 'too many arguments'
+    exit 1
+fi
+
+    vip="$1"
+    dbname="$2"
+
+    if [ -z "${dbname}" ]; then find_database ${vip}; else echo "dbname is set to '$dbname'"; fi
+    if [ -z "${dbname}" ]; then read -p "Enter database name: " dbname; fi
+
+    find_heartbeat_entry ${vip} ${dbname}
+    find_slave_info ${vip} ${dbname}
+

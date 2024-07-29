@@ -1,0 +1,7 @@
+---
+# tasks file for gds_motd
+- include_tasks: FreeBSD.yml 
+  tags:
+    - motd
+    - maint
+    - maintenance

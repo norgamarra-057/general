@@ -1,0 +1,5 @@
+#max_connections = 200
+#work_mem = 10MB
+#maintenance_work_mem = 4GB
+#checkpoint_segments = 256
+#effective_cache_size = 100GB

@@ -1,0 +1,12 @@
+#!/bin/sh --
+exec 2>&1
+LD_LIBRARY_PATH="/usr/local/lib" exec /usr/local/sbin/chpst \
+{% if gds_instances[instance_name].mysqld_options is defined %}
+{% if gds_instances[instance_name].mysqld_options.transaction_isolation_force is defined %}
+/usr/local/bin/pt-heartbeat --config {{ pt_heartbeat_service_dir }}_{{ item }}/pt-heartbeat.conf --set-vars autocommit=1 --update --replace --check-read-only
+{% else %}
+/usr/local/bin/pt-heartbeat --config {{ pt_heartbeat_service_dir }}_{{ item }}/pt-heartbeat.conf --set-vars autocommit=1,binlog_format=statement,tx_isolation='REPEATABLE-READ' --update --replace --check-read-only
+{% endif %}
+{% else %}
+/usr/local/bin/pt-heartbeat --config {{ pt_heartbeat_service_dir }}_{{ item }}/pt-heartbeat.conf --set-vars autocommit=1,binlog_format=statement,tx_isolation='REPEATABLE-READ' --update --replace --check-read-only
+{% endif %}

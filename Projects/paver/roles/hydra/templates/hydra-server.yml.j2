@@ -1,0 +1,13 @@
+# Ansible managed
+#   Version 6.5.3
+#Host Configuration
+
+consul:
+  url: http://localhost:8500
+proofOfLifeFile: /var/service/hydra-server/.log
+
+bindAddress: {{ hydra_server_bind }}
+exposedPort: {{ hydra_server_port }} 
+
+jksFile: /var/service/hydra-server/hydra-server.jks
+jksPassword: {{ hydra_server_jks_password }}

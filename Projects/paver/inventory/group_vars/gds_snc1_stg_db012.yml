@@ -1,0 +1,125 @@
+---
+gds_carp_peers:
+  - 10.30.26.245  # gds-snc1-stg-db012m1
+  - 10.30.26.246  # gds-snc1-stg-db012s1
+  - 10.30.27.245  # gds-snc1-stg-db012m1
+  - 10.30.27.246  # gds-snc1-stg-db012s1
+
+# List of all GDS instances in this timeline
+gds_instance_group: gds_prod_snc1_db012
+gds_monitor_cluster_type: mix
+gds_instances:
+  gds_stg_all:
+    type: postgresql
+    dbnames:
+      - gds_stg_all
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 400
+    unix_user: gds_uid60001
+    master_vip: 10.22.142.159
+    slave_vips:
+      - 10.22.142.167
+    replication_ips:
+      - 10.22.142.159   # gds-snc1-stg-db012m1.snc1
+      - 10.22.142.167   # gds-snc1-stg-db012s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.0.0.0/8  # open to all ips
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.121/32  #circonus-broker-ops-gds1.snc1
+      - 10.22.109.24/32  #circonus-broker-ops-gds2.snc1
+      - 10.22.81.85/32  #circonus-broker-ops-gds3.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.81.56/32 # optimus-agent1.snc1
+      - 10.22.81.206/32 # optimus-agent2.snc1
+      - 10.22.152.129/32 # optimus-agent3.snc1
+      - 10.20.81.101/32 # optimus-agent4.snc1
+      - 10.23.84.208/32 # dealplatform-odoproxy1-staging.snc1
+      - 10.23.42.145/32   # ttd-inventory-app1-staging.snc1
+      - 10.23.42.79/32   # ttd-inventory-app2-staging.snc1
+      - 10.23.76.107/32   # ttd-inventory-app1-uat.snc1
+      - 10.23.44.112/32   # ttd-inventory-app2-uat.snc1
+      - 10.23.48.91/32   # merchant-experience-app1-emea-staging.snc1
+      - 10.23.49.101/32   # merchant-experience-app2-emea-staging.snc1
+      - 10.23.49.117/32   # merchant-access-app1-emea-staging.snc1
+      - 10.23.49.17/32   # merchant-access-app2-emea-staging.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.22.200.169/32   # subscription-utility-app1-uat.snc1
+      - 10.22.200.253/32   # subscription-utility-app2-uat.snc1
+      - 10.20.78.238/32   # darwin-indexer1-grouponstaging.snc1
+      - 10.20.76.23/32   # darwin-test-indexer1.snc1
+      - 10.23.44.43/32   # deal-book-service-app2-uat.snc1
+      - 10.23.30.44/32   # ec-proximity-app1-staging.snc1
+      - 10.23.76.74/32   # ec-proximity-app1-uat.snc1
+      - 10.20.96.78/32   # goods-stores-api-app1-uat.snc1
+      - 10.23.14.216/32  # goods-stores-api-app-staging-vip.snc1
+      - 10.23.106.178/32 # gpapi-app1-uat.snc1
+      - 10.23.76.187/32 # gpapi-app2-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24  # us-west-1
+      - 10.23.64.143/32   # push-dispatcher-lpr-staging1.snc1
+      - 10.23.95.237/32   # mx-nots-app1-us-staging.snc1
+      - 10.23.48.175/32   # mx-nots-app2-us-staging.snc1
+    dba_account_name: gds_stg_all_dba
+    app_account_name: gds_stg_all_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32 # gds-admin01.snc1
+      - 10.22.74.10/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.81.56/32 # optimus-agent1.snc1
+      - 10.22.81.206/32 # optimus-agent2.snc1
+      - 10.22.152.129/32 # optimus-agent3.snc1
+      - 10.20.81.101/32 # optimus-agent4.snc1
+      - 10.23.84.208/32 # dealplatform-odoproxy1-staging.snc1
+      - 10.23.42.145/32   # ttd-inventory-app1-staging.snc1
+      - 10.23.42.79/32   # ttd-inventory-app2-staging.snc1
+      - 10.23.76.107/32   # ttd-inventory-app1-uat.snc1
+      - 10.23.44.112/32   # ttd-inventory-app2-uat.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.22.200.169/32   # subscription-utility-app1-uat.snc1
+      - 10.22.200.253/32   # subscription-utility-app2-uat.snc1
+      - 10.20.78.238/32   # darwin-indexer1-grouponstaging.snc1
+      - 10.20.76.23/32   # darwin-test-indexer1.snc1
+      - 10.23.44.43/32   # deal-book-service-app2-uat.snc1
+      - 10.23.30.44/32   # ec-proximity-app1-staging.snc1
+      - 10.23.76.74/32   # ec-proximity-app1-uat.snc1
+      - 10.20.96.78/32   # goods-stores-api-app1-uat.snc1
+      - 10.23.14.216/32  # goods-stores-api-app-staging-vip.snc1
+      - 10.23.106.178/32 # gpapi-app1-uat.snc1
+      - 10.23.76.187/32 # gpapi-app2-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24  # us-west-1
+      - 10.23.64.143/32   # push-dispatcher-lpr-staging1.snc1
+      - 10.23.95.237/32   # mx-nots-app1-us-staging.snc1
+      - 10.23.48.175/32   # mx-nots-app2-us-staging.snc1
+    ports:
+      pgbouncer_txn: 20000
+      pgbouncer_session: 20001
+      postgresql_raw: 20002
+    extra_variables:
+#  gds_mysql_stg_all: # GDS-2816 - Decommed GDS-33866

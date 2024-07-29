@@ -1,0 +1,9 @@
+mysql_sys:
+  url: https://github.com/MarkLeith/mysql-sys/archive/
+  version: 1.5.1
+  src: mysql_sys.zip
+  dest: /tmp
+  sqlfile: sys_56.sql
+  src2: gds_sys_views.sql
+  sqlfile2: gds_sys_views.sql
+  filename: mysql_sys.zip

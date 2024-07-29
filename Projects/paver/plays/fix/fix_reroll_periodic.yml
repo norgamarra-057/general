@@ -1,0 +1,19 @@
+---
+- name: Fix periodic.conf in the environment by rolling over it
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Remove file
+      shell: test -f /etc/periodic.conf.bkp || mv /etc/periodic.conf /etc/periodic.conf.bkp
+
+    - name: Create file
+      copy:
+        dest: /etc/periodic.conf
+        content: ""
+        owner: root
+        group: wheel
+        mode: 0644
+
+    - include: ../../roles/common_install/tasks/zfsnap.yml
+
+    - include: ../../roles/common_install/tasks/periodic.yml

@@ -1,0 +1,6 @@
+---
+- name: sysctl.conf reload
+  command: /usr/sbin/service sysctl reload
+
+- name: pf.conf reload
+  command: /usr/sbin/service pf reload

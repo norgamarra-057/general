@@ -1,0 +1,50 @@
+#!/usr/local/bin/bash
+
+mysql_user="dba_util"
+mysql_password="TTvktI5g-utF"
+mysql_host="127.0.0.1"
+mysql_cmd="mysql -u${mysql_user} -p${mysql_password} -h${mysql_host} --silent --silent"
+biggest_table_query="select ceil((data_length+index_length)/1024/1024) as max_size_m from information_schema.tables order by data_length+index_length desc limit 1;"
+
+biggest_table_mbytes=`echo ${biggest_table_query} | ${mysql_cmd}`
+datadir=`${mysql_cmd} -e "select @@datadir"`
+
+df_output=`df -mP`
+
+ifsold=$IFS
+# newline
+IFS='
+'
+
+for df_line in ${df_output}
+do
+  IFS=${ifsold}
+  mountpoint=`echo ${df_line} | awk '{print $NF}'`
+  if [[ ${datadir} =~ ^${mountpoint} ]]
+  then
+    space_available=`echo ${df_line} | awk '{print $4}'`
+  fi
+done
+
+IFS=${ifsold}
+
+if [ "k${space_available}" == 'k' ]
+then
+  echo "check_mysql_disk CRITICAL: Could not determine available space"
+  exit 1
+fi
+
+if [ "k${biggest_table_mbytes}" == 'k' ]
+then
+  echo "check_mysql_disk CRITICAL: Could not determine the size of the biggest table."
+  exit 1
+fi
+
+if [ $[ ${biggest_table_mbytes} * 3 / 2 ] -lt ${space_available} ]
+then
+  echo "check_mysql_disk OK: largest table size is ${biggest_table_mbytes} M and free space is ${space_available} M"
+else
+  echo "check_mysql_disk CRITICAL: largest table size is ${biggest_table_mbytes} M and free space is ${space_available} M"
+fi
+
+IFS=${ifsold}

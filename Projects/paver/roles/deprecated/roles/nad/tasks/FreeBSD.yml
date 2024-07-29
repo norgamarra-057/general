@@ -1,0 +1,4 @@
+---
+# Create parent if it doens't exist
+- name: nad install
+  pkgng: name=gds-nad state=present

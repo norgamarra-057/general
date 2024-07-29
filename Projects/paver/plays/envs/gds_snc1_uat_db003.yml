@@ -1,0 +1,5 @@
+---
+- hosts: gds_snc1_uat_db003
+  become: yes
+  roles:
+  - { role: gds-mysql-server }

@@ -1,0 +1,17 @@
+---
+- name: GDS pgbouncer | default value check
+  fail: 'msg="CONFIG ERROR: for pgbouncer, mode must be either transaction mode or session"'
+  when: mode not in ('session','transaction')
+
+- name: GDS PgBouncer Cluster | variable check | gds_cluster
+  fail: 'msg="CONFIG ERROR: For GDS PostgreSQL Clusters, gds_cluster must be specified in host_vars/{{ inventory_hostname }}.yml"'
+  when: gds_cluster is not defined or 'gds_cluster' not in hostvars[inventory_hostname]
+
+- name: GDS PgBouncer Cluster | variable check | instance_name
+  fail: 'msg="CONFIG ERROR: For GDS PostgreSQL Clusters, instance_name must be specified"'
+  when: instance_name is not defined
+
+- include_vars: ../vars/derived_vars.yml
+
+- import_tasks: FreeBSD.yml tags=pgbouncer
+  when: ansible_os_family == 'FreeBSD'

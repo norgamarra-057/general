@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: Robert Barabas
+  description: Role for check_mk monitoring
+  company: Groupon
+  min_ansible_version: 1.2
+dependencies: []

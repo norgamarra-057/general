@@ -1,0 +1,9 @@
+---
+- name: gmetad restart
+  command: /usr/local/sbin/sv term "{{ gmetad_service_path }}"
+
+- name: gmond restart
+  command: /usr/local/sbin/sv term "{{ gmond_service_path }}"
+
+- name: gmond log restart
+  command: /usr/local/sbin/sv term "{{ gmond_service_path }}/log"

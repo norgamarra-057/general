@@ -1,0 +1,68 @@
+# -*- mode: org -*-
+#+STARTUP: overview
+#+STARTUP: content
+#+STARTUP: showall
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+* Introduction to play/ playbooks
+  This directory contains one-off plays useful to perform one-time
+  mutations of the environment in a specific way. The only difference
+  between the contents of plays/ and roles/ are that roles/ contain
+  steady-state baseline information.
+
+  roles/ contains the state of the way things should be. plays/
+  describe a specific one-time action that operations is executing to
+  facilitate a particular operational task.
+#+TOC: headlines 2
+* GDS playbooks
+  Various playbooks in use by GDS
+** Setup backup jobs for databases
+   Adding a database to the existing backup procedure requires a few
+   steps, all outlined below.
+
+   1. Decrypt the existing SSH private key vault
+      : ansible-vault decrypt roles/mysql_db_backup_cron/vars/mysql_db_backup_keys_vault.yml
+   2. Generate the missing keys for the vault. This particular play
+      iterates through all of the hosts listed in the vault and
+      appends the SSH keys to the decrypted vault. Please do sort
+      hosts alphabetically. This isn't required, but it would be
+      awfully nice of you to maintain this.
+      : ansible-playbook -i inventory/database-production plays/database-mysql-backup-gen-missing-ssh-keys.yml
+   3. Re-encrypt vault containing SSH keys
+      : ansible-vault encrypt roles/mysql_db_backup_cron/vars/mysql_db_backup_keys_vault.yml
+   4. Install the correct public SSH keys on the target host.
+      : ansible-playbook --ask-vault-pass -i inventory/database-production plays/database-mysql-backup-install-keys.yml
+   5. [*/OPTIONAL/*] Ensure that the backup host is current with site
+      standards. This step is not required for every run, but should be
+      executed periodically.
+      : ansible-playbook -i inventory/database-production --limit delorean_all site.yml
+   6. Install the backups jobs. This step can be run at any time by
+      anyone with the ability to deploy system changes to the target
+      host without needing the vault password.
+      : ansible-playbook -i inventory/database-production plays/database-mysql-backup-install-jobs.yml
+*** Database Backup Architecture
+    This particular playbook is designed to pull database backup
+    content from remote hosts and archive it on one of the delorean*
+    hosts.
+
+    To achieve this:
+
+    1. A unique public/private SSH key pair is generated per host.
+    2. The public SSH key is installed on the database host,
+       frequently as the root user. The SSH key is installed and
+       limited so that only a specific command can be run
+       (e.g. innobackupex(1), pg_dump(1)).
+    3. The private key is installed on delorean* as a named file.
+    4. A backup job is created per host from a template shells script
+       and installed on the delorean* host.
+    5. A cron(8) job is created and installed on delorean* that executes
+       the above generated script. The script is only responsible for
+       transporting the data from the remote host to the local
+       host. The script delegates compression to ZFS on the operating
+       system.
+    6. delorean* iterates through all of its backup jobs and executes
+       its backup jobs in parallel using xargs(1)'s -P option.
+    7. Each individual script has its own lock file to prevent multiple
+       backups being executed against the same host. If there are concurrent
+       backups happening against the same host, the default timeout for jobs
+       is to wait for up to 3600s before failing.

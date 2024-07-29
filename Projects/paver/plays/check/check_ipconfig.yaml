@@ -1,0 +1,11 @@
+---
+- name: ifconfig Check 
+  hosts: gds_all
+  become: yes
+  tasks:
+
+    - name: Ipconfig status
+      shell: " ifconfig"
+      register: ipconfig_status
+
+    - debug: var=ipconfig_status.stdout_lines

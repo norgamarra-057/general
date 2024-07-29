@@ -1,0 +1,14 @@
+---
+- name: Ensure check_mk directory is present
+  file:
+    dest: "/etc/check_mk"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+
+- include_tasks: config_mysql.yml
+  when: db_type is defined and db_type == 'mysql'
+
+- include_tasks: config_postgres.yml
+  when: db_type is defined and db_type == 'postgresql'

@@ -1,0 +1,673 @@
+---
+gds_carp_peers:
+  - 10.30.32.232  # gds-snc1-prod-db182m1
+  - 10.30.32.233  # gds-snc1-prod-db182s1
+  - 10.30.33.232  # gds-snc1-prod-db182m1
+  - 10.30.33.233  # gds-snc1-prod-db182s1
+gds_carp_interfaces:
+  - vlan332
+  - vlan333
+gds_instance_group: gds_prod_snc1_db182
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  users_prod: # GDS-xxxx
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 40
+      max_connections_force: 8000
+      max_user_connections_force: 7980
+      innodb_buffer_pool_size_mb_force: 200000
+      innodb_flush_neighbors_force: 0
+      log_slow_rate_limit: 11
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+      relay_log_recovery_force: ON
+      expire_logs_days: 99
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-snc1-prod-db182m1.snc1
+      - gds-snc1-prod-db182s1.snc1
+    master_carp_interface: vlan332
+    slave_carp_interface: vlan333
+    vhid: 82
+    slave_vhid: 82
+    master_vip: 10.30.32.82
+    slave_vips:
+      - 10.30.33.82
+    replication_ips:
+      - 10.22.148.148 # gds-snc1-prod-db182m1.snc1
+      - 10.22.148.110 # gds-snc1-prod-db182s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.72.12/32   #rocketman-db1-perf.snc1
+      - 10.22.148.160/32   #push-dispatcher1.snc1
+      - 10.22.148.133/32   #push-dispatcher2.snc1
+      - 10.22.148.144/32   #push-dispatcher3.snc1
+      - 10.22.148.29/32   #push-dispatcher4.snc1
+      - 10.22.148.137/32   #push-dispatcher5.snc1
+      - 10.22.148.183/32   #push-dispatcher6.snc1
+      - 10.22.148.232/32   #push-dispatcher7.snc1
+      - 10.22.148.94/32   #push-dispatcher8.snc1
+      - 10.22.148.193/32   #push-dispatcher9.snc1
+      - 10.22.148.53/32   #push-dispatcher10.snc1
+      - 10.22.148.171/32   #push-dispatcher11.snc1
+      - 10.22.148.203/32   #push-dispatcher12.snc1
+      - 10.22.148.19/32   #push-dispatcher13.snc1
+      - 10.22.148.179/32   #push-dispatcher14.snc1
+      - 10.22.148.207/32   #push-dispatcher15.snc1
+      - 10.22.149.249/32  #push-dispatcher16.snc1
+      - 10.22.149.197/32  #push-dispatcher17.snc1
+      - 10.22.149.65/32   #push-dispatcher18.snc1
+      - 10.22.149.59/32   #push-dispatcher19.snc1
+      - 10.22.149.34/32   #push-dispatcher20.snc1
+      - 10.22.52.12/32   # push-dispatcher21.snc1
+      - 10.22.52.13/32   # push-dispatcher22.snc1
+      - 10.22.52.14/32   # push-dispatcher23.snc1
+      - 10.22.52.15/32   # push-dispatcher24.snc1
+      - 10.22.52.29/32   # push-dispatcher25.snc1
+      - 10.22.52.30/32   # push-dispatcher26.snc1
+      - 10.22.52.32/32   # push-dispatcher27.snc1
+      - 10.22.52.33/32   # push-dispatcher28.snc1
+      - 10.22.52.34/32   # push-dispatcher29.snc1
+      - 10.22.52.36/32   # push-dispatcher30.snc1
+      - 10.22.53.23/32   # push-dispatcher31.snc1
+      - 10.22.53.22/32   # push-dispatcher32.snc1
+      - 10.22.53.21/32   # push-dispatcher33.snc1
+      - 10.22.53.20/32   # push-dispatcher34.snc1
+      - 10.22.53.19/32   # push-dispatcher35.snc1
+      - 10.22.53.18/32   # push-dispatcher36.snc1
+      - 10.22.53.17/32   # push-dispatcher37.snc1
+      - 10.22.53.16/32   # push-dispatcher38.snc1
+      - 10.22.53.15/32   # push-dispatcher39.snc1
+      - 10.22.53.14/32   # push-dispatcher40.snc1
+      - 10.22.72.9/32   # push-dispatcher41.snc1
+      - 10.22.52.78/32   # push-dispatcher43.snc1
+      - 10.22.50.148/32   # push-dispatcher44.snc1
+      - 10.22.50.131/32   # push-dispatcher45.snc1
+      - 10.22.50.159/32   # push-dispatcher46.snc1
+      - 10.22.50.76/32   # push-dispatcher47.snc1
+      - 10.22.50.16/32   # push-dispatcher48.snc1
+      - 10.22.148.37/32   # push-dispatcher49.snc1
+      - 10.22.50.19/32   # push-dispatcher50.snc1
+      - 10.22.49.60/32   # push-dispatcher51.snc1
+      - 10.22.50.27/32   # push-dispatcher52.snc1
+      - 10.22.217.88/32  #pit-prod-megatron-slave2.snc1
+      - 10.22.77.73/32   #subscription-utility-app3.snc1
+      - 10.22.77.138/32   #subscription-utility-app4.snc1
+      - 10.22.71.105/32   #subscription-utility-app5.snc1
+      - 10.22.67.72/32   #subscription-utility-app6.snc1
+      - 10.20.77.27/32   #consumer-data-service-app1.snc1
+      - 10.20.99.73/32   #consumer-data-service-app2.snc1
+      - 10.20.81.245/32   #consumer-data-service-app3.snc1
+      - 10.20.130.30/32   #consumer-data-service-app4.snc1
+      - 10.20.130.171/32   #consumer-data-service-app5.snc1
+      - 10.20.130.251/32   #consumer-data-service-app6.snc1
+      - 10.20.68.243/32   #consumer-data-service-utility1.snc1
+      - 10.20.91.105/32   #consumer-data-service-utility2.snc1
+      - 10.20.77.100/32   #pit-share-hdpname1.snc1
+      - 10.20.74.43/32   #pit-share-hdpname2.snc1
+      - 10.20.74.22/32   #pit-share-hdpjob1.snc1
+      - 10.20.78.67/32   #pit-share-hdpdata1.snc1
+      - 10.20.74.27/32   #pit-share-hdpdata2.snc1
+      - 10.20.74.28/32   #pit-share-hdpdata3.snc1
+      - 10.20.74.30/32   #pit-share-hdpdata4.snc1
+      - 10.20.74.37/32   #pit-share-hdpdata5.snc1
+      - 10.20.74.32/32   #pit-share-hdpdata6.snc1
+      - 10.20.74.39/32   #pit-share-hdpdata7.snc1
+      - 10.20.74.31/32   #pit-share-hdpdata8.snc1
+      - 10.20.74.40/32   #pit-share-hdpdata9.snc1
+      - 10.20.74.36/32   #pit-share-hdpdata10.snc1
+      - 10.20.74.38/32   #pit-share-hdpdata11.snc1
+      - 10.20.74.35/32   #pit-share-hdpdata12.snc1
+      - 10.20.74.41/32   #pit-share-hdpdata13.snc1
+      - 10.20.74.42/32   #pit-share-hdpdata14.snc1
+      - 10.20.74.33/32   #pit-share-hdpdata15.snc1
+      - 10.20.74.44/32   #pit-share-hdpdata16.snc1
+      - 10.20.74.55/32   #pit-share-hdpdata17.snc1
+      - 10.20.74.57/32   #pit-share-hdpdata18.snc1
+      - 10.20.74.58/32   #pit-share-hdpdata19.snc1
+      - 10.20.74.59/32   #pit-share-hdpdata20.snc1
+      - 10.20.74.60/32   #pit-share-hdpdata21.snc1
+      - 10.20.74.12/32   #pit-share-hdpdata22.snc1
+      - 10.20.74.14/32   #pit-share-hdpdata23.snc1
+      - 10.20.74.13/32   #pit-share-hdpdata24.snc1
+      - 10.20.74.15/32   #pit-share-hdpdata25.snc1
+      - 10.20.74.16/32   #pit-share-hdpdata26.snc1
+      - 10.20.74.17/32   #pit-share-hdpdata27.snc1
+      - 10.20.74.18/32   #pit-share-hdpdata28.snc1
+      - 10.20.74.19/32   #pit-share-hdpdata29.snc1
+      - 10.20.74.20/32   #pit-share-hdpdata30.snc1
+      - 10.20.74.21/32   #pit-share-hdpdata31.snc1
+      - 10.20.74.23/32   #pit-share-hdpdata32.snc1
+      - 10.20.74.34/32   #pit-share-hdpdata33.snc1
+      - 10.20.74.25/32   #pit-share-hdpdata34.snc1
+      - 10.20.74.29/32   #pit-share-hdpdata35.snc1
+      - 10.20.78.60/32   #pit-share-hdpdata36.snc1
+      - 10.20.74.50/32   #pit-share-hdpdata37.snc1
+      - 10.20.74.51/32   #pit-share-hdpdata38.snc1
+      - 10.20.74.48/32   #pit-share-hdpdata39.snc1
+      - 10.20.74.47/32   #pit-share-hdpdata40.snc1
+      - 10.20.74.52/32   #pit-share-hdpdata41.snc1
+      - 10.20.78.59/32   #pit-share-hdpdata42.snc1
+      - 10.20.78.63/32   #pit-share-hdpdata43.snc1
+      - 10.20.78.66/32   #pit-share-hdpdata44.snc1
+      - 10.20.78.71/32   #pit-share-hdpdata45.snc1
+      - 10.20.78.72/32   #pit-share-hdpdata46.snc1
+      - 10.20.78.73/32   #pit-share-hdpdata47.snc1
+      - 10.20.78.74/32   #pit-share-hdpdata48.snc1
+      - 10.20.78.75/32   #pit-share-hdpdata49.snc1
+      - 10.20.78.76/32   #pit-share-hdpdata50.snc1
+      - 10.20.78.77/32   #pit-share-hdpdata51.snc1
+      - 10.20.78.84/32   #pit-share-hdpdata52.snc1
+      - 10.20.78.87/32   #pit-share-hdpdata53.snc1
+      - 10.20.78.90/32   #pit-share-hdpdata54.snc1
+      - 10.20.78.91/32   #pit-share-hdpdata55.snc1
+      - 10.20.78.92/32   #pit-share-hdpdata56.snc1
+      - 10.20.78.96/32   #pit-share-hdpdata57.snc1
+      - 10.20.78.102/32   #pit-share-hdpdata58.snc1
+      - 10.20.78.111/32   #pit-share-hdpdata59.snc1
+      - 10.20.78.112/32   #pit-share-hdpdata60.snc1
+      - 10.20.78.62/32   #pit-share-hdpdata61.snc1
+      - 10.20.74.49/32   #pit-share-hdpdata62.snc1
+      - 10.20.78.120/32   #pit-share-hdpdata63.snc1
+      - 10.20.78.64/32   #pit-share-hdpdata64.snc1
+      - 10.20.78.79/32   #pit-share-hdpdata65.snc1
+      - 10.20.78.105/32   #pit-share-hdpdata66.snc1
+      - 10.20.78.117/32   #pit-share-hdpdata67.snc1
+      - 10.20.78.119/32   #pit-share-hdpdata68.snc1
+      - 10.20.83.41/32   #pit-share-hdpdata69.snc1
+      - 10.20.78.78/32   #pit-share-hdpdata70.snc1
+      - 10.20.83.49/32   #pit-share-hdpdata71.snc1
+      - 10.20.78.94/32   #pit-share-hdpdata72.snc1
+      - 10.20.78.65/32   #pit-share-hdpdata73.snc1
+      - 10.20.83.172/32   #pit-share-hdpdata74.snc1
+      - 10.20.83.222/32   #pit-share-hdpdata75.snc1
+      - 10.20.83.83/32   #pit-share-hdpdata76.snc1
+      - 10.20.78.169/32   #pit-share-hdpdata77.snc1
+      - 10.20.83.246/32   #pit-share-hdpdata78.snc1
+      - 10.20.78.21/32   #pit-share-hdpdata79.snc1
+      - 10.20.83.158/32   #pit-share-hdpdata80.snc1
+      - 10.20.115.62/32   #pit-share-hdpdata81.snc1
+      - 10.20.115.188/32   #pit-share-hdpdata82.snc1
+      - 10.20.115.198/32   #pit-share-hdpdata83.snc1
+      - 10.20.115.73/32   #pit-share-hdpdata84.snc1
+      - 10.20.115.194/32   #pit-share-hdpdata85.snc1
+      - 10.20.115.128/32   #pit-share-hdpdata86.snc1
+      - 10.20.115.138/32   #pit-share-hdpdata87.snc1
+      - 10.20.115.141/32   #pit-share-hdpdata88.snc1
+      - 10.20.115.147/32   #pit-share-hdpdata89.snc1
+      - 10.20.115.250/32   #pit-share-hdpdata90.snc1
+      - 10.20.115.219/32   #pit-share-hdpdata91.snc1
+      - 10.20.115.54/32   #pit-share-hdpdata92.snc1
+      - 10.20.115.191/32   #pit-share-hdpdata93.snc1
+      - 10.20.115.175/32   #pit-share-hdpdata94.snc1
+      - 10.20.115.236/32   #pit-share-hdpdata95.snc1
+      - 10.20.115.182/32   #pit-share-hdpdata96.snc1
+      - 10.20.115.20/32   #pit-share-hdpdata97.snc1
+      - 10.20.115.195/32   #pit-share-hdpdata98.snc1
+      - 10.20.115.161/32   #pit-share-hdpdata99.snc1
+      - 10.20.115.253/32   #pit-share-hdpdata100.snc1
+      - 10.20.115.85/32   #pit-share-hdpdata101.snc1
+      - 10.20.115.234/32   #pit-share-hdpdata102.snc1
+      - 10.20.115.162/32   #pit-share-hdpdata103.snc1
+      - 10.20.115.176/32   #pit-share-hdpdata104.snc1
+      - 10.20.115.31/32   #pit-share-hdpdata105.snc1
+      - 10.20.115.19/32   #pit-share-hdpdata106.snc1
+      - 10.20.115.224/32   #pit-share-hdpdata107.snc1
+      - 10.20.115.91/32   #pit-share-hdpdata108.snc1
+      - 10.20.115.132/32   #pit-share-hdpdata109.snc1
+      - 10.20.115.185/32   #pit-share-hdpdata110.snc1
+      - 10.20.115.246/32   #pit-share-hdpdata111.snc1
+      - 10.20.115.136/32   #pit-share-hdpdata112.snc1
+      - 10.20.115.63/32   #pit-share-hdpdata113.snc1
+      - 10.20.115.254/32   #pit-share-hdpdata114.snc1
+      - 10.20.115.202/32   #pit-share-hdpdata115.snc1
+      - 10.20.115.24/32   #pit-share-hdpdata116.snc1
+      - 10.20.115.209/32   #pit-share-hdpdata117.snc1
+      - 10.20.115.16/32   #pit-share-hdpdata118.snc1
+      - 10.20.115.127/32   #pit-share-hdpdata119.snc1
+      - 10.20.115.22/32   #pit-share-hdpdata120.snc1
+      - 10.20.115.51/32   #pit-share-hdpdata121.snc1
+      - 10.20.115.82/32   #pit-share-hdpdata122.snc1
+      - 10.20.115.154/32   #pit-share-hdpdata123.snc1
+      - 10.20.115.112/32   #pit-share-hdpdata124.snc1
+      - 10.20.115.76/32   #pit-share-hdpdata125.snc1
+      - 10.20.115.46/32   #pit-share-hdpdata126.snc1
+      - 10.20.115.164/32   #pit-share-hdpdata127.snc1
+      - 10.20.115.218/32   #pit-share-hdpdata128.snc1
+      - 10.20.115.83/32   #pit-share-hdpdata129.snc1
+      - 10.20.115.111/32   #pit-share-hdpdata130.snc1
+      - 10.20.115.235/32   #pit-share-hdpdata131.snc1
+      - 10.20.115.79/32   #pit-share-hdpdata132.snc1
+      - 10.20.115.220/32   #pit-share-hdpdata133.snc1
+      - 10.20.115.150/32   #pit-share-hdpdata134.snc1
+      - 10.20.115.208/32   #pit-share-hdpdata135.snc1
+      - 10.20.115.196/32   #pit-share-hdpdata136.snc1
+      - 10.20.115.59/32   #pit-share-hdpdata137.snc1
+      - 10.20.115.222/32   #pit-share-hdpdata138.snc1
+      - 10.20.115.52/32   #pit-share-hdpdata139.snc1
+      - 10.20.115.240/32   #pit-share-hdpdata140.snc1
+      - 10.20.115.223/32   #pit-share-hdpdata141.snc1
+      - 10.20.115.23/32   #pit-share-hdpdata142.snc1
+      - 10.20.78.100/32   #pit-share-hdpdata143.snc1
+      - 10.20.78.106/32   #pit-share-hdpdata144.snc1
+      - 10.20.70.59/32   #pit-share-hdpdata145.snc1
+      - 10.20.74.56/32   #pit-share-hdpdata146.snc1
+      - 10.20.74.46/32   #pit-share-hdpdata147.snc1
+      - 10.20.115.40/32   #pit-share-hdpdata148.snc1
+      - 10.20.115.167/32   #pit-share-hdpdata149.snc1
+      - 10.20.115.134/32   #pit-share-hdpdata150.snc1
+      - 10.20.115.145/32   #pit-share-hdpdata151.snc1
+      - 10.20.78.70/32   #pit-share-hdpdata152.snc1
+      - 10.20.73.84/32   #pit-share-hdpdata153.snc1
+      - 10.20.73.85/32   #pit-share-hdpdata154.snc1
+      - 10.20.73.87/32   #pit-share-hdpdata155.snc1
+      - 10.20.115.104/32   #pit-share-hdpdata156.snc1
+      - 10.20.115.108/32   #pit-share-hdpdata157.snc1
+      - 10.20.115.11/32   #pit-share-hdpdata158.snc1
+      - 10.20.115.152/32   #pit-share-hdpdata159.snc1
+      - 10.20.115.174/32   #pit-share-hdpdata160.snc1
+      - 10.20.115.180/32   #pit-share-hdpdata161.snc1
+      - 10.20.115.98/32   #pit-share-hdpdata162.snc1
+      - 10.20.115.177/32   #pit-share-hdpdata163.snc1
+      - 10.20.115.17/32   #pit-share-hdpdata164.snc1
+      - 10.20.115.77/32   #pit-share-hdpdata165.snc1
+      - 10.20.115.149/32   #pit-share-hdpdata166.snc1
+      - 10.20.115.215/32   #pit-share-hdpdata167.snc1
+      - 10.20.115.226/32   #pit-share-hdpdata168.snc1
+      - 10.20.115.25/32   #pit-share-hdpdata169.snc1
+      - 10.20.115.205/32   #pit-share-hdpdata170.snc1
+      - 10.20.115.120/32   #pit-share-hdpdata171.snc1
+      - 10.20.115.144/32   #pit-share-hdpdata172.snc1
+      - 10.20.115.122/32   #pit-share-hdpdata173.snc1
+      - 10.20.115.221/32   #pit-share-hdpdata174.snc1
+      - 10.20.115.72/32   #pit-share-hdpdata175.snc1
+      - 10.20.115.212/32   #pit-share-hdpdata176.snc1
+      - 10.20.115.67/32   #pit-share-hdpdata177.snc1
+      - 10.20.75.124/32   #pit-share-hdpdata182.snc1
+      - 10.20.75.72/32   #pit-share-hdpdata193.snc1
+      - 10.20.75.179/32   #pit-share-hdpdata194.snc1
+      - 10.20.75.158/32   #pit-share-hdpdata195.snc1
+      - 10.20.40.12/32   #pit-share-hdphive1.snc1
+      - 10.20.74.26/32   #pit-share-hdputil1.snc1
+      - 10.20.91.209/32   #pit-share-hdputil2.snc1
+      - 10.20.91.210/32   #pit-share-hdputil3.snc1
+      - 10.20.64.212/32   #pit-share-hdputil4.snc1
+      - 10.20.64.193/32   #pit-share-hdputil5.snc1
+      - 10.20.64.121/32   #pit-share-hdputil6.snc1
+      - 10.22.78.222/32   #pit-share-hdputil7.snc1
+      - 10.22.78.42/32   #pit-share-hdputil8.snc1
+      - 10.20.70.34/32   #pit-share-hdputil9.snc1
+      - 10.22.70.74/32   #pit-share-hdpds1.snc1
+      - 10.22.70.246/32   #pit-share-hdpds2.snc1
+      - 10.20.76.125/32   #pit-prod-owagent3.snc1
+      - 10.20.41.45/32   #pit-prod-owagent4.snc1
+      - 10.20.71.49/32   #pit-prod-owagent5.snc1
+      - 10.20.75.135/32   #pit-prod-owagent6.snc1
+      - 10.20.115.242/32   #pit-prod-etldata1.snc1
+      - 10.20.83.180/32   #pit-prod-etldata2.snc1
+      - 10.20.115.160/32   #pit-prod-etldata3.snc1
+      - 10.20.115.156/32   #pit-prod-etldata4.snc1
+      - 10.20.115.184/32   #pit-prod-etldata5.snc1
+      - 10.20.115.247/32   #pit-prod-etldata6.snc1
+      - 10.20.115.232/32   #pit-prod-etldata7.snc1
+      - 10.20.115.229/32   #pit-prod-etldata8.snc1
+      - 10.20.115.252/32   #pit-prod-etldata9.snc1
+      - 10.20.115.32/32   #pit-prod-etldata10.snc1
+      - 10.20.70.33/32   #pit-prod-etldata11.snc1
+      - 10.20.70.28/32   #pit-prod-etldata12.snc1
+      - 10.20.70.12/32   #pit-prod-etldata13.snc1
+      - 10.20.83.133/32   #pit-prod-etldata14.snc1
+      - 10.20.83.93/32   #pit-prod-etldata15.snc1
+      - 10.20.83.165/32   #pit-prod-etldata16.snc1
+      - 10.20.83.111/32   #pit-prod-etldata17.snc1
+      - 10.20.83.201/32   #pit-prod-etldata18.snc1
+      - 10.20.83.250/32   #pit-prod-etldata19.snc1
+      - 10.20.83.187/32   #pit-prod-etldata20.snc1
+      - 10.20.83.221/32   #pit-prod-etldata21.snc1
+      - 10.20.83.61/32   #pit-prod-etldata22.snc1
+      - 10.20.83.220/32   #pit-prod-etldata23.snc1
+      - 10.20.83.231/32   #pit-prod-etldata24.snc1
+      - 10.20.83.138/32   #pit-prod-etldata25.snc1
+      - 10.20.83.163/32   #pit-prod-etldata26.snc1
+      - 10.20.83.73/32   #pit-prod-etldata27.snc1
+      - 10.20.83.207/32   #pit-prod-etldata28.snc1
+      - 10.20.115.126/32   #pit-prod-etldata29.snc1
+      - 10.20.115.71/32   #pit-prod-etldata30.snc1
+      - 10.20.115.238/32   #pit-prod-etldata31.snc1
+      - 10.20.115.166/32   #pit-prod-etldata32.snc1
+      - 10.20.115.237/32   #pit-prod-etldata33.snc1
+      - 10.20.115.75/32   #pit-prod-etldata34.snc1
+      - 10.20.73.91/32   #pit-prod-etldata35.snc1
+      - 10.20.73.92/32   #pit-prod-etldata36.snc1
+      - 10.20.73.116/32   #pit-prod-etldata37.snc1
+      - 10.20.73.94/32   #pit-prod-etldata38.snc1
+      - 10.20.78.118/32   #pit-prod-etldata39.snc1
+      - 10.20.78.108/32   #pit-prod-etldata40.snc1
+      - 10.20.78.103/32   #pit-prod-etldata41.snc1
+      - 10.20.78.101/32   #pit-prod-etldata42.snc1
+      - 10.20.78.80/32   #pit-prod-etldata43.snc1
+      - 10.20.73.76/32   #pit-prod-etldata44.snc1
+      - 10.20.73.77/32   #pit-prod-etldata45.snc1
+      - 10.20.73.78/32   #pit-prod-etldata46.snc1
+      - 10.20.115.217/32   #pit-prod-etldata47.snc1
+      - 10.20.115.227/32   #pit-prod-etldata48.snc1
+      - 10.20.115.61/32   #pit-prod-etldata49.snc1
+      - 10.20.115.74/32   #pit-prod-etldata50.snc1
+      - 10.20.115.96/32   #pit-prod-etldata51.snc1
+      - 10.20.78.99/32   #pit-prod-etldata52.snc1
+      - 10.20.74.134/32   #pit-prod-etldata53.snc1
+      - 10.20.74.139/32   #pit-prod-etldata54.snc1
+      - 10.20.74.142/32   #pit-prod-etldata55.snc1
+      - 10.20.74.143/32   #pit-prod-etldata56.snc1
+      - 10.20.74.167/32   #pit-prod-etldata57.snc1
+      - 10.20.74.172/32   #pit-prod-etldata58.snc1
+      - 10.20.74.175/32   #pit-prod-etldata59.snc1
+      - 10.20.74.177/32   #pit-prod-etldata60.snc1
+      - 10.20.74.180/32   #pit-prod-etldata61.snc1
+      - 10.20.74.185/32   #pit-prod-etldata62.snc1
+      - 10.20.70.191/32   #pit-prod-etldata63.snc1
+      - 10.20.70.142/32   #pit-prod-etldata64.snc1
+      - 10.20.70.251/32   #pit-prod-etldata65.snc1
+      - 10.20.70.164/32   #pit-prod-etldata66.snc1
+      - 10.20.70.181/32   #pit-prod-etldata67.snc1
+      - 10.20.115.57/32   #pit-prod-etldata68.snc1
+      - 10.20.115.43/32   #pit-prod-etldata69.snc1
+      - 10.20.115.55/32   #pit-prod-etldata70.snc1
+      - 10.20.115.116/32   #pit-prod-etldata71.snc1
+      - 10.20.115.88/32   #pit-prod-etldata72.snc1
+      - 10.20.70.38/32 # pit-prod-etldata73.snc1
+      - 10.20.70.39/32 # pit-prod-etldata74.snc1
+      - 10.20.70.40/32 # pit-prod-etldata75.snc1
+      - 10.20.70.41/32 # pit-prod-etldata76.snc1
+      - 10.20.70.42/32 # pit-prod-etldata77.snc1
+      - 10.20.78.33/32 # pit-prod-etldata78.snc1
+      - 10.20.78.37/32 # pit-prod-etldata79.snc1
+      - 10.20.78.30/32 # pit-prod-etldata80.snc1
+      - 10.20.78.253/32 # pit-prod-etldata81.snc1
+      - 10.20.77.147/32 # pit-prod-etldata82.snc1
+      - 10.20.77.138/32 # pit-prod-etldata83.snc1
+      - 10.20.77.179/32 # pit-prod-etldata84.snc1
+      - 10.20.77.69/32 # pit-prod-etldata85.snc1
+      - 10.20.77.59/32   #pit-prod-etlname1.snc1
+      - 10.20.64.52/32   #pit-prod-etlname3.snc1
+      - 10.20.75.96/32   #pit-prod-etljob1.snc1
+      - 10.20.70.74/32   #pit-prod-megatron-master1.snc1
+      - 10.20.76.59/32   #pit-prod-owagent8.snc1
+      - 10.20.76.55/32   #pit-prod-owagent7.snc1
+      - 10.20.76.64/32   #pit-prod-owagent9.snc1
+      - 10.20.42.48/32   #flumecollector3.snc1
+      - 10.20.42.46/32   #pit-prod-megatron-slave1.snc1
+      - 10.20.70.79/32   #pit-prod-megatron-slave2.snc1
+      - 10.20.42.175/32   #pit-dev-megatron-slave1.snc1
+      - 10.22.76.131/32 # pit-prod-owagent1.snc1
+      - 10.20.69.87/32 # pit-prod-etldata-mronly1.snc1
+      - 10.20.69.86/32 # pit-prod-etldata-mronly2.snc1
+      - 10.20.69.85/32 # pit-prod-etldata-mronly3.snc1
+      - 10.20.69.88/32 # pit-prod-etldata-mronly4.snc1
+      - 10.20.69.89/32 # pit-prod-etldata-mronly5.snc1
+      - 10.20.69.90/32 # pit-prod-etldata-mronly6.snc1
+      - 10.20.69.91/32 # pit-prod-etldata-mronly7.snc1
+      - 10.20.69.92/32 # pit-prod-etldata-mronly8.snc1
+      - 10.20.69.93/32 # pit-prod-etldata-mronly9.snc1
+      - 10.20.69.95/32 # pit-prod-etldata-mronly10.snc1
+      - 10.20.42.47/32 # pit-prod-megatron-master2.snc1
+      - 10.20.74.124/32   #smartdeals-cdh4-hadoop-slave10-snc1.snc1
+      - 10.20.83.107/32   #smartdeals-cdh4-hadoop-slave118-snc1.snc1
+      - 10.20.83.105/32   #smartdeals-cdh4-hadoop-slave119-snc1.snc1
+      - 10.20.74.123/32   #smartdeals-cdh4-hadoop-slave11-snc1.snc1
+      - 10.20.83.185/32   #smartdeals-cdh4-hadoop-slave120-snc1.snc1
+      - 10.20.83.154/32   #smartdeals-cdh4-hadoop-slave121-snc1.snc1
+      - 10.20.83.86/32   #smartdeals-cdh4-hadoop-slave122-snc1.snc1
+      - 10.20.83.244/32   #smartdeals-cdh4-hadoop-slave123-snc1.snc1
+      - 10.20.83.224/32   #smartdeals-cdh4-hadoop-slave124-snc1.snc1
+      - 10.20.83.123/32   #smartdeals-cdh4-hadoop-slave125-snc1.snc1
+      - 10.20.83.146/32   #smartdeals-cdh4-hadoop-slave126-snc1.snc1
+      - 10.20.83.142/32   #smartdeals-cdh4-hadoop-slave127-snc1.snc1
+      - 10.20.83.108/32   #smartdeals-cdh4-hadoop-slave128-snc1.snc1
+      - 10.20.83.128/32   #smartdeals-cdh4-hadoop-slave129-snc1.snc1
+      - 10.20.74.122/32   #smartdeals-cdh4-hadoop-slave12-snc1.snc1
+      - 10.20.83.71/32   #smartdeals-cdh4-hadoop-slave130-snc1.snc1
+      - 10.20.83.100/32   #smartdeals-cdh4-hadoop-slave131-snc1.snc1
+      - 10.20.83.173/32   #smartdeals-cdh4-hadoop-slave132-snc1.snc1
+      - 10.20.83.168/32   #smartdeals-cdh4-hadoop-slave133-snc1.snc1
+      - 10.20.83.198/32   #smartdeals-cdh4-hadoop-slave134-snc1.snc1
+      - 10.20.83.150/32   #smartdeals-cdh4-hadoop-slave135-snc1.snc1
+      - 10.20.83.178/32   #smartdeals-cdh4-hadoop-slave136-snc1.snc1
+      - 10.20.83.213/32   #smartdeals-cdh4-hadoop-slave137-snc1.snc1
+      - 10.20.83.190/32   #smartdeals-cdh4-hadoop-slave138-snc1.snc1
+      - 10.20.83.121/32   #smartdeals-cdh4-hadoop-slave139-snc1.snc1
+      - 10.20.74.121/32   #smartdeals-cdh4-hadoop-slave13-snc1.snc1
+      - 10.20.83.98/32   #smartdeals-cdh4-hadoop-slave140-snc1.snc1
+      - 10.20.83.186/32   #smartdeals-cdh4-hadoop-slave141-snc1.snc1
+      - 10.20.83.131/32   #smartdeals-cdh4-hadoop-slave142-snc1.snc1
+      - 10.20.83.140/32   #smartdeals-cdh4-hadoop-slave143-snc1.snc1
+      - 10.20.83.208/32   #smartdeals-cdh4-hadoop-slave144-snc1.snc1
+      - 10.20.83.153/32   #smartdeals-cdh4-hadoop-slave145-snc1.snc1
+      - 10.20.83.126/32   #smartdeals-cdh4-hadoop-slave146-snc1.snc1
+      - 10.20.83.243/32   #smartdeals-cdh4-hadoop-slave147-snc1.snc1
+      - 10.20.83.113/32   #smartdeals-cdh4-hadoop-slave148-snc1.snc1
+      - 10.20.83.80/32   #smartdeals-cdh4-hadoop-slave149-snc1.snc1
+      - 10.20.74.120/32   #smartdeals-cdh4-hadoop-slave14-snc1.snc1
+      - 10.20.83.182/32   #smartdeals-cdh4-hadoop-slave150-snc1.snc1
+      - 10.20.83.134/32   #smartdeals-cdh4-hadoop-slave151-snc1.snc1
+      - 10.20.83.101/32   #smartdeals-cdh4-hadoop-slave152-snc1.snc1
+      - 10.20.83.218/32   #smartdeals-cdh4-hadoop-slave153-snc1.snc1
+      - 10.20.83.161/32   #smartdeals-cdh4-hadoop-slave154-snc1.snc1
+      - 10.20.83.117/32   #smartdeals-cdh4-hadoop-slave155-snc1.snc1
+      - 10.20.83.181/32   #smartdeals-cdh4-hadoop-slave156-snc1.snc1
+      - 10.20.83.177/32   #smartdeals-cdh4-hadoop-slave157-snc1.snc1
+      - 10.20.83.226/32   #smartdeals-cdh4-hadoop-slave158-snc1.snc1
+      - 10.20.83.214/32   #smartdeals-cdh4-hadoop-slave159-snc1.snc1
+      - 10.20.83.69/32   #smartdeals-cdh4-hadoop-slave160-snc1.snc1
+      - 10.20.83.135/32   #smartdeals-cdh4-hadoop-slave161-snc1.snc1
+      - 10.20.74.69/32   #smartdeals-cdh4-hadoop-slave1-snc1.snc1
+      - 10.20.74.70/32   #smartdeals-cdh4-hadoop-slave2-snc1.snc1
+      - 10.20.74.71/32   #smartdeals-cdh4-hadoop-slave3-snc1.snc1
+      - 10.20.74.72/32   #smartdeals-cdh4-hadoop-slave4-snc1.snc1
+      - 10.20.83.32/32   #smartdeals-cdh4-hadoop-slave52-snc1.snc1
+      - 10.20.77.160/32   #smartdeals-cdh4-hadoop-slave59-snc1.snc1
+      - 10.20.74.73/32   #smartdeals-cdh4-hadoop-slave5-snc1.snc1
+      - 10.20.77.170/32   #smartdeals-cdh4-hadoop-slave60-snc1.snc1
+      - 10.20.76.95/32   #smartdeals-cdh4-hadoop-slave61-snc1.snc1
+      - 10.20.77.42/32   #smartdeals-cdh4-hadoop-slave62-snc1.snc1
+      - 10.20.74.89/32   #smartdeals-cdh4-hadoop-slave63-snc1.snc1
+      - 10.20.74.74/32   #smartdeals-cdh4-hadoop-slave6-snc1.snc1
+      - 10.20.74.75/32   #smartdeals-cdh4-hadoop-slave7-snc1.snc1
+      - 10.20.74.76/32   #smartdeals-cdh4-hadoop-slave8-snc1.snc1
+      - 10.20.74.125/32   #smartdeals-cdh4-hadoop-slave9-snc1.snc1
+      - 10.20.83.39/32   #smartdeals-cdh4-hadoop-util3-snc1.snc1
+      - 10.20.74.69/32 # pit-prod-etldata86.snc1
+      - 10.20.74.70/32 # pit-prod-etldata87.snc1
+      - 10.20.74.71/32 # pit-prod-etldata88.snc1
+      - 10.20.74.72/32 # pit-prod-etldata89.snc1
+      - 10.20.74.73/32 # pit-prod-etldata90.snc1
+      - 10.20.74.74/32 # pit-prod-etldata91.snc1
+      - 10.20.74.75/32 # pit-prod-etldata92.snc1
+      - 10.20.74.76/32 # pit-prod-etldata93.snc1
+      - 10.20.74.125/32 # pit-prod-etldata94.snc1
+      - 10.20.74.124/32 # pit-prod-etldata95.snc1
+      - 10.20.74.123/32 # pit-prod-etldata96.snc1
+      - 10.20.74.122/32 # pit-prod-etldata97.snc1
+      - 10.20.74.121/32 # pit-prod-etldata98.snc1
+      - 10.20.74.120/32 # pit-prod-etldata99.snc1
+      - 10.20.74.89/32 # pit-prod-etldata100.snc1
+      - 10.20.77.187/32 # pit-prod-etldata101.snc1
+      - 10.20.77.226/32 # pit-prod-etldata102.snc1
+      - 10.20.70.46/32 # pit-prod-etldata103.snc1
+      - 10.20.73.83/32 # pit-prod-etldata104.snc1
+      - 10.20.73.89/32 # pit-prod-etldata105.snc1
+      - 10.20.73.90/32 # pit-prod-etldata106.snc1
+      - 10.20.73.81/32 # pit-prod-etldata107.snc1
+      - 10.20.74.148/32 # pit-prod-etldata108.snc1
+      - 10.20.73.86/32 # pit-prod-etldata109.snc1
+      - 10.20.73.88/32 # pit-prod-etldata110.snc1
+      - 10.20.73.75/32 # pit-prod-etldata111.snc1
+      - 10.20.74.151/32 # pit-prod-etldata112.snc1
+      - 10.20.74.152/32 # pit-prod-etldata113.snc1
+      - 10.20.70.65/32 # pit-prod-etldata114.snc1
+      - 10.20.70.66/32 # pit-prod-etldata115.snc1
+      - 10.20.70.37/32 # pit-prod-etldata116.snc1
+      - 10.22.70.192/32 # pit-prod-megatron-master3.snc1
+      - 10.22.66.29/32   #subscription-service-app10.snc1
+      - 10.20.69.253/32   #subscription-service-app1.snc1
+      - 10.20.75.36/32   #subscription-service-app2.snc1
+      - 10.20.69.128/32   #subscription-service-app3.snc1
+      - 10.22.74.139/32   #subscription-service-app4.snc1
+      - 10.22.74.198/32   #subscription-service-app5.snc1
+      - 10.22.66.238/32   #subscription-service-app6.snc1
+      - 10.22.66.90/32   #subscription-service-app7.snc1
+      - 10.22.66.67/32   #subscription-service-app8.snc1
+      - 10.22.66.19/32   #subscription-service-app9.snc1
+      - 10.20.74.155/32   #users-service-app1.snc1
+      - 10.20.74.159/32   #users-service-app2.snc1
+      - 10.20.74.140/32   #users-service-app3.snc1
+      - 10.20.74.170/32   #users-service-app4.snc1
+      - 10.20.75.82/32   #users-service-app5.snc1
+      - 10.20.75.93/32   #users-service-app6.snc1
+      - 10.22.127.220/32   #users-service-app7.snc1
+      - 10.22.127.231/32   #users-service-app8.snc1
+      - 10.22.127.187/32   #users-service-app9.snc1
+      - 10.22.127.22/32   #users-service-app10.snc1
+      - 10.22.71.87/32   # users-service-app11.snc1
+      - 10.22.219.229/32   # users-service-app12.snc1
+      - 10.22.233.36/32   # users-service-app13.snc1
+      - 10.22.216.134/32   # users-service-app14.snc1
+      - 10.22.49.240/32   # users-service-app15.snc1
+      - 10.22.139.142/32   # users-service-app16.snc1
+      - 10.22.217.20/32   # users-service-app17.snc1
+      - 10.22.233.134/32   # users-service-app18.snc1
+      - 10.22.233.53/32   # users-service-app19.snc1
+      - 10.22.233.90/32   # users-service-app20.snc1
+      - 10.22.152.10/32   # users-service-app21.snc1
+      - 10.22.218.131/32   # users-service-app22.snc1
+      - 10.22.237.156/32   # users-service-app23.snc1
+      - 10.22.77.164/32   # users-service-app24.snc1
+      - 10.22.67.32/32   # users-service-app25.snc1
+      - 10.20.132.198/32   # users-service-app26.snc1
+      - 10.22.217.77/32   # users-service-app27.snc1
+      - 10.22.67.54/32   # users-service-app28.snc1
+      - 10.22.237.228/32   # users-service-app29.snc1
+      - 10.22.233.160/32   # users-service-app30.snc1
+      - 10.22.216.79/32   # users-service-app31.snc1
+      - 10.22.81.79/32   # users-service-app32.snc1
+      - 10.22.81.202/32   # users-service-app33.snc1
+      - 10.22.135.128/32   # users-service-app34.snc1
+      - 10.20.130.110/32   # users-service-app35.snc1
+      - 10.22.237.125/32   # users-service-app36.snc1
+      - 10.20.91.63/32   # users-service-app37.snc1
+      - 10.22.70.50/32   # users-service-app38.snc1
+      - 10.20.131.116/32   # users-service-app39.snc1
+      - 10.22.233.169/32   # users-service-app40.snc1
+      - 10.22.237.41/32   # users-service-app41.snc1
+      - 10.22.71.115/32   # users-service-app42.snc1
+      - 10.22.216.39/32   # users-service-app43.snc1
+      - 10.22.237.70/32   # users-service-app44.snc1
+      - 10.22.152.245/32   # users-service-app45.snc1
+      - 10.22.237.4/32   # users-service-app46.snc1
+      - 10.22.219.173/32   # users-service-app47.snc1
+      - 10.32.160.246/32   # users-service-app1.sac1
+      - 10.32.170.158/32   # users-service-app2.sac1
+      - 10.32.164.218/32   # users-service-app3.sac1
+      - 10.32.57.146/32   # users-service-app4.sac1
+      - 10.20.73.174/32 # users-service-spare1.snc1
+      - 10.22.70.28/32   #users-service-utility1.snc1
+      - 10.20.91.103/32   #users-service-utility2.snc1
+      - 10.22.138.41/32   # users-service-utility3.snc1
+      - 10.32.69.107/32   # users-service-utility1.sac1
+      - 10.32.148.130/32   # users-service-utility2.sac1
+      - 10.20.112.149/32   #user-sync-utility1.snc1
+      - 10.22.72.80/32   #user-sync-utility2.snc1
+      - 10.32.176.54/32 # user-sync-utility1.sac1
+      - 10.32.105.159/32 # user-sync-utility2.sac1
+      - 10.22.233.191/32   # cde-thirdparty1.snc1
+      - 10.32.233.248/32   # cde-thirdparty1.sac1
+      - 10.22.138.184/32   # pit-prod-megatron-slave3.snc1
+      - 10.22.74.254/32   # pit-prod-megatron-slave4.snc1
+      - 10.22.70.220/32   # pit-prod-megatron-slave5.snc1
+      - 10.22.134.27/32   # pit-prod-megatron-slave6.snc1
+      - 10.22.134.105/32   # pit-prod-megatron-slave7.snc1
+      - 10.22.216.180/32   # pit-prod-megatron-slave8.snc1
+      - 10.22.67.108/32   # pit-prod-megatron-slave9.snc1
+      - 10.22.53.32/32   # pit-prod-megatron-slave10.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.222.0.0/20  # RDS Subnet
+      - 10.222.16.0/20 # RDS Subnet
+      - 10.222.32.0/20 # RDS Subnet
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+      - 10.22.48.170/32  #users-service-app1.snc1
+      - 10.22.149.246/32 #users-service-app2.snc1
+      - 10.22.151.53/32 #users-service-app3.snc1
+      - 10.22.149.208/32 #users-service-app4.snc1
+      - 10.22.148.231/32 #users-service-app5.snc1
+      - 10.22.151.7/32  #users-service-app6.snc1
+      - 10.22.149.198/32 #users-service-app7.snc1
+      - 10.22.37.236/32   # gdoop-megatron-slave2-sox.snc1
+      - 10.22.49.11/32   # gdoop-megatron-slave1-sox.snc1
+      - 10.20.42.46/32   # pit-prod-megatron-slave1.snc1
+      - 10.20.70.79/32   # pit-prod-megatron-slave2.snc1
+      - 10.22.138.184/32   # pit-prod-megatron-slave3.snc1
+      - 10.22.74.254/32   # pit-prod-megatron-slave4.snc1
+      - 10.22.70.220/32   # pit-prod-megatron-slave5.snc1
+      - 10.22.53.32/32   # pit-prod-megatron-slave10.snc1
+      - 10.22.133.188/32   # pit-prod-megatron-slave11.snc1
+      - 10.22.233.33/32   # pit-prod-megatron-slave12.snc1
+      - 10.22.135.30/32   # pit-prod-megatron-slave13.snc1
+      - 10.22.49.194/32   # pit-prod-megatron-slave14.snc1
+      - 10.20.42.46/32   # pit-prod-megatron-slave1.snc1
+      - 10.20.70.74/32   # pit-prod-megatron-master1.snc1
+      - 10.20.42.47/32   # pit-prod-megatron-master2.snc1
+      - 10.22.70.192/32   # pit-prod-megatron-master3.snc1
+      - 10.23.44.160/32   # pit-prod-megatron-master4.snc1
+      - 10.22.133.217/32   # pit-prod-megatron-master5.snc1
+      - 10.22.132.133/32   # pit-prod-megatron-master6.snc1
+      - 10.22.233.83/32   # pit-prod-megatron-master7.snc1
+      - 10.182.0.0/16 #megatron_ro staging DB
+      - 10.181.0.0/21  #Dev CIDR
+      - 10.182.0.0/21  #Stable CIDR
+      - 10.183.0.0/21  #Prod CIDR
+    dba_account_name: users_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+    ports:
+      mysqld: 20001
+    playback_enabled: false
+    playback:
+      peers:
+        - node: gds-snc1-prod-db182m1.snc1
+          peer: gds-snc1-prod-db182s1.snc1
+        - node: gds-snc1-prod-db182s1.snc1
+          peer: gds-snc1-prod-db182m1.snc1
+      manage_mysql_slowlogd: 1
+      mysql_user_to_check: thepoint_db
+      user: playback_user
+      password: mee5pieK
+      schema: groupon_user_production
+      thread_pool_size: 100
+      user_connection_threshold: 15
+      playback_connection_timeout: 20
+      mysql_slowlogd_port: 30001
+    admin_redirect_peers:
+      - 10.22.148.230/32 # gds-snc1-prod-db181m1.snc1
+      - 10.22.148.237/32 # gds-snc1-prod-db181s1.snc1
+      - 10.22.148.148/32 # gds-snc1-prod-db182m1.snc1
+      - 10.22.148.110/32 # gds-snc1-prod-db182s1.snc1

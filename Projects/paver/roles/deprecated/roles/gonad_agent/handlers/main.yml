@@ -1,0 +1,6 @@
+---
+- name: gonad_agent restart
+  command: /usr/local/sbin/sv term /var/service/gonad_agent
+
+- name: gonad_agent log restart
+  command: /usr/local/sbin/sv term /var/service/gonad_agent/log

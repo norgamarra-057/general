@@ -1,0 +1,6 @@
+---
+
+
+- name: pf.conf | reload
+  command: /etc/rc.d/pf reload
+  ignore_errors: true

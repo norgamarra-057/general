@@ -1,0 +1,41 @@
+---
+- name: Create ipmicfg directory
+  file:
+    dest: "{{ ipmicfg_dir }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: Deploy IPMICFG zip
+  copy:
+    dest: "{{ ipmicfg_dir }}/ipmicfg.zip"
+    src: "{{ ipmicfg_zip }}"
+
+- name: Check if ipmicfg is deployed
+  stat:
+    path: "{{ ipmicfg_dir }}/IPMICFG-Linux.x86"
+  register: ipmicfg
+
+- name: Extract ZIP
+  shell: "unzip -j -d {{ ipmicfg_dir }} {{ ipmicfg_dir }}/ipmicfg.zip {{ ipmicfg_version }}/Linux/32bit/*"
+  when: ipmicfg.stat is defined and not ipmicfg.stat.exists
+
+- name: Check ipmicfg file
+  stat:
+    path: /usr/local/sbin/ipmicfg
+  register: ipmicfg_cmd
+
+- name: Remove if ipmicfg is symlink
+  file:
+    dest: /usr/local/sbin/ipmicfg
+    state: absent
+  when: ipmicfg_cmd.stat is defined and ipmicfg_cmd.islnk
+
+- name: Deploy wrapper
+  template:
+    dest: /usr/local/sbin/ipmicfg
+    src: ipmicfg.j2
+    mode: 0755
+    owner: root
+    group: wheel

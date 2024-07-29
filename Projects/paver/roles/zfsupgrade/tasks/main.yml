@@ -1,0 +1,6 @@
+---
+- include_tasks: zfsupgrade.yml
+  tags:
+    - zfs-upgrade
+    - all
+    - jailhost

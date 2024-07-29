@@ -1,0 +1,36 @@
+---
+- name: Look for missing disks
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Install sas2ircu
+      pkgng: name=sas2ircu
+
+    - name: Check if /dev/da22 is present
+      stat: path=/dev/da22
+      always_run: yes
+      register: dev_da22
+
+    - name: Check if /dev/da23 is present
+      stat: path=/dev/da23
+      always_run: yes
+      register: dev_da23
+
+    - name: Check if da22 is part of the tank pool
+      when: dev_da22.stat.exists
+      shell: zpool status -v tank | grep da22
+      always_run: true
+      ignore_errors: yes
+      register: da22_in_tank
+
+    - name: Check if da23 is part of the tank pool
+      when: dev_da23.stat.exists
+      shell: zpool status -v tank | grep da23
+      always_run: true
+      ignore_errors: yes
+      register: da23_in_tank
+
+    - name: Add if devs are not in tank
+      when: dev_da22.stat.exists and da22_in_tank.rc == 1 and dev_da23.stat.exists and da23_in_tank.rc == 1
+      command: zpool add tank mirror da22p1 da23p1
+

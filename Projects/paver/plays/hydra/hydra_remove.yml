@@ -1,0 +1,59 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+   - name: FreeBSD | run | undeploy hydra 
+     shell: |
+       exec 2>&1
+       set -e -x
+       rm -f /usr/lib/check_mk_agent/local/120/hydra_agent_status.sh 
+       rm -f /usr/lib/check_mk_agent/local/120/hydra_server_status.sh 
+       if [ -d /var/groupon/service/hydra-agent ]
+       then
+         sv kill /var/groupon/service/hydra-agent || true
+         sv stop /var/groupon/service/hydra-agent || true
+         rm -f /var/service/hydra-agent
+         rm -Rf /var/groupon/service/hydra-agent
+       fi
+       if [ -d /var/groupon/service/hydra-server ]
+       then
+         sv kill /var/groupon/service/hydra-server || true
+         sv stop /var/groupon/service/hydra-server || true
+         rm -f /var/service/hydra-server
+         rm -Rf /var/groupon/service/hydra-server
+       fi
+       if [ -d /opt/hydra ] 
+       then
+         rm -Rf /opt/hydra
+       fi
+       rm -f /opt/hydra-*.tar.gz
+#     executable: /usr/local/bin/bash
+     register: log_output
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ log_output.stdout_lines }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       var: outputs
+
+   - name: FreeBSD | run | drop hydra from Consul
+     shell: |
+       exec 2>&1
+       curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace("_","-") }}/leader"
+       {% if inventory_hostname.endswith('m1.' + datacenter) %}
+       curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace("_","-") }}/nodes/{{ item.value.hydra.ids[0] }}?recurse=true"
+       curl -s -X PUT "http://localhost:8500/v1/agent/service/deregister/{{ item.value.hydra.ids[0] }}"
+       {% else %}
+       curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace("_","-") }}/nodes/{{ item.value.hydra.ids[1] }}?recurse=true"
+       curl -s -X PUT "http://localhost:8500/v1/agent/service/deregister/{{ item.value.hydra.ids[1] }}"
+       {% endif %}
+     args:
+#       executable: /usr/local/bin/bash
+     with_dict: "{{ gds_instances }}"
+     when: item.value.hydra is defined
+     loop_control:
+       label: "{{ item.key }}"

@@ -1,0 +1,4226 @@
+---
+gds_carp_peers:
+  - 10.23.38.252  # gds-snc1-uat-db028m1
+  - 10.23.38.253  # gds-snc1-uat-db028s1
+  - 10.23.39.252  # gds-snc1-uat-db028m1
+  - 10.23.39.253  # gds-snc1-uat-db028s1
+gds_carp_interfaces:
+  - vlan338
+  - vlan339
+gds_instance_group: gds_snc1_uat_db028
+gds_monitor_cluster_type: gds_postgresql
+
+gds_instances:
+  gds_sandbox_uat: # GDS-xxxx
+    type: postgresql
+    dbnames:
+      - gds_sandbox_uat
+    schemas:
+      gds_sandbox_uat:
+        - gds_sandbox
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60001
+    master_vip: 10.23.38.51
+    slave_vips:
+      - 10.23.39.51
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.223.130.147/32   # RDS sandbox_uat instance
+      - 10.213.128.0/23   # us-west-1a-DBSubnet
+      - 10.213.129.0/23   # us-west-1b-DBSubnet
+      - 10.213.130.0/23     # us-west-1c-DBSubnet
+    dba_account_name: gds_sandbox_uat_dba
+    app_account_name: gds_sandbox_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.223.130.147/32   # RDS sandbox_uat instance
+      - 10.213.128.0/23   # us-west-1a-DBSubnet
+      - 10.213.129.0/23   # us-west-1b-DBSubnet
+      - 10.213.130.0/23     # us-west-1c-DBSubnet
+    ports:
+      pgbouncer_txn: 20000
+      pgbouncer_session: 20001
+      postgresql_raw: 20002
+    extra_variables:
+      max_connections: 100
+      pglogical: 'on'
+  clo_consent_uat: # GDS-15222
+    type: postgresql
+    dbnames:
+      - clo_consent_uat
+    schemas:
+      clo_consent_uat:
+        - clo_consent
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60002
+    master_vip: 10.23.38.52
+    slave_vips:
+      - 10.23.39.52
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.23.106.93/32   # clo-consent1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: clo_consent_uat_dba
+    app_account_name: clo_consent_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.23.106.93/32   # clo-consent1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20003
+      pgbouncer_session: 20004
+      postgresql_raw: 20005
+    extra_variables:
+  conveyor_api_uat: # GDS-15272
+    type: postgresql
+    dbnames:
+      - conveyor_api_uat
+    schemas:
+      conveyor_api_uat:
+        - conveyor_api
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60003
+    master_vip: 10.23.38.53
+    slave_vips:
+      - 10.23.39.53
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.107.10/32   # conveyor-worker1-uat.snc1
+      - 10.23.107.11/32   # conveyor-worker2-uat.snc1
+      - 10.23.107.12/32   # conveyor-worker3-uat.snc1
+      - 10.23.44.16/32   # conveyor-worker4-uat.snc1
+      - 10.23.44.163/32   # conveyor-worker5-uat.snc1
+      - 10.23.92.210/32   # conveyor-worker6-uat.snc1
+      - 10.20.71.213/32   # conveyor-worker7-uat.snc1
+      - 10.20.73.47/32   # conveyor-worker8-uat.snc1
+      - 10.20.73.46/32   # conveyor-worker9-uat.snc1
+      - 10.23.64.223/32   # conveyor-worker10-uat.snc1
+      - 10.23.104.150/32   # conveyor-worker11-uat.snc1
+      - 10.23.102.154/32   # conveyor-worker12-uat.snc1
+      - 10.23.64.252/32   # conveyor-worker13-uat.snc1
+      - 10.23.104.81/32   # conveyor-worker14-uat.snc1
+      - 10.23.102.47/32   # conveyor-worker15-uat.snc1
+      - 10.23.64.73/32   # conveyor-worker16-uat.snc1
+      - 10.23.104.85/32   # conveyor-worker17-uat.snc1
+      - 10.23.102.72/32   # conveyor-worker18-uat.snc1
+      - 10.23.106.17/32   # conveyor-worker19-uat.snc1
+      - 10.23.94.13/32   # conveyor-worker20-uat.snc1
+      - 10.23.96.12/32   # conveyor-worker21-uat.snc1
+      - 10.23.90.8/32   # conveyor-worker22-uat.snc1
+      - 10.23.102.13/32   # conveyor-worker23-uat.snc1
+      - 10.23.64.14/32   # conveyor-worker24-uat.snc1
+      - 10.23.104.13/32   # conveyor-worker25-uat.snc1
+      - 10.23.106.20/32   # conveyor-worker26-uat.snc1
+      - 10.23.94.14/32   # conveyor-worker27-uat.snc1
+      - 10.23.96.13/32   # conveyor-worker28-uat.snc1
+      - 10.23.90.9/32   # conveyor-worker29-uat.snc1
+      - 10.23.106.22/32   # conveyor-worker30-uat.snc1
+      - 10.23.94.15/32   # conveyor-worker31-uat.snc1
+      - 10.23.96.14/32   # conveyor-worker32-uat.snc1
+      - 10.23.90.10/32   # conveyor-worker33-uat.snc1
+      - 10.23.106.23/32   # conveyor-worker34-uat.snc1
+      - 10.23.94.16/32   # conveyor-worker35-uat.snc1
+      - 10.23.96.15/32   # conveyor-worker36-uat.snc1
+      - 10.23.90.11/32   # conveyor-worker37-uat.snc1
+      - 10.23.106.26/32   # conveyor-worker38-uat.snc1
+      - 10.23.94.17/32   # conveyor-worker39-uat.snc1
+      - 10.23.96.16/32   # conveyor-worker40-uat.snc1
+      - 10.23.90.12/32   # conveyor-worker41-uat.snc1
+      - 10.23.106.28/32   # conveyor-worker42-uat.snc1
+      - 10.23.94.18/32   # conveyor-worker43-uat.snc1
+      - 10.23.106.30/32   # conveyor-worker44-uat.snc1
+      - 10.23.94.19/32   # conveyor-worker45-uat.snc1
+      - 10.22.148.162/32   # conveyor-worker46-uat.snc1
+      - 10.22.148.146/32   # conveyor-worker47-uat.snc1
+      - 10.22.148.32/32   # conveyor-worker48-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: conveyor_api_uat_dba
+    app_account_name: conveyor_api_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.107.10/32   # conveyor-worker1-uat.snc1
+      - 10.23.107.11/32   # conveyor-worker2-uat.snc1
+      - 10.23.107.12/32   # conveyor-worker3-uat.snc1
+      - 10.23.44.16/32   # conveyor-worker4-uat.snc1
+      - 10.23.44.163/32   # conveyor-worker5-uat.snc1
+      - 10.23.92.210/32   # conveyor-worker6-uat.snc1
+      - 10.20.71.213/32   # conveyor-worker7-uat.snc1
+      - 10.20.73.47/32   # conveyor-worker8-uat.snc1
+      - 10.20.73.46/32   # conveyor-worker9-uat.snc1
+      - 10.23.64.223/32   # conveyor-worker10-uat.snc1
+      - 10.23.104.150/32   # conveyor-worker11-uat.snc1
+      - 10.23.102.154/32   # conveyor-worker12-uat.snc1
+      - 10.23.64.252/32   # conveyor-worker13-uat.snc1
+      - 10.23.104.81/32   # conveyor-worker14-uat.snc1
+      - 10.23.102.47/32   # conveyor-worker15-uat.snc1
+      - 10.23.64.73/32   # conveyor-worker16-uat.snc1
+      - 10.23.104.85/32   # conveyor-worker17-uat.snc1
+      - 10.23.102.72/32   # conveyor-worker18-uat.snc1
+      - 10.23.106.17/32   # conveyor-worker19-uat.snc1
+      - 10.23.94.13/32   # conveyor-worker20-uat.snc1
+      - 10.23.96.12/32   # conveyor-worker21-uat.snc1
+      - 10.23.90.8/32   # conveyor-worker22-uat.snc1
+      - 10.23.102.13/32   # conveyor-worker23-uat.snc1
+      - 10.23.64.14/32   # conveyor-worker24-uat.snc1
+      - 10.23.104.13/32   # conveyor-worker25-uat.snc1
+      - 10.23.106.20/32   # conveyor-worker26-uat.snc1
+      - 10.23.94.14/32   # conveyor-worker27-uat.snc1
+      - 10.23.96.13/32   # conveyor-worker28-uat.snc1
+      - 10.23.90.9/32   # conveyor-worker29-uat.snc1
+      - 10.23.106.22/32   # conveyor-worker30-uat.snc1
+      - 10.23.94.15/32   # conveyor-worker31-uat.snc1
+      - 10.23.96.14/32   # conveyor-worker32-uat.snc1
+      - 10.23.90.10/32   # conveyor-worker33-uat.snc1
+      - 10.23.106.23/32   # conveyor-worker34-uat.snc1
+      - 10.23.94.16/32   # conveyor-worker35-uat.snc1
+      - 10.23.96.15/32   # conveyor-worker36-uat.snc1
+      - 10.23.90.11/32   # conveyor-worker37-uat.snc1
+      - 10.23.106.26/32   # conveyor-worker38-uat.snc1
+      - 10.23.94.17/32   # conveyor-worker39-uat.snc1
+      - 10.23.96.16/32   # conveyor-worker40-uat.snc1
+      - 10.23.90.12/32   # conveyor-worker41-uat.snc1
+      - 10.23.106.28/32   # conveyor-worker42-uat.snc1
+      - 10.23.94.18/32   # conveyor-worker43-uat.snc1
+      - 10.23.106.30/32   # conveyor-worker44-uat.snc1
+      - 10.23.94.19/32   # conveyor-worker45-uat.snc1
+      - 10.22.148.162/32   # conveyor-worker46-uat.snc1
+      - 10.22.148.146/32   # conveyor-worker47-uat.snc1
+      - 10.22.148.32/32   # conveyor-worker48-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20006
+      pgbouncer_session: 20007
+      postgresql_raw: 20008
+    extra_variables:
+  activiti_snc1_uat: # GDS-15274
+    type: postgresql
+    dbnames:
+      - activiti_snc1_uat
+    schemas:
+      activiti_snc1_uat:
+        - activiti_snc1
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60004
+    master_vip: 10.23.38.54
+    slave_vips:
+      - 10.23.39.54
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.107.10/32   # conveyor-worker1-uat.snc1
+      - 10.23.107.11/32   # conveyor-worker2-uat.snc1
+      - 10.23.107.12/32   # conveyor-worker3-uat.snc1
+      - 10.23.44.16/32   # conveyor-worker4-uat.snc1
+      - 10.23.44.163/32   # conveyor-worker5-uat.snc1
+      - 10.23.92.210/32   # conveyor-worker6-uat.snc1
+      - 10.20.71.213/32   # conveyor-worker7-uat.snc1
+      - 10.20.73.47/32   # conveyor-worker8-uat.snc1
+      - 10.20.73.46/32   # conveyor-worker9-uat.snc1
+      - 10.23.64.223/32   # conveyor-worker10-uat.snc1
+      - 10.23.104.150/32   # conveyor-worker11-uat.snc1
+      - 10.23.102.154/32   # conveyor-worker12-uat.snc1
+      - 10.23.64.252/32   # conveyor-worker13-uat.snc1
+      - 10.23.104.81/32   # conveyor-worker14-uat.snc1
+      - 10.23.102.47/32   # conveyor-worker15-uat.snc1
+      - 10.23.64.73/32   # conveyor-worker16-uat.snc1
+      - 10.23.104.85/32   # conveyor-worker17-uat.snc1
+      - 10.23.102.72/32   # conveyor-worker18-uat.snc1
+      - 10.23.106.17/32   # conveyor-worker19-uat.snc1
+      - 10.23.94.13/32   # conveyor-worker20-uat.snc1
+      - 10.23.96.12/32   # conveyor-worker21-uat.snc1
+      - 10.23.90.8/32   # conveyor-worker22-uat.snc1
+      - 10.23.102.13/32   # conveyor-worker23-uat.snc1
+      - 10.23.64.14/32   # conveyor-worker24-uat.snc1
+      - 10.23.104.13/32   # conveyor-worker25-uat.snc1
+      - 10.23.106.20/32   # conveyor-worker26-uat.snc1
+      - 10.23.94.14/32   # conveyor-worker27-uat.snc1
+      - 10.23.96.13/32   # conveyor-worker28-uat.snc1
+      - 10.23.90.9/32   # conveyor-worker29-uat.snc1
+      - 10.23.106.22/32   # conveyor-worker30-uat.snc1
+      - 10.23.94.15/32   # conveyor-worker31-uat.snc1
+      - 10.23.96.14/32   # conveyor-worker32-uat.snc1
+      - 10.23.90.10/32   # conveyor-worker33-uat.snc1
+      - 10.23.106.23/32   # conveyor-worker34-uat.snc1
+      - 10.23.94.16/32   # conveyor-worker35-uat.snc1
+      - 10.23.96.15/32   # conveyor-worker36-uat.snc1
+      - 10.23.90.11/32   # conveyor-worker37-uat.snc1
+      - 10.23.106.26/32   # conveyor-worker38-uat.snc1
+      - 10.23.94.17/32   # conveyor-worker39-uat.snc1
+      - 10.23.96.16/32   # conveyor-worker40-uat.snc1
+      - 10.23.90.12/32   # conveyor-worker41-uat.snc1
+      - 10.23.106.28/32   # conveyor-worker42-uat.snc1
+      - 10.23.94.18/32   # conveyor-worker43-uat.snc1
+      - 10.23.106.30/32   # conveyor-worker44-uat.snc1
+      - 10.23.94.19/32   # conveyor-worker45-uat.snc1
+      - 10.22.148.162/32   # conveyor-worker46-uat.snc1
+      - 10.22.148.146/32   # conveyor-worker47-uat.snc1
+      - 10.22.148.32/32   # conveyor-worker48-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: activiti_snc1_uat_dba
+    app_account_name: activiti_snc1_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.107.10/32   # conveyor-worker1-uat.snc1
+      - 10.23.107.11/32   # conveyor-worker2-uat.snc1
+      - 10.23.107.12/32   # conveyor-worker3-uat.snc1
+      - 10.23.44.16/32   # conveyor-worker4-uat.snc1
+      - 10.23.44.163/32   # conveyor-worker5-uat.snc1
+      - 10.23.92.210/32   # conveyor-worker6-uat.snc1
+      - 10.20.71.213/32   # conveyor-worker7-uat.snc1
+      - 10.20.73.47/32   # conveyor-worker8-uat.snc1
+      - 10.20.73.46/32   # conveyor-worker9-uat.snc1
+      - 10.23.64.223/32   # conveyor-worker10-uat.snc1
+      - 10.23.104.150/32   # conveyor-worker11-uat.snc1
+      - 10.23.102.154/32   # conveyor-worker12-uat.snc1
+      - 10.23.64.252/32   # conveyor-worker13-uat.snc1
+      - 10.23.104.81/32   # conveyor-worker14-uat.snc1
+      - 10.23.102.47/32   # conveyor-worker15-uat.snc1
+      - 10.23.64.73/32   # conveyor-worker16-uat.snc1
+      - 10.23.104.85/32   # conveyor-worker17-uat.snc1
+      - 10.23.102.72/32   # conveyor-worker18-uat.snc1
+      - 10.23.106.17/32   # conveyor-worker19-uat.snc1
+      - 10.23.94.13/32   # conveyor-worker20-uat.snc1
+      - 10.23.96.12/32   # conveyor-worker21-uat.snc1
+      - 10.23.90.8/32   # conveyor-worker22-uat.snc1
+      - 10.23.102.13/32   # conveyor-worker23-uat.snc1
+      - 10.23.64.14/32   # conveyor-worker24-uat.snc1
+      - 10.23.104.13/32   # conveyor-worker25-uat.snc1
+      - 10.23.106.20/32   # conveyor-worker26-uat.snc1
+      - 10.23.94.14/32   # conveyor-worker27-uat.snc1
+      - 10.23.96.13/32   # conveyor-worker28-uat.snc1
+      - 10.23.90.9/32   # conveyor-worker29-uat.snc1
+      - 10.23.106.22/32   # conveyor-worker30-uat.snc1
+      - 10.23.94.15/32   # conveyor-worker31-uat.snc1
+      - 10.23.96.14/32   # conveyor-worker32-uat.snc1
+      - 10.23.90.10/32   # conveyor-worker33-uat.snc1
+      - 10.23.106.23/32   # conveyor-worker34-uat.snc1
+      - 10.23.94.16/32   # conveyor-worker35-uat.snc1
+      - 10.23.96.15/32   # conveyor-worker36-uat.snc1
+      - 10.23.90.11/32   # conveyor-worker37-uat.snc1
+      - 10.23.106.26/32   # conveyor-worker38-uat.snc1
+      - 10.23.94.17/32   # conveyor-worker39-uat.snc1
+      - 10.23.96.16/32   # conveyor-worker40-uat.snc1
+      - 10.23.90.12/32   # conveyor-worker41-uat.snc1
+      - 10.23.106.28/32   # conveyor-worker42-uat.snc1
+      - 10.23.94.18/32   # conveyor-worker43-uat.snc1
+      - 10.23.106.30/32   # conveyor-worker44-uat.snc1
+      - 10.23.94.19/32   # conveyor-worker45-uat.snc1
+      - 10.22.148.162/32   # conveyor-worker46-uat.snc1
+      - 10.22.148.146/32   # conveyor-worker47-uat.snc1
+      - 10.22.148.32/32   # conveyor-worker48-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20009
+      pgbouncer_session: 20010
+      postgresql_raw: 20011
+    extra_variables:
+  oxygen_snc1_uat: # GDS-15406
+    type: postgresql
+    dbnames:
+      - oxygen_snc1_uat
+    schemas:
+      oxygen_snc1_uat:
+        - oxygen_snc1
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60005
+    master_vip: 10.23.38.55
+    slave_vips:
+      - 10.23.39.55
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.92.232/32   # jtier-oxygen1-uat.snc1
+      - 10.23.76.253/32   # jtier-oxygen2-uat.snc1
+      - 10.213.48.0/20    # subnet
+      - 10.213.64.0/20    # subnet
+      - 10.213.54.0/20    # subnet
+      - 10.213.80.0/20    # subnet
+      - 10.228.4.0/25     # subnet
+      - 10.228.4.128/25   # subnet
+      - 10.228.5.0/25     # subnet
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: oxygen_snc1_uat_dba
+    app_account_name: oxygen_snc1_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.92.232/32   # jtier-oxygen1-uat.snc1
+      - 10.23.76.253/32   # jtier-oxygen2-uat.snc1
+      - 10.213.48.0/20    # subnet
+      - 10.213.64.0/20    # subnet
+      - 10.213.54.0/20    # subnet
+      - 10.213.80.0/20    # subnet
+      - 10.228.4.0/25     # subnet
+      - 10.228.4.128/25   # subnet
+      - 10.228.5.0/25     # subnet
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20012
+      pgbouncer_session: 20013
+      postgresql_raw: 20014
+    extra_variables:
+# destroyed GDS-28792  partner_attr_map_uat: # GDS-15483 __SOX__
+  crosslinker_uat: # GDS-15702
+    type: postgresql
+    dbnames:
+      - crosslinker_uat
+    schemas:
+      crosslinker_uat:
+        - crosslinker
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60007
+    master_vip: 10.23.38.57
+    slave_vips:
+      - 10.23.39.57
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.92.127/32 # brands-cross-linker-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: crosslinker_uat_dba
+    app_account_name: crosslinker_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.92.127/32 # brands-cross-linker-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20018
+      pgbouncer_session: 20019
+      postgresql_raw: 20020
+    extra_variables:
+  # keyword_kb_uat: # GDS-15719# Decom #GDS-34625
+  mktg_tagging_serv_uat: # GDS-16959
+    type: postgresql
+    dbnames:
+      - mktg_tagging_serv_uat
+    schemas:
+      mktg_tagging_serv_uat:
+        - mktg_tagging_serv_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60011
+    master_vip: 10.23.38.61
+    slave_vips:
+      - 10.23.39.61
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.43.232/32   # marketing-tagging-service1-uat.snc1
+      - 10.23.76.209/32   # marketing-tagging-service2-uat.snc1
+      - 10.23.76.229/32   # marketing-tagging-service-worker2-uat.snc1
+      - 10.23.92.84/32   # marketing-tagging-service-api2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: mktg_tagging_serv_uat_dba
+    app_account_name: mktg_tagging_serv_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.43.232/32   # marketing-tagging-service1-uat.snc1
+      - 10.23.76.209/32   # marketing-tagging-service2-uat.snc1
+      - 10.23.76.229/32   # marketing-tagging-service-worker2-uat.snc1
+      - 10.23.92.84/32   # marketing-tagging-service-api2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20030
+      pgbouncer_session: 20031
+      postgresql_raw: 20032
+    extra_variables:
+  coupons_inventory_uat: # GDS-17101
+    type: postgresql
+    dbnames:
+      - coupons_inventory_uat
+    schemas:
+      coupons_inventory_uat:
+        - coupons_inventory
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60012
+    master_vip: 10.23.38.62
+    slave_vips:
+      - 10.23.39.62
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.76.217/32   # coupons-inventory-service1-uat.snc1
+      - 10.23.44.248/32   # coupons-inventory-service2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: coupons_inventory_uat_dba
+    app_account_name: coupons_inventory_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.76.217/32   # coupons-inventory-service1-uat.snc1
+      - 10.23.44.248/32   # coupons-inventory-service2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20033
+      pgbouncer_session: 20034
+      postgresql_raw: 20035
+    extra_variables:
+  pageduty_hg_uat: # GDS-17186
+    type: postgresql
+    dbnames:
+      - pageduty_hg_uat
+    schemas:
+      pageduty_hg_uat:
+        - pageduty_hg
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60013
+    master_vip: 10.23.38.63
+    slave_vips:
+      - 10.23.39.63
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.45.92/32    # alexis1-dev.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: pageduty_hg_uat_dba
+    app_account_name: pageduty_hg_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.45.92/32    # alexis1-dev.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20036
+      pgbouncer_session: 20037
+      postgresql_raw: 20038
+    extra_variables:
+  metro_draft_uat: # GDS-17453
+    type: postgresql
+    dbnames:
+      - metro_draft_uat
+    schemas:
+      metro_draft_uat:
+        - metro_draft
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60015
+    master_vip: 10.23.38.65
+    slave_vips:
+      - 10.23.39.65
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.44.116/32   # mds-app1-uat.snc1
+      - 10.23.43.112/32   # draft-service-app1-uat.snc1
+      - 10.23.45.7/32   # draft-service-app2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: metro_draft_uat_dba
+    app_account_name: metro_draft_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.44.116/32   # mds-app1-uat.snc1
+      - 10.23.43.112/32   # draft-service-app1-uat.snc1
+      - 10.23.45.7/32   # draft-service-app2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20042
+      pgbouncer_session: 20043
+      postgresql_raw: 20044
+    extra_variables:
+  #seo_columbus_uat: # GDS-17835 #Decom # GDS-35020
+  performer_service_uat: # GDS-17889
+    type: postgresql
+    dbnames:
+      - performer_service_uat
+    schemas:
+      performer_service_uat:
+        - performer_service
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60017
+    master_vip: 10.23.38.67
+    slave_vips:
+      - 10.23.39.67
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.45.216/32   # merchant-data-performerservice-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: performer_service_uat_dba
+    app_account_name: performer_service_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.45.216/32   # merchant-data-performerservice-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20048
+      pgbouncer_session: 20049
+      postgresql_raw: 20050
+    extra_variables:
+  airflow_uat: # GDS-18186
+    type: postgresql
+    dbnames:
+      - airflow_uat
+    schemas:
+      airflow_uat:
+        - airflow
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60018
+    master_vip: 10.23.38.68
+    slave_vips:
+      - 10.23.39.68
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.106.138/32   # krs1.snc1
+      - 10.23.85.237/32   # dsp-airflow-scheduler1-dev.snc1
+      - 10.23.44.72/32   # dsp-airflow-app1-dev.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: airflow_uat_dba
+    app_account_name: airflow_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin02.snc1
+      - 10.23.106.138/32   # krs1.snc1
+      - 10.23.85.237/32   # dsp-airflow-scheduler1-dev.snc1
+      - 10.23.44.72/32   # dsp-airflow-app1-dev.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20051
+      pgbouncer_session: 20052
+      postgresql_raw: 20053
+    extra_variables:
+  sandbox_uat: # GDS-18515
+    type: postgresql
+    dbnames:
+      - sandbox_uat
+    schemas:
+      sandbox_uat:
+        - sandbox
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60019
+    master_vip: 10.23.38.69
+    slave_vips:
+      - 10.23.39.69
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.22.198.126/32   # dev2.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.223.130.147/32   # RDS sandbox_uat instance
+      - 10.0.0.0/0  # allow all boxes for now
+    dba_account_name: sandbox_uat_dba
+    app_account_name: sandbox_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.22.198.126/32   # dev2.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.223.130.147/32   # RDS sandbox_uat instance
+      - 10.0.0.0/0  # allow all boxes for now
+    ports:
+      pgbouncer_txn: 20054
+      pgbouncer_session: 20055
+      postgresql_raw: 20056
+    extra_variables:
+  netbox_uat: # GDS-18766
+    type: postgresql
+    dbnames:
+      - netbox_uat
+    schemas:
+      netbox_uat:
+        - netbox
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60020
+    master_vip: 10.23.38.70
+    slave_vips:
+      - 10.23.39.70
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.22.198.126/32   # dev2.snc1
+      - 10.23.92.156/32   # netauth1-uat.snc1
+      - 10.23.106.216/32  # cmkendpoint1.snc1
+      - 10.23.44.10/32   # ipam1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: netbox_uat_dba
+    app_account_name: netbox_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.22.198.126/32   # dev2.snc1
+      - 10.23.92.156/32   # netauth1-uat.snc1
+      - 10.23.106.216/32  # cmkendpoint1.snc1
+      - 10.23.44.10/32   # ipam1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20057
+      pgbouncer_session: 20058
+      postgresql_raw: 20059
+    extra_variables:
+  deals_cluster_uat: # GDS-18766
+    type: postgresql
+    dbnames:
+      - deals_cluster_uat
+    schemas:
+      deals_cluster_uat:
+        - deals_cluster
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60021
+    master_vip: 10.23.38.71
+    slave_vips:
+      - 10.23.39.71
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.22.198.126/32   # dev2.snc1
+      - 10.22.198.126/32   # dev2.snc1
+      - 10.23.22.199/32 # deals-cluster1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: deals_cluster_uat_dba
+    app_account_name: deals_cluster_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.22.198.126/32   # dev2.snc1
+      - 10.23.22.199/32 # deals-cluster1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20060
+      pgbouncer_session: 20061
+      postgresql_raw: 20062
+    extra_variables:
+  epds_uat: # GDS-19025
+    type: postgresql
+    dbnames:
+      - epds_uat
+    schemas:
+      epds_uat:
+        - epds
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60022
+    master_vip: 10.23.38.72
+    slave_vips:
+      - 10.23.39.72
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.106.133/32 # epods-app1-uat.snc1
+      - 10.23.45.237/32 # epods-app2-uat.snc1
+      - 10.23.92.112/32 # epods-app3-uat.snc1
+
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: epds_uat_dba
+    app_account_name: epds_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.106.133/32 # epods-app1-uat.snc1
+      - 10.23.45.237/32 # epods-app2-uat.snc1
+      - 10.23.92.112/32 # epods-app3-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20063
+      pgbouncer_session: 20064
+      postgresql_raw: 20065
+    extra_variables:
+  ada_uat: # GDS-19083
+    type: postgresql
+    dbnames:
+      - ada_uat
+    schemas:
+      ada_uat:
+        - ada
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60023
+    master_vip: 10.23.38.73
+    slave_vips:
+      - 10.23.39.73
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.76.220/32 # ada-app1-uat.snc1
+      - 10.23.92.238/32 # ada-app2-uat.snc1
+
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.22.237.90/32   # aws-gds-1.snc1
+      - 10.22.49.176/32   # aws-gds-2.snc1
+    dba_account_name: ada_uat_dba
+    app_account_name: ada_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.76.220/32 # ada-app1-uat.snc1
+      - 10.23.92.238/32 # ada-app2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.22.237.90/32   # aws-gds-1.snc1
+      - 10.22.49.176/32   # aws-gds-2.snc1
+    ports:
+      pgbouncer_txn: 20066
+      pgbouncer_session: 20067
+      postgresql_raw: 20068
+    extra_variables:
+  mecs_uat: # GDS-19240
+    type: postgresql
+    dbnames:
+      - mecs_uat
+    schemas:
+      mecs_uat:
+        - mecs
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60024
+    master_vip: 10.23.38.74
+    slave_vips:
+      - 10.23.39.74
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.23.84.42/32    # mecs-api1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.22.237.90/32   # aws-gds-1.snc1
+      - 10.22.49.176/32   # aws-gds-2.snc1
+    dba_account_name: mecs_uat_dba
+    app_account_name: mecs_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.20.32.17/32   # dev1.snc1
+      - 10.23.84.42/32    # mecs-api1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.22.237.90/32   # aws-gds-1.snc1
+      - 10.22.49.176/32   # aws-gds-2.snc1
+    ports:
+      pgbouncer_txn: 20069
+      pgbouncer_session: 20070
+      postgresql_raw: 20071
+    extra_variables:
+  hbw_sign_servc_uat: # GDS-19734
+    type: postgresql
+    dbnames:
+      - hbw_sign_servc_uat
+    schemas:
+      hbw_sign_servc_uat:
+        - hbw_sign_servc
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60025
+    master_vip: 10.23.38.75
+    slave_vips:
+      - 10.23.39.75
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.84.252/32  # hbw-signature-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: hbw_sign_servc_uat_dba
+    app_account_name: hbw_sign_servc_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.84.252/32  # hbw-signature-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20072
+      pgbouncer_session: 20073
+      postgresql_raw: 20074
+    extra_variables:
+  gdt_automation_uat: # GDS-19809
+    type: postgresql
+    dbnames:
+      - gdt_automation_uat
+    schemas:
+      gdt_automation_uat:
+        - gdt_automation
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60026
+    master_vip: 10.23.38.76
+    slave_vips:
+      - 10.23.39.76
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.85.86/32    # gdt-automation-app1-uat.snc1
+      - 10.23.45.14/32    # gdt-automation-app2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: gdt_automation_uat_dba
+    app_account_name: gdt_automation_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.85.86/32    # gdt-automation-app1-uat.snc1
+      - 10.23.45.14/32    # gdt-automation-app2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20075
+      pgbouncer_session: 20076
+      postgresql_raw: 20077
+    extra_variables:
+  sulu_uat: # GDS-19847
+    type: postgresql
+    dbnames:
+      - sulu_uat
+    schemas:
+      sulu_uat:
+        - sulu
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60027
+    master_vip: 10.23.38.77
+    slave_vips:
+      - 10.23.39.77
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.43.107/32  # seo-sulu-api1-uat.snc1
+      - 10.23.92.88/32  # seo-sulu-api2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: sulu_uat_dba
+    app_account_name: sulu_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.43.107/32  # seo-sulu-api1-uat.snc1
+      - 10.23.92.88/32  # seo-sulu-api2-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20078
+      pgbouncer_session: 20079
+      postgresql_raw: 20080
+    extra_variables:
+  getaways_chan_mgr_uat: # GDS-20113
+    type: postgresql
+    dbnames:
+      - getaways_chan_mgr_uat
+    schemas:
+      getaways_chan_mgr_uat:
+        - getaways_chan_mgr
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60028
+    master_vip: 10.23.38.78
+    slave_vips:
+      - 10.23.39.78
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.44.185/32   # getaways-channel-manager-integrator-ds-app1-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: getaways_chan_mgr_uat_dba
+    app_account_name: getaways_chan_mgr_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.44.185/32   # getaways-channel-manager-integrator-ds-app1-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20081
+      pgbouncer_session: 20082
+      postgresql_raw: 20083
+    extra_variables:
+  program_enroll_uat: # GDS-20188
+    type: postgresql
+    dbnames:
+      - program_enroll_uat
+    schemas:
+      program_enroll_uat:
+        - program_enroll
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60029
+    master_vip: 10.23.38.79
+    slave_vips:
+      - 10.23.39.79
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.44.145/32   # program-enrollment-service1-uat.snc1
+      - 10.23.76.44/32   # program-enrollment-service2-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: program_enroll_uat_dba
+    app_account_name: program_enroll_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.44.145/32   # program-enrollment-service1-uat.snc1
+      - 10.23.76.44/32   # program-enrollment-service2-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20084
+      pgbouncer_session: 20085
+      postgresql_raw: 20086
+    extra_variables:
+  consumer_location_uat: # GDS-20449
+    type: postgresql
+    dbnames:
+      - consumer_location_uat
+    schemas:
+      consumer_location_uat:
+        - consumer_location
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60030
+    master_vip: 10.23.38.59
+    slave_vips:
+      - 10.23.39.59
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: consumer_location_uat_dba
+    app_account_name: consumer_location_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20087
+      pgbouncer_session: 20088
+      postgresql_raw: 20089
+    extra_variables:
+  decision_engine_uat: # GDS-20516
+    type: postgresql
+    dbnames:
+      - decision_engine_uat
+    schemas:
+      decision_engine_uat:
+        - decision_engine
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60031
+    master_vip: 10.23.38.60
+    slave_vips:
+      - 10.23.39.60
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.85.156/32   # decision-engine1-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: decision_engine_uat_dba
+    app_account_name: decision_engine_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.85.156/32   # decision-engine1-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20090
+      pgbouncer_session: 20091
+      postgresql_raw: 20092
+    extra_variables:
+
+# destroyed GDS-26190  isochrones_uat: # GDS-20620
+
+  bhuvan_uat: # GDS-20679
+    type: postgresql
+    dbnames:
+      - bhuvan_uat
+    schemas:
+      bhuvan_uat:
+        - bhuvan
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60033
+    master_vip: 10.23.38.81
+    slave_vips:
+      - 10.23.39.81
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.76.55/32   # geo-bhuvan-app1-uat.snc1
+      - 10.23.44.96/32   # geo-bhuvan-app2-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: bhuvan_uat_dba
+    app_account_name: bhuvan_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.23.76.55/32   # geo-bhuvan-app1-uat.snc1
+      - 10.23.44.96/32   # geo-bhuvan-app2-uat.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20096
+      pgbouncer_session: 20097
+      postgresql_raw: 20098
+    extra_variables:
+  campaign_perform_uat: # GDS-20777
+    type: postgresql
+    dbnames:
+      - campaign_perform_uat
+    schemas:
+      campaign_perform_uat:
+        - campaign_perform
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60034
+    master_vip: 10.23.38.82
+    slave_vips:
+      - 10.23.39.82
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.24.102.155/32   # cerebro-worker1.snc1
+      - 10.24.116.106/32   # cerebro-worker2.snc1
+      - 10.24.113.184/32   # cerebro-worker3.snc1
+      - 10.24.114.83/32   # cerebro-worker4.snc1
+      - 10.24.106.248/32   # cerebro-worker5.snc1
+      - 10.24.118.88/32   # cerebro-worker6.snc1
+      - 10.24.117.71/32   # cerebro-worker7.snc1
+      - 10.24.104.207/32   # cerebro-worker8.snc1
+      - 10.24.100.177/32   # cerebro-worker9.snc1
+      - 10.24.103.113/32   # cerebro-worker10.snc1
+      - 10.24.115.178/32   # cerebro-worker11.snc1
+      - 10.24.105.144/32   # cerebro-worker12.snc1
+      - 10.24.107.240/32   # cerebro-worker13.snc1
+      - 10.24.101.128/32   # cerebro-worker14.snc1
+      - 10.24.112.143/32   # cerebro-worker15.snc1
+      - 10.24.102.246/32   # cerebro-worker16.snc1
+      - 10.24.116.91/32   # cerebro-worker17.snc1
+      - 10.24.113.205/32   # cerebro-worker18.snc1
+      - 10.24.114.209/32   # cerebro-worker19.snc1
+      - 10.24.106.195/32   # cerebro-worker20.snc1
+      - 10.24.118.101/32   # cerebro-worker21.snc1
+      - 10.24.117.83/32   # cerebro-worker22.snc1
+      - 10.24.104.79/32   # cerebro-worker23.snc1
+      - 10.24.100.113/32   # cerebro-worker24.snc1
+      - 10.24.103.151/32   # cerebro-worker25.snc1
+      - 10.24.115.201/32   # cerebro-worker26.snc1
+      - 10.24.105.238/32   # cerebro-worker27.snc1
+      - 10.24.107.245/32   # cerebro-worker28.snc1
+      - 10.24.101.94/32   # cerebro-worker29.snc1
+      - 10.24.112.217/32   # cerebro-worker30.snc1
+      - 10.24.102.139/32   # cerebro-worker31.snc1
+      - 10.24.116.155/32   # cerebro-worker32.snc1
+      - 10.24.113.176/32   # cerebro-worker33.snc1
+      - 10.24.114.167/32   # cerebro-worker34.snc1
+      - 10.24.106.126/32   # cerebro-worker35.snc1
+      - 10.24.118.185/32   # cerebro-worker36.snc1
+      - 10.24.117.228/32   # cerebro-worker37.snc1
+      - 10.24.104.176/32   # cerebro-worker38.snc1
+      - 10.24.100.108/32   # cerebro-worker39.snc1
+      - 10.24.103.78/32   # cerebro-worker40.snc1
+      - 10.24.115.85/32   # cerebro-worker41.snc1
+      - 10.24.105.229/32   # cerebro-worker42.snc1
+      - 10.24.107.103/32   # cerebro-worker43.snc1
+      - 10.24.101.115/32   # cerebro-worker44.snc1
+      - 10.24.112.186/32   # cerebro-worker45.snc1
+      - 10.24.102.146/32   # cerebro-worker46.snc1
+      - 10.24.116.77/32   # cerebro-worker47.snc1
+      - 10.24.113.214/32   # cerebro-worker48.snc1
+      - 10.24.114.196/32   # cerebro-worker49.snc1
+      - 10.24.106.133/32   # cerebro-worker50.snc1
+      - 10.24.118.103/32   # cerebro-worker51.snc1
+      - 10.24.117.92/32   # cerebro-worker52.snc1
+      - 10.24.104.98/32   # cerebro-worker53.snc1
+      - 10.24.100.119/32   # cerebro-worker54.snc1
+      - 10.24.103.235/32   # cerebro-worker55.snc1
+      - 10.24.115.241/32   # cerebro-worker56.snc1
+      - 10.24.105.140/32   # cerebro-worker57.snc1
+      - 10.24.107.190/32   # cerebro-worker58.snc1
+      - 10.24.101.194/32   # cerebro-worker59.snc1
+      - 10.24.112.172/32   # cerebro-worker60.snc1
+      - 10.24.102.66/32   # cerebro-worker61.snc1
+      - 10.24.116.112/32   # cerebro-worker62.snc1
+      - 10.24.113.201/32   # cerebro-worker63.snc1
+      - 10.24.114.224/32   # cerebro-worker64.snc1
+      - 10.24.106.161/32   # cerebro-worker65.snc1
+      - 10.24.118.82/32   # cerebro-worker66.snc1
+      - 10.24.117.79/32   # cerebro-worker67.snc1
+      - 10.24.104.183/32   # cerebro-worker68.snc1
+      - 10.24.100.167/32   # cerebro-worker69.snc1
+      - 10.24.103.206/32   # cerebro-worker70.snc1
+      - 10.24.115.68/32   # cerebro-worker71.snc1
+      - 10.24.105.250/32   # cerebro-worker72.snc1
+      - 10.24.107.174/32   # cerebro-worker73.snc1
+      - 10.24.101.163/32   # cerebro-worker74.snc1
+      - 10.24.112.116/32   # cerebro-worker75.snc1
+      - 10.24.102.207/32   # cerebro-worker76.snc1
+      - 10.24.116.246/32   # cerebro-worker77.snc1
+      - 10.24.113.167/32   # cerebro-worker78.snc1
+      - 10.24.114.118/32   # cerebro-worker79.snc1
+      - 10.24.106.174/32   # cerebro-worker80.snc1
+      - 10.24.118.242/32   # cerebro-worker81.snc1
+      - 10.24.117.231/32   # cerebro-worker82.snc1
+      - 10.24.104.112/32   # cerebro-worker83.snc1
+      - 10.24.100.207/32   # cerebro-worker84.snc1
+      - 10.24.103.139/32   # cerebro-worker85.snc1
+      - 10.24.115.120/32   # cerebro-worker86.snc1
+      - 10.24.105.220/32   # cerebro-worker87.snc1
+      - 10.24.107.125/32   # cerebro-worker88.snc1
+      - 10.24.101.157/32   # cerebro-worker89.snc1
+      - 10.24.112.196/32   # cerebro-worker90.snc1
+      - 10.24.102.129/32   # cerebro-worker91.snc1
+      - 10.24.116.79/32   # cerebro-worker92.snc1
+      - 10.24.113.74/32   # cerebro-worker93.snc1
+      - 10.24.114.240/32   # cerebro-worker94.snc1
+      - 10.24.106.112/32   # cerebro-worker95.snc1
+      - 10.24.118.151/32   # cerebro-worker96.snc1
+      - 10.24.117.191/32   # cerebro-worker97.snc1
+      - 10.24.104.194/32   # cerebro-worker98.snc1
+      - 10.24.100.154/32   # cerebro-worker99.snc1
+      - 10.24.103.128/32   # cerebro-worker100.snc1
+      - 10.24.115.67/32   # cerebro-worker101.snc1
+      - 10.24.105.71/32   # cerebro-worker102.snc1
+      - 10.24.107.79/32   # cerebro-worker103.snc1
+      - 10.24.101.112/32   # cerebro-worker104.snc1
+      - 10.24.112.107/32   # cerebro-worker105.snc1
+      - 10.24.102.62/32   # cerebro-worker106.snc1
+      - 10.24.116.128/32   # cerebro-worker107.snc1
+      - 10.24.113.105/32   # cerebro-worker108.snc1
+      - 10.24.114.115/32   # cerebro-worker109.snc1
+      - 10.24.106.114/32   # cerebro-worker110.snc1
+      - 10.24.118.182/32   # cerebro-worker111.snc1
+      - 10.24.117.152/32   # cerebro-worker112.snc1
+      - 10.24.104.113/32   # cerebro-worker113.snc1
+      - 10.24.100.194/32   # cerebro-worker114.snc1
+      - 10.24.103.167/32   # cerebro-worker115.snc1
+      - 10.24.115.154/32   # cerebro-worker116.snc1
+      - 10.24.105.97/32   # cerebro-worker117.snc1
+      - 10.24.107.114/32   # cerebro-worker118.snc1
+      - 10.24.101.161/32   # cerebro-worker119.snc1
+      - 10.24.112.129/32   # cerebro-worker120.snc1
+      - 10.24.102.99/32   # cerebro-worker121.snc1
+      - 10.24.116.237/32   # cerebro-worker122.snc1
+      - 10.24.113.211/32   # cerebro-worker123.snc1
+      - 10.24.114.195/32   # cerebro-worker124.snc1
+      - 10.24.106.65/32   # cerebro-worker125.snc1
+      - 10.24.118.70/32   # cerebro-worker126.snc1
+      - 10.24.117.170/32   # cerebro-worker127.snc1
+      - 10.24.104.125/32   # cerebro-worker128.snc1
+      - 10.24.100.188/32   # cerebro-worker129.snc1
+      - 10.24.103.201/32   # cerebro-worker130.snc1
+      - 10.24.115.173/32   # cerebro-worker131.snc1
+      - 10.24.105.100/32   # cerebro-worker132.snc1
+      - 10.24.107.143/32   # cerebro-worker133.snc1
+      - 10.24.101.149/32   # cerebro-worker134.snc1
+      - 10.24.112.221/32   # cerebro-worker135.snc1
+      - 10.24.102.112/32   # cerebro-worker136.snc1
+      - 10.24.116.90/32   # cerebro-worker137.snc1
+      - 10.24.113.174/32   # cerebro-worker138.snc1
+      - 10.24.114.109/32   # cerebro-worker139.snc1
+      - 10.24.106.172/32   # cerebro-worker140.snc1
+      - 10.24.118.78/32   # cerebro-worker141.snc1
+      - 10.24.117.237/32   # cerebro-worker142.snc1
+      - 10.24.104.168/32   # cerebro-worker143.snc1
+      - 10.24.100.185/32   # cerebro-worker144.snc1
+      - 10.24.103.101/32   # cerebro-worker145.snc1
+      - 10.24.115.118/32   # cerebro-worker146.snc1
+      - 10.24.105.170/32   # cerebro-worker147.snc1
+      - 10.24.107.212/32   # cerebro-worker148.snc1
+      - 10.24.101.147/32   # cerebro-worker149.snc1
+      - 10.24.112.230/32   # cerebro-worker150.snc1
+      - 10.24.109.26/32   # cerebro-worker151.snc1
+      - 10.24.123.45/32   # cerebro-worker152.snc1
+      - 10.24.110.48/32   # cerebro-worker153.snc1
+      - 10.24.119.19/32   # cerebro-worker154.snc1
+      - 10.24.120.19/32   # cerebro-worker155.snc1
+      - 10.24.111.58/32   # cerebro-worker156.snc1
+      - 10.24.108.22/32   # cerebro-worker157.snc1
+      - 10.24.122.13/32   # cerebro-worker158.snc1
+      - 10.24.121.38/32   # cerebro-worker159.snc1
+      - 10.24.107.47/32   # cerebro-worker160.snc1
+      - 10.24.109.12/32   # cerebro-worker161.snc1
+      - 10.24.123.46/32   # cerebro-worker162.snc1
+      - 10.24.110.52/32   # cerebro-worker163.snc1
+      - 10.24.119.48/32   # cerebro-worker164.snc1
+      - 10.24.120.51/32   # cerebro-worker165.snc1
+      - 10.24.111.43/32   # cerebro-worker166.snc1
+      - 10.24.108.26/32   # cerebro-worker167.snc1
+      - 10.24.122.28/32   # cerebro-worker168.snc1
+      - 10.24.121.13/32   # cerebro-worker169.snc1
+      - 10.24.109.40/32   # cerebro-worker170.snc1
+      - 10.24.123.38/32   # cerebro-worker171.snc1
+      - 10.24.110.46/32   # cerebro-worker172.snc1
+      - 10.24.119.23/32   # cerebro-worker173.snc1
+      - 10.24.120.57/32   # cerebro-worker174.snc1
+      - 10.24.111.48/32   # cerebro-worker175.snc1
+      - 10.24.108.17/32   # cerebro-worker176.snc1
+      - 10.24.122.30/32   # cerebro-worker177.snc1
+      - 10.24.121.36/32   # cerebro-worker178.snc1
+      - 10.24.109.15/32   # cerebro-worker179.snc1
+      - 10.24.123.43/32   # cerebro-worker180.snc1
+      - 10.24.110.41/32   # cerebro-worker181.snc1
+      - 10.24.119.35/32   # cerebro-worker182.snc1
+      - 10.24.120.53/32   # cerebro-worker183.snc1
+      - 10.24.111.55/32   # cerebro-worker184.snc1
+      - 10.24.108.25/32   # cerebro-worker185.snc1
+      - 10.24.122.37/32   # cerebro-worker186.snc1
+      - 10.24.121.12/32   # cerebro-worker187.snc1
+      - 10.24.109.23/32   # cerebro-worker188.snc1
+      - 10.24.123.42/32   # cerebro-worker189.snc1
+      - 10.24.110.29/32   # cerebro-worker190.snc1
+      - 10.24.119.14/32   # cerebro-worker191.snc1
+      - 10.24.120.18/32   # cerebro-worker192.snc1
+      - 10.24.111.47/32   # cerebro-worker193.snc1
+      - 10.24.108.58/32   # cerebro-worker194.snc1
+      - 10.24.122.17/32   # cerebro-worker195.snc1
+      - 10.24.121.42/32   # cerebro-worker196.snc1
+      - 10.24.109.27/32   # cerebro-worker197.snc1
+      - 10.24.123.44/32   # cerebro-worker198.snc1
+      - 10.24.110.55/32   # cerebro-worker199.snc1
+      - 10.24.119.59/32   # cerebro-worker200.snc1
+      - 10.24.120.11/32   # cerebro-worker201.snc1
+      - 10.24.111.39/32   # cerebro-worker202.snc1
+      - 10.24.108.56/32   # cerebro-worker203.snc1
+      - 10.24.122.43/32   # cerebro-worker204.snc1
+      - 10.24.121.40/32   # cerebro-worker205.snc1
+      - 10.24.109.58/32   # cerebro-worker206.snc1
+      - 10.24.123.41/32   # cerebro-worker207.snc1
+      - 10.24.110.39/32   # cerebro-worker208.snc1
+      - 10.24.119.25/32   # cerebro-worker209.snc1
+      - 10.24.120.31/32   # cerebro-worker210.snc1
+      - 10.24.111.62/32   # cerebro-worker211.snc1
+      - 10.24.108.61/32   # cerebro-worker212.snc1
+      - 10.24.122.50/32   # cerebro-worker213.snc1
+      - 10.24.121.55/32   # cerebro-worker214.snc1
+      - 10.24.109.57/32   # cerebro-worker215.snc1
+      - 10.24.123.36/32   # cerebro-worker216.snc1
+      - 10.24.110.31/32   # cerebro-worker217.snc1
+      - 10.24.119.20/32   # cerebro-worker218.snc1
+      - 10.24.120.29/32   # cerebro-worker219.snc1
+      - 10.24.111.53/32   # cerebro-worker220.snc1
+      - 10.24.108.16/32   # cerebro-worker221.snc1
+      - 10.24.122.40/32   # cerebro-worker222.snc1
+      - 10.24.121.37/32   # cerebro-worker223.snc1
+      - 10.24.109.45/32   # cerebro-worker224.snc1
+      - 10.24.123.35/32   # cerebro-worker225.snc1
+      - 10.24.110.58/32   # cerebro-worker226.snc1
+      - 10.24.119.46/32   # cerebro-worker227.snc1
+      - 10.24.120.30/32   # cerebro-worker228.snc1
+      - 10.24.111.33/32   # cerebro-worker229.snc1
+      - 10.24.108.29/32   # cerebro-worker230.snc1
+      - 10.24.122.46/32   # cerebro-worker231.snc1
+      - 10.24.121.57/32   # cerebro-worker232.snc1
+      - 10.24.109.20/32   # cerebro-worker233.snc1
+      - 10.24.123.37/32   # cerebro-worker234.snc1
+      - 10.24.110.35/32   # cerebro-worker235.snc1
+      - 10.24.119.32/32   # cerebro-worker236.snc1
+      - 10.24.120.36/32   # cerebro-worker237.snc1
+      - 10.24.111.30/32   # cerebro-worker238.snc1
+      - 10.24.108.54/32   # cerebro-worker239.snc1
+      - 10.24.122.21/32   # cerebro-worker240.snc1
+      - 10.24.121.14/32   # cerebro-worker241.snc1
+      - 10.24.109.14/32   # cerebro-worker242.snc1
+      - 10.24.123.40/32   # cerebro-worker243.snc1
+      - 10.24.110.34/32   # cerebro-worker244.snc1
+      - 10.24.119.41/32   # cerebro-worker245.snc1
+      - 10.24.120.40/32   # cerebro-worker246.snc1
+      - 10.24.111.37/32   # cerebro-worker247.snc1
+      - 10.24.108.45/32   # cerebro-worker248.snc1
+      - 10.24.122.33/32   # cerebro-worker249.snc1
+      - 10.24.121.23/32   # cerebro-worker250.snc1
+      - 10.24.111.165/32   # cerebro-worker251.snc1
+      - 10.24.119.228/32   # cerebro-worker252.snc1
+      - 10.24.107.244/32   # cerebro-worker253.snc1
+      - 10.24.120.89/32   # cerebro-worker254.snc1
+      - 10.24.118.150/32   # cerebro-worker255.snc1
+      - 10.24.108.132/32   # cerebro-worker256.snc1
+      - 10.24.121.253/32   # cerebro-worker257.snc1
+      - 10.24.109.98/32   # cerebro-worker258.snc1
+      - 10.24.110.188/32   # cerebro-worker259.snc1
+      - 10.24.123.216/32   # cerebro-worker260.snc1
+      - 10.24.122.202/32   # cerebro-worker261.snc1
+      - 10.24.112.59/32   # cerebro-worker262.snc1
+      - 10.24.100.13/32   # cerebro-worker263.snc1
+      - 10.24.101.14/32   # cerebro-worker264.snc1
+      - 10.24.113.14/32   # cerebro-worker265.snc1
+      - 10.24.114.12/32   # cerebro-worker266.snc1
+      - 10.24.116.60/32   # cerebro-worker267.snc1
+      - 10.24.115.12/32   # cerebro-worker268.snc1
+      - 10.24.117.60/32   # cerebro-worker269.snc1
+      - 10.24.102.60/32   # cerebro-worker270.snc1
+      - 10.24.105.12/32   # cerebro-worker271.snc1
+      - 10.24.103.12/32   # cerebro-worker272.snc1
+      - 10.24.106.13/32   # cerebro-worker273.snc1
+      - 10.24.104.60/32   # cerebro-worker274.snc1
+      - 10.24.112.57/32   # cerebro-worker275.snc1
+      - 10.24.100.15/32   # cerebro-worker276.snc1
+      - 10.24.101.13/32   # cerebro-worker277.snc1
+      - 10.24.113.13/32   # cerebro-worker278.snc1
+      - 10.24.137.26/32   # cerebro-worker279.snc1
+      - 10.24.68.46/32   # cerebro-worker280.snc1
+      - 10.24.128.27/32   # cerebro-worker281.snc1
+      - 10.24.33.47/32   # cerebro-worker282.snc1
+      - 10.24.159.42/32   # cerebro-worker283.snc1
+      - 10.24.90.56/32   # cerebro-worker284.snc1
+      - 10.24.137.37/32   # cerebro-worker285.snc1
+      - 10.24.68.45/32   # cerebro-worker286.snc1
+      - 10.24.128.32/32   # cerebro-worker287.snc1
+      - 10.24.33.49/32   # cerebro-worker288.snc1
+      - 10.24.159.45/32   # cerebro-worker289.snc1
+      - 10.24.90.60/32   # cerebro-worker290.snc1
+      - 10.24.137.28/32   # cerebro-worker291.snc1
+      - 10.24.68.50/32   # cerebro-worker292.snc1
+      - 10.24.128.25/32   # cerebro-worker293.snc1
+      - 10.24.33.51/32   # cerebro-worker294.snc1
+      - 10.24.159.43/32   # cerebro-worker295.snc1
+      - 10.24.90.54/32   # cerebro-worker296.snc1
+      - 10.24.137.12/32   # cerebro-worker297.snc1
+      - 10.24.68.48/32   # cerebro-worker298.snc1
+      - 10.24.128.38/32   # cerebro-worker299.snc1
+      - 10.24.33.43/32   # cerebro-worker300.snc1
+      - 10.24.159.47/32   # cerebro-worker301.snc1
+      - 10.24.90.52/32   # cerebro-worker302.snc1
+      - 10.24.137.34/32   # cerebro-worker303.snc1
+      - 10.24.68.43/32   # cerebro-worker304.snc1
+      - 10.24.128.40/32   # cerebro-worker305.snc1
+      - 10.24.33.42/32   # cerebro-worker306.snc1
+      - 10.24.159.46/32   # cerebro-worker307.snc1
+      - 10.24.137.22/32   # cerebro-worker308.snc1
+      - 10.24.68.44/32   # cerebro-worker309.snc1
+      - 10.24.128.21/32   # cerebro-worker310.snc1
+      - 10.24.33.40/32   # cerebro-worker311.snc1
+      - 10.24.159.50/32   # cerebro-worker312.snc1
+      - 10.24.137.30/32   # cerebro-worker313.snc1
+      - 10.24.68.47/32   # cerebro-worker314.snc1
+      - 10.24.128.30/32   # cerebro-worker315.snc1
+      - 10.24.33.45/32   # cerebro-worker316.snc1
+      - 10.24.159.44/32   # cerebro-worker317.snc1
+      - 10.24.137.32/32   # cerebro-worker318.snc1
+      - 10.24.68.41/32   # cerebro-worker319.snc1
+      - 10.24.128.39/32   # cerebro-worker320.snc1
+      - 10.24.33.44/32   # cerebro-worker321.snc1
+      - 10.24.159.48/32   # cerebro-worker322.snc1
+      - 10.24.137.23/32   # cerebro-worker323.snc1
+      - 10.24.68.40/32   # cerebro-worker324.snc1
+      - 10.24.128.26/32   # cerebro-worker325.snc1
+      - 10.24.33.50/32   # cerebro-worker326.snc1
+      - 10.24.159.60/32   # cerebro-worker327.snc1
+      - 10.24.137.24/32   # cerebro-worker328.snc1
+      - 10.24.68.39/32   # cerebro-worker329.snc1
+      - 10.24.128.35/32   # cerebro-worker330.snc1
+      - 10.24.33.46/32   # cerebro-worker331.snc1
+      - 10.24.63.42/32   # cerebro-worker332.snc1
+      - 10.24.61.45/32   # cerebro-worker333.snc1
+      - 10.24.43.50/32   # cerebro-worker334.snc1
+      - 10.24.85.42/32   # cerebro-worker335.snc1
+      - 10.24.90.46/32   # cerebro-worker336.snc1
+      - 10.24.159.40/32   # cerebro-worker337.snc1
+      - 10.24.63.43/32   # cerebro-worker338.snc1
+      - 10.24.61.44/32   # cerebro-worker339.snc1
+      - 10.24.43.43/32   # cerebro-worker340.snc1
+      - 10.24.85.40/32   # cerebro-worker341.snc1
+      - 10.24.90.45/32   # cerebro-worker342.snc1
+      - 10.24.63.45/32   # cerebro-worker343.snc1
+      - 10.24.61.43/32   # cerebro-worker344.snc1
+      - 10.24.43.49/32   # cerebro-worker345.snc1
+      - 10.24.85.51/32   # cerebro-worker346.snc1
+      - 10.24.90.47/32   # cerebro-worker347.snc1
+      - 10.24.63.51/32   # cerebro-worker348.snc1
+      - 10.24.61.58/32   # cerebro-worker349.snc1
+      - 10.24.43.47/32   # cerebro-worker350.snc1
+      - 10.24.85.50/32   # cerebro-worker351.snc1
+      - 10.24.90.44/32   # cerebro-worker352.snc1
+      - 10.24.63.49/32   # cerebro-worker353.snc1
+      - 10.24.61.41/32   # cerebro-worker354.snc1
+      - 10.24.43.51/32   # cerebro-worker355.snc1
+      - 10.24.85.60/32   # cerebro-worker356.snc1
+      - 10.24.90.48/32   # cerebro-worker357.snc1
+      - 10.24.63.48/32   # cerebro-worker358.snc1
+      - 10.24.61.53/32   # cerebro-worker359.snc1
+      - 10.24.43.39/32   # cerebro-worker360.snc1
+      - 10.24.85.46/32   # cerebro-worker361.snc1
+      - 10.24.90.42/32   # cerebro-worker362.snc1
+      - 10.24.63.50/32   # cerebro-worker363.snc1
+      - 10.24.157.43/32   # cerebro-worker364.snc1
+      - 10.24.77.49/32   # cerebro-worker365.snc1
+      - 10.24.34.40/32   # cerebro-worker366.snc1
+      - 10.24.55.39/32   # cerebro-worker367.snc1
+      - 10.24.95.41/32   # cerebro-worker368.snc1
+      - 10.24.35.43/32   # cerebro-worker369.snc1
+      - 10.24.138.32/32   # cerebro-worker370.snc1
+      - 10.24.91.48/32   # cerebro-worker371.snc1
+      - 10.24.76.48/32   # cerebro-worker372.snc1
+      - 10.24.131.24/32   # cerebro-worker373.snc1
+      - 10.24.61.50/32   # cerebro-worker374.snc1
+      - 10.24.43.52/32   # cerebro-worker375.snc1
+      - 10.24.85.53/32   # cerebro-worker376.snc1
+      - 10.24.63.56/32   # cerebro-worker377.snc1
+      - 10.24.90.57/32   # cerebro-worker378.snc1
+      - 10.24.137.15/32   # cerebro-worker379.snc1
+      - 10.24.33.59/32   # cerebro-worker380.snc1
+      - 10.24.157.38/32   # cerebro-worker381.snc1
+      - 10.24.77.40/32   # cerebro-worker382.snc1
+      - 10.24.34.42/32   # cerebro-worker383.snc1
+      - 10.24.55.38/32   # cerebro-worker384.snc1
+      - 10.24.95.47/32   # cerebro-worker385.snc1
+      - 10.24.35.39/32   # cerebro-worker386.snc1
+      - 10.24.138.30/32   # cerebro-worker387.snc1
+      - 10.24.91.49/32   # cerebro-worker388.snc1
+      - 10.24.77.42/32   # cerebro-worker389.snc1
+      - 10.24.131.19/32   # cerebro-worker390.snc1
+      - 10.24.61.49/32   # cerebro-worker391.snc1
+      - 10.24.43.56/32   # cerebro-worker392.snc1
+      - 10.24.85.55/32   # cerebro-worker393.snc1
+      - 10.24.63.58/32   # cerebro-worker394.snc1
+      - 10.24.90.58/32   # cerebro-worker395.snc1
+      - 10.24.137.14/32   # cerebro-worker396.snc1
+      - 10.24.33.58/32   # cerebro-worker397.snc1
+      - 10.24.157.47/32   # cerebro-worker398.snc1
+      - 10.24.77.38/32   # cerebro-worker399.snc1
+      - 10.24.34.38/32   # cerebro-worker400.snc1
+      - 10.24.55.44/32   # cerebro-worker401.snc1
+      - 10.24.95.40/32   # cerebro-worker402.snc1
+      - 10.24.35.62/32   # cerebro-worker403.snc1
+      - 10.24.138.31/32   # cerebro-worker404.snc1
+      - 10.24.91.43/32   # cerebro-worker405.snc1
+      - 10.24.66.63/32   # cerebro-worker406.snc1
+      - 10.24.131.23/32   # cerebro-worker407.snc1
+      - 10.24.61.48/32   # cerebro-worker408.snc1
+      - 10.24.43.57/32   # cerebro-worker409.snc1
+      - 10.24.85.52/32   # cerebro-worker410.snc1
+      - 10.24.63.57/32   # cerebro-worker411.snc1
+      - 10.24.157.48/32   # cerebro-worker412.snc1
+      - 10.24.77.41/32   # cerebro-worker413.snc1
+      - 10.24.34.44/32   # cerebro-worker414.snc1
+      - 10.24.55.45/32   # cerebro-worker415.snc1
+      - 10.24.95.44/32   # cerebro-worker416.snc1
+      - 10.24.35.46/32   # cerebro-worker417.snc1
+      - 10.24.138.29/32   # cerebro-worker418.snc1
+      - 10.24.91.41/32   # cerebro-worker419.snc1
+      - 10.24.76.44/32   # cerebro-worker420.snc1
+      - 10.24.131.20/32   # cerebro-worker421.snc1
+      - 10.24.61.54/32   # cerebro-worker422.snc1
+      - 10.24.43.55/32   # cerebro-worker423.snc1
+      - 10.24.85.54/32   # cerebro-worker424.snc1
+      - 10.24.157.49/32   # cerebro-worker425.snc1
+      - 10.24.95.42/32   # cerebro-worker426.snc1
+      - 10.24.35.47/32   # cerebro-worker427.snc1
+      - 10.24.77.46/32   # cerebro-worker428.snc1
+      - 10.24.76.43/32   # cerebro-worker429.snc1
+      - 10.24.157.39/32   # cerebro-worker430.snc1
+      - 10.24.55.49/32   # cerebro-worker431.snc1
+      - 10.24.91.38/32   # cerebro-worker432.snc1
+      - 10.24.34.46/32   # cerebro-worker433.snc1
+      - 10.24.138.23/32   # cerebro-worker434.snc1
+      - 10.24.95.45/32   # cerebro-worker435.snc1
+      - 10.24.35.38/32   # cerebro-worker436.snc1
+      - 10.24.77.39/32   # cerebro-worker437.snc1
+      - 10.24.76.42/32   # cerebro-worker438.snc1
+      - 10.24.157.40/32   # cerebro-worker439.snc1
+      - 10.24.55.42/32   # cerebro-worker440.snc1
+      - 10.24.91.44/32   # cerebro-worker441.snc1
+      - 10.24.34.48/32   # cerebro-worker442.snc1
+      - 10.24.138.33/32   # cerebro-worker443.snc1
+      - 10.24.95.39/32   # cerebro-worker444.snc1
+      - 10.24.35.45/32   # cerebro-worker445.snc1
+      - 10.24.67.112/32   # cerebro-worker446.snc1
+      - 10.24.69.178/32   # cerebro-worker447.snc1
+      - 10.24.131.108/32   # cerebro-worker448.snc1
+      - 10.24.76.96/32   # cerebro-worker449.snc1
+      - 10.24.109.168/32   # cerebro-worker450.snc1
+      - 10.24.85.191/32   # cerebro-worker451.snc1
+      - 10.24.43.172/32   # cerebro-worker452.snc1
+      - 10.24.111.159/32   # cerebro-worker453.snc1
+      - 10.24.77.121/32   # cerebro-worker454.snc1
+      - 10.24.107.238/32   # cerebro-worker455.snc1
+      - 10.24.91.83/32   # cerebro-worker456.snc1
+      - 10.24.33.220/32   # cerebro-worker457.snc1
+      - 10.24.63.65/32   # cerebro-worker458.snc1
+      - 10.24.61.251/32   # cerebro-worker459.snc1
+      - 10.24.68.127/32   # cerebro-worker460.snc1
+      - 10.24.159.114/32   # cerebro-worker461.snc1
+      - 10.24.110.253/32   # cerebro-worker462.snc1
+      - 10.24.138.154/32   # cerebro-worker463.snc1
+      - 10.24.128.166/32   # cerebro-worker464.snc1
+      - 10.24.95.189/32   # cerebro-worker465.snc1
+      - 10.24.108.163/32   # cerebro-worker466.snc1
+      - 10.24.157.160/32   # cerebro-worker467.snc1
+      - 10.24.34.171/32   # cerebro-worker468.snc1
+      - 10.24.55.204/32   # cerebro-worker469.snc1
+      - 10.24.35.173/32   # cerebro-worker470.snc1
+      - 10.24.137.215/32   # cerebro-worker471.snc1
+      - 10.24.106.196/32   # cerebro-worker472.snc1
+      - 10.24.90.145/32   # cerebro-worker473.snc1
+      - 10.24.66.220/32   # cerebro-worker474.snc1
+      - 10.24.67.221/32   # cerebro-worker475.snc1
+      - 10.24.69.163/32   # cerebro-worker476.snc1
+      - 10.24.131.224/32   # cerebro-worker477.snc1
+      - 10.24.76.223/32   # cerebro-worker478.snc1
+      - 10.24.109.86/32   # cerebro-worker479.snc1
+      - 10.24.85.94/32   # cerebro-worker480.snc1
+      - 10.24.43.240/32   # cerebro-worker481.snc1
+      - 10.24.111.184/32   # cerebro-worker482.snc1
+      - 10.24.77.232/32   # cerebro-worker483.snc1
+      - 10.24.107.130/32   # cerebro-worker484.snc1
+      - 10.24.91.227/32   # cerebro-worker485.snc1
+      - 10.24.33.65/32   # cerebro-worker486.snc1
+      - 10.24.63.79/32   # cerebro-worker487.snc1
+      - 10.24.61.161/32   # cerebro-worker488.snc1
+      - 10.24.68.232/32   # cerebro-worker489.snc1
+      - 10.24.159.154/32   # cerebro-worker490.snc1
+      - 10.24.110.148/32   # cerebro-worker491.snc1
+      - 10.24.138.148/32   # cerebro-worker492.snc1
+      - 10.24.128.211/32   # cerebro-worker493.snc1
+      - 10.24.95.182/32   # cerebro-worker494.snc1
+      - 10.24.108.248/32   # cerebro-worker495.snc1
+      - 10.24.157.85/32   # cerebro-worker496.snc1
+      - 10.24.34.190/32   # cerebro-worker497.snc1
+      - 10.24.55.122/32   # cerebro-worker498.snc1
+      - 10.24.35.175/32   # cerebro-worker499.snc1
+      - 10.24.137.161/32   # cerebro-worker500.snc1
+      - 10.24.106.146/32   # cerebro-worker501.snc1
+      - 10.24.90.93/32   # cerebro-worker502.snc1
+      - 10.24.66.226/32   # cerebro-worker503.snc1
+      - 10.24.67.90/32   # cerebro-worker504.snc1
+      - 10.24.69.142/32   # cerebro-worker505.snc1
+      - 10.24.131.247/32   # cerebro-worker506.snc1
+      - 10.24.76.75/32   # cerebro-worker507.snc1
+      - 10.24.109.62/32   # cerebro-worker508.snc1
+      - 10.24.85.244/32   # cerebro-worker509.snc1
+      - 10.24.43.134/32   # cerebro-worker510.snc1
+      - 10.24.111.231/32   # cerebro-worker511.snc1
+      - 10.24.77.82/32   # cerebro-worker512.snc1
+      - 10.24.107.228/32   # cerebro-worker513.snc1
+      - 10.24.91.156/32   # cerebro-worker514.snc1
+      - 10.24.33.93/32   # cerebro-worker515.snc1
+      - 10.24.63.220/32   # cerebro-worker516.snc1
+      - 10.24.61.239/32   # cerebro-worker517.snc1
+      - 10.24.68.94/32   # cerebro-worker518.snc1
+      - 10.24.159.87/32   # cerebro-worker519.snc1
+      - 10.24.110.100/32   # cerebro-worker520.snc1
+      - 10.24.138.231/32   # cerebro-worker521.snc1
+      - 10.24.128.227/32   # cerebro-worker522.snc1
+      - 10.24.95.231/32   # cerebro-worker523.snc1
+      - 10.24.108.238/32   # cerebro-worker524.snc1
+      - 10.24.157.65/32   # cerebro-worker525.snc1
+      - 10.24.106.136/32   # cerebro-hbase-worker1.snc1
+      - 10.24.117.168/32   # cerebro-hbase-worker2.snc1
+      - 10.24.118.221/32   # cerebro-hbase-worker3.snc1
+      - 10.24.105.146/32   # cerebro-hbase-worker4.snc1
+      - 10.24.104.57/32   # cerebro-hbase-worker5.snc1
+      - 10.20.43.137/32   # cerebro-job-submitter1.snc1
+      - 10.20.71.150/32   # cerebro-job-submitter2.snc1
+      - 10.20.71.88/32   # cerebro-job-submitter3.snc1
+      - 10.23.82.22/32   # campaign-performance-app1-staging.snc1
+      - 10.23.48.53/32   # campaign-performance-app2-staging.snc1
+      - 10.22.160.15/32   # gdoop-worker1.snc1
+      - 10.22.161.74/32   # gdoop-worker2.snc1
+      - 10.22.162.29/32   # gdoop-worker3.snc1
+      - 10.22.172.70/32   # gdoop-worker4.snc1
+      - 10.22.171.137/32   # gdoop-worker5.snc1
+      - 10.22.163.237/32   # gdoop-worker6.snc1
+      - 10.22.160.238/32   # gdoop-worker7.snc1
+      - 10.22.161.58/32   # gdoop-worker8.snc1
+      - 10.22.162.235/32   # gdoop-worker9.snc1
+      - 10.22.172.181/32   # gdoop-worker10.snc1
+      - 10.22.171.117/32   # gdoop-worker11.snc1
+      - 10.22.163.61/32   # gdoop-worker12.snc1
+      - 10.22.160.217/32   # gdoop-worker13.snc1
+      - 10.22.161.193/32   # gdoop-worker14.snc1
+      - 10.22.162.108/32   # gdoop-worker15.snc1
+      - 10.22.172.63/32   # gdoop-worker16.snc1
+      - 10.22.171.170/32   # gdoop-worker17.snc1
+      - 10.22.163.6/32   # gdoop-worker18.snc1
+      - 10.22.160.133/32   # gdoop-worker19.snc1
+      - 10.22.161.115/32   # gdoop-worker20.snc1
+      - 10.22.162.50/32   # gdoop-worker21.snc1
+      - 10.22.172.228/32   # gdoop-worker22.snc1
+      - 10.22.171.221/32   # gdoop-worker23.snc1
+      - 10.22.163.36/32   # gdoop-worker24.snc1
+      - 10.22.160.49/32   # gdoop-worker25.snc1
+      - 10.22.161.37/32   # gdoop-worker26.snc1
+      - 10.22.162.89/32   # gdoop-worker27.snc1
+      - 10.22.172.58/32   # gdoop-worker28.snc1
+      - 10.22.171.152/32   # gdoop-worker29.snc1
+      - 10.22.160.178/32   # gdoop-worker30.snc1
+      - 10.22.161.231/32   # gdoop-worker31.snc1
+      - 10.22.162.204/32   # gdoop-worker32.snc1
+      - 10.22.172.39/32   # gdoop-worker33.snc1
+      - 10.22.171.63/32   # gdoop-worker34.snc1
+      - 10.22.160.30/32   # gdoop-worker35.snc1
+      - 10.22.161.46/32   # gdoop-worker36.snc1
+      - 10.22.162.203/32   # gdoop-worker37.snc1
+      - 10.22.172.67/32   # gdoop-worker38.snc1
+      - 10.22.171.147/32   # gdoop-worker39.snc1
+      - 10.22.160.199/32   # gdoop-worker40.snc1
+      - 10.22.161.54/32   # gdoop-worker41.snc1
+      - 10.22.162.210/32   # gdoop-worker42.snc1
+      - 10.22.172.49/32   # gdoop-worker43.snc1
+      - 10.22.171.143/32   # gdoop-worker44.snc1
+      - 10.22.160.88/32   # gdoop-worker45.snc1
+      - 10.22.161.17/32   # gdoop-worker46.snc1
+      - 10.22.162.18/32   # gdoop-worker47.snc1
+      - 10.22.172.91/32   # gdoop-worker48.snc1
+      - 10.22.171.84/32   # gdoop-worker49.snc1
+      - 10.22.160.47/32   # gdoop-worker50.snc1
+      - 10.22.161.26/32   # gdoop-worker51.snc1
+      - 10.22.162.39/32   # gdoop-worker52.snc1
+      - 10.22.172.152/32   # gdoop-worker53.snc1
+      - 10.22.171.58/32   # gdoop-worker54.snc1
+      - 10.22.160.173/32   # gdoop-worker55.snc1
+      - 10.22.161.245/32   # gdoop-worker56.snc1
+      - 10.22.162.48/32   # gdoop-worker57.snc1
+      - 10.22.172.141/32   # gdoop-worker58.snc1
+      - 10.22.171.48/32   # gdoop-worker59.snc1
+      - 10.22.160.233/32   # gdoop-worker60.snc1
+      - 10.22.161.137/32   # gdoop-worker61.snc1
+      - 10.22.162.162/32   # gdoop-worker62.snc1
+      - 10.22.172.113/32   # gdoop-worker63.snc1
+      - 10.22.171.121/32   # gdoop-worker64.snc1
+      - 10.22.160.104/32   # gdoop-worker65.snc1
+      - 10.22.161.228/32   # gdoop-worker66.snc1
+      - 10.22.162.38/32   # gdoop-worker67.snc1
+      - 10.22.172.144/32   # gdoop-worker68.snc1
+      - 10.22.171.76/32   # gdoop-worker69.snc1
+      - 10.22.160.71/32   # gdoop-worker70.snc1
+      - 10.22.161.31/32   # gdoop-worker71.snc1
+      - 10.22.162.82/32   # gdoop-worker72.snc1
+      - 10.22.172.177/32   # gdoop-worker73.snc1
+      - 10.22.171.189/32   # gdoop-worker74.snc1
+      - 10.22.160.203/32   # gdoop-worker75.snc1
+      - 10.22.161.147/32   # gdoop-worker76.snc1
+      - 10.22.162.106/32   # gdoop-worker77.snc1
+      - 10.22.172.86/32   # gdoop-worker78.snc1
+      - 10.22.171.61/32   # gdoop-worker79.snc1
+      - 10.22.160.33/32   # gdoop-worker80.snc1
+      - 10.22.161.76/32   # gdoop-worker81.snc1
+      - 10.22.162.62/32   # gdoop-worker82.snc1
+      - 10.22.172.25/32   # gdoop-worker83.snc1
+      - 10.22.171.33/32   # gdoop-worker84.snc1
+      - 10.22.173.229/32   # gdoop-worker85.snc1
+      - 10.22.163.141/32   # gdoop-worker86.snc1
+      - 10.22.173.48/32   # gdoop-worker87.snc1
+      - 10.22.163.205/32   # gdoop-worker88.snc1
+      - 10.22.173.113/32   # gdoop-worker89.snc1
+      - 10.22.163.187/32   # gdoop-worker90.snc1
+      - 10.22.173.169/32   # gdoop-worker91.snc1
+      - 10.22.163.212/32   # gdoop-worker92.snc1
+      - 10.22.173.152/32   # gdoop-worker93.snc1
+      - 10.22.163.225/32   # gdoop-worker94.snc1
+      - 10.22.173.47/32   # gdoop-worker95.snc1
+      - 10.22.163.73/32   # gdoop-worker96.snc1
+      - 10.22.173.51/32   # gdoop-worker97.snc1
+      - 10.22.163.160/32   # gdoop-worker98.snc1
+      - 10.22.173.207/32   # gdoop-worker99.snc1
+      - 10.22.163.145/32   # gdoop-worker100.snc1
+      - 10.22.173.203/32   # gdoop-worker101.snc1
+      - 10.22.163.254/32   # gdoop-worker102.snc1
+      - 10.22.173.214/32   # gdoop-worker103.snc1
+      - 10.22.163.131/32   # gdoop-worker104.snc1
+      - 10.22.173.108/32   # gdoop-worker105.snc1
+      - 10.22.163.238/32   # gdoop-worker106.snc1
+      - 10.22.173.206/32   # gdoop-worker107.snc1
+      - 10.22.173.178/32   # gdoop-worker108.snc1
+      - 10.22.173.131/32   # gdoop-worker109.snc1
+      - 10.22.173.208/32   # gdoop-worker110.snc1
+      - 10.22.164.251/32   # gdoop-worker111.snc1
+      - 10.22.174.90/32   # gdoop-worker112.snc1
+      - 10.22.175.253/32   # gdoop-worker113.snc1
+      - 10.22.176.121/32   # gdoop-worker114.snc1
+      - 10.22.164.237/32   # gdoop-worker115.snc1
+      - 10.22.174.197/32   # gdoop-worker116.snc1
+      - 10.22.175.225/32   # gdoop-worker117.snc1
+      - 10.22.176.138/32   # gdoop-worker118.snc1
+      - 10.22.164.179/32   # gdoop-worker119.snc1
+      - 10.22.174.211/32   # gdoop-worker120.snc1
+      - 10.22.175.232/32   # gdoop-worker121.snc1
+      - 10.22.176.185/32   # gdoop-worker122.snc1
+      - 10.22.164.234/32   # gdoop-worker123.snc1
+      - 10.22.174.176/32   # gdoop-worker124.snc1
+      - 10.22.175.135/32   # gdoop-worker125.snc1
+      - 10.22.176.71/32   # gdoop-worker126.snc1
+      - 10.22.164.71/32   # gdoop-worker127.snc1
+      - 10.22.174.118/32   # gdoop-worker128.snc1
+      - 10.22.175.84/32   # gdoop-worker129.snc1
+      - 10.22.176.171/32   # gdoop-worker130.snc1
+      - 10.22.164.245/32   # gdoop-worker131.snc1
+      - 10.22.174.250/32   # gdoop-worker132.snc1
+      - 10.22.175.164/32   # gdoop-worker133.snc1
+      - 10.22.164.177/32   # gdoop-worker134.snc1
+      - 10.22.174.71/32   # gdoop-worker135.snc1
+      - 10.22.175.193/32   # gdoop-worker136.snc1
+      - 10.22.164.254/32   # gdoop-worker137.snc1
+      - 10.22.174.190/32   # gdoop-worker138.snc1
+      - 10.22.175.144/32   # gdoop-worker139.snc1
+      - 10.22.164.125/32   # gdoop-worker140.snc1
+      - 10.22.174.79/32   # gdoop-worker141.snc1
+      - 10.22.175.242/32   # gdoop-worker142.snc1
+      - 10.22.164.106/32   # gdoop-worker143.snc1
+      - 10.22.174.195/32   # gdoop-worker144.snc1
+      - 10.22.175.159/32   # gdoop-worker145.snc1
+      - 10.22.164.126/32   # gdoop-worker146.snc1
+      - 10.22.174.157/32   # gdoop-worker147.snc1
+      - 10.22.175.80/32   # gdoop-worker148.snc1
+      - 10.22.164.59/32   # gdoop-worker149.snc1
+      - 10.22.174.228/32   # gdoop-worker150.snc1
+      - 10.22.175.60/32   # gdoop-worker151.snc1
+      - 10.22.164.214/32   # gdoop-worker152.snc1
+      - 10.22.174.83/32   # gdoop-worker153.snc1
+      - 10.22.175.65/32   # gdoop-worker154.snc1
+      - 10.22.164.235/32   # gdoop-worker155.snc1
+      - 10.22.174.158/32   # gdoop-worker156.snc1
+      - 10.22.175.108/32   # gdoop-worker157.snc1
+      - 10.22.164.122/32   # gdoop-worker158.snc1
+      - 10.22.165.247/32   # gdoop-worker159.snc1
+      - 10.22.174.151/32   # gdoop-worker160.snc1
+      - 10.22.165.139/32   # gdoop-worker161.snc1
+      - 10.22.165.92/32   # gdoop-worker162.snc1
+      - 10.22.165.244/32   # gdoop-worker163.snc1
+      - 10.22.175.86/32   # gdoop-worker164.snc1
+      - 10.22.173.77/32   # gdoop-worker165.snc1
+      - 10.22.174.106/32   # gdoop-worker166.snc1
+      - 10.22.175.191/32   # gdoop-worker167.snc1
+      - 10.22.176.107/32   # gdoop-worker168.snc1
+      - 10.22.176.113/32   # gdoop-worker169.snc1
+      - 10.22.176.116/32   # gdoop-worker170.snc1
+      - 10.22.176.123/32   # gdoop-worker171.snc1
+      - 10.22.176.13/32   # gdoop-worker172.snc1
+      - 10.22.176.144/32   # gdoop-worker173.snc1
+      - 10.22.176.156/32   # gdoop-worker174.snc1
+      - 10.22.176.164/32   # gdoop-worker175.snc1
+      - 10.22.176.180/32   # gdoop-worker176.snc1
+      - 10.22.176.184/32   # gdoop-worker177.snc1
+      - 10.22.176.226/32   # gdoop-worker178.snc1
+      - 10.22.163.177/32   # gdoop-worker179.snc1
+      - 10.22.164.34/32   # gdoop-worker180.snc1
+      - 10.22.165.221/32   # gdoop-worker181.snc1
+      - 10.22.165.225/32   # gdoop-worker182.snc1
+      - 10.22.165.239/32   # gdoop-worker183.snc1
+      - 10.22.165.242/32   # gdoop-worker184.snc1
+      - 10.22.165.248/32   # gdoop-worker185.snc1
+      - 10.22.165.27/32   # gdoop-worker186.snc1
+      - 10.22.165.48/32   # gdoop-worker187.snc1
+      - 10.22.165.6/32   # gdoop-worker188.snc1
+      - 10.22.165.61/32   # gdoop-worker189.snc1
+      - 10.22.165.65/32   # gdoop-worker190.snc1
+      - 10.22.165.72/32   # gdoop-worker191.snc1
+      - 10.22.177.97/32   # gdoop-worker192.snc1
+      - 10.22.166.246/32   # gdoop-worker193.snc1
+      - 10.22.177.212/32   # gdoop-worker194.snc1
+      - 10.22.166.118/32   # gdoop-worker195.snc1
+      - 10.22.177.222/32   # gdoop-worker196.snc1
+      - 10.22.166.46/32   # gdoop-worker197.snc1
+      - 10.22.166.70/32   # gdoop-worker198.snc1
+      - 10.22.177.25/32   # gdoop-worker199.snc1
+      - 10.22.166.23/32   # gdoop-worker200.snc1
+      - 10.22.166.86/32   # gdoop-worker201.snc1
+      - 10.22.177.128/32   # gdoop-worker202.snc1
+      - 10.22.166.238/32   # gdoop-worker203.snc1
+      - 10.22.177.220/32   # gdoop-worker204.snc1
+      - 10.22.166.26/32   # gdoop-worker205.snc1
+      - 10.22.177.233/32   # gdoop-worker206.snc1
+      - 10.22.177.20/32   # gdoop-worker207.snc1
+      - 10.22.166.111/32   # gdoop-worker208.snc1
+      - 10.22.177.89/32   # gdoop-worker209.snc1
+      - 10.22.177.11/32   # gdoop-worker210.snc1
+      - 10.22.166.196/32   # gdoop-worker211.snc1
+      - 10.22.165.62/32   # gdoop-worker212.snc1
+      - 10.22.177.164/32   # gdoop-worker213.snc1
+      - 10.22.166.101/32   # gdoop-worker214.snc1
+      - 10.22.168.24/32   # gdoop-worker215.snc1
+      - 10.22.179.11/32   # gdoop-worker216.snc1
+      - 10.22.178.27/32   # gdoop-worker217.snc1
+      - 10.22.167.27/32   # gdoop-worker218.snc1
+      - 10.22.180.12/32   # gdoop-worker219.snc1
+      - 10.22.169.25/32   # gdoop-worker220.snc1
+      - 10.22.177.36/32   # gdoop-worker221.snc1
+      - 10.22.166.33/32   # gdoop-worker222.snc1
+      - 10.22.168.5/32   # gdoop-worker223.snc1
+      - 10.22.179.7/32   # gdoop-worker224.snc1
+      - 10.22.178.40/32   # gdoop-worker225.snc1
+      - 10.22.167.36/32   # gdoop-worker226.snc1
+      - 10.22.180.16/32   # gdoop-worker227.snc1
+      - 10.22.169.29/32   # gdoop-worker228.snc1
+      - 10.22.177.39/32   # gdoop-worker229.snc1
+      - 10.22.166.43/32   # gdoop-worker230.snc1
+      - 10.22.168.11/32   # gdoop-worker231.snc1
+      - 10.22.179.4/32   # gdoop-worker232.snc1
+      - 10.22.178.32/32   # gdoop-worker233.snc1
+      - 10.22.167.42/32   # gdoop-worker234.snc1
+      - 10.22.180.29/32   # gdoop-worker235.snc1
+      - 10.22.169.27/32   # gdoop-worker236.snc1
+      - 10.22.177.35/32   # gdoop-worker237.snc1
+      - 10.22.166.34/32   # gdoop-worker238.snc1
+      - 10.22.168.12/32   # gdoop-worker239.snc1
+      - 10.22.179.13/32   # gdoop-worker240.snc1
+      - 10.22.178.31/32   # gdoop-worker241.snc1
+      - 10.22.167.38/32   # gdoop-worker242.snc1
+      - 10.22.180.18/32   # gdoop-worker243.snc1
+      - 10.22.169.18/32   # gdoop-worker244.snc1
+      - 10.22.177.42/32   # gdoop-worker245.snc1
+      - 10.22.166.37/32   # gdoop-worker246.snc1
+      - 10.22.168.6/32   # gdoop-worker247.snc1
+      - 10.22.179.8/32   # gdoop-worker248.snc1
+      - 10.22.178.16/32   # gdoop-worker249.snc1
+      - 10.22.167.33/32   # gdoop-worker250.snc1
+      - 10.22.180.22/32   # gdoop-worker251.snc1
+      - 10.22.169.21/32   # gdoop-worker252.snc1
+      - 10.22.177.33/32   # gdoop-worker253.snc1
+      - 10.22.166.36/32   # gdoop-worker254.snc1
+      - 10.22.168.32/32   # gdoop-worker255.snc1
+      - 10.22.179.12/32   # gdoop-worker256.snc1
+      - 10.22.178.24/32   # gdoop-worker257.snc1
+      - 10.22.167.24/32   # gdoop-worker258.snc1
+      - 10.22.180.28/32   # gdoop-worker259.snc1
+      - 10.22.169.23/32   # gdoop-worker260.snc1
+      - 10.22.168.9/32   # gdoop-worker261.snc1
+      - 10.22.179.19/32   # gdoop-worker262.snc1
+      - 10.22.178.20/32   # gdoop-worker263.snc1
+      - 10.22.167.37/32   # gdoop-worker264.snc1
+      - 10.22.180.30/32   # gdoop-worker265.snc1
+      - 10.22.169.22/32   # gdoop-worker266.snc1
+      - 10.22.168.35/32   # gdoop-worker267.snc1
+      - 10.22.179.28/32   # gdoop-worker268.snc1
+      - 10.22.178.30/32   # gdoop-worker269.snc1
+      - 10.22.167.26/32   # gdoop-worker270.snc1
+      - 10.22.180.25/32   # gdoop-worker271.snc1
+      - 10.22.169.24/32   # gdoop-worker272.snc1
+      - 10.22.168.8/32   # gdoop-worker273.snc1
+      - 10.22.179.16/32   # gdoop-worker274.snc1
+      - 10.22.178.12/32   # gdoop-worker275.snc1
+      - 10.22.167.5/32   # gdoop-worker276.snc1
+      - 10.22.180.26/32   # gdoop-worker277.snc1
+      - 10.22.169.11/32   # gdoop-worker278.snc1
+      - 10.22.168.15/32   # gdoop-worker279.snc1
+      - 10.22.179.40/32   # gdoop-worker280.snc1
+      - 10.22.178.25/32   # gdoop-worker281.snc1
+      - 10.22.167.6/32   # gdoop-worker282.snc1
+      - 10.22.180.24/32   # gdoop-worker283.snc1
+      - 10.22.169.20/32   # gdoop-worker284.snc1
+      - 10.22.168.22/32   # gdoop-worker285.snc1
+      - 10.22.179.25/32   # gdoop-worker286.snc1
+      - 10.22.178.34/32   # gdoop-worker287.snc1
+      - 10.22.167.14/32   # gdoop-worker288.snc1
+      - 10.22.180.23/32   # gdoop-worker289.snc1
+      - 10.22.169.12/32   # gdoop-worker290.snc1
+      - 10.22.168.26/32   # gdoop-worker291.snc1
+      - 10.22.179.9/32   # gdoop-worker292.snc1
+      - 10.22.178.9/32   # gdoop-worker293.snc1
+      - 10.22.167.28/32   # gdoop-worker294.snc1
+      - 10.22.180.17/32   # gdoop-worker295.snc1
+      - 10.22.169.14/32   # gdoop-worker296.snc1
+      - 10.22.168.37/32   # gdoop-worker297.snc1
+      - 10.22.179.32/32   # gdoop-worker298.snc1
+      - 10.22.178.7/32   # gdoop-worker299.snc1
+      - 10.22.167.7/32   # gdoop-worker300.snc1
+      - 10.22.180.15/32   # gdoop-worker301.snc1
+      - 10.22.168.4/32   # gdoop-worker302.snc1
+      - 10.22.179.22/32   # gdoop-worker303.snc1
+      - 10.22.178.4/32   # gdoop-worker304.snc1
+      - 10.22.167.4/32   # gdoop-worker305.snc1
+      - 10.22.168.20/32   # gdoop-worker306.snc1
+      - 10.22.179.21/32   # gdoop-worker307.snc1
+      - 10.22.178.6/32   # gdoop-worker308.snc1
+      - 10.22.167.8/32   # gdoop-worker309.snc1
+      - 10.22.168.7/32   # gdoop-worker310.snc1
+      - 10.22.179.6/32   # gdoop-worker311.snc1
+      - 10.22.178.10/32   # gdoop-worker312.snc1
+      - 10.22.167.11/32   # gdoop-worker313.snc1
+      - 10.22.169.32/32   # gdoop-worker314.snc1
+      - 10.22.181.172/32   # gdoop-worker315.snc1
+      - 10.22.181.126/32   # gdoop-worker316.snc1
+      - 10.22.181.195/32   # gdoop-worker317.snc1
+      - 10.22.181.20/32   # gdoop-worker318.snc1
+      - 10.22.181.246/32   # gdoop-worker319.snc1
+      - 10.22.181.60/32   # gdoop-worker320.snc1
+      - 10.22.181.27/32   # gdoop-worker321.snc1
+      - 10.22.181.67/32   # gdoop-worker322.snc1
+      - 10.22.181.179/32   # gdoop-worker323.snc1
+      - 10.22.181.215/32   # gdoop-worker324.snc1
+      - 10.22.181.184/32   # gdoop-worker325.snc1
+      - 10.22.181.33/32   # gdoop-worker326.snc1
+      - 10.22.181.24/32   # gdoop-worker327.snc1
+      - 10.22.181.5/32   # gdoop-worker328.snc1
+      - 10.22.181.72/32   # gdoop-worker329.snc1
+      - 10.22.170.210/32   # gdoop-worker330.snc1
+      - 10.22.180.111/32   # gdoop-worker331.snc1
+      - 10.22.169.117/32   # gdoop-worker332.snc1
+      - 10.22.171.149/32   # gdoop-worker333.snc1
+      - 10.22.166.149/32   # gdoop-worker334.snc1
+      - 10.22.168.149/32   # gdoop-worker335.snc1
+      - 10.22.165.56/32   # gdoop-worker336.snc1
+      - 10.22.174.149/32   # gdoop-worker337.snc1
+      - 10.22.167.149/32   # gdoop-worker338.snc1
+      - 10.22.179.149/32   # gdoop-worker339.snc1
+      - 10.22.164.149/32   # gdoop-worker340.snc1
+      - 10.22.175.149/32   # gdoop-worker341.snc1
+      - 10.22.163.149/32   # gdoop-worker342.snc1
+      - 10.22.160.148/32   # gdoop-worker343.snc1
+      - 10.22.177.149/32   # gdoop-worker344.snc1
+      - 10.22.176.149/32   # gdoop-worker345.snc1
+      - 10.22.172.148/32   # gdoop-worker346.snc1
+      - 10.22.178.149/32   # gdoop-worker347.snc1
+      - 10.22.173.149/32   # gdoop-worker348.snc1
+      - 10.22.161.149/32   # gdoop-worker349.snc1
+      - 10.22.162.183/32   # gdoop-worker350.snc1
+      - 10.22.170.158/32   # gdoop-worker351.snc1
+      - 10.22.180.96/32   # gdoop-worker352.snc1
+      - 10.22.169.246/32   # gdoop-worker353.snc1
+      - 10.22.170.94/32   # gdoop-worker354.snc1
+      - 10.22.180.59/32   # gdoop-worker355.snc1
+      - 10.22.169.63/32   # gdoop-worker356.snc1
+      - 10.22.170.209/32   # gdoop-worker357.snc1
+      - 10.22.180.80/32   # gdoop-worker358.snc1
+      - 10.22.169.173/32   # gdoop-worker359.snc1
+      - 10.22.170.141/32   # gdoop-worker360.snc1
+      - 10.22.170.136/32   # gdoop-worker361.snc1
+      - 10.22.170.152/32   # gdoop-worker362.snc1
+      - 10.22.170.195/32   # gdoop-worker363.snc1
+      - 10.22.170.199/32   # gdoop-worker364.snc1
+      - 10.22.170.175/32   # gdoop-worker365.snc1
+      - 10.22.170.82/32   # gdoop-worker366.snc1
+      - 10.22.170.65/32   # gdoop-worker367.snc1
+      - 10.22.170.160/32   # gdoop-worker368.snc1
+      - 10.22.170.170/32   # gdoop-worker369.snc1
+      - 10.22.170.131/32   # gdoop-worker370.snc1
+      - 10.22.170.187/32   # gdoop-worker371.snc1
+      - 10.22.170.16/32   # gdoop-worker372.snc1
+      - 10.22.162.45/32   # gdoop-worker373.snc1
+      - 10.22.164.47/32   # gdoop-worker374.snc1
+      - 10.22.167.47/32   # gdoop-worker375.snc1
+      - 10.22.165.46/32   # gdoop-worker376.snc1
+      - 10.22.161.47/32   # gdoop-worker377.snc1
+      - 10.22.172.46/32   # gdoop-worker378.snc1
+      - 10.22.168.47/32   # gdoop-worker379.snc1
+      - 10.22.163.47/32   # gdoop-worker380.snc1
+      - 10.22.169.42/32   # gdoop-worker381.snc1
+      - 10.22.160.45/32   # gdoop-worker382.snc1
+      - 10.22.166.47/32   # gdoop-worker383.snc1
+      - 10.22.171.46/32   # gdoop-worker384.snc1
+      - 10.22.170.15/32   # gdoop-worker385.snc1
+      - 10.22.181.46/32   # gdoop-worker386.snc1
+      - 10.22.160.41/32   # gdoop-worker387.snc1
+      - 10.22.172.43/32   # gdoop-worker388.snc1
+      - 10.22.177.43/32   # gdoop-worker389.snc1
+      - 10.22.176.43/32   # gdoop-worker390.snc1
+      - 10.22.173.39/32   # gdoop-worker391.snc1
+      - 10.22.170.12/32   # gdoop-worker392.snc1
+      - 10.22.168.43/32   # gdoop-worker393.snc1
+      - 10.22.174.43/32   # gdoop-worker394.snc1
+      - 10.22.178.45/32   # gdoop-worker395.snc1
+      - 10.22.179.44/32   # gdoop-worker396.snc1
+      - 10.22.167.43/32   # gdoop-worker397.snc1
+      - 10.22.171.42/32   # gdoop-worker398.snc1
+      - 10.22.180.38/32   # gdoop-worker399.snc1
+      - 10.22.169.37/32   # gdoop-worker400.snc1
+      - 10.22.161.43/32   # gdoop-worker401.snc1
+      - 10.22.164.43/32   # gdoop-worker402.snc1
+      - 10.22.166.41/32   # gdoop-worker403.snc1
+      - 10.22.162.42/32   # gdoop-worker404.snc1
+      - 10.22.175.44/32   # gdoop-worker405.snc1
+      - 10.22.165.43/32   # gdoop-worker406.snc1
+      - 10.22.163.44/32   # gdoop-worker407.snc1
+      - 10.22.181.43/32   # gdoop-worker408.snc1
+      - 10.22.160.42/32   # gdoop-worker409.snc1
+      - 10.22.172.42/32   # gdoop-worker410.snc1
+      - 10.22.177.45/32   # gdoop-worker411.snc1
+      - 10.22.176.45/32   # gdoop-worker412.snc1
+      - 10.22.173.42/32   # gdoop-worker413.snc1
+      - 10.22.170.11/32   # gdoop-worker414.snc1
+      - 10.22.168.44/32   # gdoop-worker415.snc1
+      - 10.22.174.44/32   # gdoop-worker416.snc1
+      - 10.22.178.43/32   # gdoop-worker417.snc1
+      - 10.22.179.39/32   # gdoop-worker418.snc1
+      - 10.22.167.44/32   # gdoop-worker419.snc1
+      - 10.22.171.43/32   # gdoop-worker420.snc1
+      - 10.22.180.37/32   # gdoop-worker421.snc1
+      - 10.22.169.38/32   # gdoop-worker422.snc1
+      - 10.22.161.42/32   # gdoop-worker423.snc1
+      - 10.22.164.44/32   # gdoop-worker424.snc1
+      - 10.22.166.42/32   # gdoop-worker425.snc1
+      - 10.22.162.41/32   # gdoop-worker426.snc1
+      - 10.22.175.43/32   # gdoop-worker427.snc1
+      - 10.22.165.42/32   # gdoop-worker428.snc1
+      - 10.22.181.41/32   # gdoop-worker429.snc1
+      - 10.22.181.45/32   # gdoop-worker430.snc1
+      - 10.22.175.45/32   # gdoop-worker431.snc1
+      - 10.22.178.44/32   # gdoop-worker432.snc1
+      - 10.22.181.44/32   # gdoop-worker433.snc1
+      - 10.22.176.44/32   # gdoop-worker434.snc1
+      - 10.22.163.43/32   # gdoop-worker435.snc1
+      - 10.22.177.44/32   # gdoop-worker436.snc1
+      - 10.22.179.45/32   # gdoop-worker437.snc1
+      - 10.22.173.43/32   # gdoop-worker438.snc1
+      - 10.22.174.45/32   # gdoop-worker439.snc1
+      - 10.22.180.39/32   # gdoop-worker440.snc1
+      - 10.24.55.46/32   # gdoop-worker441.snc1
+      - 10.24.91.39/32   # gdoop-worker442.snc1
+      - 10.24.34.41/32   # gdoop-worker443.snc1
+      - 10.24.138.27/32   # gdoop-worker444.snc1
+      - 10.24.95.38/32   # gdoop-worker445.snc1
+      - 10.24.35.40/32   # gdoop-worker446.snc1
+      - 10.24.77.47/32   # gdoop-worker447.snc1
+      - 10.24.76.46/32   # gdoop-worker448.snc1
+      - 10.24.157.46/32   # gdoop-worker449.snc1
+      - 10.24.131.22/32   # gdoop-worker450.snc1
+      - 10.24.61.51/32   # gdoop-worker451.snc1
+      - 10.24.55.41/32   # gdoop-worker452.snc1
+      - 10.24.91.42/32   # gdoop-worker453.snc1
+      - 10.24.34.49/32   # gdoop-worker454.snc1
+      - 10.24.138.34/32   # gdoop-worker455.snc1
+      - 10.24.95.43/32   # gdoop-worker456.snc1
+      - 10.24.35.41/32   # gdoop-worker457.snc1
+      - 10.24.77.45/32   # gdoop-worker458.snc1
+      - 10.24.76.49/32   # gdoop-worker459.snc1
+      - 10.24.157.42/32   # gdoop-worker460.snc1
+      - 10.24.131.18/32   # gdoop-worker461.snc1
+      - 10.24.61.52/32   # gdoop-worker462.snc1
+      - 10.24.55.43/32   # gdoop-worker463.snc1
+      - 10.24.91.45/32   # gdoop-worker464.snc1
+      - 10.24.34.39/32   # gdoop-worker465.snc1
+      - 10.24.138.26/32   # gdoop-worker466.snc1
+      - 10.24.95.46/32   # gdoop-worker467.snc1
+      - 10.24.35.42/32   # gdoop-worker468.snc1
+      - 10.24.77.43/32   # gdoop-worker469.snc1
+      - 10.24.76.45/32   # gdoop-worker470.snc1
+      - 10.24.157.44/32   # gdoop-worker471.snc1
+      - 10.24.55.48/32   # gdoop-worker472.snc1
+      - 10.24.91.46/32   # gdoop-worker473.snc1
+      - 10.24.34.47/32   # gdoop-worker474.snc1
+      - 10.24.138.28/32   # gdoop-worker475.snc1
+      - 10.24.95.48/32   # gdoop-worker476.snc1
+      - 10.24.35.48/32   # gdoop-worker477.snc1
+      - 10.24.77.44/32   # gdoop-worker478.snc1
+      - 10.24.76.47/32   # gdoop-worker479.snc1
+      - 10.24.157.41/32   # gdoop-worker480.snc1
+      - 10.24.55.47/32   # gdoop-worker481.snc1
+      - 10.24.91.47/32   # gdoop-worker482.snc1
+      - 10.24.34.43/32   # gdoop-worker483.snc1
+      - 10.24.138.25/32   # gdoop-worker484.snc1
+      - 10.24.69.250/32   # gdoop-worker485.snc1
+      - 10.24.67.215/32   # gdoop-worker486.snc1
+      - 10.24.131.226/32   # gdoop-worker487.snc1
+      - 10.24.76.131/32   # gdoop-worker488.snc1
+      - 10.24.111.152/32   # gdoop-worker489.snc1
+      - 10.24.159.239/32   # gdoop-worker490.snc1
+      - 10.24.107.180/32   # gdoop-worker491.snc1
+      - 10.24.77.91/32   # gdoop-worker492.snc1
+      - 10.24.43.237/32   # gdoop-worker493.snc1
+      - 10.24.61.84/32   # gdoop-worker494.snc1
+      - 10.24.108.95/32   # gdoop-worker495.snc1
+      - 10.24.138.248/32   # gdoop-worker496.snc1
+      - 10.24.85.198/32   # gdoop-worker497.snc1
+      - 10.24.95.228/32   # gdoop-worker498.snc1
+      - 10.24.63.253/32   # gdoop-worker499.snc1
+      - 10.24.91.126/32   # gdoop-worker500.snc1
+      - 10.24.109.113/32   # gdoop-worker501.snc1
+      - 10.24.128.188/32   # gdoop-worker502.snc1
+      - 10.24.110.76/32   # gdoop-worker503.snc1
+      - 10.24.68.64/32   # gdoop-worker504.snc1
+      - 10.24.33.235/32   # gdoop-worker505.snc1
+      - 10.24.106.111/32   # gdoop-worker506.snc1
+      - 10.24.34.146/32   # gdoop-worker507.snc1
+      - 10.24.90.171/32   # gdoop-worker508.snc1
+      - 10.24.157.125/32   # gdoop-worker509.snc1
+      - 10.24.55.77/32   # gdoop-worker510.snc1
+      - 10.24.137.210/32   # gdoop-worker511.snc1
+      - 10.24.35.233/32   # gdoop-worker512.snc1
+      - 10.24.66.129/32   # gdoop-worker513.snc1
+      - 10.24.69.101/32   # gdoop-worker514.snc1
+      - 10.24.67.78/32   # gdoop-worker515.snc1
+      - 10.24.131.80/32   # gdoop-worker516.snc1
+      - 10.24.76.165/32   # gdoop-worker517.snc1
+      - 10.24.111.252/32   # gdoop-worker518.snc1
+      - 10.24.159.188/32   # gdoop-worker519.snc1
+      - 10.24.107.149/32   # gdoop-worker520.snc1
+      - 10.24.77.216/32   # gdoop-worker521.snc1
+      - 10.24.43.234/32   # gdoop-worker522.snc1
+      - 10.24.61.180/32   # gdoop-worker523.snc1
+      - 10.24.108.113/32   # gdoop-worker524.snc1
+      - 10.24.138.196/32   # gdoop-worker525.snc1
+      - 10.24.85.97/32   # gdoop-worker526.snc1
+      - 10.24.95.124/32   # gdoop-worker527.snc1
+      - 10.24.63.160/32   # gdoop-worker528.snc1
+      - 10.24.91.73/32   # gdoop-worker529.snc1
+      - 10.24.109.74/32   # gdoop-worker530.snc1
+      - 10.24.128.214/32   # gdoop-worker531.snc1
+      - 10.24.110.62/32   # gdoop-worker532.snc1
+      - 10.24.68.137/32   # gdoop-worker533.snc1
+      - 10.24.33.76/32   # gdoop-worker534.snc1
+      - 10.24.106.233/32   # gdoop-worker535.snc1
+      - 10.24.34.120/32   # gdoop-worker536.snc1
+      - 10.24.90.241/32   # gdoop-worker537.snc1
+      - 10.24.157.107/32   # gdoop-worker538.snc1
+      - 10.24.55.249/32   # gdoop-worker539.snc1
+      - 10.24.137.87/32   # gdoop-worker540.snc1
+      - 10.24.35.178/32   # gdoop-worker541.snc1
+      - 10.24.66.159/32   # gdoop-worker542.snc1
+      - 10.24.69.214/32   # gdoop-worker543.snc1
+      - 10.24.67.207/32   # gdoop-worker544.snc1
+      - 10.24.131.71/32   # gdoop-worker545.snc1
+      - 10.24.91.89/32   # gdoop-worker561.snc1
+      - 10.24.138.81/32   # gdoop-worker562.snc1
+      - 10.32.88.3/32   # gdoop-worker101.sac1
+      - 10.32.247.80/32   # gdoop-worker102.sac1
+      - 10.32.88.4/32   # gdoop-worker103.sac1
+      - 10.32.247.81/32   # gdoop-worker104.sac1
+      - 10.32.88.5/32   # gdoop-worker105.sac1
+      - 10.32.88.7/32   # gdoop-worker106.sac1
+      - 10.32.88.8/32   # gdoop-worker107.sac1
+      - 10.20.112.109/32   # gdoop-job-submitter1.snc1
+      - 10.22.81.222/32   # gdoop-job-submitter2.snc1
+      - 10.20.71.185/32   # gdoop-job-submitter3.snc1
+      - 10.20.71.35/32   # gdoop-job-submitter4.snc1
+      - 10.20.71.152/32   # gdoop-job-submitter5.snc1
+      - 10.24.34.45/32   # gdoop-hbase-worker1.snc1
+      - 10.24.95.49/32   # gdoop-hbase-worker2.snc1
+      - 10.24.35.60/32   # gdoop-hbase-worker3.snc1
+      - 10.24.138.24/32   # gdoop-hbase-worker4.snc1
+      - 10.24.55.40/32   # gdoop-hbase-worker5.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: campaign_perform_uat_dba
+    app_account_name: campaign_perform_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.24.102.155/32   # cerebro-worker1.snc1
+      - 10.24.116.106/32   # cerebro-worker2.snc1
+      - 10.24.113.184/32   # cerebro-worker3.snc1
+      - 10.24.114.83/32   # cerebro-worker4.snc1
+      - 10.24.106.248/32   # cerebro-worker5.snc1
+      - 10.24.118.88/32   # cerebro-worker6.snc1
+      - 10.24.117.71/32   # cerebro-worker7.snc1
+      - 10.24.104.207/32   # cerebro-worker8.snc1
+      - 10.24.100.177/32   # cerebro-worker9.snc1
+      - 10.24.103.113/32   # cerebro-worker10.snc1
+      - 10.24.115.178/32   # cerebro-worker11.snc1
+      - 10.24.105.144/32   # cerebro-worker12.snc1
+      - 10.24.107.240/32   # cerebro-worker13.snc1
+      - 10.24.101.128/32   # cerebro-worker14.snc1
+      - 10.24.112.143/32   # cerebro-worker15.snc1
+      - 10.24.102.246/32   # cerebro-worker16.snc1
+      - 10.24.116.91/32   # cerebro-worker17.snc1
+      - 10.24.113.205/32   # cerebro-worker18.snc1
+      - 10.24.114.209/32   # cerebro-worker19.snc1
+      - 10.24.106.195/32   # cerebro-worker20.snc1
+      - 10.24.118.101/32   # cerebro-worker21.snc1
+      - 10.24.117.83/32   # cerebro-worker22.snc1
+      - 10.24.104.79/32   # cerebro-worker23.snc1
+      - 10.24.100.113/32   # cerebro-worker24.snc1
+      - 10.24.103.151/32   # cerebro-worker25.snc1
+      - 10.24.115.201/32   # cerebro-worker26.snc1
+      - 10.24.105.238/32   # cerebro-worker27.snc1
+      - 10.24.107.245/32   # cerebro-worker28.snc1
+      - 10.24.101.94/32   # cerebro-worker29.snc1
+      - 10.24.112.217/32   # cerebro-worker30.snc1
+      - 10.24.102.139/32   # cerebro-worker31.snc1
+      - 10.24.116.155/32   # cerebro-worker32.snc1
+      - 10.24.113.176/32   # cerebro-worker33.snc1
+      - 10.24.114.167/32   # cerebro-worker34.snc1
+      - 10.24.106.126/32   # cerebro-worker35.snc1
+      - 10.24.118.185/32   # cerebro-worker36.snc1
+      - 10.24.117.228/32   # cerebro-worker37.snc1
+      - 10.24.104.176/32   # cerebro-worker38.snc1
+      - 10.24.100.108/32   # cerebro-worker39.snc1
+      - 10.24.103.78/32   # cerebro-worker40.snc1
+      - 10.24.115.85/32   # cerebro-worker41.snc1
+      - 10.24.105.229/32   # cerebro-worker42.snc1
+      - 10.24.107.103/32   # cerebro-worker43.snc1
+      - 10.24.101.115/32   # cerebro-worker44.snc1
+      - 10.24.112.186/32   # cerebro-worker45.snc1
+      - 10.24.102.146/32   # cerebro-worker46.snc1
+      - 10.24.116.77/32   # cerebro-worker47.snc1
+      - 10.24.113.214/32   # cerebro-worker48.snc1
+      - 10.24.114.196/32   # cerebro-worker49.snc1
+      - 10.24.106.133/32   # cerebro-worker50.snc1
+      - 10.24.118.103/32   # cerebro-worker51.snc1
+      - 10.24.117.92/32   # cerebro-worker52.snc1
+      - 10.24.104.98/32   # cerebro-worker53.snc1
+      - 10.24.100.119/32   # cerebro-worker54.snc1
+      - 10.24.103.235/32   # cerebro-worker55.snc1
+      - 10.24.115.241/32   # cerebro-worker56.snc1
+      - 10.24.105.140/32   # cerebro-worker57.snc1
+      - 10.24.107.190/32   # cerebro-worker58.snc1
+      - 10.24.101.194/32   # cerebro-worker59.snc1
+      - 10.24.112.172/32   # cerebro-worker60.snc1
+      - 10.24.102.66/32   # cerebro-worker61.snc1
+      - 10.24.116.112/32   # cerebro-worker62.snc1
+      - 10.24.113.201/32   # cerebro-worker63.snc1
+      - 10.24.114.224/32   # cerebro-worker64.snc1
+      - 10.24.106.161/32   # cerebro-worker65.snc1
+      - 10.24.118.82/32   # cerebro-worker66.snc1
+      - 10.24.117.79/32   # cerebro-worker67.snc1
+      - 10.24.104.183/32   # cerebro-worker68.snc1
+      - 10.24.100.167/32   # cerebro-worker69.snc1
+      - 10.24.103.206/32   # cerebro-worker70.snc1
+      - 10.24.115.68/32   # cerebro-worker71.snc1
+      - 10.24.105.250/32   # cerebro-worker72.snc1
+      - 10.24.107.174/32   # cerebro-worker73.snc1
+      - 10.24.101.163/32   # cerebro-worker74.snc1
+      - 10.24.112.116/32   # cerebro-worker75.snc1
+      - 10.24.102.207/32   # cerebro-worker76.snc1
+      - 10.24.116.246/32   # cerebro-worker77.snc1
+      - 10.24.113.167/32   # cerebro-worker78.snc1
+      - 10.24.114.118/32   # cerebro-worker79.snc1
+      - 10.24.106.174/32   # cerebro-worker80.snc1
+      - 10.24.118.242/32   # cerebro-worker81.snc1
+      - 10.24.117.231/32   # cerebro-worker82.snc1
+      - 10.24.104.112/32   # cerebro-worker83.snc1
+      - 10.24.100.207/32   # cerebro-worker84.snc1
+      - 10.24.103.139/32   # cerebro-worker85.snc1
+      - 10.24.115.120/32   # cerebro-worker86.snc1
+      - 10.24.105.220/32   # cerebro-worker87.snc1
+      - 10.24.107.125/32   # cerebro-worker88.snc1
+      - 10.24.101.157/32   # cerebro-worker89.snc1
+      - 10.24.112.196/32   # cerebro-worker90.snc1
+      - 10.24.102.129/32   # cerebro-worker91.snc1
+      - 10.24.116.79/32   # cerebro-worker92.snc1
+      - 10.24.113.74/32   # cerebro-worker93.snc1
+      - 10.24.114.240/32   # cerebro-worker94.snc1
+      - 10.24.106.112/32   # cerebro-worker95.snc1
+      - 10.24.118.151/32   # cerebro-worker96.snc1
+      - 10.24.117.191/32   # cerebro-worker97.snc1
+      - 10.24.104.194/32   # cerebro-worker98.snc1
+      - 10.24.100.154/32   # cerebro-worker99.snc1
+      - 10.24.103.128/32   # cerebro-worker100.snc1
+      - 10.24.115.67/32   # cerebro-worker101.snc1
+      - 10.24.105.71/32   # cerebro-worker102.snc1
+      - 10.24.107.79/32   # cerebro-worker103.snc1
+      - 10.24.101.112/32   # cerebro-worker104.snc1
+      - 10.24.112.107/32   # cerebro-worker105.snc1
+      - 10.24.102.62/32   # cerebro-worker106.snc1
+      - 10.24.116.128/32   # cerebro-worker107.snc1
+      - 10.24.113.105/32   # cerebro-worker108.snc1
+      - 10.24.114.115/32   # cerebro-worker109.snc1
+      - 10.24.106.114/32   # cerebro-worker110.snc1
+      - 10.24.118.182/32   # cerebro-worker111.snc1
+      - 10.24.117.152/32   # cerebro-worker112.snc1
+      - 10.24.104.113/32   # cerebro-worker113.snc1
+      - 10.24.100.194/32   # cerebro-worker114.snc1
+      - 10.24.103.167/32   # cerebro-worker115.snc1
+      - 10.24.115.154/32   # cerebro-worker116.snc1
+      - 10.24.105.97/32   # cerebro-worker117.snc1
+      - 10.24.107.114/32   # cerebro-worker118.snc1
+      - 10.24.101.161/32   # cerebro-worker119.snc1
+      - 10.24.112.129/32   # cerebro-worker120.snc1
+      - 10.24.102.99/32   # cerebro-worker121.snc1
+      - 10.24.116.237/32   # cerebro-worker122.snc1
+      - 10.24.113.211/32   # cerebro-worker123.snc1
+      - 10.24.114.195/32   # cerebro-worker124.snc1
+      - 10.24.106.65/32   # cerebro-worker125.snc1
+      - 10.24.118.70/32   # cerebro-worker126.snc1
+      - 10.24.117.170/32   # cerebro-worker127.snc1
+      - 10.24.104.125/32   # cerebro-worker128.snc1
+      - 10.24.100.188/32   # cerebro-worker129.snc1
+      - 10.24.103.201/32   # cerebro-worker130.snc1
+      - 10.24.115.173/32   # cerebro-worker131.snc1
+      - 10.24.105.100/32   # cerebro-worker132.snc1
+      - 10.24.107.143/32   # cerebro-worker133.snc1
+      - 10.24.101.149/32   # cerebro-worker134.snc1
+      - 10.24.112.221/32   # cerebro-worker135.snc1
+      - 10.24.102.112/32   # cerebro-worker136.snc1
+      - 10.24.116.90/32   # cerebro-worker137.snc1
+      - 10.24.113.174/32   # cerebro-worker138.snc1
+      - 10.24.114.109/32   # cerebro-worker139.snc1
+      - 10.24.106.172/32   # cerebro-worker140.snc1
+      - 10.24.118.78/32   # cerebro-worker141.snc1
+      - 10.24.117.237/32   # cerebro-worker142.snc1
+      - 10.24.104.168/32   # cerebro-worker143.snc1
+      - 10.24.100.185/32   # cerebro-worker144.snc1
+      - 10.24.103.101/32   # cerebro-worker145.snc1
+      - 10.24.115.118/32   # cerebro-worker146.snc1
+      - 10.24.105.170/32   # cerebro-worker147.snc1
+      - 10.24.107.212/32   # cerebro-worker148.snc1
+      - 10.24.101.147/32   # cerebro-worker149.snc1
+      - 10.24.112.230/32   # cerebro-worker150.snc1
+      - 10.24.109.26/32   # cerebro-worker151.snc1
+      - 10.24.123.45/32   # cerebro-worker152.snc1
+      - 10.24.110.48/32   # cerebro-worker153.snc1
+      - 10.24.119.19/32   # cerebro-worker154.snc1
+      - 10.24.120.19/32   # cerebro-worker155.snc1
+      - 10.24.111.58/32   # cerebro-worker156.snc1
+      - 10.24.108.22/32   # cerebro-worker157.snc1
+      - 10.24.122.13/32   # cerebro-worker158.snc1
+      - 10.24.121.38/32   # cerebro-worker159.snc1
+      - 10.24.107.47/32   # cerebro-worker160.snc1
+      - 10.24.109.12/32   # cerebro-worker161.snc1
+      - 10.24.123.46/32   # cerebro-worker162.snc1
+      - 10.24.110.52/32   # cerebro-worker163.snc1
+      - 10.24.119.48/32   # cerebro-worker164.snc1
+      - 10.24.120.51/32   # cerebro-worker165.snc1
+      - 10.24.111.43/32   # cerebro-worker166.snc1
+      - 10.24.108.26/32   # cerebro-worker167.snc1
+      - 10.24.122.28/32   # cerebro-worker168.snc1
+      - 10.24.121.13/32   # cerebro-worker169.snc1
+      - 10.24.109.40/32   # cerebro-worker170.snc1
+      - 10.24.123.38/32   # cerebro-worker171.snc1
+      - 10.24.110.46/32   # cerebro-worker172.snc1
+      - 10.24.119.23/32   # cerebro-worker173.snc1
+      - 10.24.120.57/32   # cerebro-worker174.snc1
+      - 10.24.111.48/32   # cerebro-worker175.snc1
+      - 10.24.108.17/32   # cerebro-worker176.snc1
+      - 10.24.122.30/32   # cerebro-worker177.snc1
+      - 10.24.121.36/32   # cerebro-worker178.snc1
+      - 10.24.109.15/32   # cerebro-worker179.snc1
+      - 10.24.123.43/32   # cerebro-worker180.snc1
+      - 10.24.110.41/32   # cerebro-worker181.snc1
+      - 10.24.119.35/32   # cerebro-worker182.snc1
+      - 10.24.120.53/32   # cerebro-worker183.snc1
+      - 10.24.111.55/32   # cerebro-worker184.snc1
+      - 10.24.108.25/32   # cerebro-worker185.snc1
+      - 10.24.122.37/32   # cerebro-worker186.snc1
+      - 10.24.121.12/32   # cerebro-worker187.snc1
+      - 10.24.109.23/32   # cerebro-worker188.snc1
+      - 10.24.123.42/32   # cerebro-worker189.snc1
+      - 10.24.110.29/32   # cerebro-worker190.snc1
+      - 10.24.119.14/32   # cerebro-worker191.snc1
+      - 10.24.120.18/32   # cerebro-worker192.snc1
+      - 10.24.111.47/32   # cerebro-worker193.snc1
+      - 10.24.108.58/32   # cerebro-worker194.snc1
+      - 10.24.122.17/32   # cerebro-worker195.snc1
+      - 10.24.121.42/32   # cerebro-worker196.snc1
+      - 10.24.109.27/32   # cerebro-worker197.snc1
+      - 10.24.123.44/32   # cerebro-worker198.snc1
+      - 10.24.110.55/32   # cerebro-worker199.snc1
+      - 10.24.119.59/32   # cerebro-worker200.snc1
+      - 10.24.120.11/32   # cerebro-worker201.snc1
+      - 10.24.111.39/32   # cerebro-worker202.snc1
+      - 10.24.108.56/32   # cerebro-worker203.snc1
+      - 10.24.122.43/32   # cerebro-worker204.snc1
+      - 10.24.121.40/32   # cerebro-worker205.snc1
+      - 10.24.109.58/32   # cerebro-worker206.snc1
+      - 10.24.123.41/32   # cerebro-worker207.snc1
+      - 10.24.110.39/32   # cerebro-worker208.snc1
+      - 10.24.119.25/32   # cerebro-worker209.snc1
+      - 10.24.120.31/32   # cerebro-worker210.snc1
+      - 10.24.111.62/32   # cerebro-worker211.snc1
+      - 10.24.108.61/32   # cerebro-worker212.snc1
+      - 10.24.122.50/32   # cerebro-worker213.snc1
+      - 10.24.121.55/32   # cerebro-worker214.snc1
+      - 10.24.109.57/32   # cerebro-worker215.snc1
+      - 10.24.123.36/32   # cerebro-worker216.snc1
+      - 10.24.110.31/32   # cerebro-worker217.snc1
+      - 10.24.119.20/32   # cerebro-worker218.snc1
+      - 10.24.120.29/32   # cerebro-worker219.snc1
+      - 10.24.111.53/32   # cerebro-worker220.snc1
+      - 10.24.108.16/32   # cerebro-worker221.snc1
+      - 10.24.122.40/32   # cerebro-worker222.snc1
+      - 10.24.121.37/32   # cerebro-worker223.snc1
+      - 10.24.109.45/32   # cerebro-worker224.snc1
+      - 10.24.123.35/32   # cerebro-worker225.snc1
+      - 10.24.110.58/32   # cerebro-worker226.snc1
+      - 10.24.119.46/32   # cerebro-worker227.snc1
+      - 10.24.120.30/32   # cerebro-worker228.snc1
+      - 10.24.111.33/32   # cerebro-worker229.snc1
+      - 10.24.108.29/32   # cerebro-worker230.snc1
+      - 10.24.122.46/32   # cerebro-worker231.snc1
+      - 10.24.121.57/32   # cerebro-worker232.snc1
+      - 10.24.109.20/32   # cerebro-worker233.snc1
+      - 10.24.123.37/32   # cerebro-worker234.snc1
+      - 10.24.110.35/32   # cerebro-worker235.snc1
+      - 10.24.119.32/32   # cerebro-worker236.snc1
+      - 10.24.120.36/32   # cerebro-worker237.snc1
+      - 10.24.111.30/32   # cerebro-worker238.snc1
+      - 10.24.108.54/32   # cerebro-worker239.snc1
+      - 10.24.122.21/32   # cerebro-worker240.snc1
+      - 10.24.121.14/32   # cerebro-worker241.snc1
+      - 10.24.109.14/32   # cerebro-worker242.snc1
+      - 10.24.123.40/32   # cerebro-worker243.snc1
+      - 10.24.110.34/32   # cerebro-worker244.snc1
+      - 10.24.119.41/32   # cerebro-worker245.snc1
+      - 10.24.120.40/32   # cerebro-worker246.snc1
+      - 10.24.111.37/32   # cerebro-worker247.snc1
+      - 10.24.108.45/32   # cerebro-worker248.snc1
+      - 10.24.122.33/32   # cerebro-worker249.snc1
+      - 10.24.121.23/32   # cerebro-worker250.snc1
+      - 10.24.111.165/32   # cerebro-worker251.snc1
+      - 10.24.119.228/32   # cerebro-worker252.snc1
+      - 10.24.107.244/32   # cerebro-worker253.snc1
+      - 10.24.120.89/32   # cerebro-worker254.snc1
+      - 10.24.118.150/32   # cerebro-worker255.snc1
+      - 10.24.108.132/32   # cerebro-worker256.snc1
+      - 10.24.121.253/32   # cerebro-worker257.snc1
+      - 10.24.109.98/32   # cerebro-worker258.snc1
+      - 10.24.110.188/32   # cerebro-worker259.snc1
+      - 10.24.123.216/32   # cerebro-worker260.snc1
+      - 10.24.122.202/32   # cerebro-worker261.snc1
+      - 10.24.112.59/32   # cerebro-worker262.snc1
+      - 10.24.100.13/32   # cerebro-worker263.snc1
+      - 10.24.101.14/32   # cerebro-worker264.snc1
+      - 10.24.113.14/32   # cerebro-worker265.snc1
+      - 10.24.114.12/32   # cerebro-worker266.snc1
+      - 10.24.116.60/32   # cerebro-worker267.snc1
+      - 10.24.115.12/32   # cerebro-worker268.snc1
+      - 10.24.117.60/32   # cerebro-worker269.snc1
+      - 10.24.102.60/32   # cerebro-worker270.snc1
+      - 10.24.105.12/32   # cerebro-worker271.snc1
+      - 10.24.103.12/32   # cerebro-worker272.snc1
+      - 10.24.106.13/32   # cerebro-worker273.snc1
+      - 10.24.104.60/32   # cerebro-worker274.snc1
+      - 10.24.112.57/32   # cerebro-worker275.snc1
+      - 10.24.100.15/32   # cerebro-worker276.snc1
+      - 10.24.101.13/32   # cerebro-worker277.snc1
+      - 10.24.113.13/32   # cerebro-worker278.snc1
+      - 10.24.137.26/32   # cerebro-worker279.snc1
+      - 10.24.68.46/32   # cerebro-worker280.snc1
+      - 10.24.128.27/32   # cerebro-worker281.snc1
+      - 10.24.33.47/32   # cerebro-worker282.snc1
+      - 10.24.159.42/32   # cerebro-worker283.snc1
+      - 10.24.90.56/32   # cerebro-worker284.snc1
+      - 10.24.137.37/32   # cerebro-worker285.snc1
+      - 10.24.68.45/32   # cerebro-worker286.snc1
+      - 10.24.128.32/32   # cerebro-worker287.snc1
+      - 10.24.33.49/32   # cerebro-worker288.snc1
+      - 10.24.159.45/32   # cerebro-worker289.snc1
+      - 10.24.90.60/32   # cerebro-worker290.snc1
+      - 10.24.137.28/32   # cerebro-worker291.snc1
+      - 10.24.68.50/32   # cerebro-worker292.snc1
+      - 10.24.128.25/32   # cerebro-worker293.snc1
+      - 10.24.33.51/32   # cerebro-worker294.snc1
+      - 10.24.159.43/32   # cerebro-worker295.snc1
+      - 10.24.90.54/32   # cerebro-worker296.snc1
+      - 10.24.137.12/32   # cerebro-worker297.snc1
+      - 10.24.68.48/32   # cerebro-worker298.snc1
+      - 10.24.128.38/32   # cerebro-worker299.snc1
+      - 10.24.33.43/32   # cerebro-worker300.snc1
+      - 10.24.159.47/32   # cerebro-worker301.snc1
+      - 10.24.90.52/32   # cerebro-worker302.snc1
+      - 10.24.137.34/32   # cerebro-worker303.snc1
+      - 10.24.68.43/32   # cerebro-worker304.snc1
+      - 10.24.128.40/32   # cerebro-worker305.snc1
+      - 10.24.33.42/32   # cerebro-worker306.snc1
+      - 10.24.159.46/32   # cerebro-worker307.snc1
+      - 10.24.137.22/32   # cerebro-worker308.snc1
+      - 10.24.68.44/32   # cerebro-worker309.snc1
+      - 10.24.128.21/32   # cerebro-worker310.snc1
+      - 10.24.33.40/32   # cerebro-worker311.snc1
+      - 10.24.159.50/32   # cerebro-worker312.snc1
+      - 10.24.137.30/32   # cerebro-worker313.snc1
+      - 10.24.68.47/32   # cerebro-worker314.snc1
+      - 10.24.128.30/32   # cerebro-worker315.snc1
+      - 10.24.33.45/32   # cerebro-worker316.snc1
+      - 10.24.159.44/32   # cerebro-worker317.snc1
+      - 10.24.137.32/32   # cerebro-worker318.snc1
+      - 10.24.68.41/32   # cerebro-worker319.snc1
+      - 10.24.128.39/32   # cerebro-worker320.snc1
+      - 10.24.33.44/32   # cerebro-worker321.snc1
+      - 10.24.159.48/32   # cerebro-worker322.snc1
+      - 10.24.137.23/32   # cerebro-worker323.snc1
+      - 10.24.68.40/32   # cerebro-worker324.snc1
+      - 10.24.128.26/32   # cerebro-worker325.snc1
+      - 10.24.33.50/32   # cerebro-worker326.snc1
+      - 10.24.159.60/32   # cerebro-worker327.snc1
+      - 10.24.137.24/32   # cerebro-worker328.snc1
+      - 10.24.68.39/32   # cerebro-worker329.snc1
+      - 10.24.128.35/32   # cerebro-worker330.snc1
+      - 10.24.33.46/32   # cerebro-worker331.snc1
+      - 10.24.63.42/32   # cerebro-worker332.snc1
+      - 10.24.61.45/32   # cerebro-worker333.snc1
+      - 10.24.43.50/32   # cerebro-worker334.snc1
+      - 10.24.85.42/32   # cerebro-worker335.snc1
+      - 10.24.90.46/32   # cerebro-worker336.snc1
+      - 10.24.159.40/32   # cerebro-worker337.snc1
+      - 10.24.63.43/32   # cerebro-worker338.snc1
+      - 10.24.61.44/32   # cerebro-worker339.snc1
+      - 10.24.43.43/32   # cerebro-worker340.snc1
+      - 10.24.85.40/32   # cerebro-worker341.snc1
+      - 10.24.90.45/32   # cerebro-worker342.snc1
+      - 10.24.63.45/32   # cerebro-worker343.snc1
+      - 10.24.61.43/32   # cerebro-worker344.snc1
+      - 10.24.43.49/32   # cerebro-worker345.snc1
+      - 10.24.85.51/32   # cerebro-worker346.snc1
+      - 10.24.90.47/32   # cerebro-worker347.snc1
+      - 10.24.63.51/32   # cerebro-worker348.snc1
+      - 10.24.61.58/32   # cerebro-worker349.snc1
+      - 10.24.43.47/32   # cerebro-worker350.snc1
+      - 10.24.85.50/32   # cerebro-worker351.snc1
+      - 10.24.90.44/32   # cerebro-worker352.snc1
+      - 10.24.63.49/32   # cerebro-worker353.snc1
+      - 10.24.61.41/32   # cerebro-worker354.snc1
+      - 10.24.43.51/32   # cerebro-worker355.snc1
+      - 10.24.85.60/32   # cerebro-worker356.snc1
+      - 10.24.90.48/32   # cerebro-worker357.snc1
+      - 10.24.63.48/32   # cerebro-worker358.snc1
+      - 10.24.61.53/32   # cerebro-worker359.snc1
+      - 10.24.43.39/32   # cerebro-worker360.snc1
+      - 10.24.85.46/32   # cerebro-worker361.snc1
+      - 10.24.90.42/32   # cerebro-worker362.snc1
+      - 10.24.63.50/32   # cerebro-worker363.snc1
+      - 10.24.157.43/32   # cerebro-worker364.snc1
+      - 10.24.77.49/32   # cerebro-worker365.snc1
+      - 10.24.34.40/32   # cerebro-worker366.snc1
+      - 10.24.55.39/32   # cerebro-worker367.snc1
+      - 10.24.95.41/32   # cerebro-worker368.snc1
+      - 10.24.35.43/32   # cerebro-worker369.snc1
+      - 10.24.138.32/32   # cerebro-worker370.snc1
+      - 10.24.91.48/32   # cerebro-worker371.snc1
+      - 10.24.76.48/32   # cerebro-worker372.snc1
+      - 10.24.131.24/32   # cerebro-worker373.snc1
+      - 10.24.61.50/32   # cerebro-worker374.snc1
+      - 10.24.43.52/32   # cerebro-worker375.snc1
+      - 10.24.85.53/32   # cerebro-worker376.snc1
+      - 10.24.63.56/32   # cerebro-worker377.snc1
+      - 10.24.90.57/32   # cerebro-worker378.snc1
+      - 10.24.137.15/32   # cerebro-worker379.snc1
+      - 10.24.33.59/32   # cerebro-worker380.snc1
+      - 10.24.157.38/32   # cerebro-worker381.snc1
+      - 10.24.77.40/32   # cerebro-worker382.snc1
+      - 10.24.34.42/32   # cerebro-worker383.snc1
+      - 10.24.55.38/32   # cerebro-worker384.snc1
+      - 10.24.95.47/32   # cerebro-worker385.snc1
+      - 10.24.35.39/32   # cerebro-worker386.snc1
+      - 10.24.138.30/32   # cerebro-worker387.snc1
+      - 10.24.91.49/32   # cerebro-worker388.snc1
+      - 10.24.77.42/32   # cerebro-worker389.snc1
+      - 10.24.131.19/32   # cerebro-worker390.snc1
+      - 10.24.61.49/32   # cerebro-worker391.snc1
+      - 10.24.43.56/32   # cerebro-worker392.snc1
+      - 10.24.85.55/32   # cerebro-worker393.snc1
+      - 10.24.63.58/32   # cerebro-worker394.snc1
+      - 10.24.90.58/32   # cerebro-worker395.snc1
+      - 10.24.137.14/32   # cerebro-worker396.snc1
+      - 10.24.33.58/32   # cerebro-worker397.snc1
+      - 10.24.157.47/32   # cerebro-worker398.snc1
+      - 10.24.77.38/32   # cerebro-worker399.snc1
+      - 10.24.34.38/32   # cerebro-worker400.snc1
+      - 10.24.55.44/32   # cerebro-worker401.snc1
+      - 10.24.95.40/32   # cerebro-worker402.snc1
+      - 10.24.35.62/32   # cerebro-worker403.snc1
+      - 10.24.138.31/32   # cerebro-worker404.snc1
+      - 10.24.91.43/32   # cerebro-worker405.snc1
+      - 10.24.66.63/32   # cerebro-worker406.snc1
+      - 10.24.131.23/32   # cerebro-worker407.snc1
+      - 10.24.61.48/32   # cerebro-worker408.snc1
+      - 10.24.43.57/32   # cerebro-worker409.snc1
+      - 10.24.85.52/32   # cerebro-worker410.snc1
+      - 10.24.63.57/32   # cerebro-worker411.snc1
+      - 10.24.157.48/32   # cerebro-worker412.snc1
+      - 10.24.77.41/32   # cerebro-worker413.snc1
+      - 10.24.34.44/32   # cerebro-worker414.snc1
+      - 10.24.55.45/32   # cerebro-worker415.snc1
+      - 10.24.95.44/32   # cerebro-worker416.snc1
+      - 10.24.35.46/32   # cerebro-worker417.snc1
+      - 10.24.138.29/32   # cerebro-worker418.snc1
+      - 10.24.91.41/32   # cerebro-worker419.snc1
+      - 10.24.76.44/32   # cerebro-worker420.snc1
+      - 10.24.131.20/32   # cerebro-worker421.snc1
+      - 10.24.61.54/32   # cerebro-worker422.snc1
+      - 10.24.43.55/32   # cerebro-worker423.snc1
+      - 10.24.85.54/32   # cerebro-worker424.snc1
+      - 10.24.157.49/32   # cerebro-worker425.snc1
+      - 10.24.95.42/32   # cerebro-worker426.snc1
+      - 10.24.35.47/32   # cerebro-worker427.snc1
+      - 10.24.77.46/32   # cerebro-worker428.snc1
+      - 10.24.76.43/32   # cerebro-worker429.snc1
+      - 10.24.157.39/32   # cerebro-worker430.snc1
+      - 10.24.55.49/32   # cerebro-worker431.snc1
+      - 10.24.91.38/32   # cerebro-worker432.snc1
+      - 10.24.34.46/32   # cerebro-worker433.snc1
+      - 10.24.138.23/32   # cerebro-worker434.snc1
+      - 10.24.95.45/32   # cerebro-worker435.snc1
+      - 10.24.35.38/32   # cerebro-worker436.snc1
+      - 10.24.77.39/32   # cerebro-worker437.snc1
+      - 10.24.76.42/32   # cerebro-worker438.snc1
+      - 10.24.157.40/32   # cerebro-worker439.snc1
+      - 10.24.55.42/32   # cerebro-worker440.snc1
+      - 10.24.91.44/32   # cerebro-worker441.snc1
+      - 10.24.34.48/32   # cerebro-worker442.snc1
+      - 10.24.138.33/32   # cerebro-worker443.snc1
+      - 10.24.95.39/32   # cerebro-worker444.snc1
+      - 10.24.35.45/32   # cerebro-worker445.snc1
+      - 10.24.67.112/32   # cerebro-worker446.snc1
+      - 10.24.69.178/32   # cerebro-worker447.snc1
+      - 10.24.131.108/32   # cerebro-worker448.snc1
+      - 10.24.76.96/32   # cerebro-worker449.snc1
+      - 10.24.109.168/32   # cerebro-worker450.snc1
+      - 10.24.85.191/32   # cerebro-worker451.snc1
+      - 10.24.43.172/32   # cerebro-worker452.snc1
+      - 10.24.111.159/32   # cerebro-worker453.snc1
+      - 10.24.77.121/32   # cerebro-worker454.snc1
+      - 10.24.107.238/32   # cerebro-worker455.snc1
+      - 10.24.91.83/32   # cerebro-worker456.snc1
+      - 10.24.33.220/32   # cerebro-worker457.snc1
+      - 10.24.63.65/32   # cerebro-worker458.snc1
+      - 10.24.61.251/32   # cerebro-worker459.snc1
+      - 10.24.68.127/32   # cerebro-worker460.snc1
+      - 10.24.159.114/32   # cerebro-worker461.snc1
+      - 10.24.110.253/32   # cerebro-worker462.snc1
+      - 10.24.138.154/32   # cerebro-worker463.snc1
+      - 10.24.128.166/32   # cerebro-worker464.snc1
+      - 10.24.95.189/32   # cerebro-worker465.snc1
+      - 10.24.108.163/32   # cerebro-worker466.snc1
+      - 10.24.157.160/32   # cerebro-worker467.snc1
+      - 10.24.34.171/32   # cerebro-worker468.snc1
+      - 10.24.55.204/32   # cerebro-worker469.snc1
+      - 10.24.35.173/32   # cerebro-worker470.snc1
+      - 10.24.137.215/32   # cerebro-worker471.snc1
+      - 10.24.106.196/32   # cerebro-worker472.snc1
+      - 10.24.90.145/32   # cerebro-worker473.snc1
+      - 10.24.66.220/32   # cerebro-worker474.snc1
+      - 10.24.67.221/32   # cerebro-worker475.snc1
+      - 10.24.69.163/32   # cerebro-worker476.snc1
+      - 10.24.131.224/32   # cerebro-worker477.snc1
+      - 10.24.76.223/32   # cerebro-worker478.snc1
+      - 10.24.109.86/32   # cerebro-worker479.snc1
+      - 10.24.85.94/32   # cerebro-worker480.snc1
+      - 10.24.43.240/32   # cerebro-worker481.snc1
+      - 10.24.111.184/32   # cerebro-worker482.snc1
+      - 10.24.77.232/32   # cerebro-worker483.snc1
+      - 10.24.107.130/32   # cerebro-worker484.snc1
+      - 10.24.91.227/32   # cerebro-worker485.snc1
+      - 10.24.33.65/32   # cerebro-worker486.snc1
+      - 10.24.63.79/32   # cerebro-worker487.snc1
+      - 10.24.61.161/32   # cerebro-worker488.snc1
+      - 10.24.68.232/32   # cerebro-worker489.snc1
+      - 10.24.159.154/32   # cerebro-worker490.snc1
+      - 10.24.110.148/32   # cerebro-worker491.snc1
+      - 10.24.138.148/32   # cerebro-worker492.snc1
+      - 10.24.128.211/32   # cerebro-worker493.snc1
+      - 10.24.95.182/32   # cerebro-worker494.snc1
+      - 10.24.108.248/32   # cerebro-worker495.snc1
+      - 10.24.157.85/32   # cerebro-worker496.snc1
+      - 10.24.34.190/32   # cerebro-worker497.snc1
+      - 10.24.55.122/32   # cerebro-worker498.snc1
+      - 10.24.35.175/32   # cerebro-worker499.snc1
+      - 10.24.137.161/32   # cerebro-worker500.snc1
+      - 10.24.106.146/32   # cerebro-worker501.snc1
+      - 10.24.90.93/32   # cerebro-worker502.snc1
+      - 10.24.66.226/32   # cerebro-worker503.snc1
+      - 10.24.67.90/32   # cerebro-worker504.snc1
+      - 10.24.69.142/32   # cerebro-worker505.snc1
+      - 10.24.131.247/32   # cerebro-worker506.snc1
+      - 10.24.76.75/32   # cerebro-worker507.snc1
+      - 10.24.109.62/32   # cerebro-worker508.snc1
+      - 10.24.85.244/32   # cerebro-worker509.snc1
+      - 10.24.43.134/32   # cerebro-worker510.snc1
+      - 10.24.111.231/32   # cerebro-worker511.snc1
+      - 10.24.77.82/32   # cerebro-worker512.snc1
+      - 10.24.107.228/32   # cerebro-worker513.snc1
+      - 10.24.91.156/32   # cerebro-worker514.snc1
+      - 10.24.33.93/32   # cerebro-worker515.snc1
+      - 10.24.63.220/32   # cerebro-worker516.snc1
+      - 10.24.61.239/32   # cerebro-worker517.snc1
+      - 10.24.68.94/32   # cerebro-worker518.snc1
+      - 10.24.159.87/32   # cerebro-worker519.snc1
+      - 10.24.110.100/32   # cerebro-worker520.snc1
+      - 10.24.138.231/32   # cerebro-worker521.snc1
+      - 10.24.128.227/32   # cerebro-worker522.snc1
+      - 10.24.95.231/32   # cerebro-worker523.snc1
+      - 10.24.108.238/32   # cerebro-worker524.snc1
+      - 10.24.157.65/32   # cerebro-worker525.snc1
+      - 10.24.106.136/32   # cerebro-hbase-worker1.snc1
+      - 10.24.117.168/32   # cerebro-hbase-worker2.snc1
+      - 10.24.118.221/32   # cerebro-hbase-worker3.snc1
+      - 10.24.105.146/32   # cerebro-hbase-worker4.snc1
+      - 10.24.104.57/32   # cerebro-hbase-worker5.snc1
+      - 10.20.43.137/32   # cerebro-job-submitter1.snc1
+      - 10.20.71.150/32   # cerebro-job-submitter2.snc1
+      - 10.20.71.88/32   # cerebro-job-submitter3.snc1
+      - 10.23.82.22/32   # campaign-performance-app1-staging.snc1
+      - 10.23.48.53/32   # campaign-performance-app2-staging.snc1
+      - 10.22.160.15/32   # gdoop-worker1.snc1
+      - 10.22.161.74/32   # gdoop-worker2.snc1
+      - 10.22.162.29/32   # gdoop-worker3.snc1
+      - 10.22.172.70/32   # gdoop-worker4.snc1
+      - 10.22.171.137/32   # gdoop-worker5.snc1
+      - 10.22.163.237/32   # gdoop-worker6.snc1
+      - 10.22.160.238/32   # gdoop-worker7.snc1
+      - 10.22.161.58/32   # gdoop-worker8.snc1
+      - 10.22.162.235/32   # gdoop-worker9.snc1
+      - 10.22.172.181/32   # gdoop-worker10.snc1
+      - 10.22.171.117/32   # gdoop-worker11.snc1
+      - 10.22.163.61/32   # gdoop-worker12.snc1
+      - 10.22.160.217/32   # gdoop-worker13.snc1
+      - 10.22.161.193/32   # gdoop-worker14.snc1
+      - 10.22.162.108/32   # gdoop-worker15.snc1
+      - 10.22.172.63/32   # gdoop-worker16.snc1
+      - 10.22.171.170/32   # gdoop-worker17.snc1
+      - 10.22.163.6/32   # gdoop-worker18.snc1
+      - 10.22.160.133/32   # gdoop-worker19.snc1
+      - 10.22.161.115/32   # gdoop-worker20.snc1
+      - 10.22.162.50/32   # gdoop-worker21.snc1
+      - 10.22.172.228/32   # gdoop-worker22.snc1
+      - 10.22.171.221/32   # gdoop-worker23.snc1
+      - 10.22.163.36/32   # gdoop-worker24.snc1
+      - 10.22.160.49/32   # gdoop-worker25.snc1
+      - 10.22.161.37/32   # gdoop-worker26.snc1
+      - 10.22.162.89/32   # gdoop-worker27.snc1
+      - 10.22.172.58/32   # gdoop-worker28.snc1
+      - 10.22.171.152/32   # gdoop-worker29.snc1
+      - 10.22.160.178/32   # gdoop-worker30.snc1
+      - 10.22.161.231/32   # gdoop-worker31.snc1
+      - 10.22.162.204/32   # gdoop-worker32.snc1
+      - 10.22.172.39/32   # gdoop-worker33.snc1
+      - 10.22.171.63/32   # gdoop-worker34.snc1
+      - 10.22.160.30/32   # gdoop-worker35.snc1
+      - 10.22.161.46/32   # gdoop-worker36.snc1
+      - 10.22.162.203/32   # gdoop-worker37.snc1
+      - 10.22.172.67/32   # gdoop-worker38.snc1
+      - 10.22.171.147/32   # gdoop-worker39.snc1
+      - 10.22.160.199/32   # gdoop-worker40.snc1
+      - 10.22.161.54/32   # gdoop-worker41.snc1
+      - 10.22.162.210/32   # gdoop-worker42.snc1
+      - 10.22.172.49/32   # gdoop-worker43.snc1
+      - 10.22.171.143/32   # gdoop-worker44.snc1
+      - 10.22.160.88/32   # gdoop-worker45.snc1
+      - 10.22.161.17/32   # gdoop-worker46.snc1
+      - 10.22.162.18/32   # gdoop-worker47.snc1
+      - 10.22.172.91/32   # gdoop-worker48.snc1
+      - 10.22.171.84/32   # gdoop-worker49.snc1
+      - 10.22.160.47/32   # gdoop-worker50.snc1
+      - 10.22.161.26/32   # gdoop-worker51.snc1
+      - 10.22.162.39/32   # gdoop-worker52.snc1
+      - 10.22.172.152/32   # gdoop-worker53.snc1
+      - 10.22.171.58/32   # gdoop-worker54.snc1
+      - 10.22.160.173/32   # gdoop-worker55.snc1
+      - 10.22.161.245/32   # gdoop-worker56.snc1
+      - 10.22.162.48/32   # gdoop-worker57.snc1
+      - 10.22.172.141/32   # gdoop-worker58.snc1
+      - 10.22.171.48/32   # gdoop-worker59.snc1
+      - 10.22.160.233/32   # gdoop-worker60.snc1
+      - 10.22.161.137/32   # gdoop-worker61.snc1
+      - 10.22.162.162/32   # gdoop-worker62.snc1
+      - 10.22.172.113/32   # gdoop-worker63.snc1
+      - 10.22.171.121/32   # gdoop-worker64.snc1
+      - 10.22.160.104/32   # gdoop-worker65.snc1
+      - 10.22.161.228/32   # gdoop-worker66.snc1
+      - 10.22.162.38/32   # gdoop-worker67.snc1
+      - 10.22.172.144/32   # gdoop-worker68.snc1
+      - 10.22.171.76/32   # gdoop-worker69.snc1
+      - 10.22.160.71/32   # gdoop-worker70.snc1
+      - 10.22.161.31/32   # gdoop-worker71.snc1
+      - 10.22.162.82/32   # gdoop-worker72.snc1
+      - 10.22.172.177/32   # gdoop-worker73.snc1
+      - 10.22.171.189/32   # gdoop-worker74.snc1
+      - 10.22.160.203/32   # gdoop-worker75.snc1
+      - 10.22.161.147/32   # gdoop-worker76.snc1
+      - 10.22.162.106/32   # gdoop-worker77.snc1
+      - 10.22.172.86/32   # gdoop-worker78.snc1
+      - 10.22.171.61/32   # gdoop-worker79.snc1
+      - 10.22.160.33/32   # gdoop-worker80.snc1
+      - 10.22.161.76/32   # gdoop-worker81.snc1
+      - 10.22.162.62/32   # gdoop-worker82.snc1
+      - 10.22.172.25/32   # gdoop-worker83.snc1
+      - 10.22.171.33/32   # gdoop-worker84.snc1
+      - 10.22.173.229/32   # gdoop-worker85.snc1
+      - 10.22.163.141/32   # gdoop-worker86.snc1
+      - 10.22.173.48/32   # gdoop-worker87.snc1
+      - 10.22.163.205/32   # gdoop-worker88.snc1
+      - 10.22.173.113/32   # gdoop-worker89.snc1
+      - 10.22.163.187/32   # gdoop-worker90.snc1
+      - 10.22.173.169/32   # gdoop-worker91.snc1
+      - 10.22.163.212/32   # gdoop-worker92.snc1
+      - 10.22.173.152/32   # gdoop-worker93.snc1
+      - 10.22.163.225/32   # gdoop-worker94.snc1
+      - 10.22.173.47/32   # gdoop-worker95.snc1
+      - 10.22.163.73/32   # gdoop-worker96.snc1
+      - 10.22.173.51/32   # gdoop-worker97.snc1
+      - 10.22.163.160/32   # gdoop-worker98.snc1
+      - 10.22.173.207/32   # gdoop-worker99.snc1
+      - 10.22.163.145/32   # gdoop-worker100.snc1
+      - 10.22.173.203/32   # gdoop-worker101.snc1
+      - 10.22.163.254/32   # gdoop-worker102.snc1
+      - 10.22.173.214/32   # gdoop-worker103.snc1
+      - 10.22.163.131/32   # gdoop-worker104.snc1
+      - 10.22.173.108/32   # gdoop-worker105.snc1
+      - 10.22.163.238/32   # gdoop-worker106.snc1
+      - 10.22.173.206/32   # gdoop-worker107.snc1
+      - 10.22.173.178/32   # gdoop-worker108.snc1
+      - 10.22.173.131/32   # gdoop-worker109.snc1
+      - 10.22.173.208/32   # gdoop-worker110.snc1
+      - 10.22.164.251/32   # gdoop-worker111.snc1
+      - 10.22.174.90/32   # gdoop-worker112.snc1
+      - 10.22.175.253/32   # gdoop-worker113.snc1
+      - 10.22.176.121/32   # gdoop-worker114.snc1
+      - 10.22.164.237/32   # gdoop-worker115.snc1
+      - 10.22.174.197/32   # gdoop-worker116.snc1
+      - 10.22.175.225/32   # gdoop-worker117.snc1
+      - 10.22.176.138/32   # gdoop-worker118.snc1
+      - 10.22.164.179/32   # gdoop-worker119.snc1
+      - 10.22.174.211/32   # gdoop-worker120.snc1
+      - 10.22.175.232/32   # gdoop-worker121.snc1
+      - 10.22.176.185/32   # gdoop-worker122.snc1
+      - 10.22.164.234/32   # gdoop-worker123.snc1
+      - 10.22.174.176/32   # gdoop-worker124.snc1
+      - 10.22.175.135/32   # gdoop-worker125.snc1
+      - 10.22.176.71/32   # gdoop-worker126.snc1
+      - 10.22.164.71/32   # gdoop-worker127.snc1
+      - 10.22.174.118/32   # gdoop-worker128.snc1
+      - 10.22.175.84/32   # gdoop-worker129.snc1
+      - 10.22.176.171/32   # gdoop-worker130.snc1
+      - 10.22.164.245/32   # gdoop-worker131.snc1
+      - 10.22.174.250/32   # gdoop-worker132.snc1
+      - 10.22.175.164/32   # gdoop-worker133.snc1
+      - 10.22.164.177/32   # gdoop-worker134.snc1
+      - 10.22.174.71/32   # gdoop-worker135.snc1
+      - 10.22.175.193/32   # gdoop-worker136.snc1
+      - 10.22.164.254/32   # gdoop-worker137.snc1
+      - 10.22.174.190/32   # gdoop-worker138.snc1
+      - 10.22.175.144/32   # gdoop-worker139.snc1
+      - 10.22.164.125/32   # gdoop-worker140.snc1
+      - 10.22.174.79/32   # gdoop-worker141.snc1
+      - 10.22.175.242/32   # gdoop-worker142.snc1
+      - 10.22.164.106/32   # gdoop-worker143.snc1
+      - 10.22.174.195/32   # gdoop-worker144.snc1
+      - 10.22.175.159/32   # gdoop-worker145.snc1
+      - 10.22.164.126/32   # gdoop-worker146.snc1
+      - 10.22.174.157/32   # gdoop-worker147.snc1
+      - 10.22.175.80/32   # gdoop-worker148.snc1
+      - 10.22.164.59/32   # gdoop-worker149.snc1
+      - 10.22.174.228/32   # gdoop-worker150.snc1
+      - 10.22.175.60/32   # gdoop-worker151.snc1
+      - 10.22.164.214/32   # gdoop-worker152.snc1
+      - 10.22.174.83/32   # gdoop-worker153.snc1
+      - 10.22.175.65/32   # gdoop-worker154.snc1
+      - 10.22.164.235/32   # gdoop-worker155.snc1
+      - 10.22.174.158/32   # gdoop-worker156.snc1
+      - 10.22.175.108/32   # gdoop-worker157.snc1
+      - 10.22.164.122/32   # gdoop-worker158.snc1
+      - 10.22.165.247/32   # gdoop-worker159.snc1
+      - 10.22.174.151/32   # gdoop-worker160.snc1
+      - 10.22.165.139/32   # gdoop-worker161.snc1
+      - 10.22.165.92/32   # gdoop-worker162.snc1
+      - 10.22.165.244/32   # gdoop-worker163.snc1
+      - 10.22.175.86/32   # gdoop-worker164.snc1
+      - 10.22.173.77/32   # gdoop-worker165.snc1
+      - 10.22.174.106/32   # gdoop-worker166.snc1
+      - 10.22.175.191/32   # gdoop-worker167.snc1
+      - 10.22.176.107/32   # gdoop-worker168.snc1
+      - 10.22.176.113/32   # gdoop-worker169.snc1
+      - 10.22.176.116/32   # gdoop-worker170.snc1
+      - 10.22.176.123/32   # gdoop-worker171.snc1
+      - 10.22.176.13/32   # gdoop-worker172.snc1
+      - 10.22.176.144/32   # gdoop-worker173.snc1
+      - 10.22.176.156/32   # gdoop-worker174.snc1
+      - 10.22.176.164/32   # gdoop-worker175.snc1
+      - 10.22.176.180/32   # gdoop-worker176.snc1
+      - 10.22.176.184/32   # gdoop-worker177.snc1
+      - 10.22.176.226/32   # gdoop-worker178.snc1
+      - 10.22.163.177/32   # gdoop-worker179.snc1
+      - 10.22.164.34/32   # gdoop-worker180.snc1
+      - 10.22.165.221/32   # gdoop-worker181.snc1
+      - 10.22.165.225/32   # gdoop-worker182.snc1
+      - 10.22.165.239/32   # gdoop-worker183.snc1
+      - 10.22.165.242/32   # gdoop-worker184.snc1
+      - 10.22.165.248/32   # gdoop-worker185.snc1
+      - 10.22.165.27/32   # gdoop-worker186.snc1
+      - 10.22.165.48/32   # gdoop-worker187.snc1
+      - 10.22.165.6/32   # gdoop-worker188.snc1
+      - 10.22.165.61/32   # gdoop-worker189.snc1
+      - 10.22.165.65/32   # gdoop-worker190.snc1
+      - 10.22.165.72/32   # gdoop-worker191.snc1
+      - 10.22.177.97/32   # gdoop-worker192.snc1
+      - 10.22.166.246/32   # gdoop-worker193.snc1
+      - 10.22.177.212/32   # gdoop-worker194.snc1
+      - 10.22.166.118/32   # gdoop-worker195.snc1
+      - 10.22.177.222/32   # gdoop-worker196.snc1
+      - 10.22.166.46/32   # gdoop-worker197.snc1
+      - 10.22.166.70/32   # gdoop-worker198.snc1
+      - 10.22.177.25/32   # gdoop-worker199.snc1
+      - 10.22.166.23/32   # gdoop-worker200.snc1
+      - 10.22.166.86/32   # gdoop-worker201.snc1
+      - 10.22.177.128/32   # gdoop-worker202.snc1
+      - 10.22.166.238/32   # gdoop-worker203.snc1
+      - 10.22.177.220/32   # gdoop-worker204.snc1
+      - 10.22.166.26/32   # gdoop-worker205.snc1
+      - 10.22.177.233/32   # gdoop-worker206.snc1
+      - 10.22.177.20/32   # gdoop-worker207.snc1
+      - 10.22.166.111/32   # gdoop-worker208.snc1
+      - 10.22.177.89/32   # gdoop-worker209.snc1
+      - 10.22.177.11/32   # gdoop-worker210.snc1
+      - 10.22.166.196/32   # gdoop-worker211.snc1
+      - 10.22.165.62/32   # gdoop-worker212.snc1
+      - 10.22.177.164/32   # gdoop-worker213.snc1
+      - 10.22.166.101/32   # gdoop-worker214.snc1
+      - 10.22.168.24/32   # gdoop-worker215.snc1
+      - 10.22.179.11/32   # gdoop-worker216.snc1
+      - 10.22.178.27/32   # gdoop-worker217.snc1
+      - 10.22.167.27/32   # gdoop-worker218.snc1
+      - 10.22.180.12/32   # gdoop-worker219.snc1
+      - 10.22.169.25/32   # gdoop-worker220.snc1
+      - 10.22.177.36/32   # gdoop-worker221.snc1
+      - 10.22.166.33/32   # gdoop-worker222.snc1
+      - 10.22.168.5/32   # gdoop-worker223.snc1
+      - 10.22.179.7/32   # gdoop-worker224.snc1
+      - 10.22.178.40/32   # gdoop-worker225.snc1
+      - 10.22.167.36/32   # gdoop-worker226.snc1
+      - 10.22.180.16/32   # gdoop-worker227.snc1
+      - 10.22.169.29/32   # gdoop-worker228.snc1
+      - 10.22.177.39/32   # gdoop-worker229.snc1
+      - 10.22.166.43/32   # gdoop-worker230.snc1
+      - 10.22.168.11/32   # gdoop-worker231.snc1
+      - 10.22.179.4/32   # gdoop-worker232.snc1
+      - 10.22.178.32/32   # gdoop-worker233.snc1
+      - 10.22.167.42/32   # gdoop-worker234.snc1
+      - 10.22.180.29/32   # gdoop-worker235.snc1
+      - 10.22.169.27/32   # gdoop-worker236.snc1
+      - 10.22.177.35/32   # gdoop-worker237.snc1
+      - 10.22.166.34/32   # gdoop-worker238.snc1
+      - 10.22.168.12/32   # gdoop-worker239.snc1
+      - 10.22.179.13/32   # gdoop-worker240.snc1
+      - 10.22.178.31/32   # gdoop-worker241.snc1
+      - 10.22.167.38/32   # gdoop-worker242.snc1
+      - 10.22.180.18/32   # gdoop-worker243.snc1
+      - 10.22.169.18/32   # gdoop-worker244.snc1
+      - 10.22.177.42/32   # gdoop-worker245.snc1
+      - 10.22.166.37/32   # gdoop-worker246.snc1
+      - 10.22.168.6/32   # gdoop-worker247.snc1
+      - 10.22.179.8/32   # gdoop-worker248.snc1
+      - 10.22.178.16/32   # gdoop-worker249.snc1
+      - 10.22.167.33/32   # gdoop-worker250.snc1
+      - 10.22.180.22/32   # gdoop-worker251.snc1
+      - 10.22.169.21/32   # gdoop-worker252.snc1
+      - 10.22.177.33/32   # gdoop-worker253.snc1
+      - 10.22.166.36/32   # gdoop-worker254.snc1
+      - 10.22.168.32/32   # gdoop-worker255.snc1
+      - 10.22.179.12/32   # gdoop-worker256.snc1
+      - 10.22.178.24/32   # gdoop-worker257.snc1
+      - 10.22.167.24/32   # gdoop-worker258.snc1
+      - 10.22.180.28/32   # gdoop-worker259.snc1
+      - 10.22.169.23/32   # gdoop-worker260.snc1
+      - 10.22.168.9/32   # gdoop-worker261.snc1
+      - 10.22.179.19/32   # gdoop-worker262.snc1
+      - 10.22.178.20/32   # gdoop-worker263.snc1
+      - 10.22.167.37/32   # gdoop-worker264.snc1
+      - 10.22.180.30/32   # gdoop-worker265.snc1
+      - 10.22.169.22/32   # gdoop-worker266.snc1
+      - 10.22.168.35/32   # gdoop-worker267.snc1
+      - 10.22.179.28/32   # gdoop-worker268.snc1
+      - 10.22.178.30/32   # gdoop-worker269.snc1
+      - 10.22.167.26/32   # gdoop-worker270.snc1
+      - 10.22.180.25/32   # gdoop-worker271.snc1
+      - 10.22.169.24/32   # gdoop-worker272.snc1
+      - 10.22.168.8/32   # gdoop-worker273.snc1
+      - 10.22.179.16/32   # gdoop-worker274.snc1
+      - 10.22.178.12/32   # gdoop-worker275.snc1
+      - 10.22.167.5/32   # gdoop-worker276.snc1
+      - 10.22.180.26/32   # gdoop-worker277.snc1
+      - 10.22.169.11/32   # gdoop-worker278.snc1
+      - 10.22.168.15/32   # gdoop-worker279.snc1
+      - 10.22.179.40/32   # gdoop-worker280.snc1
+      - 10.22.178.25/32   # gdoop-worker281.snc1
+      - 10.22.167.6/32   # gdoop-worker282.snc1
+      - 10.22.180.24/32   # gdoop-worker283.snc1
+      - 10.22.169.20/32   # gdoop-worker284.snc1
+      - 10.22.168.22/32   # gdoop-worker285.snc1
+      - 10.22.179.25/32   # gdoop-worker286.snc1
+      - 10.22.178.34/32   # gdoop-worker287.snc1
+      - 10.22.167.14/32   # gdoop-worker288.snc1
+      - 10.22.180.23/32   # gdoop-worker289.snc1
+      - 10.22.169.12/32   # gdoop-worker290.snc1
+      - 10.22.168.26/32   # gdoop-worker291.snc1
+      - 10.22.179.9/32   # gdoop-worker292.snc1
+      - 10.22.178.9/32   # gdoop-worker293.snc1
+      - 10.22.167.28/32   # gdoop-worker294.snc1
+      - 10.22.180.17/32   # gdoop-worker295.snc1
+      - 10.22.169.14/32   # gdoop-worker296.snc1
+      - 10.22.168.37/32   # gdoop-worker297.snc1
+      - 10.22.179.32/32   # gdoop-worker298.snc1
+      - 10.22.178.7/32   # gdoop-worker299.snc1
+      - 10.22.167.7/32   # gdoop-worker300.snc1
+      - 10.22.180.15/32   # gdoop-worker301.snc1
+      - 10.22.168.4/32   # gdoop-worker302.snc1
+      - 10.22.179.22/32   # gdoop-worker303.snc1
+      - 10.22.178.4/32   # gdoop-worker304.snc1
+      - 10.22.167.4/32   # gdoop-worker305.snc1
+      - 10.22.168.20/32   # gdoop-worker306.snc1
+      - 10.22.179.21/32   # gdoop-worker307.snc1
+      - 10.22.178.6/32   # gdoop-worker308.snc1
+      - 10.22.167.8/32   # gdoop-worker309.snc1
+      - 10.22.168.7/32   # gdoop-worker310.snc1
+      - 10.22.179.6/32   # gdoop-worker311.snc1
+      - 10.22.178.10/32   # gdoop-worker312.snc1
+      - 10.22.167.11/32   # gdoop-worker313.snc1
+      - 10.22.169.32/32   # gdoop-worker314.snc1
+      - 10.22.181.172/32   # gdoop-worker315.snc1
+      - 10.22.181.126/32   # gdoop-worker316.snc1
+      - 10.22.181.195/32   # gdoop-worker317.snc1
+      - 10.22.181.20/32   # gdoop-worker318.snc1
+      - 10.22.181.246/32   # gdoop-worker319.snc1
+      - 10.22.181.60/32   # gdoop-worker320.snc1
+      - 10.22.181.27/32   # gdoop-worker321.snc1
+      - 10.22.181.67/32   # gdoop-worker322.snc1
+      - 10.22.181.179/32   # gdoop-worker323.snc1
+      - 10.22.181.215/32   # gdoop-worker324.snc1
+      - 10.22.181.184/32   # gdoop-worker325.snc1
+      - 10.22.181.33/32   # gdoop-worker326.snc1
+      - 10.22.181.24/32   # gdoop-worker327.snc1
+      - 10.22.181.5/32   # gdoop-worker328.snc1
+      - 10.22.181.72/32   # gdoop-worker329.snc1
+      - 10.22.170.210/32   # gdoop-worker330.snc1
+      - 10.22.180.111/32   # gdoop-worker331.snc1
+      - 10.22.169.117/32   # gdoop-worker332.snc1
+      - 10.22.171.149/32   # gdoop-worker333.snc1
+      - 10.22.166.149/32   # gdoop-worker334.snc1
+      - 10.22.168.149/32   # gdoop-worker335.snc1
+      - 10.22.165.56/32   # gdoop-worker336.snc1
+      - 10.22.174.149/32   # gdoop-worker337.snc1
+      - 10.22.167.149/32   # gdoop-worker338.snc1
+      - 10.22.179.149/32   # gdoop-worker339.snc1
+      - 10.22.164.149/32   # gdoop-worker340.snc1
+      - 10.22.175.149/32   # gdoop-worker341.snc1
+      - 10.22.163.149/32   # gdoop-worker342.snc1
+      - 10.22.160.148/32   # gdoop-worker343.snc1
+      - 10.22.177.149/32   # gdoop-worker344.snc1
+      - 10.22.176.149/32   # gdoop-worker345.snc1
+      - 10.22.172.148/32   # gdoop-worker346.snc1
+      - 10.22.178.149/32   # gdoop-worker347.snc1
+      - 10.22.173.149/32   # gdoop-worker348.snc1
+      - 10.22.161.149/32   # gdoop-worker349.snc1
+      - 10.22.162.183/32   # gdoop-worker350.snc1
+      - 10.22.170.158/32   # gdoop-worker351.snc1
+      - 10.22.180.96/32   # gdoop-worker352.snc1
+      - 10.22.169.246/32   # gdoop-worker353.snc1
+      - 10.22.170.94/32   # gdoop-worker354.snc1
+      - 10.22.180.59/32   # gdoop-worker355.snc1
+      - 10.22.169.63/32   # gdoop-worker356.snc1
+      - 10.22.170.209/32   # gdoop-worker357.snc1
+      - 10.22.180.80/32   # gdoop-worker358.snc1
+      - 10.22.169.173/32   # gdoop-worker359.snc1
+      - 10.22.170.141/32   # gdoop-worker360.snc1
+      - 10.22.170.136/32   # gdoop-worker361.snc1
+      - 10.22.170.152/32   # gdoop-worker362.snc1
+      - 10.22.170.195/32   # gdoop-worker363.snc1
+      - 10.22.170.199/32   # gdoop-worker364.snc1
+      - 10.22.170.175/32   # gdoop-worker365.snc1
+      - 10.22.170.82/32   # gdoop-worker366.snc1
+      - 10.22.170.65/32   # gdoop-worker367.snc1
+      - 10.22.170.160/32   # gdoop-worker368.snc1
+      - 10.22.170.170/32   # gdoop-worker369.snc1
+      - 10.22.170.131/32   # gdoop-worker370.snc1
+      - 10.22.170.187/32   # gdoop-worker371.snc1
+      - 10.22.170.16/32   # gdoop-worker372.snc1
+      - 10.22.162.45/32   # gdoop-worker373.snc1
+      - 10.22.164.47/32   # gdoop-worker374.snc1
+      - 10.22.167.47/32   # gdoop-worker375.snc1
+      - 10.22.165.46/32   # gdoop-worker376.snc1
+      - 10.22.161.47/32   # gdoop-worker377.snc1
+      - 10.22.172.46/32   # gdoop-worker378.snc1
+      - 10.22.168.47/32   # gdoop-worker379.snc1
+      - 10.22.163.47/32   # gdoop-worker380.snc1
+      - 10.22.169.42/32   # gdoop-worker381.snc1
+      - 10.22.160.45/32   # gdoop-worker382.snc1
+      - 10.22.166.47/32   # gdoop-worker383.snc1
+      - 10.22.171.46/32   # gdoop-worker384.snc1
+      - 10.22.170.15/32   # gdoop-worker385.snc1
+      - 10.22.181.46/32   # gdoop-worker386.snc1
+      - 10.22.160.41/32   # gdoop-worker387.snc1
+      - 10.22.172.43/32   # gdoop-worker388.snc1
+      - 10.22.177.43/32   # gdoop-worker389.snc1
+      - 10.22.176.43/32   # gdoop-worker390.snc1
+      - 10.22.173.39/32   # gdoop-worker391.snc1
+      - 10.22.170.12/32   # gdoop-worker392.snc1
+      - 10.22.168.43/32   # gdoop-worker393.snc1
+      - 10.22.174.43/32   # gdoop-worker394.snc1
+      - 10.22.178.45/32   # gdoop-worker395.snc1
+      - 10.22.179.44/32   # gdoop-worker396.snc1
+      - 10.22.167.43/32   # gdoop-worker397.snc1
+      - 10.22.171.42/32   # gdoop-worker398.snc1
+      - 10.22.180.38/32   # gdoop-worker399.snc1
+      - 10.22.169.37/32   # gdoop-worker400.snc1
+      - 10.22.161.43/32   # gdoop-worker401.snc1
+      - 10.22.164.43/32   # gdoop-worker402.snc1
+      - 10.22.166.41/32   # gdoop-worker403.snc1
+      - 10.22.162.42/32   # gdoop-worker404.snc1
+      - 10.22.175.44/32   # gdoop-worker405.snc1
+      - 10.22.165.43/32   # gdoop-worker406.snc1
+      - 10.22.163.44/32   # gdoop-worker407.snc1
+      - 10.22.181.43/32   # gdoop-worker408.snc1
+      - 10.22.160.42/32   # gdoop-worker409.snc1
+      - 10.22.172.42/32   # gdoop-worker410.snc1
+      - 10.22.177.45/32   # gdoop-worker411.snc1
+      - 10.22.176.45/32   # gdoop-worker412.snc1
+      - 10.22.173.42/32   # gdoop-worker413.snc1
+      - 10.22.170.11/32   # gdoop-worker414.snc1
+      - 10.22.168.44/32   # gdoop-worker415.snc1
+      - 10.22.174.44/32   # gdoop-worker416.snc1
+      - 10.22.178.43/32   # gdoop-worker417.snc1
+      - 10.22.179.39/32   # gdoop-worker418.snc1
+      - 10.22.167.44/32   # gdoop-worker419.snc1
+      - 10.22.171.43/32   # gdoop-worker420.snc1
+      - 10.22.180.37/32   # gdoop-worker421.snc1
+      - 10.22.169.38/32   # gdoop-worker422.snc1
+      - 10.22.161.42/32   # gdoop-worker423.snc1
+      - 10.22.164.44/32   # gdoop-worker424.snc1
+      - 10.22.166.42/32   # gdoop-worker425.snc1
+      - 10.22.162.41/32   # gdoop-worker426.snc1
+      - 10.22.175.43/32   # gdoop-worker427.snc1
+      - 10.22.165.42/32   # gdoop-worker428.snc1
+      - 10.22.181.41/32   # gdoop-worker429.snc1
+      - 10.22.181.45/32   # gdoop-worker430.snc1
+      - 10.22.175.45/32   # gdoop-worker431.snc1
+      - 10.22.178.44/32   # gdoop-worker432.snc1
+      - 10.22.181.44/32   # gdoop-worker433.snc1
+      - 10.22.176.44/32   # gdoop-worker434.snc1
+      - 10.22.163.43/32   # gdoop-worker435.snc1
+      - 10.22.177.44/32   # gdoop-worker436.snc1
+      - 10.22.179.45/32   # gdoop-worker437.snc1
+      - 10.22.173.43/32   # gdoop-worker438.snc1
+      - 10.22.174.45/32   # gdoop-worker439.snc1
+      - 10.22.180.39/32   # gdoop-worker440.snc1
+      - 10.24.55.46/32   # gdoop-worker441.snc1
+      - 10.24.91.39/32   # gdoop-worker442.snc1
+      - 10.24.34.41/32   # gdoop-worker443.snc1
+      - 10.24.138.27/32   # gdoop-worker444.snc1
+      - 10.24.95.38/32   # gdoop-worker445.snc1
+      - 10.24.35.40/32   # gdoop-worker446.snc1
+      - 10.24.77.47/32   # gdoop-worker447.snc1
+      - 10.24.76.46/32   # gdoop-worker448.snc1
+      - 10.24.157.46/32   # gdoop-worker449.snc1
+      - 10.24.131.22/32   # gdoop-worker450.snc1
+      - 10.24.61.51/32   # gdoop-worker451.snc1
+      - 10.24.55.41/32   # gdoop-worker452.snc1
+      - 10.24.91.42/32   # gdoop-worker453.snc1
+      - 10.24.34.49/32   # gdoop-worker454.snc1
+      - 10.24.138.34/32   # gdoop-worker455.snc1
+      - 10.24.95.43/32   # gdoop-worker456.snc1
+      - 10.24.35.41/32   # gdoop-worker457.snc1
+      - 10.24.77.45/32   # gdoop-worker458.snc1
+      - 10.24.76.49/32   # gdoop-worker459.snc1
+      - 10.24.157.42/32   # gdoop-worker460.snc1
+      - 10.24.131.18/32   # gdoop-worker461.snc1
+      - 10.24.61.52/32   # gdoop-worker462.snc1
+      - 10.24.55.43/32   # gdoop-worker463.snc1
+      - 10.24.91.45/32   # gdoop-worker464.snc1
+      - 10.24.34.39/32   # gdoop-worker465.snc1
+      - 10.24.138.26/32   # gdoop-worker466.snc1
+      - 10.24.95.46/32   # gdoop-worker467.snc1
+      - 10.24.35.42/32   # gdoop-worker468.snc1
+      - 10.24.77.43/32   # gdoop-worker469.snc1
+      - 10.24.76.45/32   # gdoop-worker470.snc1
+      - 10.24.157.44/32   # gdoop-worker471.snc1
+      - 10.24.55.48/32   # gdoop-worker472.snc1
+      - 10.24.91.46/32   # gdoop-worker473.snc1
+      - 10.24.34.47/32   # gdoop-worker474.snc1
+      - 10.24.138.28/32   # gdoop-worker475.snc1
+      - 10.24.95.48/32   # gdoop-worker476.snc1
+      - 10.24.35.48/32   # gdoop-worker477.snc1
+      - 10.24.77.44/32   # gdoop-worker478.snc1
+      - 10.24.76.47/32   # gdoop-worker479.snc1
+      - 10.24.157.41/32   # gdoop-worker480.snc1
+      - 10.24.55.47/32   # gdoop-worker481.snc1
+      - 10.24.91.47/32   # gdoop-worker482.snc1
+      - 10.24.34.43/32   # gdoop-worker483.snc1
+      - 10.24.138.25/32   # gdoop-worker484.snc1
+      - 10.24.69.250/32   # gdoop-worker485.snc1
+      - 10.24.67.215/32   # gdoop-worker486.snc1
+      - 10.24.131.226/32   # gdoop-worker487.snc1
+      - 10.24.76.131/32   # gdoop-worker488.snc1
+      - 10.24.111.152/32   # gdoop-worker489.snc1
+      - 10.24.159.239/32   # gdoop-worker490.snc1
+      - 10.24.107.180/32   # gdoop-worker491.snc1
+      - 10.24.77.91/32   # gdoop-worker492.snc1
+      - 10.24.43.237/32   # gdoop-worker493.snc1
+      - 10.24.61.84/32   # gdoop-worker494.snc1
+      - 10.24.108.95/32   # gdoop-worker495.snc1
+      - 10.24.138.248/32   # gdoop-worker496.snc1
+      - 10.24.85.198/32   # gdoop-worker497.snc1
+      - 10.24.95.228/32   # gdoop-worker498.snc1
+      - 10.24.63.253/32   # gdoop-worker499.snc1
+      - 10.24.91.126/32   # gdoop-worker500.snc1
+      - 10.24.109.113/32   # gdoop-worker501.snc1
+      - 10.24.128.188/32   # gdoop-worker502.snc1
+      - 10.24.110.76/32   # gdoop-worker503.snc1
+      - 10.24.68.64/32   # gdoop-worker504.snc1
+      - 10.24.33.235/32   # gdoop-worker505.snc1
+      - 10.24.106.111/32   # gdoop-worker506.snc1
+      - 10.24.34.146/32   # gdoop-worker507.snc1
+      - 10.24.90.171/32   # gdoop-worker508.snc1
+      - 10.24.157.125/32   # gdoop-worker509.snc1
+      - 10.24.55.77/32   # gdoop-worker510.snc1
+      - 10.24.137.210/32   # gdoop-worker511.snc1
+      - 10.24.35.233/32   # gdoop-worker512.snc1
+      - 10.24.66.129/32   # gdoop-worker513.snc1
+      - 10.24.69.101/32   # gdoop-worker514.snc1
+      - 10.24.67.78/32   # gdoop-worker515.snc1
+      - 10.24.131.80/32   # gdoop-worker516.snc1
+      - 10.24.76.165/32   # gdoop-worker517.snc1
+      - 10.24.111.252/32   # gdoop-worker518.snc1
+      - 10.24.159.188/32   # gdoop-worker519.snc1
+      - 10.24.107.149/32   # gdoop-worker520.snc1
+      - 10.24.77.216/32   # gdoop-worker521.snc1
+      - 10.24.43.234/32   # gdoop-worker522.snc1
+      - 10.24.61.180/32   # gdoop-worker523.snc1
+      - 10.24.108.113/32   # gdoop-worker524.snc1
+      - 10.24.138.196/32   # gdoop-worker525.snc1
+      - 10.24.85.97/32   # gdoop-worker526.snc1
+      - 10.24.95.124/32   # gdoop-worker527.snc1
+      - 10.24.63.160/32   # gdoop-worker528.snc1
+      - 10.24.91.73/32   # gdoop-worker529.snc1
+      - 10.24.109.74/32   # gdoop-worker530.snc1
+      - 10.24.128.214/32   # gdoop-worker531.snc1
+      - 10.24.110.62/32   # gdoop-worker532.snc1
+      - 10.24.68.137/32   # gdoop-worker533.snc1
+      - 10.24.33.76/32   # gdoop-worker534.snc1
+      - 10.24.106.233/32   # gdoop-worker535.snc1
+      - 10.24.34.120/32   # gdoop-worker536.snc1
+      - 10.24.90.241/32   # gdoop-worker537.snc1
+      - 10.24.157.107/32   # gdoop-worker538.snc1
+      - 10.24.55.249/32   # gdoop-worker539.snc1
+      - 10.24.137.87/32   # gdoop-worker540.snc1
+      - 10.24.35.178/32   # gdoop-worker541.snc1
+      - 10.24.66.159/32   # gdoop-worker542.snc1
+      - 10.24.69.214/32   # gdoop-worker543.snc1
+      - 10.24.67.207/32   # gdoop-worker544.snc1
+      - 10.24.131.71/32   # gdoop-worker545.snc1
+      - 10.24.91.89/32   # gdoop-worker561.snc1
+      - 10.24.138.81/32   # gdoop-worker562.snc1
+      - 10.32.88.3/32   # gdoop-worker101.sac1
+      - 10.32.247.80/32   # gdoop-worker102.sac1
+      - 10.32.88.4/32   # gdoop-worker103.sac1
+      - 10.32.247.81/32   # gdoop-worker104.sac1
+      - 10.32.88.5/32   # gdoop-worker105.sac1
+      - 10.32.88.7/32   # gdoop-worker106.sac1
+      - 10.32.88.8/32   # gdoop-worker107.sac1
+      - 10.20.112.109/32   # gdoop-job-submitter1.snc1
+      - 10.22.81.222/32   # gdoop-job-submitter2.snc1
+      - 10.20.71.185/32   # gdoop-job-submitter3.snc1
+      - 10.20.71.35/32   # gdoop-job-submitter4.snc1
+      - 10.20.71.152/32   # gdoop-job-submitter5.snc1
+      - 10.24.34.45/32   # gdoop-hbase-worker1.snc1
+      - 10.24.95.49/32   # gdoop-hbase-worker2.snc1
+      - 10.24.35.60/32   # gdoop-hbase-worker3.snc1
+      - 10.24.138.24/32   # gdoop-hbase-worker4.snc1
+      - 10.24.55.40/32   # gdoop-hbase-worker5.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20099
+      pgbouncer_session: 20100
+      postgresql_raw: 20101
+    extra_variables:
+  jira_uat: # GDS-21167
+    type: postgresql
+    dbnames:
+      - jira_uat
+    schemas:
+      jira_uat:
+        - atl_jira
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60035
+    master_vip: 10.23.38.83
+    slave_vips:
+      - 10.23.39.83
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.38.93/32  # jira-n1.snc1
+      - 10.22.150.29/32 # jira-n2.snc1
+      - 10.22.237.143/32  # prodsa-tools1.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: jira_uat_dba
+    app_account_name: jira_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.38.93/32  # jira-n1.snc1
+      - 10.22.150.29/32 # jira-n2.snc1
+      - 10.22.237.143/32  # prodsa-tools1.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20102
+      pgbouncer_session: 20103
+      postgresql_raw: 20104
+    extra_variables:
+  seo_auto_indexer_uat: # GDS-24707
+    type: postgresql
+    dbnames:
+      - seo_auto_indexer_uat
+    schemas:
+      seo_auto_indexer_uat:
+        - seo_auto_indexer
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60036
+    master_vip: 10.23.38.84
+    slave_vips:
+      - 10.23.39.84
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.23.92.169/32   # goods-seo-autoindexer-app1-uat.snc1
+      - 10.221.62.0/20  # GDS-24941
+    dba_account_name: seo_auto_indexer_uat_dba
+    app_account_name: seo_auto_indexer_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.23.92.169/32   # goods-seo-autoindexer-app1-uat.snc1
+      - 10.221.62.0/20   # GDS-24941
+    ports:
+      pgbouncer_txn: 20105
+      pgbouncer_session: 20106
+      postgresql_raw: 20107
+    extra_variables:
+  customfieldsval_uat: # GDS-24919
+    type: postgresql
+    dbnames:
+      - customfieldsval_uat
+    schemas:
+      customfieldsval_uat:
+        - customfieldsval
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60037
+    master_vip: 10.23.38.85
+    slave_vips:
+      - 10.23.39.85
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.23.29.129/32   # custom-fields-app1-uat.snc1
+    dba_account_name: customfieldsval_uat_dba
+    app_account_name: customfieldsval_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.23.29.129/32   # custom-fields-app1-uat.snc1
+    ports:
+      pgbouncer_txn: 20108
+      pgbouncer_session: 20109
+      postgresql_raw: 20110
+    extra_variables:
+  #geekon_uat: # GDS-26936 #Decom #GDS-33927
+  pctest_uat: # GDS-27766
+    type: postgresql
+    dbnames:
+      - pctest_uat
+    schemas:
+      pctest_uat:
+        - pctest
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60039
+    master_vip: 10.23.38.87
+    slave_vips:
+      - 10.23.39.87
+    replication_ips:
+      - 10.23.106.36 # gds-snc1-uat-db028m1.snc1
+      - 10.23.94.22 # gds-snc1-uat-db028s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: pctest_uat_dba
+    app_account_name: pctest_uat_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20114
+      pgbouncer_session: 20115
+      postgresql_raw: 20116
+    extra_variables:

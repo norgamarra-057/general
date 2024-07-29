@@ -1,0 +1,27 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Copy script1
+      template:
+        src: ../../plays/postgres/files/list_pg_instances.j2
+        dest: "/usr/local/sbin/list_pg_instances"
+        owner: root
+        group: wheel
+        mode: 0655
+    - name: Copy script2
+      copy:
+        src: ../../plays/postgres/files/find_pg_stats
+        dest: "/usr/local/sbin/find_pg_stats"
+        owner: root
+        group: wheel
+        mode: 0655
+    - name: Copy new perl script
+      copy:
+        src: ../../roles/check_mk/files/locals/postgresql/custom/check_postgres_new.pl
+        dest: "/usr/local/bin/"
+        owner: root
+        group: wheel
+        mode: 0655

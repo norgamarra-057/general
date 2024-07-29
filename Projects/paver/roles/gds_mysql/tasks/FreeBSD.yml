@@ -1,0 +1,23 @@
+- include_tasks: facts.yml
+  tags:
+    - mysql-config
+- include_tasks: gds_facts.yml
+  tags:
+    - mysql-config
+- include_tasks: zfs.yml
+- include_tasks: packages.yml
+- include_tasks: install.yml
+- include_tasks: runit.yml
+- include_tasks: after_install.yml
+- include_tasks: pt_heartbeat.yml
+- include_tasks: monitoring.yml
+- include_tasks: fulltext.yml
+- include_tasks: playback.yml
+- include_tasks: mysql_sys.yml
+  tags:
+    - gds_mysql
+    - mysql-sys
+    - sys-schema
+#- include_tasks: vip.yml
+#  tags:
+#    - vip

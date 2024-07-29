@@ -1,0 +1,12 @@
+---
+- set_fact: is_ro_master=false
+  when: is_ro_master is undefined
+
+- name: Deploy mysql check_mk configuration
+  template:
+    src: mysql.cfg.j2
+    dest: /etc/check_mk/mysql.cfg
+    mode: 0644
+    owner: root
+    group: wheel
+

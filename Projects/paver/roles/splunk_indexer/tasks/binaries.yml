@@ -1,0 +1,29 @@
+#- name: splunk | binaries | stop splunkd service
+#  service: 
+#    name=splunkd
+#    state=stopped 
+#    enabled=no
+
+#- name: splunk | binaries | stop splunkweb service
+#  service: 
+#    name=splunkweb
+#    state=stopped 
+#    enabled=no
+
+#- name: splunk | binaries | get tgz with fbsd-binaries (6.1.2)
+#  copy:
+#    dest="/tmp/splunk-6.1.2-213098-FreeBSD7-amd64.tgz"
+#    src="../ansible/splunk-6.1.2-213098-FreeBSD7-amd64.tgz"
+
+- name: splunk | binaries | get tgz with fbsd-binaries (5.0.5)
+  copy:
+    dest="/tmp/splunk-5.0.5-179365-FreeBSD7-amd64.tgz"
+    src="../ansible/splunk-5.0.5-179365-FreeBSD7-amd64.tgz"
+
+#- name: splunk | binaries | uncompress fbsd-binaries (6.1.2)
+#  shell: sudo -u splunk tar -zxvf /tmp/splunk-6.1.2-213098-FreeBSD7-amd64.tgz -C /var/groupon
+#    creates="/var/groupon/splunk/splunk-6.1.2-213098-FreeBSD7-amd64-manifest"
+
+- name: splunk | binaries | uncompress fbsd-binaries (5.05)
+  shell: sudo -u splunk tar -zxvf /tmp/splunk-5.0.5-179365-FreeBSD7-amd64.tgz -C /var/groupon
+    creates="/var/groupon/splunk/splunk-5.0.5-179365-FreeBSD7-amd64-manifest"

@@ -1,0 +1,1 @@
+table <gds-replication-peers> persist file "/etc/pf.conf.d/tables/gds-replication-peers.table"

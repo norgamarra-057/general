@@ -1,0 +1,16 @@
+### -*- mode: conf; -*-
+
+# Basic inventory for new boxes
+
+[gds_new]
+# empty
+
+[gds_all:children]
+gds_new
+
+[FreeBSD:children]
+gds_new
+
+[FreeBSD:vars]
+ansible_python_interpreter=/usr/local/bin/python2.7
+

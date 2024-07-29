@@ -1,0 +1,17 @@
+###############################################################
+#  REPLICATION(READ) ONLY CLUSTER
+############################################################### 
+---
+gds_carp_peers:
+  - 10.14.189.224  # gds-dub1-prod-db013m1
+  - 10.14.189.225  # gds-dub1-prod-db013s1
+  - 10.14.82.224  # gds-dub1-prod-db013m1
+  - 10.14.82.225  # gds-dub1-prod-db013s1
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+gds_instance_group: gds_prod_dub1_db013
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+##  vis20_prod: # GDS-6059 # decomm'd GDS-34361

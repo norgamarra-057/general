@@ -1,0 +1,3 @@
+#!/bin/sh --
+QUERY="SELECT round(min(unix_timestamp(now()) - unix_timestamp(concat(substr(ts,1,10), ' ', substr(ts,12,8))))) as lag_sec FROM percona.heartbeat;"
+/usr/local/bin/mysql  -P {{ gds_instances[instance_name].ports.mysqld }} --socket=/var/groupon/percona/{{instance_name}}/mysql.sock -e "$QUERY" -s -N | awk '{ printf("repl_delay\tL\t%d\n",$1); }'

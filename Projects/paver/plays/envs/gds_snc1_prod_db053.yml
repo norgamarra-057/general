@@ -1,0 +1,9 @@
+---
+- hosts: gds_snc1_prod_db053
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: login_prod }
+  - { role: gds-mysql-ha, instance: travel_notif_prod }
+  - { role: gds-mysql-ha, instance: janus_prod }
+  - { role: gds-mysql-ha, instance: rocketman_v2_n_prod }

@@ -1,0 +1,5 @@
+---
+- hosts: monitoring_prod_splunk_indexers
+  become: yes
+  roles:
+    - splunk_indexer

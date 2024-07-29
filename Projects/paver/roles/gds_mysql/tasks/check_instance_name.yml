@@ -1,0 +1,14 @@
+---
+- name: Ensure instance name is defined
+  tags:
+    - instance_name_check
+  fail: msg='instance_name must be defined with the role'
+  when: instance_name is not defined
+  
+- name: Calculate instance name length
+  set_fact:
+     instance_name_length: "{{ instance_name|length }}"
+
+- name: Ensure instance name length is OK
+  fail: msg='instance name must not be longer than 22 chars'
+  when: instance_name_length < 22

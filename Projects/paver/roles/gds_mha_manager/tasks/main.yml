@@ -1,0 +1,17 @@
+---
+#- name: GDS MHA | manager | variable check
+#  fail: 'msg="Placeholder for variable checks"'
+#  when: ansible_hostname is not defined
+
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "../defaults/{{ ansible_os_family }}.yml"
+    - "../defaults/default.yml"
+
+- include_vars: derived_vars.yml
+
+- include_tasks: FreeBSD.yml
+  tags:
+    - mha
+    - mha-manager
+  when: ansible_os_family == 'FreeBSD'

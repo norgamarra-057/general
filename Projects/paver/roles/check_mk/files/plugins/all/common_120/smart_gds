@@ -1,0 +1,25 @@
+#!/usr/local/bin/bash
+#set -x
+# Only handle always updated values, add device path and vendor/model
+smartctl="$(which smartctl)"
+if $smartctl -h > /dev/null 2>&1 ; then
+
+    echo '<<<smart_gds>>>'
+    for D in `ls /dev/* | egrep "da[0-9]+$"`; do
+        [ "$D" != "${D%-part*}" ] && continue
+
+        TEMP=false
+        CMD_RESULT="$($smartctl -d auto -i -A $D)"
+        SERIAL="$(echo "$CMD_RESULT" | grep "Serial Number:" | awk '{print $3}')"
+        MODEL="$(echo "$CMD_RESULT" | grep -i "device model" | sed -e "s/.*:[ ]*//g" -e "s/\ /_/g")"
+
+        if echo "$CMD_RESULT" | egrep -q "^194(.*)Temperature(.*)"; then
+            TEMP=true
+            echo "$CMD_RESULT" | grep Always | egrep -v '^190(.*)Temperature(.*)' | sed "s|^|$D $MODEL $SERIAL |"
+        fi
+        if echo "$CMD_RESULT" | egrep -q "^190(.*)Temperature(.*)" && [ $TEMP == "false" ];then
+            echo "$CMD_RESULT" | grep Always | sed -e 's/^190 /194 /' | sed "s|^|$D $MODEL $SERIAL |"
+        fi
+        sleep 0.5
+    done 2>/dev/null
+fi

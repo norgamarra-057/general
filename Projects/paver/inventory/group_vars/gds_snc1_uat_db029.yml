@@ -1,0 +1,32 @@
+---
+gds_carp_peers:
+  - 10.23.38.254  # gds-snc1-uat-db029m1
+  - 10.23.38.255  # gds-snc1-uat-db029s1
+  - 10.23.39.254  # gds-snc1-uat-db029m1
+  - 10.23.39.255  # gds-snc1-uat-db029s1
+gds_carp_interfaces:
+  - vlan338
+  - vlan339
+gds_instance_group: gds_snc1_uat_db029
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  contract_service_uat: # GDS-14734
+#  service_portal_uat: # GDS-15134
+#  fast_uat: # GDS-15049
+#  samiam_uat: # GDS-15625
+#  getaways_geo_uat: # GDS-16089
+#  stores_uat: # GDS-16093
+#  geoplaces_uat: # GDS-16846
+#  jtier_dash_uat: # GDS-17119
+#  fingerprint_uat: # GDS-17290
+#  ad_inventory_uat: # GDS-17722
+#  gan_uat: # GDS-18187
+#  deal_book_uat: # GDS-18224
+#  glive_inventory_uat: # GDS-18226
+#  rele_airflow_uat: # GDS-18621
+#  merchant_market_uat: # GDS-21581
+
+#  case_mgmt_uat: # gds-23125
+
+#  gso_merch_success_uat: # gds-23778 - decommed 

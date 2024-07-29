@@ -1,0 +1,8 @@
+#!/bin/sh --
+QUERY="select datid, datname, numbackends, xact_commit, xact_rollback, blks_read, blks_hit, tup_returned, tup_fetched,tup_updated, tup_deleted, pg_database_size(datname) "datsize" from pg_stat_database where datname='{{ gds_instances[instance_name]['dbnames'][0] }}' ;"
+/usr/local/bin/psql -U postgres -At -p {{ gds_instances[instance_name].ports.postgresql_raw }} {{ gds_instances[instance_name]['dbnames'][0] }} -c "$QUERY" | awk -F '|' '{
+printf("id\tL\t%d\nname\ts\t%s\nnumbackends\tL\t%d\nxactCommit\tL\t%d\nxactRollback\tL\t%d\nblksRead\tL\t%d\nblksHit\tL\t%d\ntupReturned\tL\t%d\ntupFetched\tL\t%d\ntupUpdated\tL\t%d\ntupDeleted\tL\t%d\ndbSize\tL\t%d\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12); }'
+
+
+
+

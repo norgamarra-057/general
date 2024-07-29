@@ -1,0 +1,60 @@
+---
+- include_tasks: install_package.yml
+- include_tasks: monitord_runit.yml
+- include_tasks: plugins.yml
+
+
+- name: FreeBSD | templates | render Mysql monitord config
+  template:
+    src=../templates/monitord_config_mysql.conf.j2
+    dest=/var/groupon/monitord/config.yml
+    owner=monitord
+    group=_monitoring
+    mode=0444
+    backup=yes
+  when:  gds_monitor_cluster_type == "gds_mysql"
+  tags: configuration
+  notify:
+    - monitord_agent restart
+
+- name: FreeBSD | runit | render Postgresql monitord config
+  template:
+    src=../templates/monitord_config_postgres.conf.j2
+    dest=/var/groupon/monitord/config.yml
+    owner=monitord
+    group=_monitoring
+    mode=0444
+    backup=yes
+  when:  gds_monitor_cluster_type == "gds_postgresql"
+  tags: configuration
+  notify:
+    - monitord_agent restart
+
+- include_tasks: monitord_runit_aux.yml
+  when:  gds_monitor_cluster_type == "mix"
+
+- name: FreeBSD | templates | render Mysql monitord config
+  template:
+    src=../templates/monitord_config_mysql.conf.j2
+    dest=/var/groupon/monitord/config.yml
+    owner=monitord
+    group=_monitoring
+    mode=0444
+    backup=yes
+  when:  gds_monitor_cluster_type == "mix"
+  tags: configuration
+  notify:
+    - monitord_agent restart
+
+- name: FreeBSD | templates| render Postgresql monitord aux config
+  template:
+    src=../templates/monitord_config_postgres.conf.j2
+    dest=/var/groupon/monitord/config_aux.yml
+    owner=monitord
+    group=_monitoring
+    mode=0444
+    backup=yes
+  when:  gds_monitor_cluster_type == "mix"
+  tags: configuration
+  notify:
+    - monitord_agent_aux restart

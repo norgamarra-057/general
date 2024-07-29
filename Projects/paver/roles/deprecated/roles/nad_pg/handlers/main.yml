@@ -1,0 +1,6 @@
+---
+- name: nad_pg reload
+  command: /usr/local/sbin/sv hup {{ nad_pg_service_dir }}/
+
+- name: nad_pg log restart
+  command: /usr/local/sbin/sv hup "{{ nad_pg_service_dir }}/log/"

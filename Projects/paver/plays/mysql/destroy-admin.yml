@@ -1,0 +1,18 @@
+---
+# Removes MHA configuration for an instance
+
+- include: "{{ playbook_dir }}/../common/check-params.yml"
+
+- name: Clear MHA configuration
+  vars:
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - include: "{{ playbook_dir }}/tasks/facts.yml"
+
+    - name: Wipe MHA configuration
+      file:
+        name: "{{ mha_conf }}"
+        state: absent

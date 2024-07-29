@@ -1,0 +1,15 @@
+---
+- name: Check firewall (pf) status and error if down
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Obtain pf status
+      shell: "pfctl -si 2>&1 | awk '{if ($1 ~ /^Status/){ print $2 }}'"
+      register: pf_status
+      changed_when: false
+
+    - debug: var=pf_status.stdout
+
+    - name: Fail if of is not enabled
+      fail: msg='pf is not enabled on {{ ansible_fqdn }}'
+      when: pf_status.stdout != 'Enabled'

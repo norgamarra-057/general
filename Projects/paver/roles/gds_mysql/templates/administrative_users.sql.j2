@@ -1,0 +1,27 @@
+DELETE FROM mysql.user WHERE user = '';
+DELETE FROM mysql.user WHERE user = 'root' AND host != 'localhost';
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE db = 'test' OR db = 'test\_%';
+FLUSH PRIVILEGES;
+
+-- Grants for 'replication'@'%'
+GRANT REPLICATION CLIENT, REPLICATION SLAVE ON *.* TO 'replication'@'%' IDENTIFIED BY PASSWORD '*32A25C60D87B21B78A6D1DF4D86D4CAD59FBCB1D';
+-- Grants for 'monitor'@'127.0.0.1'
+GRANT CREATE TABLESPACE, PROCESS, SUPER ON *.* TO 'monitor'@'%' IDENTIFIED BY PASSWORD '*EB07D742C27580A80609208436C58066D56487BA';
+GRANT SELECT on percona.heartbeat TO 'monitor'@'%';
+-- Grants for 'dba_util'@'%'
+GRANT ALL PRIVILEGES ON *.* TO 'dba_util'@'%' IDENTIFIED BY PASSWORD '*02100A65644BDDB04BF2D4D651269E3FD127C2DD';
+-- Grants for 'dba_util'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO 'dba_util'@'localhost' IDENTIFIED BY PASSWORD '*02100A65644BDDB04BF2D4D651269E3FD127C2DD';
+-- Grants for 'pt_heartbeat'@'localhost'
+GRANT SUPER, REPLICATION CLIENT ON *.* TO 'pt_heartbeat'@'localhost' IDENTIFIED BY PASSWORD '*3D30143DCD49260B323EE8CFD1E1ED76B9E967E0';
+GRANT DELETE, INSERT, SELECT, UPDATE ON `percona`.* TO 'pt_heartbeat'@'localhost';
+-- FIXME(pboros@): restrict the MHA user's privileges
+-- Grants for 'gds_mha'@'%'
+GRANT ALL PRIVILEGES ON *.* TO 'gds_mha'@'%' IDENTIFIED BY PASSWORD '*A3AC3B68430B6A79776F0FDB55E5DA8B53A2ADE3';
+-- Grants for 'gds_mha'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO 'gds_mha'@'localhost' IDENTIFIED BY PASSWORD '*A3AC3B68430B6A79776F0FDB55E5DA8B53A2ADE3';
+-- Grants for 'playback_user'@'%'
+GRANT SELECT ON *.* TO 'playback_user'@'%' IDENTIFIED BY PASSWORD '*1C980587ADF12BF2645605D775A0E1D033C4BB2E';
+-- Grants for 'playback_user'@'localhost'
+GRANT SELECT ON *.* TO 'playback_user'@'localhost' IDENTIFIED BY PASSWORD '*1C980587ADF12BF2645605D775A0E1D033C4BB2E';

@@ -1,0 +1,11 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst -v \
+    -u splunk:splunk  \
+    -e /var/service/splunkd/env \
+  /var/groupon/splunk/bin/splunk \
+    --answer-yes \
+    --no-prompt \
+    start splunkd --nodaemon

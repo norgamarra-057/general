@@ -1,0 +1,5 @@
+# Ansible managed
+{{ item.value.master_vip }}/32
+{% for ip in item.value.slave_vips %}
+{{ ip }}/32
+{% endfor %}

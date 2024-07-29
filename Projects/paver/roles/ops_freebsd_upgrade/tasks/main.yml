@@ -1,0 +1,107 @@
+---
+# NOTE(seanc@): The following is useful if this Update script needs to be run
+# via chroot(2) (e.g. /mnt).
+#
+# - name: Update FreeBSD | src | devfs
+#   command: /sbin/mount -t devfs devfs /mnt/dev
+#   ignore_errors: True
+
+- assert: { that: "ansible_os_family == 'FreeBSD'" }
+
+- name: src | checkout 10-STABLE
+  command: /usr/bin/svnlite --non-interactive --trust-server-cert co -q -r {{ freebsd_version_number }} https://svn0.us-west.freebsd.org/base/stable/10/ /usr/src/
+
+- name: src | ZFS Patch | Copy
+  copy:
+    src: '{{ item }}'
+    dest: '/tmp/{{ item }}'
+    owner: root
+    group: wheel
+    mode: 0644
+  with_items: custom_kernel_patches
+
+- name: src | ZFS Patch | Apply
+  command: /usr/bin/patch -ENtp0 -i '/tmp/{{ item }}'
+  ignore_errors: True
+  with_items: custom_kernel_patches
+
+- name: src | make.conf
+  copy:
+    src: make.conf
+    dest: /etc/make.conf
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: src | src.conf
+  copy:
+    src: src.conf
+    dest: /etc/src.conf
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: src | KERNCONF
+  copy:
+    src: "{{ custom_kernel_name }}"
+    dest: "/usr/src/sys/amd64/conf/{{ custom_kernel_name }}"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: src | KERNCONF
+  lineinfile: dest=/etc/src.conf regexp=^KERNCONF= line="KERNCONF={{ custom_kernel_name }}"
+
+- name: src | buildworld
+  shell: "/bin/sh -c '/usr/bin/make -j{{ ansible_processor_count }} buildworld 2>&1 > /var/tmp/buildworld.log'"
+  args:
+    chdir: /usr/src
+
+- name: src | buildkernel
+  shell: "/bin/sh -c '/usr/bin/make -j{{ ansible_processor_count }} buildkernel 2>&1 > /var/tmp/buildkernel.log'"
+  args:
+    chdir: /usr/src
+
+- name: src | installkernel
+  shell: "/bin/sh -c '/usr/bin/make installkernel 2>&1 > /var/tmp/installkernel.log'"
+  args:
+    chdir: /usr/src
+
+- name: src | tzsetup | UTC
+  command: /usr/sbin/tzsetup -s UTC
+
+- name: src | mergemaster -p
+  shell: "/bin/sh -c '/usr/sbin/mergemaster -p 2>&1 > /var/tmp/mergemaster.log'"
+
+- name: src | mergemaster -a
+  shell: "/bin/sh -c '/usr/sbin/mergemaster -a 2>&1 >> /var/tmp/mergemaster.log'"
+
+- name: src | installworld
+  shell: "/bin/sh -c '/usr/bin/make -C /usr/src installworld 2>&1 > /var/tmp/installworld.log'"
+
+- name: src | delete-old
+  shell: "/bin/sh -c '/usr/bin/make -DBATCH_DELETE_OLD_FILES delete-old 2>&1 > /var/tmp/delete-old.log'"
+  args:
+    chdir: /usr/src
+
+- name: src | delete-old-libs
+  shell: "/bin/sh -c '/usr/bin/make -DBATCH_DELETE_OLD_FILES delete-old-libs 2>&1 > /var/tmp/delete-old-libs.log'"
+  args:
+    chdir: /usr/src
+
+- name: src | zpool upgrade | prepare
+  command: /sbin/sysctl -q kern.geom.debugflags=0x10
+
+- name: src | zpool upgrade | update zpool
+  command: /sbin/zpool upgrade -a
+
+# FIXME(seanc@): Is this always correct? Always ada0? This screams like it
+# should be a fact left behind from provisioning.
+- name: src | zpool upgrade | update bootloader
+  command: /sbin/gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 ada0
+
+- name: src | zpool upgrade | finalize
+  command: /sbin/sysctl -q kern.geom.debugflags=0
+
+- name: Update FreeBSD | src | mergemaster NEXT
+  debug: msg="To finish the mergemaster process, run /usr/sbin/mergemaster -iCUF"

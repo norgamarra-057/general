@@ -1,0 +1,21 @@
+---
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+
+- name: Ensure host level settings look OK
+  gather_facts: false
+  become: true
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Edit my.cnf and set innodb_buffer_pool_size to 1G
+      lineinfile: dest=/var/groupon/service/{{ item }}-mysql/my.cnf state=present regexp='^innodb_buffer_pool_size' line='innodb_buffer_pool_size         = 1000M' backup=yes
+      with_items: 
+        - "{{ gds_instances.keys() }}"
+      ignore_errors: true

@@ -1,0 +1,11 @@
+---
+- name: Deploy MySQL "checker" scripts
+  tags:
+    - mysql-scripts
+  copy:
+    dest: "/usr/local/sbin/{{ item }}"
+    src: "checkers/{{ item }}"
+    owner: "root"
+    group: "wheel"
+    mode: 0700
+  with_items: "{{ checker_scripts }}"

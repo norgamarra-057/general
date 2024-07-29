@@ -1,0 +1,27 @@
+---
+- name: Deploy /usr/local/bin/master_ip_failover_online
+  template:
+    src: master_ip_failover_online.j2
+    dest: "/usr/local/bin/master_ip_failover_online-{{ instance_name }}-{{ gds_instances[instance_name]['vhid'] }}"
+    owner: root
+    group: wheel
+    mode: 0755
+  when: gds_instances[instance_name] is defined
+
+- name: Identify binlog dir for instance
+  shell: "dirname `grep 'log-bin ' /var/service/{{ instance_name }}-{{ gds_cluster }}-mysql/my.cnf | awk '{print $NF}'`"
+  register: binlog_dir_reg
+  changed_when: false
+
+- name: Set binlog dir fact
+  set_fact:
+    percona_binlog_dir: "{{ binlog_dir_reg.stdout }}"
+
+- name: MHA instance configuration
+  template:
+    src: mha_instance_config.j2
+    dest: "/usr/home/gds_mha/{{ instance_name }}-mha.cnf"
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0644
+  when: gds_instances[instance_name] is defined

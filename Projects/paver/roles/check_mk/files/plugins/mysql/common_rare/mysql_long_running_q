@@ -1,0 +1,26 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# instances to check
+echo '<<<mysql_long_running_q>>>'
+for mysqlinstance in $(grep -e '\[.*\]' $MK_CONFDIR/mysql.cfg | sed -e 's/\[//g' -e 's/\]//g' | tr '\n' ' ');do
+    currentinstance=$(grep -A3 "\[${mysqlinstance}\]" $MK_CONFDIR/mysql.cfg)
+    port=$(echo "$currentinstance" | grep "port=" | sed -e 's/port=//')
+    socket=$(echo "$currentinstance" | grep "socket=")
+    name=$(echo "${port} - ${mysqlinstance}")
+
+    result=$(mysql -u root -P ${port} --${socket} -e "SELECT case
+                                                      WHEN (count(*)>0) THEN time else 0 end as mytime
+                                                      FROM information_schema.processlist
+                                                      WHERE command not in ('Sleep','Binlog Dump') 
+                                                      AND user not in ('system user','replication','event_scheduler','tungsten');" -s -N 2> /dev/null)
+
+    exit_code=$(echo $?)
+
+    if [[ "${exit_code}" -eq "1" ]]; then
+        result="-1"
+    fi
+
+    echo "[[$name]]"
+    echo "$result"
+    sleep 0.5
+done

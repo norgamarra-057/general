@@ -1,0 +1,22 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+    datacenter: "{{ inventory_hostname | regex_replace('^.*\\.([^\\.]+)$', '\\1') }}"
+  tasks:
+   - name: FreeBSD | run | drop hydra from Consul
+     shell: |
+       exec 2>&1
+       {% if inventory_hostname.endswith('m1.' + datacenter) %}
+       curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace("_","-") }}/nodes/{{ item.value.hydra.ids[0] }}/version"
+       {% else %}
+       curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace("_","-") }}/nodes/{{ item.value.hydra.ids[1] }}/version"
+       {% endif %}
+     args:
+       executable: /usr/local/bin/bash
+     with_dict: "{{ gds_instances }}"
+     when: item.value.hydra is defined and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+

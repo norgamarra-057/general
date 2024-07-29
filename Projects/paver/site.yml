@@ -1,0 +1,18 @@
+---
+# *** GDS Team! ***
+#
+# Please find your MySQL cluster definitions in plays/mysql_instances.yml
+#
+# This file can still be used as before but the actual instances defitinitions are
+# under said file.
+# Working with Allan Jude and Dave Cottlehuber
+
+- name: Setup services common for all FreeBSD hosts (monitoring, ntpd, motd, etc.)
+  import_playbook: plays/envs/freebsd.yml
+
+- name: Setup services for GDS prod hosts (firewall)
+  import_playbook: "plays/envs/gds_prod_all.yml"
+
+- name: MySQL clusters and their instance definitions
+  import_playbook: "plays/mysql_instances.yml"
+

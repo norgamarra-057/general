@@ -1,0 +1,23 @@
+---
+- name: Add leftover disks to tank zpool
+  hosts: all
+  become: yes
+  vars:
+    - size: 745
+  tasks:
+    - name: Ensure py27-yaml is installed
+      pkgng:
+        name: py27-yaml
+        state: present
+
+    - name: Get available disks
+      shell: /usr/local/sbin/disklayout.py disks | grep "{{ size }}" | awk '{ print $1 }' | sort | uniq > /tmp/available_disks.txt
+
+    - name: Identify disks in use
+      shell: zpool status | egrep 'da[0-9]' | awk '{ print $1 }' | sed 's/p[0-9]//' | sort | uniq > /tmp/used_disks.txt
+
+    - name: Find free data disks
+      shell: comm -13 /tmp/used_disks.txt /tmp/available_disks.txt > /tmp/disks_to_use.txt
+
+    - name: Add mirrors
+      shell: "cat /tmp/disks_to_use.txt | awk 'BEGIN{i=0}{ arr[i]=$0; i++; }END{ i-=1; for (x=0; x<i/2; x++){print arr[x] 'p1', arr[i-x] 'p1' }}' | xargs -n 2 zpool add tank mirror"

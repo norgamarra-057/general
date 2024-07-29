@@ -1,0 +1,1376 @@
+---
+gds_carp_peers:
+  - 10.30.24.218  # gds-snc1-prod-db175m1
+  - 10.30.24.219  # gds-snc1-prod-db175s1
+  - 10.30.25.218  # gds-snc1-prod-db175m1
+  - 10.30.25.219  # gds-snc1-prod-db175s1
+gds_carp_interfaces:
+  - vlan324
+  - vlan325
+gds_instance_group: gds_prod_snc1_db175
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  pwa_prod: # GDS-1868
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 60
+      max_connections_force: 10000
+      max_user_connections_force: 9980
+      innodb_buffer_pool_size_mb_force: 200000
+      innodb_thread_sleep_delay_force: 0
+      innodb_flush_neighbors_force: 0
+      long_query_time_force: 1
+      log_slow_rate_limit_force: 11
+      log_warnings_force: 2
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+      group_concat_max_len_force: 16384
+      relay_log_recovery_force: ON
+      expire_logs_days: 99
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-snc1-prod-db175m1.snc1
+      - gds-snc1-prod-db175s1.snc1
+    master_carp_interface: vlan324
+    slave_carp_interface: vlan325
+    vhid: 79
+    slave_vhid: 79
+    master_vip: 10.30.24.79
+    slave_vips:
+      - 10.30.25.79
+    replication_ips:
+      - 10.22.142.19 # gds-snc1-prod-db175m1.snc1
+      - 10.22.142.229 # gds-snc1-prod-db175s1.snc1
+      - 10.22.142.192 # gds-snc1-prod-db017m1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.142.192/32 # gds-snc1-prod-db017m1.snc1
+      - 10.22.142.197/32 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.246/32 # gds-snc1-prod-db172s1.snc1
+      - 10.22.148.123/32 # gds-snc1-prod-db037m1.snc1
+      - 10.22.148.213/32 # gds-snc1-prod-db037s1.snc1
+      - 10.32.114.27/32  # gds-sac1-prod-db175m1.sac1
+      - 10.32.114.128/32  # gds-sac1-prod-db175s1.sac1
+      - 10.20.65.11/32 # db1.snc1
+      - 10.20.73.174/32 # users-service-spare1.snc1
+      - 50.115.209.4/32   #b1.snc1
+      - 50.115.209.5/32   #b2.snc1
+      - 10.22.72.55/32   #voucher-inventory-utility1.snc1
+      - 10.22.109.129/32   #voucher-inventory-utility2.snc1
+      - 10.23.85.55/32   #mosaic1-dev.snc1
+      - 10.20.82.117/32   #mosaic6-dev.snc1
+      - 10.22.192.146/32   #mosaic7-dev.snc1
+      - 10.20.75.243/32   #goods-outbound-controller-app1.snc1
+      - 10.22.67.14/32   #goods-outbound-controller-app2.snc1
+      - 10.22.77.208/32   #goods-outbound-controller-app3.snc1
+      - 10.22.77.8/32   #goods-outbound-controller-app4.snc1
+      - 10.22.77.94/32   #goods-outbound-controller-app5.snc1
+      - 10.22.76.14/32   #goods-outbound-controller-app6.snc1
+      - 10.22.237.197/32   #goods-daas-utility-1.snc1
+      - 10.22.152.176/32   #goods-daas-utility-2.snc1
+      - 10.22.77.73/32   #subscription-utility-app3.snc1
+      - 10.22.77.138/32   #subscription-utility-app4.snc1
+      - 10.22.71.105/32   #subscription-utility-app5.snc1
+      - 10.22.67.72/32   #subscription-utility-app6.snc1
+      - 10.22.50.203/32   #darwinprod-batch5-agg1.snc1
+      - 10.22.50.46/32   #darwinprod-batch5-agg2.snc1
+      - 10.22.50.136/32   #darwinprod-batch5-agg3.snc1
+      - 10.22.50.176/32   #darwinprod-batch5-agg4.snc1
+      - 10.22.50.109/32   #darwinprod-batch5-agg5.snc1
+      - 10.22.50.175/32   #darwinprod-batch5-es1.snc1
+      - 10.22.50.198/32   #darwinprod-batch5-es10.snc1
+      - 10.22.50.181/32   #darwinprod-batch5-es11.snc1
+      - 10.22.50.39/32   #darwinprod-batch5-es12.snc1
+      - 10.22.50.23/32   #darwinprod-batch5-es13.snc1
+      - 10.22.50.102/32   #darwinprod-batch5-es14.snc1
+      - 10.22.50.43/32   #darwinprod-batch5-es15.snc1
+      - 10.22.50.167/32   #darwinprod-batch5-es16.snc1
+      - 10.22.50.107/32   #darwinprod-batch5-es17.snc1
+      - 10.22.50.118/32   #darwinprod-batch5-es18.snc1
+      - 10.22.50.105/32   #darwinprod-batch5-es19.snc1
+      - 10.22.50.80/32   #darwinprod-batch5-es2.snc1
+      - 10.22.50.235/32   #darwinprod-batch5-es20.snc1
+      - 10.22.50.137/32   #darwinprod-batch5-es21.snc1
+      - 10.22.50.186/32   #darwinprod-batch5-es22.snc1
+      - 10.22.50.75/32   #darwinprod-batch5-es23.snc1
+      - 10.22.50.37/32   #darwinprod-batch5-es24.snc1
+      - 10.22.50.236/32   #darwinprod-batch5-es25.snc1
+      - 10.22.50.81/32   #darwinprod-batch5-es26.snc1
+      - 10.22.50.129/32   #darwinprod-batch5-es27.snc1
+      - 10.22.50.169/32   #darwinprod-batch5-es28.snc1
+      - 10.22.50.49/32   #darwinprod-batch5-es3.snc1
+      - 10.22.50.127/32   #darwinprod-batch5-es4.snc1
+      - 10.22.50.222/32   #darwinprod-batch5-es5.snc1
+      - 10.22.50.197/32   #darwinprod-batch5-es6.snc1
+      - 10.22.50.120/32   #darwinprod-batch5-es7.snc1
+      - 10.22.50.61/32   #darwinprod-batch5-es8.snc1
+      - 10.22.50.100/32   #darwinprod-batch5-es9.snc1
+      - 10.22.148.103/32   #darwin-prod-batch6-agg1.snc1
+      - 10.22.148.112/32   #darwin-prod-batch6-agg2.snc1
+      - 10.22.148.120/32   #darwin-prod-batch6-agg3.snc1
+      - 10.22.148.121/32   #darwin-prod-batch6-agg4.snc1
+      - 10.22.148.122/32   #darwin-prod-batch6-agg5.snc1
+      - 10.22.148.128/32   #darwin-prod-batch6-es1.snc1
+      - 10.22.148.188/32   #darwin-prod-batch6-es10.snc1
+      - 10.22.148.192/32   #darwin-prod-batch6-es11.snc1
+      - 10.22.148.214/32   #darwin-prod-batch6-es12.snc1
+      - 10.22.148.218/32   #darwin-prod-batch6-es13.snc1
+      - 10.22.148.226/32   #darwin-prod-batch6-es14.snc1
+      - 10.22.148.241/32   #darwin-prod-batch6-es15.snc1
+      - 10.22.148.243/32   #darwin-prod-batch6-es16.snc1
+      - 10.22.148.249/32   #darwin-prod-batch6-es17.snc1
+      - 10.22.148.28/32   #darwin-prod-batch6-es18.snc1
+      - 10.22.148.36/32   #darwin-prod-batch6-es19.snc1
+      - 10.22.148.145/32   #darwin-prod-batch6-es2.snc1
+      - 10.22.148.49/32   #darwin-prod-batch6-es20.snc1
+      - 10.22.148.51/32   #darwin-prod-batch6-es21.snc1
+      - 10.22.148.55/32   #darwin-prod-batch6-es22.snc1
+      - 10.22.148.64/32   #darwin-prod-batch6-es23.snc1
+      - 10.22.148.65/32   #darwin-prod-batch6-es24.snc1
+      - 10.22.148.70/32   #darwin-prod-batch6-es25.snc1
+      - 10.22.148.74/32   #darwin-prod-batch6-es26.snc1
+      - 10.22.148.75/32   #darwin-prod-batch6-es27.snc1
+      - 10.22.148.93/32   #darwin-prod-batch6-es28.snc1
+      - 10.22.148.149/32   #darwin-prod-batch6-es3.snc1
+      - 10.22.148.156/32   #darwin-prod-batch6-es4.snc1
+      - 10.22.148.159/32   #darwin-prod-batch6-es5.snc1
+      - 10.22.148.177/32   #darwin-prod-batch6-es6.snc1
+      - 10.22.148.182/32   #darwin-prod-batch6-es7.snc1
+      - 10.22.148.185/32   #darwin-prod-batch6-es8.snc1
+      - 10.22.148.187/32   #darwin-prod-batch6-es9.snc1
+      - 10.23.100.166/32   #geo-redundancy-load-test1.snc1
+      - 10.23.76.59/32   #geo-redundancy-load-test2.snc1
+      - 10.23.72.99/32   #geo-redundancy-load-test3.snc1
+      - 10.22.133.54/32   # custsvc-utility1.snc1  #GDS-3306
+      - 10.22.138.104/32   # custsvc-utility2.snc1 
+      - 10.32.158.41/32   # custsvc-app1.sac1
+      - 10.32.146.62/32   # custsvc-app2.sac1
+      - 10.32.69.112/32   # custsvc-api1.sac1
+      - 10.32.166.105/32   # custsvc-api2.sac1
+      - 10.32.154.3/32   # custsvc-cron1.sac1
+      - 10.32.152.164/32   # custsvc-cron2.sac1
+      - 10.32.55.51/32   # custsvc-utility1.sac1
+      - 10.32.170.120/32   # custsvc-irb1.sac1
+      - 10.22.71.118/32   #merchant-experience-app1.snc1
+      - 10.22.67.205/32   #merchant-experience-app2.snc1
+      - 10.22.71.169/32   #merchant-experience-app3.snc1
+      - 10.22.119.237/32  # merchant-experience-app4.snc1
+      - 10.20.87.203/32   # pricing-utility1.snc1
+      - 10.22.139.199/32  # darwin-prod-batch1-agg4.snc1
+      - 10.22.139.61/32  # darwin-prod-batch1-agg5.snc1
+      - 10.22.139.226/32  # darwin-prod-batch2-agg4.snc1
+      - 10.22.139.136/32  # darwin-prod-batch2-agg5.snc1
+      - 10.22.139.39/32  # darwin-prod-batch3-agg5.snc1
+      - 10.22.139.84/32  # darwin-prod-batch4-agg5.snc1
+      - 10.22.133.198/32   #darwin-push-agg1-pod1-prod.snc1
+      - 10.22.133.131/32   #darwin-push-agg1-pod2-prod.snc1
+      - 10.22.127.232/32   #darwin-push-agg2-pod1-prod.snc1
+      - 10.22.133.167/32   #darwin-push-agg2-pod2-prod.snc1
+      - 10.22.133.92/32   #darwin-push-agg3-pod1-prod.snc1
+      - 10.22.133.48/32   #darwin-push-agg3-pod2-prod.snc1
+      - 10.22.133.245/32   #darwin-push-agg4-pod1-prod.snc1
+      - 10.22.133.20/32   #darwin-push-agg4-pod2-prod.snc1
+      - 10.22.76.71/32    # darwin-cards-aggregator1.snc1
+      - 10.22.76.156/32    # darwin-cards-aggregator2.snc1
+      - 10.22.76.154/32   # darwinemail-cards-aggregator1.snc1
+      - 10.22.76.148/32   # darwinemail-cards-aggregator2.snc1
+      - 10.20.69.127/32   #darwin-prod-indexer1.snc1
+      - 10.22.64.10/32   #darwin-prod-rt1-rapiagg2.snc1
+      - 10.20.68.108/32   #darwin-prod-rt10-rapiagg2.snc1
+      - 10.22.64.193/32   #darwin-prod-rt2-rapiagg2.snc1
+      - 10.22.64.75/32   #darwin-prod-rt3-rapiagg2.snc1
+      - 10.20.42.37/32   #darwin-prod-rt4-rapiagg2.snc1
+      - 10.22.65.242/32   #darwin-prod-rt5-rapiagg2.snc1
+      - 10.22.65.183/32   #darwin-prod-rt6-rapiagg2.snc1
+      - 10.20.113.55/32   #darwin-prod-rt7-rapiagg2.snc1
+      - 10.20.76.35/32   #darwin-prod-rt8-rapiagg2.snc1
+      - 10.22.64.188/32   #darwin-prod-rt9-rapiagg2.snc1
+      - 10.22.64.5/32   #darwin-prod-spare1.snc1
+      - 10.22.64.210/32   #darwin-prod-spare2.snc1
+      - 10.20.78.211/32   #darwin-prod-spare3.snc1
+      - 10.22.64.124/32   #darwin-prod-spare4.snc1
+      - 10.22.64.211/32   #darwin-prod-spare5.snc1
+      - 10.22.74.231/32   #darwin-prod-spare6.snc1
+      - 10.22.65.230/32   #darwin-prod-spare7.snc1
+      - 10.22.64.220/32   #darwin-prod-spare8.snc1
+      - 10.22.72.58/32    # custsvc-api1.snc1
+      - 10.22.71.123/32    # custsvc-api2.snc1
+      - 10.22.78.35/32    # custsvc-irb1.snc1
+      - 10.20.71.25/32   #babar-app1.snc1
+      - 10.20.69.138/32   #babar-app2.snc1
+      - 10.20.71.84/32   #babar-db1.snc1
+      - 10.20.71.40/32   #babar-db2.snc1
+      - 10.20.71.97/32   #babar-db3.snc1
+      - 10.20.72.14/32   #babar-db4.snc1
+      - 10.20.71.67/32   #babar-redis2.snc1
+      - 10.20.75.104/32   #babar-redis3.snc1
+      - 10.20.75.110/32   #babar-redis4.snc1
+      - 10.20.99.227/32   #backup-restore-db1.snc1
+      - 10.22.133.141/32   #badges-api1.snc1
+      - 10.22.134.158/32   #badges-api2.snc1
+      - 10.22.135.77/32   #badges-api3.snc1
+      - 10.22.135.221/32   #badges-api4.snc1
+      - 10.22.133.126/32   #badges-api5.snc1
+      - 10.22.135.164/32   #badges-api6.snc1
+      - 10.22.74.173/32   #badges-redis1.snc1
+      - 10.22.74.26/32   #badges-redis2.snc1
+      - 10.22.134.249/32   #badges-util1.snc1
+      - 10.22.135.93/32   #badges-util2.snc1
+      - 10.22.200.19/32   #baqi-app1-test.snc1
+      - 10.20.52.8/32   #berlin1.snc1
+      - 10.20.52.10/32   #berlin2.snc1
+      - 10.20.52.13/32   #berlin3.snc1
+      - 10.20.52.14/32   #berlin4.snc1
+      - 10.20.82.207/32   #berlin-database-replica.snc1
+      - 10.20.96.144/32   #bi-dev-app1.snc1
+      - 10.20.96.137/32   #bi-dev-app2.snc1
+      - 10.20.75.37/32   #bi-dev-app3.snc1
+      - 10.20.76.124/32   #bi-dev-mstris1.snc1
+      - 10.20.76.123/32   #bi-dev-mstris2.snc1
+      - 10.20.77.15/32   #bi-prod-mstris1.snc1
+      - 10.20.77.63/32   #bi-prod-mstris2.snc1
+      - 10.20.77.30/32   #bi-prod-mstris3.snc1
+      - 10.20.128.22/32   #birdcage-app1-qa.snc1
+      - 10.22.67.150/32   #birdcage-app5.snc1
+      - 10.20.114.33/32   #birdcage-db1-qa.snc1
+      - 10.22.67.142/32   #birdcage-db3.snc1
+      - 10.22.67.183/32   #birdcage-db4.snc1
+      - 10.20.69.129/32   #bksrv1.snc1
+      - 10.20.69.193/32   #bksrv2ng.snc1
+      - 10.20.42.81/32   #bksrv2.snc1
+      - 10.20.42.80/32   #bksrv3.snc1
+      - 10.20.42.78/32   #bksrv4.snc1
+      - 10.20.42.79/32   #bksrv5.snc1
+      - 10.22.66.177/32   #bksrv6.snc1
+      - 10.20.132.180/32   #blackbird-utility1.snc1
+      - 10.22.109.106/32   #blacklist-filter-app1.snc1
+      - 10.22.134.253/32   #blacklist-filter-app2.snc1
+      - 10.22.134.40/32   #blacklist-filter-app3.snc1
+      - 10.22.78.241/32   #blacklist-rule-api1.snc1
+      - 10.22.67.82/32   #blacklist-rule-api2.snc1
+      - 10.20.32.11/32   #blast1-old.snc1
+      - 10.22.2.239/32   #blast1-snc2.snc1
+      - 10.22.2.200/32   #blast2-snc2.snc1
+      - 10.20.71.176/32   #blast3.snc1
+      - 10.20.71.235/32   #blast4.snc1
+      - 10.20.81.104/32   #booking-engine-3rd-party-app1.snc1
+      - 10.20.81.235/32   #booking-engine-3rd-party-app2.snc1
+      - 10.20.77.21/32   #booking-engine-3rd-party-db1.snc1
+      - 10.20.77.55/32   #booking-engine-3rd-party-db2.snc1
+      - 10.20.87.157/32   #booking-engine-3rd-party-redis2.snc1
+      - 10.20.87.59/32   #booking-engine-3rd-party-redis3.snc1
+      - 10.22.81.201/32   #booking-engine-api-app1.snc1
+      - 10.20.99.171/32   #booking-engine-api-app2.snc1
+      - 10.20.87.191/32   #booking-engine-appointments-app1.snc1
+      - 10.20.87.184/32   #booking-engine-appointments-app2.snc1
+      - 10.20.77.52/32   #booking-engine-appointments-db1.snc1
+      - 10.20.77.52/32   #booking-engine-appointments-db1.snc1
+      - 10.20.77.68/32   #booking-engine-appointments-db2.snc1
+      - 10.20.77.68/32   #booking-engine-appointments-db2.snc1
+      - 10.20.81.44/32   #booking-engine-appointments-redis1.snc1
+      - 10.20.81.233/32   #booking-engine-appointments-redis2.snc1
+      - 10.22.81.157/32   #booking-engine-appointments-utility1.snc1
+      - 10.22.135.104/32   #booking-engine-appointments-utility2.snc1
+      - 10.20.81.96/32   #booking-engine-availability-app1.snc1
+      - 10.20.81.174/32   #booking-engine-availability-app2.snc1
+      - 10.22.78.126/32   #booking-engine-availability-app3.snc1
+      - 10.20.77.48/32   #booking-engine-availability-db1.snc1
+      - 10.20.77.62/32   #booking-engine-availability-db2.snc1
+      - 10.20.87.174/32   #booking-engine-availability-redis1.snc1
+      - 10.20.87.107/32   #booking-engine-availability-redis2.snc1
+      - 10.22.81.21/32   #booking-engine-background-worker-redis1.snc1
+      - 10.22.81.15/32   #booking-engine-background-worker-redis2.snc1
+      - 10.20.85.17/32   #booking-engine-merchant-setup-itier1.snc1
+      - 10.20.112.124/32   #booking-engine-merchant-setup-itier2.snc1
+      - 10.20.87.71/32   #booking-engine-message-handler-redis1.snc1
+      - 10.20.87.112/32   #booking-engine-message-handler-redis2.snc1
+      - 10.20.96.160/32   #booking-engine-my-appointments-itier1-perf.snc1
+      - 10.20.87.118/32   #booking-engine-my-appointments-itier1.snc1
+      - 10.20.81.100/32   #booking-engine-my-appointments-itier2.snc1
+      - 10.20.85.53/32   #booking-engine-my-appointments-itier3.snc1
+      - 10.20.85.77/32   #booking-engine-my-appointments-itier4.snc1
+      - 10.20.87.69/32   #booking-engine-my-appointments-memcache1.snc1
+      - 10.20.81.168/32   #booking-engine-my-appointments-memcache2.snc1
+      - 10.20.91.251/32   #booking-engine-notifications-db1.snc1
+      - 10.20.91.134/32   #booking-engine-notifications-db2.snc1
+      - 10.20.87.142/32   #booking-engine-notifications-worker1.snc1
+      - 10.20.87.177/32   #booking-engine-notifications-worker2.snc1
+      - 10.20.81.120/32   #booking-engine-notifications-worker3.snc1
+      - 10.22.71.33/32   #booking-engine-notifications-worker4.snc1
+      - 10.20.87.212/32   #booking-engine-prepurchase-memcache1.snc1
+      - 10.20.87.137/32   #booking-engine-prepurchase-memcache2.snc1
+      - 10.20.87.133/32   #booking-engine-scheduler-lite-memcache1.snc1
+      - 10.20.87.187/32   #booking-engine-scheduler-lite-memcache2.snc1
+      - 10.20.87.145/32   #booking-engine-service-client-memcache1.snc1
+      - 10.20.87.34/32   #booking-engine-service-client-memcache2.snc1
+      - 10.20.87.98/32   #booking-engine-setup-app1.snc1
+      - 10.20.87.72/32   #booking-engine-setup-app2.snc1
+      - 10.20.77.46/32   #booking-engine-setup-db1.snc1
+      - 10.20.77.36/32   #booking-engine-setup-db2.snc1
+      - 10.20.130.38/32   #booking-engine-setup-old-app1.snc1
+      - 10.20.129.254/32   #brianm.snc1
+      - 10.22.109.150/32   #brs-app1.snc1
+      - 10.22.81.132/32   #brs-app2.snc1
+      - 10.22.67.85/32   #bts-app10.snc1
+      - 10.22.67.116/32   #bts-app11.snc1
+      - 10.22.67.245/32   #bts-app12.snc1
+      - 10.22.78.152/32   #bts-app13.snc1
+      - 10.22.78.43/32   #bts-app14.snc1
+      - 10.22.78.40/32   #bts-app17.snc1
+      - 10.20.99.124/32   #bts-app1.snc1
+      - 10.20.99.195/32   #bts-app2.snc1
+      - 10.20.132.42/32   #bts-app3.snc1
+      - 10.20.132.22/32   #bts-app4.snc1
+      - 10.20.131.104/32   #bts-app5.snc1
+      - 10.20.130.181/32   #bts-app6.snc1
+      - 10.22.67.226/32   #bts-app7.snc1
+      - 10.22.67.161/32   #bts-app8.snc1
+      - 10.22.67.46/32   #bts-app9.snc1
+      - 10.22.77.188/32   #bts-batch1.snc1
+      - 10.22.77.144/32   #bts-batch2.snc1
+      - 10.22.71.94/32   #bts-cassandra1.snc1
+      - 10.22.72.98/32   #bts-cassandra2.snc1
+      - 10.22.71.107/32   #bts-cassandra3.snc1
+      - 10.20.114.19/32   #bts-db1.snc1
+      - 10.20.114.62/32   #bts-db2.snc1
+      - 10.20.91.68/32   #bts-db-mongo1.snc1
+      - 10.20.131.17/32   #bts-elasticsearch1.snc1
+      - 10.22.71.56/32   #bts-elasticsearch2.snc1
+      - 10.22.77.221/32   #bts-rcmd-app10.snc1
+      - 10.20.76.109/32   #bts-rcmd-app12.snc1
+      - 10.22.135.232/32   #bts-rcmd-app13.snc1
+      - 10.20.77.235/32   #bts-rcmd-app15.snc1
+      - 10.22.71.222/32   #bts-rcmd-app1.snc1
+      - 10.22.71.199/32   #bts-rcmd-app2.snc1
+      - 10.22.72.90/32   #bts-rcmd-app3.snc1
+      - 10.22.72.244/32   #bts-rcmd-app4.snc1
+      - 10.22.109.114/32   #bts-rcmd-app5.snc1
+      - 10.22.109.127/32   #bts-rcmd-app6.snc1
+      - 10.22.109.18/32   #bts-rcmd-app7.snc1
+      - 10.22.109.232/32   #bts-rcmd-app8.snc1
+      - 10.22.77.158/32   #bts-rcmd-app9.snc1
+      - 10.22.77.248/32   #bts-rec-log1.snc1
+      - 10.22.77.227/32   #bts-rec-log2.snc1
+      - 10.22.74.27/32   #bts-spark-worker10.snc1
+      - 10.22.74.190/32   #bts-spark-worker11.snc1
+      - 10.22.74.8/32   #bts-spark-worker12.snc1
+      - 10.22.74.231/32   #bts-spark-worker1.snc1
+      - 10.22.74.220/32   #bts-spark-worker2.snc1
+      - 10.22.74.124/32   #bts-spark-worker3.snc1
+      - 10.22.65.61/32   #bts-spark-worker4.snc1
+      - 10.22.65.17/32   #bts-spark-worker5.snc1
+      - 10.20.114.97/32   #bts-spark-worker6.snc1
+      - 10.20.114.20/32   #bts-spark-worker7.snc1
+      - 10.20.114.165/32   #bts-spark-worker8.snc1
+      - 10.20.114.121/32   #bts-spark-worker9.snc1
+      - 10.20.32.20/32   #build1.snc1
+      - 10.20.32.21/32   #build2.snc1
+      - 10.20.83.58/32   #buildmaster1.snc1
+      - 10.20.43.113/32   #buildmaster2.snc1
+      - 10.20.43.190/32   #buildmaster2-vm1.snc1
+      - 10.20.43.194/32   #buildmaster2-vm3.snc1
+      - 10.20.43.116/32   #buildmaster3.snc1
+      - 10.20.81.62/32   #buildmetrics1.snc1
+      - 10.22.74.116/32   #bumblebee-db1.snc1
+      - 10.22.74.169/32   #bumblebee-db2.snc1
+      - 10.20.99.219/32   #bumblebee-monitor1.snc1
+      - 10.20.99.65/32   #bumblebee-monitor2.snc1
+      - 10.20.69.233/32   #bys01m1.snc1
+      - 10.20.80.230/32   #consumer-data-service-app1-integration.snc1
+      - 10.20.77.27/32   #consumer-data-service-app1.snc1
+      - 10.20.99.73/32   #consumer-data-service-app2.snc1
+      - 10.20.81.245/32   #consumer-data-service-app3.snc1
+      - 10.20.130.30/32   #consumer-data-service-app4.snc1
+      - 10.20.130.171/32   #consumer-data-service-app5.snc1
+      - 10.20.130.251/32   #consumer-data-service-app6.snc1
+      - 10.20.68.243/32   #consumer-data-service-utility1.snc1
+      - 10.20.91.105/32   #consumer-data-service-utility2.snc1
+      - 10.20.41.43/32   #custsvc-app1.snc1
+      - 10.20.80.124/32   #custsvc-app1-test1.snc1
+      - 10.20.82.150/32   #custsvc-app1-test2.snc1
+      - 10.20.40.15/32   #custsvc-app2.snc1
+      - 10.22.71.37/32   #custsvc-cron1.snc1
+      - 10.22.71.229/32   #custsvc-cron2.snc1
+      - 10.22.195.143/32   #darwin-aggregator1-dev.snc1
+      - 10.22.76.172/32   #darwin-aggregator1.snc1
+      - 10.22.76.95/32   #darwin-aggregator2.snc1
+      - 10.22.76.160/32   #darwin-aggregator3.snc1
+      - 10.22.76.203/32   #darwin-aggregator4.snc1
+      - 10.22.76.134/32   #darwin-aggregator5.snc1
+      - 10.20.83.103/32   #darwin-aggregator6.snc1
+      - 10.22.79.93/32   #darwin-aggregator7.snc1
+      - 10.20.76.61/32   #darwin-aggregator8.snc1
+      - 10.20.78.204/32   #darwin-aggregator9.snc1
+      - 10.20.76.25/32   #darwinemail-aggregator1.snc1
+      - 10.20.41.86/32   #darwinemail-aggregator2.snc1
+      - 10.20.113.174/32   #darwinemail-aggregator3.snc1
+      - 10.20.75.235/32   #darwinemail-aggregator4.snc1
+      - 10.20.83.91/32   #darwinemail-aggregator5.snc1
+      - 10.22.76.102/32   #darwinemail-aggregator6.snc1
+      - 10.20.76.24/32   #darwinemail-aggregator7.snc1
+      - 10.22.70.103/32   #darwinemail-aggregator8.snc1
+      - 10.20.83.99/32   #darwinemail-aggregator9.snc1
+      - 10.22.194.158/32   #darwin-indexer1-dev.snc1
+      - 10.22.76.198/32   #darwin-indexer1.snc1
+      - 10.20.83.204/32   #darwin-indexer-dev1.snc1
+      - 10.20.79.69/32   #darwin-indexer-dev2.snc1
+      - 10.22.79.242/32   #darwin-rocketman-aggregator1.snc1
+      - 10.20.78.22/32   #darwin-rocketman-aggregator2.snc1
+      - 10.22.136.102/32   #darwin-rocketman-aggregator3.snc1
+      - 10.22.136.58/32   #darwin-rocketman-aggregator4.snc1
+      - 10.22.136.176/32   #darwin-rocketman-aggregator5.snc1
+      - 10.22.136.172/32   #darwin-rocketman-aggregator6.snc1
+      - 10.20.73.21/32   #darwin-spare1.snc1
+      - 10.20.74.160/32   #deal-ecosystem-app1.snc1
+      - 10.20.74.147/32   #deal-ecosystem-app2.snc1
+      - 10.20.73.186/32   #deal-ecosystem-app3.snc1
+      - 10.20.73.178/32   #deal-ecosystem-app4.snc1
+      - 10.20.68.122/32   #deal-ecosystem-app5.snc1
+      - 10.20.78.231/32   #deal-ecosystem-worker1.snc1
+      - 10.20.78.181/32   #deal-ecosystem-worker2.snc1
+      - 10.20.91.179/32   #deal-ecosystem-worker3.snc1
+      - 10.20.72.45/32   #dealservice-app10.snc1
+      - 10.20.41.122/32   #dealservice-app1.snc1
+      - 10.20.42.50/32   #dealservice-app2.snc1
+      - 10.20.42.131/32   #dealservice-app3.snc1
+      - 10.20.42.132/32   #dealservice-app4.snc1
+      - 10.20.72.30/32   #dealservice-app5.snc1
+      - 10.20.72.36/32   #dealservice-app6.snc1
+      - 10.20.72.58/32   #dealservice-app7.snc1
+      - 10.20.72.88/32   #dealservice-app8.snc1
+      - 10.20.71.144/32   #dealservice-app9.snc1
+      - 10.20.42.125/32   #dealservice-app11.snc1
+      - 10.20.71.211/32   #dealservice-app12.snc1
+      - 10.20.68.170/32   #dealservice-app13.snc1
+      - 10.20.42.120/32   #dealservice-app14.snc1
+      - 10.20.42.126/32   #dealservice-app15.snc1
+      - 10.20.91.194/32   #dealservice-utility1.snc1
+      - 10.22.72.198/32   #dealservice-utility3.snc1
+      - 10.22.133.154/32  # dealservice-utility4.snc1
+      - 10.22.137.130/32  # dealservice-utility5.snc1
+      - 10.20.100.129/32   #distbuild10-vm1.snc1
+      - 10.20.100.130/32   #distbuild10-vm2.snc1
+      - 10.20.100.131/32   #distbuild11-vm1.snc1
+      - 10.20.100.132/32   #distbuild11-vm2.snc1
+      - 10.20.100.133/32   #distbuild12-vm1.snc1
+      - 10.20.100.134/32   #distbuild12-vm2.snc1
+      - 10.20.100.135/32   #distbuild13-vm1.snc1
+      - 10.20.100.136/32   #distbuild13-vm2.snc1
+      - 10.20.100.137/32   #distbuild14-vm1.snc1
+      - 10.20.100.138/32   #distbuild14-vm2.snc1
+      - 10.20.100.139/32   #distbuild15-vm1.snc1
+      - 10.20.100.140/32   #distbuild15-vm2.snc1
+      - 10.20.100.141/32   #distbuild16-vm1.snc1
+      - 10.20.100.142/32   #distbuild16-vm2.snc1
+      - 10.20.100.143/32   #distbuild17-vm1.snc1
+      - 10.20.100.144/32   #distbuild17-vm2.snc1
+      - 10.20.100.145/32   #distbuild18-vm1.snc1
+      - 10.20.100.146/32   #distbuild18-vm2.snc1
+      - 10.20.93.104/32   #distbuild19-vm1.snc1
+      - 10.20.93.105/32   #distbuild19-vm2.snc1
+      - 10.20.100.117/32   #distbuild1-vm1.snc1
+      - 10.20.100.118/32   #distbuild1-vm2.snc1
+      - 10.20.100.147/32   #distbuild20-vm1.snc1
+      - 10.20.100.148/32   #distbuild20-vm2.snc1
+      - 10.20.100.149/32   #distbuild21-vm1.snc1
+      - 10.20.100.150/32   #distbuild21-vm2.snc1
+      - 10.20.100.151/32   #distbuild22-vm1.snc1
+      - 10.20.100.152/32   #distbuild22-vm2.snc1
+      - 10.20.100.153/32   #distbuild23-vm1.snc1
+      - 10.20.100.154/32   #distbuild23-vm2.snc1
+      - 10.20.100.155/32   #distbuild24-vm1.snc1
+      - 10.20.100.156/32   #distbuild24-vm2.snc1
+      - 10.20.100.157/32   #distbuild25-vm1.snc1
+      - 10.20.100.158/32   #distbuild25-vm2.snc1
+      - 10.20.100.159/32   #distbuild26-vm1.snc1
+      - 10.20.100.160/32   #distbuild26-vm2.snc1
+      - 10.20.100.161/32   #distbuild27-vm1.snc1
+      - 10.20.100.162/32   #distbuild27-vm2.snc1
+      - 10.20.100.163/32   #distbuild28-vm1.snc1
+      - 10.20.100.164/32   #distbuild28-vm2.snc1
+      - 10.20.100.165/32   #distbuild29-vm1.snc1
+      - 10.20.100.166/32   #distbuild29-vm2.snc1
+      - 10.20.100.119/32   #distbuild2-vm1.snc1
+      - 10.20.100.120/32   #distbuild2-vm2.snc1
+      - 10.20.100.167/32   #distbuild30-vm1.snc1
+      - 10.20.100.168/32   #distbuild30-vm2.snc1
+      - 10.20.100.169/32   #distbuild31-vm1.snc1
+      - 10.20.100.170/32   #distbuild31-vm2.snc1
+      - 10.20.100.171/32   #distbuild32-vm1.snc1
+      - 10.20.100.172/32   #distbuild32-vm2.snc1
+      - 10.20.100.173/32   #distbuild33-vm1.snc1
+      - 10.20.100.174/32   #distbuild33-vm2.snc1
+      - 10.20.100.175/32   #distbuild34-vm1.snc1
+      - 10.20.100.176/32   #distbuild34-vm2.snc1
+      - 10.20.100.177/32   #distbuild35-vm1.snc1
+      - 10.20.100.178/32   #distbuild35-vm2.snc1
+      - 10.20.100.179/32   #distbuild36-vm1.snc1
+      - 10.20.100.180/32   #distbuild36-vm2.snc1
+      - 10.20.100.181/32   #distbuild37-vm1.snc1
+      - 10.20.100.182/32   #distbuild37-vm2.snc1
+      - 10.20.100.183/32   #distbuild38-vm1.snc1
+      - 10.20.100.184/32   #distbuild38-vm2.snc1
+      - 10.20.100.185/32   #distbuild39-vm1.snc1
+      - 10.20.100.186/32   #distbuild39-vm2.snc1
+      - 10.20.100.121/32   #distbuild3-vm1.snc1
+      - 10.20.100.122/32   #distbuild3-vm2.snc1
+      - 10.20.100.187/32   #distbuild40-vm1.snc1
+      - 10.20.100.188/32   #distbuild40-vm2.snc1
+      - 10.20.100.189/32   #distbuild41-vm1.snc1
+      - 10.20.100.190/32   #distbuild41-vm2.snc1
+      - 10.20.100.191/32   #distbuild42-vm1.snc1
+      - 10.20.100.192/32   #distbuild42-vm2.snc1
+      - 10.20.100.193/32   #distbuild43-vm1.snc1
+      - 10.20.100.194/32   #distbuild43-vm2.snc1
+      - 10.20.100.195/32   #distbuild44-vm1.snc1
+      - 10.20.100.196/32   #distbuild44-vm2.snc1
+      - 10.20.100.197/32   #distbuild45-vm1.snc1
+      - 10.20.100.198/32   #distbuild45-vm2.snc1
+      - 10.20.100.199/32   #distbuild46-vm1.snc1
+      - 10.20.100.200/32   #distbuild46-vm2.snc1
+      - 10.20.100.201/32   #distbuild47-vm1.snc1
+      - 10.20.100.202/32   #distbuild47-vm2.snc1
+      - 10.20.100.203/32   #distbuild48-vm1.snc1
+      - 10.20.100.204/32   #distbuild48-vm2.snc1
+      - 10.20.100.205/32   #distbuild49-vm1.snc1
+      - 10.20.100.206/32   #distbuild49-vm2.snc1
+      - 10.20.93.108/32   #distbuild4-vm1.snc1
+      - 10.20.93.109/32   #distbuild4-vm2.snc1
+      - 10.20.93.192/32   #distbuild50-vm1.snc1
+      - 10.20.93.193/32   #distbuild50-vm2.snc1
+      - 10.20.93.190/32   #distbuild51-vm1.snc1
+      - 10.20.93.191/32   #distbuild51-vm2.snc1
+      - 10.20.93.188/32   #distbuild52-vm1.snc1
+      - 10.20.93.189/32   #distbuild52-vm2.snc1
+      - 10.20.93.186/32   #distbuild53-vm1.snc1
+      - 10.20.93.187/32   #distbuild53-vm2.snc1
+      - 10.20.93.184/32   #distbuild54-vm1.snc1
+      - 10.20.93.185/32   #distbuild54-vm2.snc1
+      - 10.20.93.182/32   #distbuild55-vm1.snc1
+      - 10.20.93.183/32   #distbuild55-vm2.snc1
+      - 10.20.93.180/32   #distbuild56-vm1.snc1
+      - 10.20.93.181/32   #distbuild56-vm2.snc1
+      - 10.20.93.178/32   #distbuild57-vm1.snc1
+      - 10.20.93.179/32   #distbuild57-vm2.snc1
+      - 10.20.93.176/32   #distbuild58-vm1.snc1
+      - 10.20.93.177/32   #distbuild58-vm2.snc1
+      - 10.20.93.174/32   #distbuild59-vm1.snc1
+      - 10.20.93.175/32   #distbuild59-vm2.snc1
+      - 10.20.93.110/32   #distbuild5-vm1.snc1
+      - 10.20.93.111/32   #distbuild5-vm2.snc1
+      - 10.20.93.172/32   #distbuild60-vm1.snc1
+      - 10.20.93.173/32   #distbuild60-vm2.snc1
+      - 10.20.93.170/32   #distbuild61-vm1.snc1
+      - 10.20.93.171/32   #distbuild61-vm2.snc1
+      - 10.20.93.106/32   #distbuild6-vm1.snc1
+      - 10.20.93.107/32   #distbuild6-vm2.snc1
+      - 10.20.100.123/32   #distbuild7-vm1.snc1
+      - 10.20.100.124/32   #distbuild7-vm2.snc1
+      - 10.20.100.125/32   #distbuild8-vm1.snc1
+      - 10.20.100.126/32   #distbuild8-vm2.snc1
+      - 10.20.100.127/32   #distbuild9-vm1.snc1
+      - 10.20.100.128/32   #distbuild9-vm2.snc1
+      - 10.20.96.139/32   #goods-app1-perf.snc1
+      - 10.20.69.56/32   #goods-app1.snc1
+      - 10.20.69.60/32   #goods-app2.snc1
+      - 10.20.41.95/32   #goods-app3.snc1
+      - 10.20.40.17/32   #goods-app4.snc1
+      - 10.20.81.213/32   #goods-dashboard1.snc1
+      - 10.20.91.185/32   #goods-dashboard2.snc1
+      - 10.20.130.205/32   #goods-dashboard-memcache1.snc1
+      - 10.20.130.163/32   #goods-dashboard-memcache2.snc1
+      - 10.20.91.102/32   #goods-dashboard-node1.snc1
+      - 10.20.130.200/32   #goods-dashboard-node2.snc1
+      - 10.20.91.139/32   #goods-email-platform.snc1
+      - 10.20.87.214/32   #goods-irb1.snc1
+      - 10.22.81.202/32   #goods-po-api-app1.snc1
+      - 10.22.109.111/32   #goods-po-api-app2.snc1
+      - 10.20.68.157/32   #goods-utility1.snc1
+      - 10.22.64.168/32   #goods-utility2.snc1
+      - 10.20.68.156/32   #goods-worker1.snc1
+      - 10.20.72.80/32   #goods-worker2.snc1
+      - 10.20.41.96/32   #irb1.snc1
+      - 10.20.41.97/32   #irb2.snc1
+      - 10.20.43.154/32   #irb-rw1.snc1
+      - 10.20.43.154/32   #irb-rw1.snc1
+      - 10.20.43.154/32   #irb-rw1.snc1
+      - 10.20.43.155/32   #irb-rw2.snc1
+      - 10.20.43.155/32   #irb-rw2.snc1
+      - 10.20.43.155/32   #irb-rw2.snc1
+      - 10.20.131.105/32  #merchant-umapi-usapac-app1.snc1
+      - 10.20.131.56/32   #merchant-umapi-usapac-app2.snc1
+      - 10.20.132.113/32   #merchant-umapi-usapac-app3.snc1
+      - 10.20.130.217/32   #merchant-umapi-usapac-app4.snc1
+      - 10.22.72.110/32   #merchant-umapi-usapac-app5.snc1
+      - 10.20.131.61/32   #mobilenotifications-token1.snc1
+      - 10.20.91.235/32   #mobilenotifications-token2.snc1
+      - 10.20.132.88/32   #mobilenotifications-token3.snc1
+      - 10.20.132.17/32   #mobilenotifications-token4.snc1
+      - 10.20.32.30/32   #ops1.snc1
+      - 10.20.32.30/32   #ops1.snc1
+      - 10.20.32.32/32   #ops2.snc1
+      - 10.20.32.32/32   #ops2.snc1
+      - 10.22.74.95/32   #ops3.snc1
+      - 10.22.74.95/32   #ops3.snc1
+      - 10.22.74.88/32   #ops4.snc1
+      - 10.22.74.88/32   #ops4.snc1
+      - 10.20.87.61/32   #ops-reporting1.snc1
+      - 10.20.87.61/32   #ops-reporting1.snc1
+      - 10.20.87.172/32   #ops-request1.snc1
+      - 10.20.87.172/32   #ops-request1.snc1
+      - 10.20.112.90/32   #ops-request2.snc1
+      - 10.20.112.90/32   #ops-request2.snc1
+      - 10.20.82.191/32   #ops-test-hdpvm1.snc1
+      - 10.20.82.191/32   #ops-test-hdpvm1.snc1
+      - 10.20.82.138/32   #ops-test-hdpvm2.snc1
+      - 10.20.82.138/32   #ops-test-hdpvm2.snc1
+      - 10.20.82.163/32   #ops-test-hdpvm3.snc1
+      - 10.20.82.163/32   #ops-test-hdpvm3.snc1
+      - 10.20.82.233/32   #ops-test-hdpvm4.snc1
+      - 10.20.82.233/32   #ops-test-hdpvm4.snc1
+      - 10.20.82.249/32   #ops-test-hdpvm5.snc1
+      - 10.20.82.249/32   #ops-test-hdpvm5.snc1
+      - 10.20.84.133/32   #ops-test-hdpvm6.snc1
+      - 10.20.84.133/32   #ops-test-hdpvm6.snc1
+      - 10.20.129.114/32   #ops-test-utilvm1.snc1
+      - 10.20.129.114/32   #ops-test-utilvm1.snc1
+      - 10.20.76.37/32   #ops-tooling-vmhost1.snc1
+      - 10.20.76.37/32   #ops-tooling-vmhost1.snc1
+      - 10.20.76.40/32   #ops-tooling-vmhost2.snc1
+      - 10.20.76.40/32   #ops-tooling-vmhost2.snc1
+      - 10.20.41.66/32   #orders-app1.snc1
+      - 10.20.79.100/32   #orders-app1-e2e.snc1
+      - 10.20.41.67/32   #orders-app2.snc1
+      - 10.20.41.68/32   #orders-app3.snc1
+      - 10.20.80.24/32   #orders-app3-perf.snc1
+      - 10.20.40.27/32   #orders-app4.snc1
+      - 10.20.74.188/32   #orders-app5.snc1
+      - 10.20.74.179/32   #orders-app6.snc1
+      - 10.20.74.194/32   #orders-app7.snc1
+      - 10.20.74.162/32   #orders-app8.snc1
+      - 10.20.75.192/32   #orders-app9.snc1
+      - 10.20.75.195/32   #orders-app10.snc1
+      - 10.20.75.196/32   #orders-app11.snc1
+      - 10.20.75.198/32   #orders-app12.snc1
+      - 10.20.78.121/32   #orders-app13.snc1
+      - 10.20.78.147/32   #orders-app14.snc1
+      - 10.20.78.130/32   #orders-app15.snc1
+      - 10.20.78.142/32   #orders-app16.snc1
+      - 10.22.134.87/32   # orders-app17.snc1
+      - 10.22.53.127/32   # orders-app18.snc1
+      - 10.22.54.72/32   # orders-app19.snc1
+      - 10.22.137.252/32   # orders-app20.snc1
+      - 10.22.132.208/32   # orders-app21.snc1
+      - 10.22.71.237/32   # orders-app22.snc1
+      - 10.22.54.150/32   # orders-app23.snc1
+      - 10.22.53.46/32   # orders-app24.snc1
+      - 10.22.54.101/32   # orders-app25.snc1
+      - 10.22.67.55/32   # orders-app26.snc1
+      - 10.22.76.90/32   # orders-app27.snc1
+      - 10.22.233.225/32   # orders-app28.snc1
+      - 10.22.70.17/32   # orders-app29.snc1
+      - 10.22.217.169/32   # orders-app30.snc1
+      - 10.22.141.28/32   # orders-app31.snc1
+      - 10.22.81.118/32   # orders-app32.snc1
+      - 10.22.77.52/32   # orders-app33.snc1
+      - 10.22.133.108/32   # orders-app34.snc1
+      - 10.22.133.200/32   # orders-app35.snc1
+      - 10.22.72.125/32   # orders-app36.snc1
+      - 10.22.219.212/32   # orders-app37.snc1
+      - 10.22.133.4/32   # orders-app38.snc1
+      - 10.22.81.35/32   # orders-app39.snc1
+      - 10.22.141.232/32   # orders-app40.snc1
+      - 10.22.71.98/32   # orders-app41.snc1
+      - 10.22.55.123/32   # orders-app42.snc1
+      - 10.22.77.71/32   # orders-app43.snc1
+      - 10.22.81.111/32   # orders-app44.snc1
+      - 10.22.77.21/32   # orders-app45.snc1
+      - 10.22.132.159/32   # orders-app46.snc1
+      - 10.22.109.219/32   # orders-app47.snc1
+      - 10.22.134.55/32   # orders-app48.snc1
+      - 10.22.141.226/32   # orders-app49.snc1
+      - 10.22.216.62/32   # orders-app50.snc1
+      - 10.22.150.219/32   # orders-app51.snc1
+      - 10.22.71.102/32   # orders-app52.snc1
+      - 10.22.217.43/32   # orders-app53.snc1
+      - 10.22.141.211/32   # orders-app54.snc1
+      - 10.22.49.182/32   # orders-app55.snc1
+      - 10.22.81.197/32   # orders-app56.snc1
+      - 10.22.149.207/32   # orders-app57.snc1
+      - 10.22.149.168/32   # orders-app58.snc1
+      - 10.22.138.166/32   # orders-app59.snc1
+      - 10.22.119.108/32   # orders-app60.snc1
+      - 10.22.152.101/32   # orders-app61.snc1
+      - 10.22.141.106/32   # orders-app62.snc1
+      - 10.22.141.117/32   # orders-app63.snc1
+      - 10.22.233.125/32   # orders-app64.snc1
+      - 10.22.233.129/32   # orders-app65.snc1
+      - 10.32.158.243/32   # orders-app17.sac1
+      - 10.20.42.101/32   #orders-read-app1.snc1
+      - 10.20.42.102/32   #orders-read-app2.snc1
+      - 10.20.78.125/32   #orders-read-app3.snc1
+      - 10.20.78.153/32   #orders-read-app4.snc1
+      - 10.20.78.151/32   #orders-read-app5.snc1
+      - 10.20.68.138/32   #orders-read-app6.snc1
+      - 10.20.68.141/32   #orders-read-app7.snc1
+      - 10.20.68.118/32   #orders-read-app8.snc1
+      - 10.20.69.242/32   #orders-read-app9.snc1
+      - 10.20.75.88/32   #orders-read-app10.snc1
+      - 10.20.83.209/32   #orders-read-app11.snc1
+      - 10.20.69.200/32   #orders-read-app12.snc1
+      - 10.20.75.166/32   #orders-read-app13.snc1
+      - 10.20.69.163/32   #orders-read-app14.snc1
+      - 10.20.75.120/32   #orders-read-app15.snc1
+      - 10.20.69.215/32   #orders-read-app16.snc1
+      - 10.22.81.148/32   # orders-read-app17.snc1
+      - 10.22.77.209/32   # orders-read-app18.snc1
+      - 10.22.109.82/32   # orders-read-app20.snc1
+      - 10.22.109.34/32   # orders-read-app21.snc1
+      - 10.22.54.118/32   # orders-read-app22.snc1
+      - 10.22.50.140/32   # orders-read-app23.snc1
+      - 10.22.132.202/32   # orders-read-app24.snc1
+      - 10.22.53.139/32   # orders-read-app25.snc1
+      - 10.22.55.177/32   # orders-read-app26.snc1
+      - 10.22.50.115/32   # orders-read-app27.snc1
+      - 10.22.48.181/32   # orders-read-app28.snc1
+      - 10.22.133.168/32   # orders-read-app29.snc1
+      - 10.22.53.228/32   # orders-read-app30.snc1
+      - 10.22.49.250/32   # orders-read-app31.snc1
+      - 10.22.77.254/32   # orders-read-app32.snc1
+      - 10.22.49.127/32   # orders-read-app33.snc1
+      - 10.22.67.27/32   # orders-read-app34.snc1
+      - 10.22.70.44/32   # orders-read-app35.snc1
+      - 10.22.49.243/32   # orders-read-app36.snc1
+      - 10.22.132.226/32   # orders-read-app37.snc1
+      - 10.22.49.120/32   # orders-read-app38.snc1
+      - 10.22.81.212/32   # orders-read-app39.snc1
+      - 10.22.141.68/32   # orders-read-app40.snc1
+      - 10.22.49.125/32   # orders-read-app41.snc1
+      - 10.22.71.9/32   # orders-read-app42.snc1
+      - 10.22.49.140/32   # orders-read-app43.snc1
+      - 10.22.49.99/32   # orders-read-app44.snc1
+      - 10.22.49.112/32   # orders-read-app45.snc1
+      - 10.22.49.156/32   # orders-read-app46.snc1
+      - 10.22.49.218/32   # orders-read-app47.snc1
+      - 10.22.49.237/32   # orders-read-app48.snc1
+      - 10.22.49.167/32   # orders-read-app49.snc1
+      - 10.22.49.190/32   # orders-read-app50.snc1
+      - 10.22.49.123/32   # orders-read-app51.snc1
+      - 10.22.49.217/32   # orders-read-app52.snc1
+      - 10.22.49.174/32   # orders-read-app53.snc1
+      - 10.22.49.153/32   # orders-read-app54.snc1
+      - 10.22.49.97/32   # orders-read-app55.snc1
+      - 10.22.49.183/32   # orders-read-app56.snc1
+      - 10.22.49.180/32   # orders-read-app57.snc1
+      - 10.22.49.141/32   # orders-read-app58.snc1
+      - 10.22.49.137/32   # orders-read-app59.snc1
+      - 10.22.49.228/32   # orders-read-app60.snc1
+      - 10.22.140.48/32   # orders-read-app61.snc1
+      - 10.22.78.121/32   # orders-read-app62.snc1
+      - 10.22.134.57/32   # orders-read-app63.snc1
+      - 10.22.217.31/32   # orders-read-app64.snc1
+      - 10.22.219.55/32   # orders-read-app65.snc1
+      - 10.22.217.109/32   # orders-read-app66.snc1
+      - 10.22.237.131/32   # orders-read-app67.snc1
+      - 10.22.233.15/32   # orders-read-app68.snc1
+      - 10.22.133.184/32   # orders-read-app69.snc1
+      - 10.22.219.15/32   # orders-read-app70.snc1
+      - 10.22.233.102/32   # orders-read-app71.snc1
+      - 10.22.53.204/32   # orders-read-app72.snc1
+      - 10.22.150.180/32   # orders-read-app73.snc1
+      - 10.22.151.16/32   # orders-read-app74.snc1
+      - 10.22.237.144/32   # orders-read-app75.snc1
+      - 10.32.208.85/32   # orders-read-app9.sac1
+      - 10.32.49.98/32   # orders-read-app10.sac1
+      - 10.32.176.191/32   # orders-read-app11.sac1
+      - 10.32.150.47/32   # orders-read-app12.sac1
+      - 10.32.154.235/32   # orders-read-app13.sac1
+      - 10.32.152.97/32   # orders-read-app14.sac1
+      - 10.32.254.204/32   # orders-read-app15.sac1
+      - 10.20.41.52/32   # orders-irb1.snc1
+      - 10.22.216.57/32   # orders-irb2.snc1
+      - 10.32.150.32/32   # orders-irb1.sac1
+      - 10.32.142.63/32   # orders-irb2.sac1
+      - 10.20.41.131/32   # orders-irb-rw1.snc1
+      - 10.22.218.190/32   # orders-irb-rw2.snc1
+      - 10.32.140.193/32   # orders-irb-rw1.sac1
+      - 10.32.62.188/32   # orders-irb-rw2.sac1
+      - 10.20.41.48/32   #orders-sphinx1.snc1
+      - 10.20.40.21/32   #orders-sphinx2.snc1
+      - 10.20.41.87/32   #orders-utility1.snc1
+      - 10.22.78.65/32   # orders-utility2.snc1
+      - 10.20.72.67/32   #orders-utility3.snc1
+      - 10.22.71.126/32   # orders-utility4.snc1
+      - 10.22.141.60/32   # orders-utility5.snc1
+      - 10.20.70.80/32   #pit-adhoc1.snc1
+      - 10.20.70.108/32   #pit-adhoc2.snc1
+      - 10.22.152.167/32  # pricing-app11.snc1
+      - 10.20.81.199/32  # pricing-app12.snc1
+      - 10.20.83.155/32  # pricing-app13.snc1
+      - 10.22.137.78/32  # pricing-app14.snc1
+      - 10.20.91.166/32   #pricing-app10.snc1
+      - 10.20.82.213/32   #pricing-app1-dev.snc1
+      - 10.20.91.51/32   #pricing-app5.snc1
+      - 10.20.91.225/32   #pricing-app6.snc1
+      - 10.20.91.188/32   #pricing-app7.snc1
+      - 10.20.91.153/32   #pricing-app8.snc1
+      - 10.20.91.107/32   #pricing-app9.snc1
+      - 10.22.152.167/32   #pricing-app11.snc1
+      - 10.20.81.199/32   #pricing-app12.snc1
+      - 10.20.83.155/32   #pricing-app13.snc1
+      - 10.22.137.78/32   #pricing-app14.snc1
+      - 10.22.140.18/32   #pricing-app15.snc1
+      - 10.22.150.106/32   #pricing-app16.snc1
+      - 10.22.140.43/32   #pricing-app17.snc1
+      - 10.22.150.81/32   #pricing-app18.snc1
+      - 10.22.237.243/32   #pricing-app19.snc1
+      - 10.22.151.217/32   #pricing-app20.snc1
+      - 10.22.237.160/32   #pricing-app21.snc1
+      - 10.22.150.71/32   #pricing-app22.snc1
+      - 10.22.149.132/32   #pricing-app23.snc1
+      - 10.22.150.234/32   #pricing-app24.snc1
+      - 10.20.112.218/32   #pricing-differential-app1.snc1
+      - 10.20.112.77/32   #pricing-differential-app2.snc1
+      - 10.20.131.191/32   #pricing-differential-app3.snc1
+      - 10.20.99.180/32   #pricing-differential-app4.snc1
+      - 10.20.41.76/32   #relevance-app1.snc1
+      - 10.20.41.77/32   #relevance-app2.snc1
+      - 10.20.77.217/32   #relevance-app32.snc1
+      - 10.20.71.140/32   #relevance-app33.snc1
+      - 10.20.77.221/32   #relevance-app34.snc1
+      - 10.20.71.162/32   #relevance-app35.snc1
+      - 10.20.77.219/32   #relevance-app36.snc1
+      - 10.20.40.216/32   #relevance-app37.snc1
+      - 10.20.76.164/32   #relevance-app38.snc1
+      - 10.20.41.201/32   #relevance-app39.snc1
+      - 10.20.41.80/32   #relevance-app3.snc1
+      - 10.20.41.203/32   #relevance-app40.snc1
+      - 10.20.70.121/32   #relevance-app45.snc1
+      - 10.20.70.99/32   #relevance-app48.snc1
+      - 10.20.42.55/32   #relevance-app49.snc1
+      - 10.20.40.39/32   #relevance-app4.snc1
+      - 10.20.68.81/32   #relevance-app57.snc1
+      - 10.20.72.46/32   #relevance-app58.snc1
+      - 10.20.69.144/32   #relevance-indexer1.snc1
+      - 10.20.40.47/32   #smartdeals-utility1.snc1
+      - 10.22.127.22/32   #users-service-app10.snc1
+      - 10.20.80.114/32   #users-service-app1-integration.snc1
+      - 10.20.74.155/32   #users-service-app1.snc1
+      - 10.20.79.168/32   #users-service-app1-tat.snc1
+      - 10.20.74.159/32   #users-service-app2.snc1
+      - 10.22.200.240/32   #users-service-app2-test.snc1
+      - 10.20.74.140/32   #users-service-app3.snc1
+      - 10.20.74.170/32   #users-service-app4.snc1
+      - 10.20.75.82/32   #users-service-app5.snc1
+      - 10.20.75.93/32   #users-service-app6.snc1
+      - 10.22.127.220/32   #users-service-app7.snc1
+      - 10.22.127.231/32   #users-service-app8.snc1
+      - 10.22.127.187/32   #users-service-app9.snc1
+      - 10.22.70.28/32   #users-service-utility1.snc1
+      - 10.20.91.103/32   #users-service-utility2.snc1
+      - 10.20.87.235/32   #voucher-txn-service-app1.snc1
+      - 10.20.87.38/32   #voucher-txn-service-app2.snc1
+      - 10.20.98.12/32   #vulnscan1.snc1
+      - 10.20.98.12/32   #vulnscan1.snc1
+      - 10.20.74.207/32   #watson-storm10-prod.snc1
+      - 10.20.74.207/32   #watson-storm10-prod.snc1
+      - 10.20.74.204/32   #watson-storm11-prod.snc1
+      - 10.20.74.204/32   #watson-storm11-prod.snc1
+      - 10.22.74.100/32   #watson-storm11.snc1
+      - 10.20.74.201/32   #watson-storm12-prod.snc1
+      - 10.20.74.201/32   #watson-storm12-prod.snc1
+      - 10.22.74.51/32   #watson-storm12.snc1
+      - 10.22.74.81/32   #watson-storm13-prod.snc1
+      - 10.22.74.81/32   #watson-storm13-prod.snc1
+      - 10.22.74.97/32   #watson-storm13.snc1
+      - 10.22.74.39/32   #watson-storm14.snc1
+      - 10.22.74.149/32   #watson-storm16.snc1
+      - 10.20.74.63/32   #watson-storm1-prod.snc1
+      - 10.20.74.63/32   #watson-storm1-prod.snc1
+      - 10.20.74.64/32   #watson-storm2-prod.snc1
+      - 10.20.74.64/32   #watson-storm2-prod.snc1
+      - 10.20.74.65/32   #watson-storm3-prod.snc1
+      - 10.20.74.65/32   #watson-storm3-prod.snc1
+      - 10.20.40.66/32   #watson-storm4-prod.snc1
+      - 10.20.40.66/32   #watson-storm4-prod.snc1
+      - 10.20.76.74/32   #watson-storm5-prod.snc1
+      - 10.20.76.74/32   #watson-storm5-prod.snc1
+      - 10.20.78.236/32   #watson-storm6-prod.snc1
+      - 10.20.78.236/32   #watson-storm6-prod.snc1
+      - 10.20.73.57/32   #watson-storm7-prod.snc1
+      - 10.20.73.57/32   #watson-storm7-prod.snc1
+      - 10.20.74.163/32   #watson-storm8-prod.snc1
+      - 10.20.74.163/32   #watson-storm8-prod.snc1
+      - 10.20.74.131/32   #watson-storm9-prod.snc1
+      - 10.20.74.131/32   #watson-storm9-prod.snc1
+      - 10.20.68.85/32   #web-pod1-app1-perf.snc1
+      - 10.20.41.104/32   #web-pod1-app1.snc1
+      - 10.20.68.86/32   #web-pod1-app2-perf.snc1
+      - 10.20.41.105/32   #web-pod1-app2.snc1
+      - 10.20.68.87/32   #web-pod1-app3-perf.snc1
+      - 10.20.41.106/32   #web-pod1-app3.snc1
+      - 10.20.41.107/32   #web-pod1-app4.snc1
+      - 10.20.41.114/32   #web-pod2-app1.snc1
+      - 10.20.41.115/32   #web-pod2-app2.snc1
+      - 10.20.41.116/32   #web-pod2-app3.snc1
+      - 10.20.41.117/32   #web-pod2-app4.snc1
+      - 10.20.40.85/32   #web-pod3-app1.snc1
+      - 10.20.40.88/32   #web-pod3-app2.snc1
+      - 10.20.40.89/32   #web-pod3-app3.snc1
+      - 10.20.40.91/32   #web-pod3-app4.snc1
+      - 10.20.40.23/32   #web-pod4-app1.snc1
+      - 10.20.40.96/32   #web-pod4-app2.snc1
+      - 10.20.40.50/32   #web-pod4-app3.snc1
+      - 10.20.40.51/32   #web-pod4-app4.snc1
+      - 10.20.41.110/32   #web-pod5-app1.snc1
+      - 10.20.41.111/32   #web-pod5-app2.snc1
+      - 10.20.41.112/32   #web-pod5-app3.snc1
+      - 10.20.41.120/32   #web-pod5-app4.snc1
+      - 10.20.74.171/32   #web-pod6-app1.snc1
+      - 10.20.74.176/32   #web-pod6-app2.snc1
+      - 10.20.74.178/32   #web-pod6-app3.snc1
+      - 10.20.74.182/32   #web-pod6-app4.snc1
+      - 10.20.73.202/32   #web-pod7-app1.snc1
+      - 10.20.73.207/32   #web-pod7-app2.snc1
+      - 10.20.73.209/32   #web-pod7-app3.snc1
+      - 10.20.73.212/32   #web-pod7-app4.snc1
+      - 10.20.78.128/32   #web-pod8-app1.snc1
+      - 10.20.78.136/32   #web-pod8-app2.snc1
+      - 10.20.78.138/32   #web-pod8-app3.snc1
+      - 10.20.78.150/32   #web-pod8-app4.snc1
+      - 10.20.78.159/32   #web-pod9-app1.snc1
+      - 10.20.78.158/32   #web-pod9-app2.snc1
+      - 10.20.78.160/32   #web-pod9-app3.snc1
+      - 10.20.78.161/32   #web-pod9-app4.snc1
+      - 10.20.41.44/32   #web-sphinx1.snc1
+      - 10.20.40.22/32   #web-sphinx2.snc1
+      - 10.20.41.124/32   #web-utility1.snc1
+      - 10.20.41.125/32   #web-utility2.snc1
+      - 10.20.41.126/32   #web-worker1.snc1
+      - 10.20.41.127/32   #web-worker2.snc1
+      - 10.20.41.128/32   #web-worker3.snc1
+      - 10.20.41.129/32   #web-worker4.snc1
+      - 10.20.41.130/32   #web-worker5.snc1
+      - 10.20.43.77/32   #web-worker6.snc1
+      - 10.20.43.69/32   #web-worker7.snc1
+      - 10.22.148.59/32   #darwin-prod-rt10-rapiagg1.snc1
+      - 10.22.148.189/32   #darwin-prod-rt2-rapiagg1.snc1
+      - 10.22.148.150/32   #darwin-prod-rt4-rapiagg1.snc1
+      - 10.22.148.9/32   #darwin-prod-rt6-rapiagg1.snc1
+      - 10.22.148.38/32   #darwin-prod-rt8-rapiagg1.snc1
+      - 10.22.148.199/32   #darwin-prod-rt1-rapiagg1.snc1
+      - 10.22.148.21/32   #darwin-prod-rt3-rapiagg1.snc1
+      - 10.22.148.20/32   #darwin-prod-rt5-rapiagg1.snc1
+      - 10.22.148.135/32   #darwin-prod-rt7-rapiagg1.snc1
+      - 10.22.148.141/32   #darwin-prod-rt9-rapiagg1.snc1
+      - 10.22.76.53/32     # darwin-cards-aggregator3.snc1
+      - 10.22.237.185/32 # voucher-inventory-app1.snc1
+      - 10.20.77.235/32 # voucher-inventory-app2.snc1
+      - 10.22.237.141/32 # voucher-inventory-app3.snc1
+      - 10.22.140.134/32 # voucher-inventory-app4.snc1
+      - 10.22.237.8/32 # voucher-inventory-app5.snc1
+      - 10.22.150.185/32 # voucher-inventory-app6.snc1
+      - 10.22.152.205/32 # voucher-inventory-app7.snc1
+      - 10.22.237.148/32 # voucher-inventory-app8.snc1
+      - 10.22.72.55/32 # voucher-inventory-utility1.snc1
+      - 10.22.109.129/32 # voucher-inventory-utility2.snc1
+      - 10.22.148.103/32   #darwin-prod-batch6-agg1.snc1
+      - 10.22.148.112/32   #darwin-prod-batch6-agg2.snc1
+      - 10.22.148.120/32   #darwin-prod-batch6-agg3.snc1
+      - 10.22.148.121/32   #darwin-prod-batch6-agg4.snc1
+      - 10.22.148.122/32   #darwin-prod-batch6-agg5.snc1
+      - 10.22.148.128/32   #darwin-prod-batch6-es1.snc1
+      - 10.22.148.188/32   #darwin-prod-batch6-es10.snc1
+      - 10.22.148.192/32   #darwin-prod-batch6-es11.snc1
+      - 10.22.148.214/32   #darwin-prod-batch6-es12.snc1
+      - 10.22.148.218/32   #darwin-prod-batch6-es13.snc1
+      - 10.22.148.226/32   #darwin-prod-batch6-es14.snc1
+      - 10.22.148.241/32   #darwin-prod-batch6-es15.snc1
+      - 10.22.148.243/32   #darwin-prod-batch6-es16.snc1
+      - 10.22.148.249/32   #darwin-prod-batch6-es17.snc1
+      - 10.22.148.28/32   #darwin-prod-batch6-es18.snc1
+      - 10.22.148.36/32   #darwin-prod-batch6-es19.snc1
+      - 10.22.148.145/32   #darwin-prod-batch6-es2.snc1
+      - 10.22.148.49/32   #darwin-prod-batch6-es20.snc1
+      - 10.22.148.51/32   #darwin-prod-batch6-es21.snc1
+      - 10.22.148.55/32   #darwin-prod-batch6-es22.snc1
+      - 10.22.148.64/32   #darwin-prod-batch6-es23.snc1
+      - 10.22.148.65/32   #darwin-prod-batch6-es24.snc1
+      - 10.22.148.70/32   #darwin-prod-batch6-es25.snc1
+      - 10.22.148.74/32   #darwin-prod-batch6-es26.snc1
+      - 10.22.148.75/32   #darwin-prod-batch6-es27.snc1
+      - 10.22.148.93/32   #darwin-prod-batch6-es28.snc1
+      - 10.22.148.149/32   #darwin-prod-batch6-es3.snc1
+      - 10.22.148.156/32   #darwin-prod-batch6-es4.snc1
+      - 10.22.148.159/32   #darwin-prod-batch6-es5.snc1
+      - 10.22.148.177/32   #darwin-prod-batch6-es6.snc1
+      - 10.22.148.182/32   #darwin-prod-batch6-es7.snc1
+      - 10.22.148.185/32   #darwin-prod-batch6-es8.snc1
+      - 10.22.148.187/32   #darwin-prod-batch6-es9.snc1
+      - 10.20.77.241/32   # darwin-test-agg1.snc1
+      - 10.22.64.160/32   # darwin-test-agg3.snc1
+      - 10.22.64.248/32   # darwin-test-agg4.snc1
+      - 10.20.76.23/32   # darwin-test-indexer1.snc1
+      - 10.20.77.148/32   # darwin-ci-indexer1.snc1
+      - 10.22.76.116/32   # darwin-ci-aggregator1.snc1
+      - 10.20.42.123/32   # darwin-ci-aggregator2.snc1
+      - 10.32.144.158/32   # custsvc-latam-app1.sac1
+      - 10.32.140.50/32   # custsvc-latam-app2.sac1
+      - 10.20.43.111/32   # db-replica-etl-split-vip.snc1 
+      - 10.22.81.219/32   # custsvc-latam-app1.snc1 
+      - 10.22.81.214/32   # custsvc-latam-app2.snc1 
+      - 10.32.160.246/32   # users-service-app1.sac1
+      - 10.32.170.158/32   # users-service-app2.sac1
+      - 10.32.164.218/32   # users-service-app3.sac1
+      - 10.32.57.146/32   # users-service-app4.sac1
+      - 10.32.69.107/32   # users-service-utility1.sac1
+      - 10.32.148.130/32   # users-service-utility2.sac1
+      - 10.32.71.181/32   # voucher-inventory-app1.sac1
+      - 10.32.213.141/32   # voucher-inventory-app2.sac1
+      - 10.32.142.155/32   # voucher-inventory-app3.sac1
+      - 10.32.120.197/32   # voucher-inventory-app4.sac1
+      - 10.32.209.155/32   # voucher-inventory-memcache1.sac1
+      - 10.32.174.131/32   # voucher-inventory-memcache2.sac1
+      - 10.32.152.35/32   # voucher-inventory-utility1.sac1
+      - 10.32.150.215/32   # voucher-inventory-utility2.sac1
+      - 10.32.105.168/32   # deal-ecosystem-app1.sac1
+      - 10.32.239.124/32   # deal-ecosystem-app2.sac1
+      - 10.32.110.78/32   # deal-ecosystem-app3.sac1
+      - 10.20.75.143/32  # deal-ecosystem-app6.snc1
+      - 10.20.69.30/32  # deal-ecosystem-app7.snc1
+      - 10.20.75.107/32  # deal-ecosystem-app8.snc1
+      - 10.22.218.74/32   #dealservice-app16.snc1
+      - 10.22.233.217/32   #dealservice-app17.snc1
+      - 10.22.233.92/32   #dealservice-app18.snc1
+      - 10.22.217.194/32   #dealservice-app19.snc1
+      - 10.22.218.64/32   #dealservice-app20.snc1
+      - 10.22.218.223/32   #dealservice-app21.snc1
+      - 10.22.218.224/32   #dealservice-app22.snc1
+      - 10.22.218.202/32   #dealservice-app23.snc1
+      - 10.22.217.218/32   #dealservice-app24.snc1
+      - 10.22.233.155/32 #dealservice-app-rw1.snc1
+      - 10.22.218.24/32  #dealservice-app-rw2.snc1
+      - 10.20.130.150/32 #dealservice-app-rw3.snc1
+      - 10.22.218.111/32 #dealservice-app-rw4.snc1
+      - 10.22.218.254/32 #dealservice-app-rw5.snc1
+      - 10.22.233.76/32  #dealservice-app-rw6.snc1
+      - 10.22.37.157/32  #darwin-prod-rt11-agg1.snc1
+      - 10.22.37.191/32  #darwin-prod-rt11-agg2.snc1
+      - 10.22.37.106/32  #darwin-prod-rt11-agg3.snc1
+      - 10.22.37.245/32  #darwin-prod-rt11-agg4.snc1
+      - 10.22.37.186/32  #darwin-prod-rt11-agg5.snc1
+      - 10.22.37.223/32  #darwin-prod-rt12-agg1.snc1
+      - 10.22.37.63/32  #darwin-prod-rt12-agg2.snc1
+      - 10.22.37.154/32  #darwin-prod-rt12-agg3.snc1
+      - 10.22.37.231/32  #darwin-prod-rt12-agg4.snc1
+      - 10.22.37.85/32  #darwin-prod-rt12-agg5.snc1
+      - 10.22.37.138/32  #darwin-prod-rt13-agg1.snc1
+      - 10.22.37.28/32  #darwin-prod-rt13-agg2.snc1
+      - 10.22.37.232/32  #darwin-prod-rt13-agg3.snc1
+      - 10.22.37.220/32  #darwin-prod-rt13-agg4.snc1
+      - 10.22.37.197/32  #darwin-prod-rt13-agg5.snc1
+      - 10.22.217.190/32   #dealservice-app25.snc1
+      - 10.22.217.79/32   #dealservice-app26.snc1
+      - 10.22.217.229/32   #dealservice-app27.snc1
+      - 10.22.233.227/32   #dealservice-app28.snc1
+      - 10.22.109.91/32   #dealservice-app29.snc1
+      - 10.22.233.30/32   #dealservice-app30.snc1
+      - 10.20.41.71/32   # orders-read-batch1.snc1
+      - 10.20.43.43/32   # orders-read-batch2.snc1  
+      - 10.20.131.88/32   # deal-ecosystem-app9.snc1
+      - 10.22.217.253/32   # deal-ecosystem-app10.snc1
+      - 10.22.233.242/32   # deal-ecosystem-app11.snc1
+      - 10.22.218.219/32   # deal-ecosystem-app12.snc1
+      - 10.22.218.50/32   # deal-ecosystem-app13.snc1
+      - 10.22.218.230/32   # deal-ecosystem-app14.snc1
+      - 10.22.233.200/32   # deal-ecosystem-app15.snc1
+      - 10.22.218.150/32   # deal-ecosystem-app16.snc1
+      - 10.22.218.143/32   # deal-ecosystem-app17.snc1
+      - 10.22.233.25/32   # deal-ecosystem-app18.snc1
+      - 10.22.218.221/32   # custsvc-app3.snc1
+      - 10.22.218.69/32   # custsvc-app4.snc1
+      - 10.22.217.188/32   # voucher-inventory-app9.snc1
+      - 10.22.217.19/32   # voucher-inventory-app10.snc1
+      - 10.22.233.71/32   # voucher-inventory-app11.snc1
+      - 10.22.218.44/32   # voucher-inventory-app12.snc1
+      - 10.22.218.149/32   # voucher-inventory-app13.snc1
+      - 10.22.233.37/32   # voucher-inventory-app14.snc1
+      - 10.22.233.121/32   # voucher-inventory-app15.snc1
+      - 10.22.233.70/32   # voucher-inventory-app16.snc1
+      - 10.22.218.45/32   # voucher-inventory-app17.snc1
+      - 10.22.233.207/32   # voucher-inventory-app18.snc1
+      - 10.20.82.197/32 # pricing-utility1-uat.snc1
+      - 10.22.77.145/32 # merchant-umapi-app1-us.snc1
+      - 10.22.109.101/32 # merchant-umapi-app2-us.snc1
+      - 10.20.68.135/32 # merchant-umapi-app3-us.snc1
+      - 10.20.81.151/32 # merchant-umapi-app4-us.snc1
+      - 10.22.139.65/32 # merchant-umapi-app5-us.snc1
+      - 10.22.150.109/32 # merchant-umapi-app6-us.snc1
+      - 10.22.233.62/32 # dealservice-app31.snc1
+      - 10.20.112.149/32 # user-sync-utility1.snc1
+      - 10.32.176.54/32 # user-sync-utility1.sac1
+      - 10.22.72.80/32 # user-sync-utility2.snc1
+      - 10.32.105.159/32 # user-sync-utility2.sac1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.22.217.84/32   # dealservice-app-rw7.snc1
+      - 10.22.233.29/32   # dealservice-app-rw8.snc1
+      - 10.22.218.201/32   # dealservice-app-rw9.snc1
+      - 10.20.91.240/32   # custsvc-tokenizer1.snc1
+      - 10.22.217.107/32   # custsvc-tokenizer2.snc1
+      - 10.22.109.211/32   # voucher-inventory-app19.snc1
+      - 10.22.109.155/32   # voucher-inventory-app20.snc1
+      - 10.22.149.130/32   # voucher-inventory-app21.snc1
+      - 10.22.149.31/32   # voucher-inventory-app22.snc1
+      - 10.22.237.73/32   # voucher-inventory-app23.snc1
+      - 10.22.216.201/32   # voucher-inventory-app24.snc1
+      - 10.22.237.104/32   # voucher-inventory-app25.snc1
+      - 10.22.237.140/32   # voucher-inventory-app26.snc1
+      - 10.22.233.127/32   # voucher-inventory-app27.snc1
+      - 10.22.67.235/32   # voucher-inventory-app28.snc1
+      - 10.22.150.154/32   # voucher-inventory-app29.snc1
+      - 10.22.217.136/32   # voucher-inventory-app30.snc1
+      - 10.22.237.117/32   # voucher-inventory-app31.snc1
+      - 10.22.67.164/32   # voucher-inventory-app32.snc1
+      - 10.22.67.15/32   # voucher-inventory-app33.snc1
+      - 10.22.67.36/32   # voucher-inventory-app34.snc1
+      - 10.22.135.201/32   # voucher-inventory-app35.snc1
+      - 10.22.237.37/32   # voucher-inventory-app36.snc1
+      - 10.22.216.44/32   # voucher-inventory-app37.snc1
+      - 10.22.71.251/32   # voucher-inventory-app38.snc1
+      - 10.22.81.60/32   # voucher-inventory-worker1.snc1
+      - 10.22.76.39/32   #voucher-inventory-worker3.snc1
+      - 10.20.76.237/32   #voucher-inventory-worker4.snc1
+      - 10.22.77.69/32   # voucher-inventory-worker6.snc1
+      - 10.32.55.15/32   # voucher-inventory-worker1.sac1
+      - 10.32.142.209/32   # voucher-inventory-worker2.sac1
+      - 10.22.132.11/32  # voucher-inventory-jworker1.snc1
+      - 10.22.109.131/32   # voucher-inventory-jworker2.snc1
+      - 10.32.74.206/32   # custsvc-utility1.sac1
+      - 10.32.55.142/32   # custsvc-utility2.sac1
+      - 10.32.158.73/32   # custsvc-tokenizer1.sac1
+      - 10.32.253.189/32   # custsvc-tokenizer2.sac1
+      - 10.22.219.81/32   # pricing-app1.snc1
+      - 10.22.216.204/32   # pricing-app2.snc1
+      - 10.22.216.227/32   # pricing-app3.snc1
+      - 10.20.78.56/32   # pricing-app4.snc1
+      - 10.22.119.146/32   # pricing-app25.snc1
+      - 10.20.69.253/32   # subscription-service-app1.snc1
+      - 10.20.75.36/32   # subscription-service-app2.snc1
+      - 10.20.69.128/32   # subscription-service-app3.snc1
+      - 10.22.74.139/32   # subscription-service-app4.snc1
+      - 10.22.74.198/32   # subscription-service-app5.snc1
+      - 10.22.66.238/32   # subscription-service-app6.snc1
+      - 10.22.66.90/32   # subscription-service-app7.snc1
+      - 10.22.66.67/32   # subscription-service-app8.snc1
+      - 10.22.66.19/32   # subscription-service-app9.snc1
+      - 10.22.66.29/32   # subscription-service-app10.snc1
+      - 10.22.70.166/32   # subscription-service-app11.snc1
+      - 10.22.70.51/32   # subscription-service-app12.snc1
+      - 10.22.70.100/32   # subscription-service-app13.snc1
+      - 10.22.64.194/32   # subscription-service-app14.snc1
+      - 10.22.70.6/32   # subscription-service-app15.snc1
+      - 10.32.247.57/32   # pricing-app11.sac1
+      - 10.32.154.132/32   # pricing-app12.sac1
+      - 10.32.37.77/32   # pricing-app13.sac1
+      - 10.32.158.144/32   # pricing-app14.sac1
+      - 10.32.72.246/32   # pricing-app15.sac1
+      - 10.32.100.239/32   # pricing-app16.sac1
+      - 10.32.172.162/32   # pricing-app17.sac1
+      - 10.32.142.144/32   # pricing-app18.sac1
+      - 10.32.156.227/32   # pricing-app19.sac1
+      - 10.32.208.242/32   # pricing-app20.sac1
+      - 10.32.152.248/32   # pricing-app21.sac1
+      - 10.32.97.170/32   # pricing-app22.sac1
+      - 10.32.234.223/32   # pricing-app23.sac1
+      - 10.32.174.20/32   # pricing-app24.sac1
+      - 10.32.230.7/32   # pricing-app25.sac1
+      - 10.22.71.87/32     # users-service-app11.snc1
+      - 10.22.219.229/32   # users-service-app12.snc1
+      - 10.22.233.36/32    # users-service-app13.snc1
+      - 10.22.216.134/32   # users-service-app14.snc1
+      - 10.22.67.193/32    # users-service-app15.snc1
+      - 10.22.139.142/32   # users-service-app16.snc1
+      - 10.22.217.20/32    # users-service-app17.snc1
+      - 10.22.233.134/32   # users-service-app18.snc1
+      - 10.22.233.53/32    # users-service-app19.snc1
+      - 10.22.233.90/32    # users-service-app20.snc1
+      - 10.22.152.10/32    # users-service-app21.snc1
+      - 10.22.218.131/32   # users-service-app22.snc1
+      - 10.22.237.156/32   # users-service-app23.snc1
+      - 10.22.77.164/32    # users-service-app24.snc1
+      - 10.22.67.32/32     # users-service-app25.snc1
+      - 10.20.132.198/32   # users-service-app26.snc1
+      - 10.22.217.77/32    # users-service-app27.snc1
+      - 10.22.67.54/32     # users-service-app28.snc1
+      - 10.22.237.228/32   # users-service-app29.snc1
+      - 10.22.233.160/32   # users-service-app30.snc1 
+      - 10.22.216.79/32   # users-service-app31.snc1
+      - 10.22.81.79/32   # users-service-app32.snc1
+      - 10.22.81.202/32   # users-service-app33.snc1
+      - 10.22.135.128/32   # users-service-app34.snc1
+      - 10.20.130.110/32   # users-service-app35.snc1
+      - 10.22.237.125/32   # users-service-app36.snc1
+      - 10.20.91.63/32   # users-service-app37.snc1
+      - 10.22.70.50/32   # users-service-app38.snc1
+      - 10.20.131.116/32   # users-service-app39.snc1
+      - 10.22.233.169/32   # users-service-app40.snc1
+      - 10.22.237.41/32   # users-service-app41.snc1
+      - 10.22.71.115/32   # users-service-app42.snc1
+      - 10.22.216.39/32   # users-service-app43.snc1
+      - 10.22.237.70/32   # users-service-app44.snc1
+      - 10.22.152.245/32   # users-service-app45.snc1
+      - 10.22.237.4/32   # users-service-app46.snc1
+      - 10.22.219.173/32   # users-service-app47.snc1   
+      - 10.22.218.46/32   # dealservice-app1.snc1
+      - 10.22.233.113/32   # dealservice-app2.snc1
+      - 10.22.218.232/32   # dealservice-app3.snc1
+      - 10.22.237.184/32   # dealservice-app4.snc1
+      - 10.22.138.115/32   # dealservice-app5.snc1
+      - 10.22.237.136/32   # voucher-inventory-japp21.snc1
+      - 10.22.218.48/32   # voucher-inventory-japp22.snc1
+      - 10.22.218.252/32   # voucher-inventory-japp23.snc1
+      - 10.22.71.31/32   # voucher-inventory-japp24.snc1
+      - 10.22.233.239/32   # voucher-inventory-japp25.snc1
+      - 10.22.237.126/32   # voucher-inventory-japp26.snc1
+      - 10.22.237.132/32   # voucher-inventory-japp27.snc1
+      - 10.22.218.38/32   # voucher-inventory-japp28.snc1
+      - 10.22.233.88/32   # voucher-inventory-japp29.snc1
+      - 10.22.218.116/32   # voucher-inventory-japp30.snc1
+      - 10.22.218.234/32   # voucher-inventory-japp31.snc1
+      - 10.22.67.131/32   # voucher-inventory-japp32.snc1
+      - 10.22.216.187/32   # voucher-inventory-japp33.snc1
+      - 10.22.218.76/32   # voucher-inventory-japp34.snc1
+      - 10.22.233.152/32   # voucher-inventory-japp35.snc1
+      - 10.20.91.69/32   # goods-app5.snc1
+      - 10.22.67.111/32   # goods-app6.snc1
+      - 10.22.81.175/32   # discussion-service-app2.snc1
+      - 10.22.237.30/32   # goods-app7.snc1
+      - 10.22.135.245/32   # goods-app9.snc1
+      - 10.22.237.178/32   # pricing-app1.snc1
+      - 10.22.78.141/32   # pricing-app2.snc1
+      - 10.22.151.84/32   # pricing-app3.snc1
+      - 10.22.217.111/32   # pricing-app4.snc1
+      - 10.22.237.114/32   # pricing-app25.snc1
+      - 10.22.219.179/32   # pricing-app26.snc1
+      - 10.20.80.203/32   # dealestate-irb1.snc1
+      - 10.22.135.131/32   # voucher-inventory-ht-read-app2.snc1
+      - 10.22.218.28/32   # voucher-inventory-ht-read-app3.snc1
+      - 10.22.78.208/32   # voucher-inventory-ht-read-app4.snc1
+      - 10.22.135.205/32   # voucher-inventory-lt-read-app1.snc1
+      - 10.22.72.243/32   # voucher-inventory-lt-read-app2.snc1
+      - 10.22.133.64/32   # voucher-inventory-lt-read-app3.snc1
+      - 10.22.218.20/32   # voucher-inventory-lt-read-app4.snc1
+      - 10.22.81.106/32   # voucher-inventory-ht-write-app1.snc1
+      - 10.22.219.227/32   # voucher-inventory-ht-write-app2.snc1
+      - 10.22.217.34/32   # voucher-inventory-ht-write-app3.snc1
+      - 10.22.237.220/32   # voucher-inventory-ht-write-app4.snc1
+      - 10.22.218.82/32   # voucher-inventory-lt-write-app5.snc1
+      - 10.22.72.143/32   # voucher-inventory-lt-write-app6.snc1
+      - 10.22.133.129/32   # voucher-inventory-lt-write-app7.snc1
+      - 10.22.78.243/32   # voucher-inventory-lt-write-app8.snc1
+      - 10.22.134.90/32   # orders-read-batch3.snc1
+      - 10.32.69.36/32   # orders-read-batch3.sac1
+      - 10.22.219.93/32   # voucher-inventory-backfill-worker1.snc1
+      - 10.22.109.19/32   # voucher-inventory-backfill-worker2.snc1
+      - 10.22.218.32/32   # voucher-inventory-backfill-write-app1.snc1
+      - 10.22.134.159/32   # voucher-inventory-backfill-write-app2.snc1
+      - 10.22.109.27/32   # voucher-inventory-backfill-write-app3.snc1
+      - 10.22.133.69/32   # voucher-inventory-backfill-write-app4.snc1
+      - 10.22.216.57/32   # orders-irb2.snc1
+      - 10.22.72.103/32   # voucher-inventory-utility3.snc1
+      - 10.22.67.79/32   # voucher-inventory-ht-read-app5.snc1
+      - 10.22.141.201/32   # voucher-inventory-ht-read-app6.snc1
+      - 10.22.67.200/32   # voucher-inventory-ht-read-app7.snc1
+      - 10.22.137.91/32   # voucher-inventory-ht-read-app8.snc1
+      - 10.22.133.221/32   # voucher-inventory-ht-read-app9.snc1
+      - 10.22.109.186/32   # voucher-inventory-ht-read-app10.snc1
+      - 10.211.64.0/19   # us-west-1a conSub1
+      - 10.211.96.0/19   # us-west-1b conSub2
+      - 10.211.142.0/24   # us-west-1c conSub3
+      - 10.228.48.0/20   # eu-west-1a
+      - 10.228.64.0/20   # eu-west-1b
+      - 10.228.80.0/20   # eu-west-1c
+      - 10.20.41.74/32   #orders-worker1.snc1
+      - 10.22.137.107/32   # orders-worker2.snc1
+      - 10.20.69.131/32   #orders-worker3.snc1
+      - 10.22.233.246/32   # orders-worker4.snc1
+      - 10.22.237.24/32   # orders-worker5.snc1
+      - 10.22.134.111/32   # orders-worker6.snc1
+      - 10.22.78.130/32   # orders-worker7.snc1
+      - 10.22.81.113/32   # orders-worker8.snc1
+      - 10.22.133.189/32   # orders-worker9.snc1
+      - 10.22.109.31/32   # orders-worker10.snc1
+      - 10.22.67.243/32   # orders-worker11.snc1
+      - 10.22.140.50/32   # orders-worker12.snc1
+      - 10.22.233.42/32   # orders-worker13.snc1
+      - 10.22.141.104/32   # orders-worker14.snc1
+      - 10.22.55.135/32   # orders-read-batch4.snc1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: pwa_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.snc1
+    ports:
+      mysqld: 20001
+    playback_enabled: true
+    playback:
+      peers:
+        - node: gds-snc1-prod-db175m1.snc1
+          peer: gds-snc1-prod-db175s1.snc1
+        - node: gds-snc1-prod-db175s1.snc1
+          peer: gds-snc1-prod-db175m1.snc1
+      manage_mysql_slowlogd: 1
+      mysql_user_to_check: thepoint_db
+      user: playback_user
+      password: mee5pieK
+      schema: groupon_production
+      thread_pool_size: 100
+      user_connection_threshold: 15
+      playback_connection_timeout: 20
+      mysql_slowlogd_port: 30001
+    admin_redirect_peers:
+      - 10.22.142.192 # gds-snc1-prod-db017m1.snc1
+      - 10.22.142.216 # gds-snc1-prod-db017s1.snc1
+      - 10.22.142.197 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.246 # gds-snc1-prod-db172s1.snc1
+      - 10.22.142.177 # gds-snc1-prod-db173m1.snc1
+      - 10.22.142.77 # gds-snc1-prod-db173s1.snc1
+      - 10.22.142.214 # gds-snc1-prod-db174m1.snc1
+      - 10.22.142.247 # gds-snc1-prod-db174s1.snc1
+      - 10.22.142.19   # gds-snc1-prod-db175m1.snc1
+      - 10.22.142.229   # gds-snc1-prod-db175s1.snc1
+      - 10.22.142.229 # gds-snc1-prod-db017m2.snc1
+      - 10.32.114.27  # gds-sac1-prod-db017m1.sac1
+      - 10.32.114.128  # gds-sac1-prod-db017s1.sac1
+      - 10.32.121.73   #gds-sac1-prod-db172m1.sac1
+      - 10.32.121.222   #gds-sac1-prod-db172s1.sac1
+      - 10.32.121.53   #gds-sac1-prod-db173m1.sac1
+      - 10.32.121.68   #gds-sac1-prod-db173s1.sac1
+      - 10.32.121.187   #gds-sac1-prod-db174m1.sac1
+      - 10.32.121.206   #gds-sac1-prod-db174s1.sac1
+      - 10.32.121.203   #gds-sac1-prod-db175m1.sac1
+      - 10.32.114.98   #gds-sac1-prod-db175s1.sac1
+      - 10.13.250.142 # gds-dub1-prod-db171m1.dub1
+      - 10.13.250.115  # gds-dub1-prod-db171s1.dub1
+      - 10.13.250.163   #gds-dub1-prod-db172m1.dub1
+      - 10.13.250.125   #gds-dub1-prod-db172s1.dub1
+      - 10.13.250.42   #gds-dub1-prod-db173m1.dub1
+      - 10.13.250.217   #gds-dub1-prod-db173s1.dub1

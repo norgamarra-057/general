@@ -1,0 +1,378 @@
+---
+# This has been commented intentionally
+# - name: PostgreSQL cluster gds_snc1_prod_db002
+#  import_playbook: "../plays/envs/gds_snc1_prod_db002.yml"
+
+# Production MySQL clusters in DUB1
+- name: gds_dub1_prod_db001
+  import_playbook: "../plays/envs/gds_dub1_prod_db001.yml"
+
+- name: gds_dub1_prod_db003
+  import_playbook: "../plays/envs/gds_dub1_prod_db003.yml"
+
+- name: gds_dub1_prod_db005
+  import_playbook: "../plays/envs/gds_dub1_prod_db005.yml"
+
+- name: gds_dub1_prod_db007
+  import_playbook: "../plays/envs/gds_dub1_prod_db007.yml"
+
+- name: gds_dub1_prod_db009
+  import_playbook: "../plays/envs/gds_dub1_prod_db009.yml"
+
+- name: gds_dub1_prod_db011
+  import_playbook: "../plays/envs/gds_dub1_prod_db011.yml"
+
+- name: gds_dub1_prod_db013
+  import_playbook: "../plays/envs/gds_dub1_prod_db013.yml"
+
+- name: gds_dub1_prod_db015
+  import_playbook: "../plays/envs/gds_dub1_prod_db015.yml"
+
+- name: gds_dub1_prod_db019
+  import_playbook: "../plays/envs/gds_dub1_prod_db019.yml"
+
+- name: gds_dub1_prod_db151
+  import_playbook: "../plays/envs/gds_dub1_prod_db151.yml"
+
+- name: gds_dub1_prod_db152
+  import_playbook: "../plays/envs/gds_dub1_prod_db152.yml"
+
+- name: gds_dub1_prod_db153
+  import_playbook: "../plays/envs/gds_dub1_prod_db153.yml"
+
+- name: gds_dub1_prod_db171
+  import_playbook: "../plays/envs/gds_dub1_prod_db171.yml"
+
+- name: gds_dub1_prod_db172
+  import_playbook: "../plays/envs/gds_dub1_prod_db172.yml"
+
+- name: gds_dub1_prod_db173
+  import_playbook: "../plays/envs/gds_dub1_prod_db173.yml"
+
+- name: gds_dub1_prod_db191
+  import_playbook: "../plays/envs/gds_dub1_prod_db191.yml"
+
+- name: gds_dub1_prod_db192
+  import_playbook: "../plays/envs/gds_dub1_prod_db192.yml"
+
+# Production MySQL clusters in SAC1
+- name: gds_sac1_prod_dbl003
+  import_playbook: "../plays/envs/gds_sac1_prod_dbl003.yml"
+
+- name: gds_sac1_prod_db001
+  import_playbook: "../plays/envs/gds_sac1_prod_db001.yml"
+
+- name: gds_sac1_prod_db002
+  import_playbook: "../plays/envs/gds_sac1_prod_db002.yml"
+
+- name: gds_sac1_prod_db009
+  import_playbook: "../plays/envs/gds_sac1_prod_db009.yml"
+
+- name: gds_sac1_prod_db013
+  import_playbook: "../plays/envs/gds_sac1_prod_db013.yml"
+
+- name: gds_sac1_prod_db015
+  import_playbook: "../plays/envs/gds_sac1_prod_db015.yml"
+
+- name: gds_sac1_prod_db017
+  import_playbook: "../plays/envs/gds_sac1_prod_db017.yml"
+
+- name: gds_sac1_prod_db019
+  import_playbook: "../plays/envs/gds_sac1_prod_db019.yml"
+
+- name: gds_sac1_prod_db021
+  import_playbook: "../plays/envs/gds_sac1_prod_db021.yml"
+
+- name: gds_sac1_prod_db023
+  import_playbook: "../plays/envs/gds_sac1_prod_db023.yml"
+
+- name: gds_sac1_prod_db031
+  import_playbook: "../plays/envs/gds_sac1_prod_db031.yml"
+
+- name: gds_sac1_prod_db033
+  import_playbook: "../plays/envs/gds_sac1_prod_db033.yml"
+
+- name: gds_sac1_prod_db035
+  import_playbook: "../plays/envs/gds_sac1_prod_db035.yml"
+
+- name: gds_sac1_prod_db039
+  import_playbook: "../plays/envs/gds_sac1_prod_db039.yml"
+
+- name: gds_sac1_prod_db043
+  import_playbook: "../plays/envs/gds_sac1_prod_db043.yml"
+
+- name: gds_sac1_prod_db051
+  import_playbook: "../plays/envs/gds_sac1_prod_db051.yml"
+
+- name: gds_sac1_prod_db052
+  import_playbook: "../plays/envs/gds_sac1_prod_db052.yml"
+
+- name: gds_sac1_prod_db053
+  import_playbook: "../plays/envs/gds_sac1_prod_db053.yml"
+
+- name: gds_sac1_prod_db055
+  import_playbook: "../plays/envs/gds_sac1_prod_db055.yml"
+
+- name: gds_sac1_prod_db057
+  import_playbook: "../plays/envs/gds_sac1_prod_db057.yml"
+
+- name: gds_sac1_prod_db059
+  import_playbook: "../plays/envs/gds_sac1_prod_db059.yml"
+
+- name: gds_sac1_prod_db061
+  import_playbook: "../plays/envs/gds_sac1_prod_db061.yml"
+
+- name: gds_sac1_prod_db063
+  import_playbook: "../plays/envs/gds_sac1_prod_db063.yml"
+
+- name: gds_sac1_prod_db065
+  import_playbook: "../plays/envs/gds_sac1_prod_db065.yml"
+
+- name: gds_sac1_prod_db071
+  import_playbook: "../plays/envs/gds_sac1_prod_db071.yml"
+
+- name: gds_sac1_prod_db101
+  import_playbook: "../plays/envs/gds_sac1_prod_db101.yml"
+
+- name: gds_sac1_prod_db172
+  import_playbook: "../plays/envs/gds_sac1_prod_db172.yml"
+
+- name: gds_sac1_prod_db173
+  import_playbook: "../plays/envs/gds_sac1_prod_db173.yml"
+
+- name: gds_sac1_prod_db174
+  import_playbook: "../plays/envs/gds_sac1_prod_db174.yml"
+
+- name: gds_sac1_prod_db175
+  import_playbook: "../plays/envs/gds_sac1_prod_db175.yml"
+
+- name: gds_sac1_prod_db037
+  import_playbook: "../plays/envs/gds_sac1_prod_db037.yml"
+
+- name: gds_sac1_prod_db161
+  import_playbook: "../plays/envs/gds_sac1_prod_db161.yml"
+
+- name: gds_sac1_prod_db162
+  import_playbook: "../plays/envs/gds_sac1_prod_db162.yml"
+
+- name: gds_sac1_prod_db163
+  import_playbook: "../plays/envs/gds_sac1_prod_db163.yml"
+
+- name: gds_sac1_prod_db164
+  import_playbook: "../plays/envs/gds_sac1_prod_db164.yml"
+
+- name: gds_sac1_prod_db181
+  import_playbook: "../plays/envs/gds_sac1_prod_db181.yml"
+
+- name: gds_sac1_prod_db182
+  import_playbook: "../plays/envs/gds_sac1_prod_db182.yml"
+
+
+# Odd hosts in SNC1
+
+## An "odd" host (testing?)
+- hosts: gds-snc1-stg-db002s1.snc1
+  become: yes
+  roles:
+    - role: gds_mysql
+      instance_name: default
+
+# Testing MySQL clusters in SNC1
+- name: gds_snc1_test_db001
+  import_playbook: "../plays/envs/gds_snc1_test_db001.yml"
+
+- name: gds_snc1_test_db002
+  import_playbook: "../plays/envs/gds_snc1_test_db002.yml"
+
+- name: gds_snc1_test_db003
+  import_playbook: "../plays/envs/gds_snc1_test_db003.yml"
+
+
+# UAT MySQL clusters in SNC1
+- name: gds_snc1_uat_db032
+  import_playbook: "../plays/envs/gds_snc1_uat_db032.yml"
+
+- name: gds_snc1_uat_db003
+  import_playbook: "../plays/envs/gds_snc1_uat_db003.yml"
+
+# Staging MySQL clusters in SNC1
+- name: gds_snc1_stg_db005
+  import_playbook: "../plays/envs/gds_snc1_stg_db005.yml"
+
+# Staging MySQL clusters in SNC1 for EMEA
+- name: gds_snc1_stg_db007
+  import_playbook: "../plays/envs/gds_snc1_stg_db007.yml"
+
+# Staging MySQL clusters in SNC1 for North America
+- name: gds_snc1_stg_db027
+  import_playbook: "../plays/envs/gds_snc1_stg_db027.yml"
+
+# Staging MySQL clusters in SNC1 for North America
+- name: gds_snc1_stg_db029
+  import_playbook: "../plays/envs/gds_snc1_uat_db029.yml"
+
+- name: gds_snc1_stg_db011
+  import_playbook: "../plays/envs/gds_snc1_stg_db011.yml"
+
+- name: gds_snc1_stg_db022
+  import_playbook: "../plays/envs/gds_snc1_stg_db022.yml"
+
+- name: gds_sac1_stg_db022
+  import_playbook: "../plays/envs/gds_sac1_stg_db022.yml"
+
+
+- name: gds_snc1_stg_db042
+  import_playbook: "../plays/envs/gds_snc1_stg_db042.yml"
+
+
+# Production MySQL clusters in SNC1
+- name: gds_snc1_prod_db001
+  import_playbook: "../plays/envs/gds_snc1_prod_db001.yml"
+
+- name: gds_snc1_prod_db009
+  import_playbook: "../plays/envs/gds_snc1_prod_db009.yml"
+
+- name: gds_snc1_prod_db012
+  import_playbook: "../plays/envs/gds_snc1_prod_db012.yml"
+
+- name: gds_snc1_prod_db013
+  import_playbook: "../plays/envs/gds_snc1_prod_db013.yml"
+
+- name: gds_snc1_prod_db015
+  import_playbook: "../plays/envs/gds_snc1_prod_db015.yml"
+
+- name: gds_snc1_prod_db017
+  import_playbook: "../plays/envs/gds_snc1_prod_db017.yml"
+
+- name: gds_snc1_prod_db019
+  import_playbook: "../plays/envs/gds_snc1_prod_db019.yml"
+
+- name: gds_snc1_prod_db021
+  import_playbook: "../plays/envs/gds_snc1_prod_db021.yml"
+
+- name: gds_snc1_prod_db023
+  import_playbook: "../plays/envs/gds_snc1_prod_db023.yml"
+
+- name: gds_snc1_prod_db031
+  import_playbook: "../plays/envs/gds_snc1_prod_db031.yml"
+
+- name: gds_snc1_prod_db033
+  import_playbook: "../plays/envs/gds_snc1_prod_db033.yml"
+
+- name: gds_snc1_prod_db035
+  import_playbook: "../plays/envs/gds_snc1_prod_db035.yml"
+
+- name: gds_snc1_prod_db037
+  import_playbook: "../plays/envs/gds_snc1_prod_db037.yml"
+
+- name: gds_snc1_prod_db039
+  import_playbook: "../plays/envs/gds_snc1_prod_db039.yml"
+
+- name: gds_snc1_prod_db043
+  import_playbook: "../plays/envs/gds_snc1_prod_db043.yml"
+
+- name: gds_snc1_prod_db047
+  import_playbook: "../plays/envs/gds_snc1_prod_db047.yml"
+
+- name: gds_snc1_prod_db051
+  import_playbook: "../plays/envs/gds_snc1_prod_db051.yml"
+
+- name: gds_snc1_prod_db052
+  import_playbook: "../plays/envs/gds_snc1_prod_db052.yml"
+
+- name: gds_snc1_prod_db053
+  import_playbook: "../plays/envs/gds_snc1_prod_db053.yml"
+
+- name: gds_snc1_prod_db055
+  import_playbook: "../plays/envs/gds_snc1_prod_db055.yml"
+
+- name: gds_snc1_prod_db057
+  import_playbook: "../plays/envs/gds_snc1_prod_db057.yml"
+
+- name: gds_snc1_prod_db059
+  import_playbook: "../plays/envs/gds_snc1_prod_db059.yml"
+
+- name: gds_snc1_prod_db061
+  import_playbook: "../plays/envs/gds_snc1_prod_db061.yml"
+
+- name: gds_snc1_prod_db063
+  import_playbook: "../plays/envs/gds_snc1_prod_db063.yml"
+
+- name: gds_snc1_prod_db065
+  import_playbook: "../plays/envs/gds_snc1_prod_db065.yml"
+
+- name: gds_snc1_prod_db071
+  import_playbook: "../plays/envs/gds_snc1_prod_db071.yml"
+
+- name: gds_snc1_prod_db101
+  import_playbook: "../plays/envs/gds_snc1_prod_db101.yml"
+
+- name: gds_snc1_prod_db161
+  import_playbook: "../plays/envs/gds_snc1_prod_db161.yml"
+
+- name: gds_snc1_prod_db162
+  import_playbook: "../plays/envs/gds_snc1_prod_db162.yml"
+
+- name: gds_snc1_prod_db163
+  import_playbook: "../plays/envs/gds_snc1_prod_db163.yml"
+
+- name: gds_snc1_prod_db164
+  import_playbook: "../plays/envs/gds_snc1_prod_db164.yml"
+
+- name: gds_snc1_prod_db172
+  import_playbook: "../plays/envs/gds_snc1_prod_db172.yml"
+
+- name: gds_snc1_prod_db173
+  import_playbook: "../plays/envs/gds_snc1_prod_db173.yml"
+
+- name: gds_snc1_prod_db174
+  import_playbook: "../plays/envs/gds_snc1_prod_db174.yml"
+
+- name: gds_snc1_prod_db175
+  import_playbook: "../plays/envs/gds_snc1_prod_db175.yml"
+
+- name: gds_snc1_prod_db181
+  import_playbook: "../plays/envs/gds_snc1_prod_db181.yml"
+
+- name: gds_snc1_prod_db182
+  import_playbook: "../plays/envs/gds_snc1_prod_db182.yml"
+
+- name: gds_snc1_prod_dbl003
+  import_playbook: "../plays/envs/gds_snc1_prod_dbl003.yml"
+
+- name: gds_snc1_prod_db201
+  import_playbook: "../plays/envs/gds_snc1_prod_db201.yml"
+
+- name: gds_snc1_prod_db202
+  import_playbook: "../plays/envs/gds_snc1_prod_db202.yml"
+
+- name: gds_snc1_prod_db401
+  import_playbook: "../plays/envs/gds_snc1_prod_db401.yml"
+
+- name: gds_snc1_prod_db402
+  import_playbook: "../plays/envs/gds_snc1_prod_db402.yml"
+
+
+#- hosts: gds_snc1_prod_db175
+#  become: yes
+#  roles:
+#  - { role: gds_mysql,
+#      instance_name: pwa_prod,
+#      innodb_io_capacity_force: 8000,
+#      innodb_io_capacity_max_force: 16000,
+#      innodb_lru_scan_depth_force: 6000,
+#      max_slowlog_files_force: 60,
+#      max_connections: 8000,
+#      max_user_connections: 7980,
+#      innodb_buffer_pool_size_mb_force: 200000,
+#      innodb_purge_threads_force: 8,
+#      innodb_thread_sleep_delay_force: 0,
+#      innodb_flush_neighbors_force: 0,
+#      long_query_time_force: 1,
+#      log_slow_rate_limit_force: 11,
+#      log_warnings_force: 2,
+#      sync_binlog_force: 0,
+#      innodb_flush_log_at_trx_commit_force: 2 }
+#  - { role: gds_mha_manager,
+#      instance_name: pwa_prod }
+

@@ -1,0 +1,180 @@
+---
+- set_fact:
+    plugins_pg_db_common_frequent: "{{ plugins['postgresql']['common_frequent'] | default([]) }}"
+    plugins_mysql_db_common_frequent: "{{ plugins['mysql']['common_frequent'] | default([]) }}"
+    plugins_db_common: "{{ plugins[db_type]['common'] | default([]) }}"
+    plugins_pg_db_common_rare: "{{ plugins['postgresql']['common_rare'] | default([]) }}"
+    plugins_mysql_db_common_rare: "{{ plugins['mysql']['common_rare'] | default([]) }}"
+    plugins_pg_db_common_rare_hourly: "{{ plugins['postgresql']['common_rare_hourly'] | default([]) }}"
+    plugins_mysql_db_common_rare_hourly: "{{ plugins['mysql']['common_rare_hourly'] | default([]) }}"
+    locals_db_common: "{{ locals[db_type]['common'] | default([]) }}"
+    locals_db_common_rare: "{{ locals[db_type]['common_rare'] | default([]) }}"
+
+- name: stat checks_old
+  stat: path=/var/groupon/check_mk/checks_old
+  register: links_checks_old
+
+- name: stat checks
+  stat: path=/var/groupon/check_mk/checks
+  register: checks_stat
+
+- name: Move checks to old
+  command: mv /var/groupon/check_mk/checks /var/groupon/check_mk/checks_old
+  when: checks_stat.stat.exists and links_checks_old.stat.islnk is not defined and checks_stat.stat.islnk == False
+
+- name: Copy checks
+  copy:
+    src: "checks/{{ db_type }}"
+    dest: "/var/groupon/check_mk"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type is defined
+
+- name: Create symlink for db_type
+  file:
+    src: "/var/groupon/check_mk/{{ db_type }}"
+    dest: "/var/groupon/check_mk/checks"
+    state: link
+    owner: root
+    group: wheel
+  when: db_type is defined
+
+- name: Copy common plugins for db_type
+  copy:
+    src: "plugins/{{ db_type }}/common/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  with_items: "{{ plugins_db_common }}"
+
+- name: Ensure target directory for high frequency  exists
+  file:
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_high }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+
+- name: Copy common_frequent plugins for db_type pg
+  copy:
+    src: "plugins/{{ db_type }}/common_frequent/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_high }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'postgresql'
+  with_items: "{{ plugins_pg_db_common_frequent }}"
+
+- name: Copy common_frequent plugins for db_type mysql
+  copy:
+    src: "plugins/{{ db_type }}/common_frequent/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_high }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'mysql'
+  with_items: "{{ plugins_mysql_db_common_frequent }}"
+
+- name: Ensure plugins target directory for pg common rare exists
+  file:
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_rare }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+  when: db_type == 'postgresql'
+
+- name: Copy common_rare plugins for db_type pg
+  copy:
+    src: "plugins/{{ db_type }}/common_rare/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_rare }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'postgresql'
+  with_items: "{{ plugins_pg_db_common_rare }}"
+
+- name: Ensure plugins target directory for mysql common rare exists
+  file:
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_mysql_common_rare }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+  when: db_type == 'mysql'
+
+- name: Copy common_rare plugins for db_type mysql
+  copy:
+    src: "plugins/{{ db_type }}/common_rare/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_mysql_common_rare }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'mysql'
+  with_items: "{{ plugins_mysql_db_common_rare }}"
+
+- name: Ensure plugins target directory for common rare hourly exists
+  file:
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_rare_hourly }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+
+- name: Copy common_rare_hourly plugins for db_type pg
+  copy:
+    src: "plugins/{{ db_type }}/common_rare_hourly/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_rare_hourly }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'postgresql'
+  with_items: "{{ plugins_pg_db_common_rare_hourly }}"
+
+- name: Copy common_rare_hourly plugins for db_type mysql
+  copy:
+    src: "plugins/{{ db_type }}/common_rare_hourly/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency_rare_hourly }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'mysql'
+  with_items: "{{ plugins_mysql_db_common_rare_hourly }}"
+
+
+- name: Copy common locals for db_type
+  copy:
+    src: "locals/{{ db_type }}/common/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/local/{{ frequency }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  with_items: "{{ locals_db_common }}"
+
+- name: Ensure locals target directory for mysql common rare exists
+  file:
+    dest: "/usr/lib/check_mk_agent/local/{{ frequency_mysql_common_rare }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+  when: db_type == 'mysql'
+
+- name: Copy common locals for db_type mysql rare
+  copy:
+    src: "locals/{{ db_type }}/common_rare/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/local/{{ frequency_mysql_common_rare }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  when: db_type == 'mysql'
+  with_items: "{{ locals_db_common_rare }}"
+
+

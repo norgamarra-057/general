@@ -1,0 +1,225 @@
+---
+- name: nad_pg install
+  pkgng: name=gds-nad state=present
+
+- name: nad_pg | runit | directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+  with_items:
+    - "{{ nad_pg_service_dir }}"
+    - "{{ nad_pg_service_dir }}/env"
+    - "{{ nad_pg_service_dir }}/etc"
+    - "{{ nad_pg_service_dir }}/log"
+
+- name: nad_pg | runit | directories | log
+  file:
+    path: "{{ nad_pg_service_dir }}/log/main"
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+
+
+- name: nad_pg | config
+  template:
+    dest: "{{ nad_pg_service_dir }}/etc/vip.sh"
+    src: "vip.sh.j2"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: nad_pg | PostgreSQL | register var MASTER_OR_SLAVE
+  shell: "{{ nad_pg_service_dir }}/etc/vip.sh"
+  register: vip_name
+  ignore_errors: false
+
+- name: nad_pg | runit | environment | NODE_PATH
+  copy:
+    dest: "{{ nad_pg_service_dir }}/env/NODE_PATH"
+    content: "/usr/local/lib/node_modules"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad_pg | runit | environment | PATH
+  copy:
+    dest: "{{ nad_pg_service_dir }}/env/PATH"
+    content: "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+
+- name: nad_pg | config
+  template:
+    dest: "{{ nad_pg_service_dir }}/etc/nad_pg.config"
+    src: "nad-{{ ansible_os_family }}.config.j2"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad_pg | runit | log | run
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ nad_pg_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: nad_pg | runit | log | config
+  copy:
+    src: svlogd.config
+    dest: "{{ nad_pg_service_dir }}/log/main/config"
+    owner: _log
+    group: _log
+    mode: 0644
+  notify:
+    - nad_pg log restart
+
+- name: nad_pg | runit | run
+  template:
+    src: runit.sh.j2
+    dest: "{{ nad_pg_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  notify:
+    - nad_pg reload
+
+- name: nad_pg| runit | enabless
+  file:
+    src: "{{ nad_pg_service_dir }}"
+    dest: "/var/service/nad_pg"
+    owner: root
+    group: wheel
+    state: link
+
+- name: NAD | PostgreSQL | create folder
+  file:
+    path: "/usr/local/etc/node-agent.d/postgresql"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | PostgreSQL | pg_ind
+  template:
+    src: pg_ind.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_ind_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | PostgreSQL | pg_locks
+  template:
+    src: pg_locks.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_locks_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | PostgreSQL | pg_repl
+  template:
+    src: pg_repl.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_repl_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | PostgreSQL | pg_repl_master
+  template:
+    src: pg_repl_master.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_repl_master_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | PostgreSQL | pg_repl_slave
+  template:
+    src: pg_repl_slave.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_repl_slave_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | PostgreSQL | pg_slave
+  template:
+    src: pg_slave.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_slave_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | PostgreSQL | pg_stat
+  template:
+    src: pg_stat.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_stat_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: NAD | PostgreSQL | pg_transac_state
+  template:
+    src: pg_transac_state.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_transac_state_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755    
+
+- name: NAD | PostgreSQL | pg_txn
+  template:
+    src: pg_txn.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_txn_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755 
+
+- name: NAD | PostgreSQL | pg_wait
+  template:
+    src: pg_wait.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_wait_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755 
+
+- name: NAD | PostgreSQL | pg_wraparound
+  template:
+    src: pg_wraparound.sh.j2
+    dest: "/usr/local/etc/node-agent.d/postgresql/pg_wraparound_{{ instance_name }}.sh"
+    owner: root
+    group: wheel
+    mode: 0755 
+
+- name: nad_pg | config
+  template:
+    dest: "{{ nad_pg_service_dir }}/etc/nad_pg.config"
+    src: "nad-{{ ansible_os_family }}.config.j2"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: nad | PostgreSQL | register var
+  shell: ls /usr/local/etc/node-agent.d/postgresql/*.sh | xargs -n 1 basename
+  register: files_link
+  ignore_errors: true
+
+- name: NAD | PostgreSQL | create symlinks
+  file:
+    src=/usr/local/etc/node-agent.d/postgresql/{{ item }}
+    dest=/usr/local/etc/node-agent.d/{{ item }}
+    owner=root
+    group=wheel
+    state=link
+  with_items: "{{files_link.stdout_lines}}"
+
+- name: NAD | PostgreSQL | create symlinks service dir 
+  file:
+    src={{ nad_pg_service_dir }}
+    dest=/var/service/nad_pg
+    owner=root
+    group=wheel
+    state=link

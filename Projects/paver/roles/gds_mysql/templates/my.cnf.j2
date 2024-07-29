@@ -1,0 +1,162 @@
+# {{ ansible_managed }}
+
+#########
+# General MySQL options
+#########
+[mysqld]
+autocommit                      = {{ autocommit }}
+auto_increment_increment        = {{ auto_increment_increment }}
+auto_increment_offset           = {{ auto_increment_offset }}
+basedir                         = /usr/local
+bind_address                    = 127.0.0.1
+binlog_format                   = {{ binlog_format }}
+character-set-server            = {{ character_set_server }}
+datadir                         = {{ percona_instance_path }}/data
+default-storage-engine          = InnoDB
+event_scheduler                 = {{ event_scheduler }}
+expand_fast_index_creation      = 1
+expire_logs_days                = {{ expire_logs_days }}
+key_buffer_size                 = {{ key_buffer_size }}
+lc-messages                     = en_US
+lc-messages-dir                 = /usr/local/share/mysql
+log-error                       = {{ percona_logdir }}/error.log
+net_buffer_length               = {{ net_buffer_length }}
+open-files-limit                = {{ open_files_limit }}
+optimizer_switch                = {{ optimizer_switch }}
+pid-file                        = {{ percona_instance_path }}/mysql.pid
+port                            = {{ gds_instances[instance_name].ports.mysqld }}
+read_only                       = {{ read_only }}
+skip-name-resolve
+slave_compressed_protocol       = {{ slave_compressed_protocol }}
+sql_mode                        = {{ sql_mode }}
+tmpdir                          = {{ percona_tmpdir }}
+transaction-isolation           = {{ transaction_isolation }}
+default-time-zone               = SYSTEM
+socket                          = {{ percona_instance_path }}/mysql.sock
+user				= {{ gds_instances[instance_name].unix_user }}
+log_bin_trust_function_creators = {{ log_bin_trust_function_creators }}
+
+##########
+# Replication options
+##########
+log-bin-index                   = {{ percona_binlogdir }}/master-bin.index
+log-bin                         = {{ percona_binlogdir }}/master-bin
+log-slave-updates               = {{ log_slave_updates }}
+relay-log-index                 = {{ percona_binlogdir }}/slave-relay-bin.index
+relay-log                       = {{ percona_binlogdir }}/slave-relay-bin
+server-id                       = {{ ansible_local.mysql.default_server_id }}
+relay_log_purge                 = {{ relay_log_purge }}
+
+
+
+##########
+# Logging options
+##########
+# See http://www.mysqlperformanceblog.com/2009/02/10/impact-of-logging-on-mysql%E2%80%99s-performance/
+long_query_time                 = {{ long_query_time }}
+log_slow_verbosity              = {{ log_slow_verbosity }}
+log_slow_slave_statements       = {{ log_slow_slave_statements }}
+log_slow_rate_limit             = {{ log_slow_rate_limit }}
+log_slow_rate_type              = {{ log_slow_rate_type }}
+slow_query_log                  = {{ slow_query_log }}
+slow_query_log_file             = {{ percona_logdir }}/slow_query_log
+slow_query_log_use_global_control = {{ slow_query_log_use_global_control }}
+slow_query_log_timestamp_always = {{ slow_query_log_timestamp_always }}
+max_slowlog_files		= {{ max_slowlog_files }}
+max_slowlog_size		= {{ max_slowlog_size }}
+userstat                        = {{ userstat }}
+max_binlog_size			= {{ max_binlog_size }}
+max_binlog_files		= {{ max_binlog_files }}
+
+##########
+# Memory-limited configuration
+##########
+join_buffer_size                = {{ join_buffer_size }}
+max_allowed_packet              = {{ max_allowed_packet }}
+max_connections                 = {{ max_connections }}
+max_user_connections            = {{ max_user_connections }}
+max_heap_table_size             = {{ max_heap_table_size }}
+query_cache_size                = {{ query_cache_size }}
+query_cache_type                = {{ query_cache_type }}
+read_buffer_size                = {{ read_buffer_size }}
+read_rnd_buffer_size            = {{ read_rnd_buffer_size }}
+sort_buffer_size                = {{ sort_buffer_size }}
+table_open_cache                = {{ table_open_cache }}
+thread_cache_size               = {{ thread_cache_size }}
+tmp_table_size                  = {{ tmp_table_size }}
+
+
+#########
+# InnoDB configuration
+#########
+innodb_buffer_pool_load_at_startup = {{ innodb_buffer_pool_load_at_startup }}
+innodb_buffer_pool_dump_at_shutdown = {{ innodb_buffer_pool_dump_at_shutdown }}
+innodb_buffer_pool_instances    = {{ innodb_buffer_pool_instances }}
+innodb_buffer_pool_size         = {{ innodb_buffer_pool_size_mb }}M
+innodb_checksum_algorithm       = {{ innodb_checksum_algorithm }}
+innodb_log_checksum_algorithm   = {{ innodb_log_checksum_algorithm }}
+innodb_stats_on_metadata        = {{ innodb_stats_on_metadata }}
+innodb_data_file_path           = {{ innodb_data_file_path }}
+innodb_fast_shutdown            = {{ innodb_fast_shutdown }}
+innodb_file_format              = {{ innodb_file_format }}
+innodb_file_per_table           = {{ innodb_file_per_table }}
+innodb_flush_log_at_trx_commit  = {{ innodb_flush_log_at_trx_commit }}
+innodb_flush_method             = {{ innodb_flush_method }}
+innodb_flush_neighbors          = {{ innodb_flush_neighbors }}
+innodb_io_capacity              = {{ innodb_io_capacity }}
+innodb_large_prefix             = {{ innodb_large_prefix }}
+innodb_lru_scan_depth           = {{ innodb_lru_scan_depth }}
+innodb_lock_wait_timeout        = {{ innodb_lock_wait_timeout }}
+innodb_log_buffer_size          = {{ innodb_log_buffer_size }}
+innodb_log_files_in_group       = {{ innodb_log_files_in_group }}
+innodb_log_file_size            = {{ innodb_log_file_size }}
+innodb_rollback_on_timeout      = {{ innodb_rollback_on_timeout }}
+innodb_stats_sample_pages       = {{ innodb_stats_sample_pages }}
+innodb_thread_concurrency       = {{ innodb_thread_concurrency }}
+innodb_read_io_threads          = {{ innodb_read_io_threads }}
+innodb_write_io_threads         = {{ innodb_write_io_threads }}
+innodb_doublewrite              = {{ innodb_doublewrite }}
+innodb_use_global_flush_log_at_trx_commit = {{ innodb_use_global_flush_log_at_trx_commit }}
+innodb_use_sys_malloc           = {{ innodb_use_sys_malloc }}
+master_info_repository          = {{ master_info_repository }}
+relay_log_info_repository       = {{ relay_log_info_repository }}
+sync-binlog                     = {{ sync_binlog }}
+sync-frm                        = {{ sync_frm }}
+
+# Fulltext search configuration
+ft_min_word_len			= {{ ft_min_word_len }}
+ft_boolean_syntax		= {{ ft_boolean_syntax }}
+{% if ft_custom_stopword_file is defined %}
+ft_stopword_file		= {{ percona_service_dir }}/ft_stopword_file
+innodb_ft_server_stopword_table	= percona/innodb_stopwords
+{% endif %}
+
+# Replication filters (can be empty)
+
+{% for item in replicate_wild_do_table %}
+replicate_wild_do_table = {{ item }}
+{% endfor %}
+
+{% for item in binlog_ignore_db %}
+binlog_ignore_db = {{ item }}
+{% endfor %}
+
+{% for item in binlog_do_db %}
+binlog_do_db = {{ item }}
+{% endfor %}
+
+{% for item in replicate_ignore_db %}
+replicate_ignore_db = {{ item }}
+{% endfor %}
+
+{% for item in replicate_do_db %}
+replicate_do_db = {{ item }}
+{% endfor %}
+
+{% for item in replicate_do_table %}
+replicate_do_table = {{ item }}
+{% endfor %}
+
+{% for item in replicate_ignore_table %}
+replicate_ignore_table = {{ item }}
+{% endfor %}

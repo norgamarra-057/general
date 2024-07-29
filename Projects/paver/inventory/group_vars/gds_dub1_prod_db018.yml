@@ -1,0 +1,382 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.14.189.220 # gds-dub1-prod-db018m1
+  - 10.14.189.221 # gds-dub1-prod-db018s1
+  - 10.14.82.220 # gds-dub1-prod-db018m1
+  - 10.14.82.221 # gds-dub1-prod-db018s1
+
+gds_instance_group: gds_prod_dub1_db018
+gds_monitor_cluster_type: gds_postgresql
+# List of all GDS instances in this timeline
+
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+
+gds_instances:
+#  user_behavior_prod: # GDS-11285 decom GPROD-247268
+#  cert_authority_prod: # GDS-11471
+#  merch_rept_files_prod: # GDS-13105 decom GPROD-247268
+  # cronus_prod: # GDS-13271 # decommissioned #
+  gds_sandbox_prod: # GDS-13269 (decommed)
+  conveyor_dub1_prod: # GDS-13781
+    type: postgresql
+    dbnames:
+      - conveyor_dub1_prod
+    schemas:
+      conveyor_dub1_prod:
+        - conveyor_api
+    write_origin: dub1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60007
+    master_vip: 10.14.189.17
+    slave_vips:
+      - 10.14.82.17
+    replication_ips:
+      - 10.13.250.104   # gds-dub1-prod-db018m1.dub1
+      - 10.13.250.114   # gds-dub1-prod-db018s1.dub1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.32.172.246/32 # conveyor-worker1-production.sac1
+      - 10.32.69.145/32 # conveyor-worker2-production.sac1
+      - 10.32.57.71/32 # conveyor-worker3-production.sac1
+      - 10.32.84.166/32 # conveyor-worker4-production.sac1
+      - 10.32.179.49/32 # conveyor-worker5-production.sac1
+      - 10.32.175.146/32 # conveyor-worker6-production.sac1
+      - 10.32.92.249/32 # conveyor-worker7-production.sac1
+      - 10.32.73.130/32 # conveyor-worker8-production.sac1
+      - 10.32.126.129/32 # conveyor-worker9-production.sac1
+      - 10.32.98.146/32 # conveyor-worker10-production.sac1
+      - 10.32.177.20/32 # conveyor-worker11-production.sac1
+      - 10.32.40.113/32 # conveyor-util1-production.sac1
+      - 10.32.176.126/32 # conveyor-util2-production.sac1
+      - 10.12.240.158/32   # conveyor-worker1-production.dub1
+      - 10.13.8.3/32   # conveyor-worker2-production.dub1
+      - 10.12.240.64/32   # conveyor-worker3-production.dub1
+      - 10.12.32.113/32   # conveyor-worker4-production.dub1
+      - 10.12.136.238/32   # conveyor-worker5-production.dub1
+      - 10.12.252.147/32   # conveyor-worker6-production.dub1
+      - 10.12.33.213/32   # conveyor-worker7-production.dub1
+      - 10.12.132.35/32   # conveyor-worker8-production.dub1
+      - 10.12.130.6/32   # conveyor-worker9-production.dub1
+      - 10.12.128.243/32   # conveyor-worker10-production.dub1
+      - 10.13.2.131/32   # conveyor-worker11-production.dub1
+      - 10.12.35.125/32   # conveyor-worker12-production.dub1
+      - 10.12.36.81/32   # conveyor-worker13-production.dub1
+      - 10.12.39.109/32   # conveyor-worker14-production.dub1
+      - 10.12.35.115/32   # conveyor-worker15-production.dub1
+      - 10.12.237.183/32   # conveyor-worker16-production.dub1
+      - 10.12.35.150/32   # conveyor-worker17-production.dub1
+      - 10.12.36.70/32   # conveyor-worker18-production.dub1
+      - 10.12.39.114/32   # conveyor-worker19-production.dub1
+      - 10.12.37.201/32   # conveyor-worker20-production.dub1
+      - 10.13.170.160/32   # conveyor-worker30-production.dub1
+      - 10.13.93.71/32   # conveyor-worker31-production.dub1
+      - 10.13.170.82/32   # conveyor-worker32-production.dub1
+      - 10.13.61.49/32   # conveyor-worker33-production.dub1
+      - 10.13.73.165/32   # conveyor-worker34-production.dub1
+      - 10.13.156.242/32   # conveyor-worker35-production.dub1
+      - 10.13.38.204/32   # conveyor-worker36-production.dub1
+      - 10.13.113.119/32   # conveyor-worker37-production.dub1
+      - 10.13.162.50/32   # conveyor-worker38-production.dub1
+      - 10.13.93.161/32   # conveyor-worker39-production.dub1
+      - 10.12.218.30/32   # conveyor-worker40-production.dub1
+      - 10.12.239.227/32   # conveyor-worker41-production.dub1
+      - 10.12.212.89/32   # conveyor-worker42-production.dub1
+      - 10.12.206.76/32   # conveyor-worker43-production.dub1
+      - 10.13.140.249/32   # conveyor-worker44-production.dub1
+      - 10.12.230.90/32   # conveyor-worker45-production.dub1
+      - 10.13.41.154/32   # conveyor-worker46-production.dub1
+      - 10.12.224.19/32   # conveyor-worker47-production.dub1
+      - 10.13.132.164/32   # conveyor-worker48-production.dub1
+      - 10.12.209.253/32   # conveyor-worker49-production.dub1
+      - 10.12.236.122/32   # conveyor-worker50-production.dub1
+      - 10.12.227.181/32   # conveyor-worker51-production.dub1
+      - 10.13.186.39/32   # conveyor-worker52-production.dub1
+      - 10.13.175.212/32   # conveyor-worker53-production.dub1
+      - 10.13.80.79/32   # conveyor-worker54-production.dub1
+      - 10.12.215.134/32   # conveyor-worker55-production.dub1
+      - 10.12.221.49/32   # conveyor-worker56-production.dub1
+      - 10.13.217.67/32   # conveyor-worker57-production.dub1
+      - 10.12.233.40/32   # conveyor-worker58-production.dub1
+      - 10.12.206.176/32   # conveyor-worker59-production.dub1
+      - 10.12.239.253/32   # conveyor-worker60-production.dub1
+      - 10.12.236.21/32   # conveyor-worker61-production.dub1
+      - 10.12.230.17/32   # conveyor-worker62-production.dub1
+      - 10.12.224.190/32   # conveyor-worker63-production.dub1
+      - 10.12.215.118/32   # conveyor-worker64-production.dub1
+      - 10.12.227.63/32   # conveyor-worker65-production.dub1
+      - 10.13.140.101/32   # conveyor-worker66-production.dub1
+      - 10.12.218.175/32   # conveyor-worker67-production.dub1
+      - 10.13.41.47/32   # conveyor-worker68-production.dub1
+      - 10.13.80.118/32   # conveyor-worker69-production.dub1
+      - 10.12.212.94/32   # conveyor-worker70-production.dub1
+      - 10.12.221.121/32   # conveyor-worker71-production.dub1
+      - 10.13.64.202/32   # conveyor-worker72-production.dub1
+      - 10.13.217.242/32   # conveyor-worker73-production.dub1
+      - 10.13.245.100/32   # conveyor-worker74-production.dub1
+      - 10.13.190.228/32   # conveyor-worker75-production.dub1
+      - 10.13.202.143/32   # conveyor-worker76-production.dub1
+      - 10.13.199.146/32   # conveyor-worker77-production.dub1
+      - 10.13.206.86/32   # conveyor-worker78-production.dub1
+      - 10.13.116.181/32   # conveyor-worker79-production.dub1
+      - 10.13.155.22/32   # conveyor-worker80-production.dub1
+      - 10.13.26.147/32   # conveyor-worker81-production.dub1
+      - 10.13.236.91/32   # conveyor-worker82-production.dub1
+      - 10.13.56.249/32   # conveyor-worker83-production.dub1
+      - 10.13.170.123/32   # conveyor-worker84-production.dub1
+      - 10.13.154.27/32   # conveyor-worker85-production.dub1
+      - 10.13.123.122/32   # conveyor-worker86-production.dub1
+      - 10.13.156.7/32   # conveyor-worker87-production.dub1
+      - 10.13.92.85/32   # conveyor-worker88-production.dub1
+      - 10.13.113.2/32   # conveyor-worker89-production.dub1
+      - 10.13.38.170/32   # conveyor-worker90-production.dub1
+      - 10.13.162.205/32   # conveyor-worker91-production.dub1
+      - 10.13.174.78/32   # conveyor-worker92-production.dub1
+      - 10.13.93.243/32   # conveyor-worker93-production.dub1
+      - 10.13.73.78/32   # conveyor-worker94-production.dub1
+      - 10.13.231.128/32   # conveyor-worker95-production.dub1
+      - 10.13.150.237/32   # conveyor-worker96-production.dub1
+      - 10.13.52.29/32   # conveyor-worker97-production.dub1
+      - 10.13.106.162/32   # conveyor-worker98-production.dub1
+      - 10.13.61.108/32   # conveyor-worker99-production.dub1
+      - 10.13.22.70/32   # conveyor-worker100-production.dub1
+      - 10.13.56.245/32   # conveyor-worker101-production.dub1
+      - 10.13.170.110/32   # conveyor-worker102-production.dub1
+      - 10.13.154.155/32   # conveyor-worker103-production.dub1
+      - 10.13.123.5/32   # conveyor-worker104-production.dub1
+      - 10.13.156.148/32   # conveyor-worker105-production.dub1
+      - 10.13.92.14/32   # conveyor-worker106-production.dub1
+      - 10.13.113.245/32   # conveyor-worker107-production.dub1
+      - 10.13.38.225/32   # conveyor-worker108-production.dub1
+      - 10.13.162.182/32   # conveyor-worker109-production.dub1
+      - 10.13.174.113/32   # conveyor-worker110-production.dub1
+      - 10.13.93.202/32   # conveyor-worker111-production.dub1
+      - 10.13.73.123/32   # conveyor-worker112-production.dub1
+      - 10.13.231.193/32   # conveyor-worker113-production.dub1
+      - 10.13.150.148/32   # conveyor-worker114-production.dub1
+      - 10.13.52.205/32   # conveyor-worker115-production.dub1
+      - 10.13.106.143/32   # conveyor-worker116-production.dub1
+      - 10.13.61.12/32   # conveyor-worker117-production.dub1
+      - 10.13.22.204/32   # conveyor-worker118-production.dub1
+      - 10.13.56.85/32   # conveyor-worker119-production.dub1
+      - 10.13.170.144/32   # conveyor-worker120-production.dub1
+      - 10.13.154.117/32   # conveyor-worker121-production.dub1
+      - 10.13.123.131/32   # conveyor-worker122-production.dub1
+      - 10.13.156.128/32   # conveyor-worker123-production.dub1
+      - 10.13.92.77/32   # conveyor-worker124-production.dub1
+      - 10.13.113.238/32   # conveyor-worker125-production.dub1
+      - 10.13.38.166/32   # conveyor-worker126-production.dub1
+      - 10.13.162.40/32   # conveyor-worker127-production.dub1
+      - 10.13.174.204/32   # conveyor-worker128-production.dub1
+      - 10.13.93.13/32   # conveyor-worker129-production.dub1
+      - 10.13.73.136/32   # conveyor-worker130-production.dub1
+      - 10.13.231.214/32   # conveyor-worker131-production.dub1
+      - 10.13.150.236/32   # conveyor-worker132-production.dub1
+      - 10.13.52.31/32   # conveyor-worker133-production.dub1
+      - 10.13.106.125/32   # conveyor-worker134-production.dub1
+      - 10.13.61.22/32   # conveyor-worker135-production.dub1
+      - 10.13.22.137/32   # conveyor-worker136-production.dub1
+      - 10.13.56.99/32   # conveyor-worker137-production.dub1
+      - 10.13.170.249/32   # conveyor-worker138-production.dub1
+      - 10.13.154.248/32   # conveyor-worker139-production.dub1
+      - 10.13.123.27/32   # conveyor-worker140-production.dub1
+      - 10.13.156.49/32   # conveyor-worker141-production.dub1
+      - 10.13.92.9/32   # conveyor-worker142-production.dub1
+      - 10.13.113.53/32   # conveyor-worker143-production.dub1
+      - 10.13.38.71/32   # conveyor-worker144-production.dub1
+      - 10.13.162.60/32   # conveyor-worker145-production.dub1
+      - 10.13.174.87/32   # conveyor-worker146-production.dub1
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    dba_account_name: conveyor_dub1_dba
+    app_account_name: conveyor_dub1_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.32.172.246/32 # conveyor-worker1-production.sac1
+      - 10.32.69.145/32 # conveyor-worker2-production.sac1
+      - 10.32.57.71/32 # conveyor-worker3-production.sac1
+      - 10.32.84.166/32 # conveyor-worker4-production.sac1
+      - 10.32.179.49/32 # conveyor-worker5-production.sac1
+      - 10.32.175.146/32 # conveyor-worker6-production.sac1
+      - 10.32.92.249/32 # conveyor-worker7-production.sac1
+      - 10.32.73.130/32 # conveyor-worker8-production.sac1
+      - 10.32.126.129/32 # conveyor-worker9-production.sac1
+      - 10.32.98.146/32 # conveyor-worker10-production.sac1
+      - 10.32.177.20/32 # conveyor-worker11-production.sac1
+      - 10.32.40.113/32 # conveyor-util1-production.sac1
+      - 10.32.176.126/32 # conveyor-util2-production.sac1
+      - 10.12.240.158/32   # conveyor-worker1-production.dub1
+      - 10.13.8.3/32   # conveyor-worker2-production.dub1
+      - 10.12.240.64/32   # conveyor-worker3-production.dub1
+      - 10.12.32.113/32   # conveyor-worker4-production.dub1
+      - 10.12.136.238/32   # conveyor-worker5-production.dub1
+      - 10.12.252.147/32   # conveyor-worker6-production.dub1
+      - 10.12.33.213/32   # conveyor-worker7-production.dub1
+      - 10.12.132.35/32   # conveyor-worker8-production.dub1
+      - 10.12.130.6/32   # conveyor-worker9-production.dub1
+      - 10.12.128.243/32   # conveyor-worker10-production.dub1
+      - 10.13.2.131/32   # conveyor-worker11-production.dub1
+      - 10.12.35.125/32   # conveyor-worker12-production.dub1
+      - 10.12.36.81/32   # conveyor-worker13-production.dub1
+      - 10.12.39.109/32   # conveyor-worker14-production.dub1
+      - 10.12.35.115/32   # conveyor-worker15-production.dub1
+      - 10.12.237.183/32   # conveyor-worker16-production.dub1
+      - 10.12.35.150/32   # conveyor-worker17-production.dub1
+      - 10.12.36.70/32   # conveyor-worker18-production.dub1
+      - 10.12.39.114/32   # conveyor-worker19-production.dub1
+      - 10.12.37.201/32   # conveyor-worker20-production.dub1
+      - 10.13.170.160/32   # conveyor-worker30-production.dub1
+      - 10.13.93.71/32   # conveyor-worker31-production.dub1
+      - 10.13.170.82/32   # conveyor-worker32-production.dub1
+      - 10.13.61.49/32   # conveyor-worker33-production.dub1
+      - 10.13.73.165/32   # conveyor-worker34-production.dub1
+      - 10.13.156.242/32   # conveyor-worker35-production.dub1
+      - 10.13.38.204/32   # conveyor-worker36-production.dub1
+      - 10.13.113.119/32   # conveyor-worker37-production.dub1
+      - 10.13.162.50/32   # conveyor-worker38-production.dub1
+      - 10.13.93.161/32   # conveyor-worker39-production.dub1
+      - 10.12.218.30/32   # conveyor-worker40-production.dub1
+      - 10.12.239.227/32   # conveyor-worker41-production.dub1
+      - 10.12.212.89/32   # conveyor-worker42-production.dub1
+      - 10.12.206.76/32   # conveyor-worker43-production.dub1
+      - 10.13.140.249/32   # conveyor-worker44-production.dub1
+      - 10.12.230.90/32   # conveyor-worker45-production.dub1
+      - 10.13.41.154/32   # conveyor-worker46-production.dub1
+      - 10.12.224.19/32   # conveyor-worker47-production.dub1
+      - 10.13.132.164/32   # conveyor-worker48-production.dub1
+      - 10.12.209.253/32   # conveyor-worker49-production.dub1
+      - 10.12.236.122/32   # conveyor-worker50-production.dub1
+      - 10.12.227.181/32   # conveyor-worker51-production.dub1
+      - 10.13.186.39/32   # conveyor-worker52-production.dub1
+      - 10.13.175.212/32   # conveyor-worker53-production.dub1
+      - 10.13.80.79/32   # conveyor-worker54-production.dub1
+      - 10.12.215.134/32   # conveyor-worker55-production.dub1
+      - 10.12.221.49/32   # conveyor-worker56-production.dub1
+      - 10.13.217.67/32   # conveyor-worker57-production.dub1
+      - 10.12.233.40/32   # conveyor-worker58-production.dub1
+      - 10.12.206.176/32   # conveyor-worker59-production.dub1
+      - 10.12.239.253/32   # conveyor-worker60-production.dub1
+      - 10.12.236.21/32   # conveyor-worker61-production.dub1
+      - 10.12.230.17/32   # conveyor-worker62-production.dub1
+      - 10.12.224.190/32   # conveyor-worker63-production.dub1
+      - 10.12.215.118/32   # conveyor-worker64-production.dub1
+      - 10.12.227.63/32   # conveyor-worker65-production.dub1
+      - 10.13.140.101/32   # conveyor-worker66-production.dub1
+      - 10.12.218.175/32   # conveyor-worker67-production.dub1
+      - 10.13.41.47/32   # conveyor-worker68-production.dub1
+      - 10.13.80.118/32   # conveyor-worker69-production.dub1
+      - 10.12.212.94/32   # conveyor-worker70-production.dub1
+      - 10.12.221.121/32   # conveyor-worker71-production.dub1
+      - 10.13.64.202/32   # conveyor-worker72-production.dub1
+      - 10.13.217.242/32   # conveyor-worker73-production.dub1
+      - 10.13.245.100/32   # conveyor-worker74-production.dub1
+      - 10.13.190.228/32   # conveyor-worker75-production.dub1
+      - 10.13.202.143/32   # conveyor-worker76-production.dub1
+      - 10.13.199.146/32   # conveyor-worker77-production.dub1
+      - 10.13.206.86/32   # conveyor-worker78-production.dub1
+      - 10.13.116.181/32   # conveyor-worker79-production.dub1
+      - 10.13.155.22/32   # conveyor-worker80-production.dub1
+      - 10.13.26.147/32   # conveyor-worker81-production.dub1
+      - 10.13.236.91/32   # conveyor-worker82-production.dub1
+      - 10.13.56.249/32   # conveyor-worker83-production.dub1
+      - 10.13.170.123/32   # conveyor-worker84-production.dub1
+      - 10.13.154.27/32   # conveyor-worker85-production.dub1
+      - 10.13.123.122/32   # conveyor-worker86-production.dub1
+      - 10.13.156.7/32   # conveyor-worker87-production.dub1
+      - 10.13.92.85/32   # conveyor-worker88-production.dub1
+      - 10.13.113.2/32   # conveyor-worker89-production.dub1
+      - 10.13.38.170/32   # conveyor-worker90-production.dub1
+      - 10.13.162.205/32   # conveyor-worker91-production.dub1
+      - 10.13.174.78/32   # conveyor-worker92-production.dub1
+      - 10.13.93.243/32   # conveyor-worker93-production.dub1
+      - 10.13.73.78/32   # conveyor-worker94-production.dub1
+      - 10.13.231.128/32   # conveyor-worker95-production.dub1
+      - 10.13.150.237/32   # conveyor-worker96-production.dub1
+      - 10.13.52.29/32   # conveyor-worker97-production.dub1
+      - 10.13.106.162/32   # conveyor-worker98-production.dub1
+      - 10.13.61.108/32   # conveyor-worker99-production.dub1
+      - 10.13.22.70/32   # conveyor-worker100-production.dub1
+      - 10.13.56.245/32   # conveyor-worker101-production.dub1
+      - 10.13.170.110/32   # conveyor-worker102-production.dub1
+      - 10.13.154.155/32   # conveyor-worker103-production.dub1
+      - 10.13.123.5/32   # conveyor-worker104-production.dub1
+      - 10.13.156.148/32   # conveyor-worker105-production.dub1
+      - 10.13.92.14/32   # conveyor-worker106-production.dub1
+      - 10.13.113.245/32   # conveyor-worker107-production.dub1
+      - 10.13.38.225/32   # conveyor-worker108-production.dub1
+      - 10.13.162.182/32   # conveyor-worker109-production.dub1
+      - 10.13.174.113/32   # conveyor-worker110-production.dub1
+      - 10.13.93.202/32   # conveyor-worker111-production.dub1
+      - 10.13.73.123/32   # conveyor-worker112-production.dub1
+      - 10.13.231.193/32   # conveyor-worker113-production.dub1
+      - 10.13.150.148/32   # conveyor-worker114-production.dub1
+      - 10.13.52.205/32   # conveyor-worker115-production.dub1
+      - 10.13.106.143/32   # conveyor-worker116-production.dub1
+      - 10.13.61.12/32   # conveyor-worker117-production.dub1
+      - 10.13.22.204/32   # conveyor-worker118-production.dub1
+      - 10.13.56.85/32   # conveyor-worker119-production.dub1
+      - 10.13.170.144/32   # conveyor-worker120-production.dub1
+      - 10.13.154.117/32   # conveyor-worker121-production.dub1
+      - 10.13.123.131/32   # conveyor-worker122-production.dub1
+      - 10.13.156.128/32   # conveyor-worker123-production.dub1
+      - 10.13.92.77/32   # conveyor-worker124-production.dub1
+      - 10.13.113.238/32   # conveyor-worker125-production.dub1
+      - 10.13.38.166/32   # conveyor-worker126-production.dub1
+      - 10.13.162.40/32   # conveyor-worker127-production.dub1
+      - 10.13.174.204/32   # conveyor-worker128-production.dub1
+      - 10.13.93.13/32   # conveyor-worker129-production.dub1
+      - 10.13.73.136/32   # conveyor-worker130-production.dub1
+      - 10.13.231.214/32   # conveyor-worker131-production.dub1
+      - 10.13.150.236/32   # conveyor-worker132-production.dub1
+      - 10.13.52.31/32   # conveyor-worker133-production.dub1
+      - 10.13.106.125/32   # conveyor-worker134-production.dub1
+      - 10.13.61.22/32   # conveyor-worker135-production.dub1
+      - 10.13.22.137/32   # conveyor-worker136-production.dub1
+      - 10.13.56.99/32   # conveyor-worker137-production.dub1
+      - 10.13.170.249/32   # conveyor-worker138-production.dub1
+      - 10.13.154.248/32   # conveyor-worker139-production.dub1
+      - 10.13.123.27/32   # conveyor-worker140-production.dub1
+      - 10.13.156.49/32   # conveyor-worker141-production.dub1
+      - 10.13.92.9/32   # conveyor-worker142-production.dub1
+      - 10.13.113.53/32   # conveyor-worker143-production.dub1
+      - 10.13.38.71/32   # conveyor-worker144-production.dub1
+      - 10.13.162.60/32   # conveyor-worker145-production.dub1
+      - 10.13.174.87/32   # conveyor-worker146-production.dub1
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    ports:
+      pgbouncer_txn: 20018
+      pgbouncer_session: 20019
+      postgresql_raw: 20020
+    extra_variables:
+      ignore_startup_parameters: extra_float_digits,search_path
+      pglogical: 'on'
+  merchand_indexer_prod: # GDS-14213(Decommed)
+#  email_campaign_prod: # GDS-14595 decom GPROD-247268
+  #reg_cons_log_prod: # GDS-15404
+#  oxygen_prod: # GDS-15409 decom GPROD-247268
+#  display_leadgen_prod: # GDS-16030
+#  olympus_prod: # GDS-16475 # Decomm GDS-32840 #
+#  dsply_lead_gen_prod: # GDS-16528 ## __SOX__
+#  rise_prod: # GDS-16758 decom GPROD-247268
+#  list_manager_prod: # GDS-17054 GPROD-247268
+#  goods_invoicing_prod: # GDS-17371 GPROD-247268
+  campaign_alert_prod: # GDS-17601(Decommed)
+#  delivery_est_prod: # GDS-19393 #Decomm GDS-32736#
+#  ada_prod: # GDS-19516 GPROD-247268
+  gdt_auto_prod: # GDS-19592(Decommed)

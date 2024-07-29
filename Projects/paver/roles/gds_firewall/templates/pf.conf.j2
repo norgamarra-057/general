@@ -1,0 +1,117 @@
+# Ansible managed
+#
+# NOTE: This is the GDS production firewall for use after provisioning the OS
+# and is intended for production use.
+
+ext_if="{{ ansible_default_ipv4.interface }}"
+ext_ifs="{" $ext_if carp "}"
+
+include '/etc/pf.conf.d/gds-constants.conf'
+
+table <gds-admin-hosts> persist { {% for gds_admin_hosts in gds_admin_hosts %}'{{ gds_admin_hosts }}'{% if not loop.last %},{% endif %}{% endfor %} }
+table <gds-backup-hosts> persist { {% for gds_backup_hosts in gds_backup_hosts %}'{{ gds_backup_hosts }}'{% if not loop.last %},{% endif %}{% endfor %} }
+table <check-mk-hosts> persist { {% for check_mk_hosts in check_mk_hosts %}'{{ check_mk_hosts }}'{% if not loop.last %},{% endif %}{% endfor %} }
+
+include '/etc/pf.conf.d/tables.conf'
+
+set block-policy return # NOTE: Fail fast, return an RST/ICMP UNREACHABLE
+set debug urgent
+set optimization normal
+set require-order yes
+set ruleset-optimization profile
+# set skip on lo # NOTE: See comment below attached to `pass quick on lo`
+#set timeout { tcp.established 600, tcp.closing 60 }
+set timeout { tcp.closing 60 }
+set limit states 50000
+
+scrub out all min-ttl 15 fragment reassemble # set-tos 0x1c
+scrub in  all min-ttl 15 fragment reassemble
+
+# NAT all client requests from their vlan(4)/carp(4) interface to the actual
+# service iteslf listening on loopback.
+include '/etc/pf.conf.d/redirects.conf'
+
+# Default deny inbound/permit out
+block return in log
+pass out
+
+# Pass in GDS clients
+pass in quick tagged gds-client
+pass in quick tagged gds-replication
+pass in quick tagged gds-admin-redirect
+
+# NOTE: MHA requires access to a host's address.  This in turn means that
+# talking to a host's MySQL instance be NAT'ed.  In order to support NAT on
+# local addresses, we can't have pf(4) skip processing on lo0.  i.e. this
+# must work:
+#
+# HostA% telnet HostA 20000
+#
+# Where the IP address for HostA is listening on lagg0, but because it's
+# local, it gets short-circuited and handled via loopback... which means
+# traffic on loopback needs to be NAT'ed, which means pf(4) needs to be
+# involved on lo0.
+pass quick on lo
+
+# Log all sshd(2) connections by default
+#pass in log on $ext_if proto tcp from <groupon-bastion-hosts> to any port ssh
+{% if groups['gds_admin'] is defined and inventory_hostname in groups['gds_admin'] %}
+pass in log on $ext_if proto tcp from any to any port ssh
+{% else %}
+pass in log on $ext_if proto tcp from <gds-admin-hosts> to any port ssh
+{% endif %}
+pass in log proto tcp from <gds-backup-hosts> to any port ssh
+pass in log on $ext_if proto tcp from <gds-replication-peers> to <gds-replication-peers> port ssh
+
+# Load vulnscan allowance rules
+pass in quick log on $ext_if from <gds-vulnscan-host> to any
+
+# Load instance specific rules
+include '/etc/pf.conf.d/instance_specific.conf'
+
+# Dedicated ports for mysql instance cloning
+pass in log proto tcp from <gds-replication-peers> to <gds-replication-peers> port 9999:10100
+
+# Be liberal in our acceptance of ICMP
+pass in inet proto icmp from any to any icmp-type { echoreq, unreach, redir, timex }
+
+# Pass carp(4) packets from other GDS hosts
+pass quick on vlan proto carp from <gds-replication-peers> keep state (no-sync)
+{% if gds_carp_interfaces is defined %}
+{% for carp_interface in gds_carp_interfaces %}
+pass quick on {{ carp_interface }} proto carp from <gds-replication-peers> keep state (no-sync)
+{% endfor %}
+{% endif %}
+
+# Allow Check_MK
+pass in quick proto tcp from <check-mk-hosts> to self port 6556
+
+# Pass in monitord
+pass in quick proto tcp from any to any port $monitord_port
+
+# pass in splunk_forwarder
+pass in quick proto tcp from any to any port $splunk_forwarder
+
+{% if fw_jenkins is defined and fw_jenkins == 'true' %}
+# Pass in jenkins 
+pass in quick proto tcp from any to any port { 8180, 28144 }
+pass in quick proto udp from any to any port { 33848, 5353 }
+{% endif %}
+
+# Pass in HashiCorp's Serf protocol
+#
+# NOTE: This may not be used because consul has its own ports used for serf
+# LAN and serf WAN
+pass in quick proto {tcp,udp} from any to any port $serf_port
+
+
+# Pass in HashiCorp Consul services that require TCP/UDP
+pass in quick proto {tcp,udp} from any to any port { $consul_dns_port, $consul_serf_lan_port, $consul_serf_wan_port }
+
+# Pass in HashiCorp Consul services that only require TCP
+pass in quick proto tcp from any to any port { $consul_server_rpc_port, $consul_http_port, $consul_rpc_port }
+
+{% if fw_hydra is defined  and  fw_hydra == 'true' %}
+# Pass in Hydra services that only require TCP
+pass in quick proto tcp from any to any port $hydra_http_port
+{% endif %}

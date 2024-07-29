@@ -1,0 +1,35 @@
+---
+- name: ops-config | FreeBSD | host.yml
+  get_url:
+    url="http://config/configs/hosts/{{ inventory_hostname }}.yml"
+    dest=/usr/local/etc/host.yml
+    mode=0644
+    owner=root
+    group=wheel
+
+- name: ops-config | FreeBSD | hostclass
+  register: hostclass
+  shell: "/usr/bin/grep ^hostclass: /usr/local/etc/host.yml | /usr/bin/awk '{print $2}' | /usr/bin/sed -e 's#-.*$##'"
+  changed_when: False
+
+- debug: var=hostclass
+
+# FIXME(pboros@): ansible's get_url loads it with html, if there is a more
+# elegant solution than fetch(1) we should go for it
+- name: ops-config | FreeBSD | hostclass.yml
+  command: "/usr/bin/fetch -a -w 15 -qo /usr/local/etc/hostclass.yml http://config/configs/hostclasses/{{ hostclass.stdout }}.yml"
+
+
+# FIXME(seanc@): both of these jobs should eventually be moved to
+# "special_time=hourly" instead of minute.
+- name: ops-config | FreeBSD | host.yml cron
+  cron:
+    name="ops-config host.yml"
+    minute="*/5"
+    job="/usr/bin/fetch -a -w 15 -qo /usr/local/etc/host.yml http://config/configs/hosts/{{ inventory_hostname }}.yml"
+
+- name: ops-config | FreeBSD | hostclass.yml cron
+  cron:
+    name="ops-config hostclass.yml"
+    minute="*/5"
+    job="/usr/bin/fetch -a -w 15 -qo /usr/local/etc/hostclass.yml http://config/configs/hostclasses/`/usr/bin/grep ^hostclass /usr/local/etc/host.yml | /usr/bin/awk '{print $2}' | /usr/bin/sed -e 's#-.*$##'`.yml"

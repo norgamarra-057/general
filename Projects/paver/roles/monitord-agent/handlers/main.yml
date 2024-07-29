@@ -1,0 +1,12 @@
+---
+- name: monitord_agent restart
+  shell: sleep 3 && /usr/local/sbin/sv term /var/service/monitord_agent
+
+- name: monitord_agent log restart
+  shell: sleep 3 && /usr/local/sbin/sv term /var/service/monitord_agent/log
+
+- name: monitord_agent_aux restart
+  shell: sleep 3 && /usr/local/sbin/sv term /var/service/monitord_agent_aux
+
+- name: monitord_agent_aux log restart
+  shell: sleep 3 && /usr/local/sbin/sv term /var/service/monitord_agent_aux/log

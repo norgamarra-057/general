@@ -1,0 +1,31 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - target_host is defined
+          - instance is defined
+
+    - name: Autovac to 0.10
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter system set autovacuum_vacuum_scale_factor=0.1"
+
+    - name: Autovac to 0.05
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter system set autovacuum_vacuum_scale_factor=0.05"
+      when: extra_aggr is defined and extra_aggr == "t"
+
+    - name: Analyze to 0.05
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter system set autovacuum_analyze_scale_factor=0.05"
+
+    - name: Delay to 10ms
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter system set autovacuum_vacuum_cost_delay=10"
+
+    - name: Logging autovac
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter system set log_autovacuum_min_duration=60000"
+
+    - name: Reload
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_reload_conf()"
+

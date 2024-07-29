@@ -1,0 +1,168 @@
+---
+# Create parent if it doens't exist
+- name: Percona | FreeBSD | zfs | groupon root
+  zfs:
+    name: "tank/var/groupon"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'on'
+    mountpoint: "{{ groupon_root }}"
+    primarycache: all
+    readonly: 'off'
+    secondarycache: all
+    setuid: 'off'
+    state: present
+    sync: disabled
+
+
+# Create the base dataset that all databases inherit from
+- name: Percona | FreeBSD | zfs | percona root
+  zfs:
+    name: "tank/var/groupon/percona"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "{{ percona_root }}"
+    primarycache: all
+    readonly: 'off'
+    recordsize: 16K
+    secondarycache: all
+    setuid: 'off'
+    state: present
+    sync: disabled
+
+- name: Percona | FreeBSD | zfs | cluster_path
+  zfs:
+    name: "tank{{ percona_instance_path }}"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "{{ percona_instance_path }}"
+    primarycache: all
+    readonly: 'off'
+    recordsize: 16K
+    secondarycache: all
+    setuid: 'off'
+    state: present
+    sync: disabled
+
+- name: Percona | FreeBSD | zfs | datadir
+  zfs:
+    name: "tank{{ percona_datadir }}"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "{{ percona_datadir }}"
+    primarycache: all
+    readonly: 'off'
+    recordsize: 16K
+    setuid: 'off'
+    state: present
+    sync: disabled
+
+- name: Percona | FreeBSD | zfs | binlogdir
+  zfs:
+    name: "tank{{ percona_binlogdir }}"
+    atime: 'off'
+    checksum: 'off'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "{{ percona_binlogdir }}"
+    primarycache: metadata
+    readonly: 'off'
+    recordsize: 128K
+    setuid: 'off'
+    state: present
+    sync: standard
+    logbias: throughput
+
+- name: Percona | FreeBSD | zfs | logdir
+  zfs:
+    name: "tank{{ percona_logdir }}"
+    atime: 'off'
+    checksum: 'off'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "{{ percona_logdir }}"
+    primarycache: metadata
+    readonly: 'off'
+    recordsize: 128K
+    setuid: 'off'
+    state: present
+    sync: disabled
+    logbias: throughput
+
+- name: Percona | FreeBSD | zfs | tmpdir
+  zfs:
+    name: "tank{{ percona_tmpdir }}"
+    atime: 'off'
+    checksum: 'off'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "{{ percona_tmpdir }}"
+    primarycache: metadata
+    readonly: 'off'
+    recordsize: 128K
+    setuid: 'off'
+    state: present
+    sync: disabled
+    logbias: throughput
+
+- name: Percona | FreeBSD | initdb | cluster_path
+  file:
+    name: "{{ percona_instance_path }}"
+    state: directory
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instances[instance_name].unix_user].group }}"
+    mode: 0755
+
+- name: Percona | FreeBSD | initdb | datadir
+  file:
+    name: "{{ percona_datadir }}"
+    state: directory
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instances[instance_name].unix_user].group }}"
+    mode: 0700
+
+- name: set permissions and ownership on binlogdir
+  file:
+    name: "{{ percona_binlogdir }}"
+    state: directory
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instances[instance_name].unix_user].group }}"
+    mode: 0770
+
+
+- name: Percona | FreeBSD | initdb | logdir
+  file:
+    name: "{{ percona_logdir }}"
+    state: directory
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instances[instance_name].unix_user].group }}"
+    mode: 0775
+
+- name: Percona | FreeBSD | tmpdir
+  file:
+    name: "{{ percona_tmpdir }}"
+    state: directory
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instances[instance_name].unix_user].group }}"
+    mode: 0700

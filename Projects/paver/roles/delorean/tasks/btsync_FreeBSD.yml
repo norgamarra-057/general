@@ -1,0 +1,26 @@
+---
+- name: check for btsync install
+  command: /usr/sbin/pkg info btsync
+  register: btsyncpkg_result
+  changed_when: btsyncpkg_result.rc != 0
+  ignore_errors: true
+
+- name: install btsync
+  command: /usr/sbin/pkg add http://blast/dist/btsync-1.3.106.txz
+  when: btsyncpkg_result.rc != 0
+
+- name: create btsync scratch directory
+  file: path=/var/groupon/btsync state=directory
+
+- name: FreeBSD | rc.conf | btsync enable
+  sysrc: name=btsync_enable value='YES'
+
+- name: FreeBSD | rc.conf | btsync user
+  sysrc: name=btsync_user value='root'
+
+- name: FreeBSD | rc.conf | btsync group
+  sysrc: name=btsync_group value='wheel'
+
+- name: FreeBSD | rc.conf | btsync data dir
+  sysrc: name=btsync_data_dir value='/var/groupon/btsync'
+

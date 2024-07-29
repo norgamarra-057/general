@@ -1,0 +1,53 @@
+---
+- name: ttys | Disable unused ttys
+  copy: dest="/etc/ttys" src="ttys" owner=root group=wheel mode=0644
+  notify:
+    - init reload
+
+# TODO(seanc@): This is incorrect, the changed_when=False is set
+# because rc.d/motd always rewrites the first line of the file.
+- name: motd
+  template:
+    src: "motd.j2"
+    dest: "/etc/motd"
+    mode: 0644
+    owner: root
+    group: wheel
+  changed_when: False
+  notify:
+    - motd start
+
+- name: FreeBSD | mfi | stat
+  stat:
+    path: /dev/mfi0
+  register: mfi0_st
+
+- name: FreeBSD | mfi | MegaCLI
+  pkgng: name=megacli state=present
+  when: mfi0_st.stat.exists
+
+- name: Install a few baseline packages
+  pkgng: name={{ item }} state=present
+  with_items:
+    - ipmitool
+    - py27-yaml
+
+- name: FreeBSD | syslog | console.log
+  copy:
+    dest: "/var/log/console.log"
+    owner: root
+    group: wheel
+    mode: 0600
+    content: ""
+    force: no
+
+- name: FreeBSD | syslog | console.info
+  lineinfile:
+    dest: /etc/syslog.conf
+    regexp: '^console.info[\s]+/var/log/console.log'
+    line: 'console.info                                    /var/log/console.log'
+    insertafter: EOF
+    state: present
+  notify:
+    - syslogd reload
+

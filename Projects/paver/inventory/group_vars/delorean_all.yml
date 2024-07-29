@@ -1,0 +1,125 @@
+---
+# List of all delorean Host Admins
+host_admins:
+  - alock
+  - c_mboehm
+  - c_pboros
+  - c_rbarabas
+  - c_dguzmanburgos
+  - c_dducos
+  - chaynie
+  - chschneider
+  - cllanca
+  - fkalamidas
+  - jose.finotto
+  - juan
+  - mreussner
+  - msubramanian
+  - rpenugonda
+  - saurabh
+  - schittenden
+  - sdoumbouya
+
+# List of programs/packages that should exist on all delorean machines
+host_packages:
+  - gtar
+  - mtr-nox11
+  - nano
+  - pbzip2
+  - pigz
+  - portmaster
+  - pstree
+  - pv
+  - python27
+  - screen
+  - tmux
+  - zfs-stats
+  - zfsnap
+  - p5-libwww
+  - lwp
+
+backup_users:
+  docker:
+    gid: 998
+    name: Docker Backup User
+    uid: 998
+  gds_prod_snc1_db001:
+    gid: 998
+    name: GDS Cluster SNC1-001
+    uid: 998
+  gds_prod_snc1_db002:
+    gid: 998
+    name: GDS Cluster SNC1-002
+    uid: 998
+  gds_prod_snc1_db003:
+    gid: 998
+    name: GDS Cluster SNC1-003
+    uid: 998
+  gds_prod_snc1_db004:
+    gid: 998
+    name: GDS Cluster SNC1-004
+    uid: 998
+  gds_prod_snc1_db005:
+    gid: 998
+    name: GDS Cluster SNC1-005
+    uid: 998
+  gds_prod_snc1_db006:
+    gid: 998
+    name: GDS Cluster SNC1-006
+    uid: 998
+  gds_prod_snc1_db007:
+    gid: 998
+    name: GDS Cluster SNC1-007
+    uid: 998
+  gds_prod_snc1_db015:
+    gid: 998
+    name: GDS Cluster SNC1-015
+    uid: 998
+  gds_prod_snc1_db021:
+    gid: 998
+    name: GDS Cluster SNC1-021
+    uid: 998
+  github:
+    gid: 998
+    name: Github Backup User
+    uid: 998
+  mysql:
+    gid: 998
+    name: GDS MySQL Backup User
+    uid: 998
+  nagios:
+    gid: 998
+    name: Nagios Backup User
+    uid: 998
+  pdns:
+    gid: 998
+    name: PDNS Backup User
+    uid: 998
+  postgres:
+    gid: 998
+    name: PostgreSQL Backup User
+    uid: 998
+  wms:
+    gid: 998
+    name: WMS user for backups
+    uid: 998
+  ss:
+    gid: 998
+    name: SS user for backups
+    uid: 998
+  jira-bkup:
+    gid: 998
+    name: jira and wiki user for backups
+    uid: 998
+  emailmsysdb:
+    gid: 998
+    name: email msys db backups
+    uid: 998
+  gan:
+    gid: 998
+    name: gan systems
+    uid: 998
+#  postgresql:
+#    gid: 998
+#    name: Postgresql Backup User
+#    uid: 998

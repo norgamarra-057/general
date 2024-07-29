@@ -1,0 +1,186 @@
+---
+- name: Aws part initial
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - assert:
+        that:
+          - gcp_host_curr_primary is defined
+          - db is defined
+          - aws_host_new_primary is defined
+          - admin_password is defined
+          - my_app_user is defined
+          - my_dba_user is defined
+
+- name: RDS part new primary 1
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+  
+    - name: Set app user to nologin
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "alter user {{ my_app_user }} nologin"
+
+    - name: Set dba user to nologin
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "alter user {{ my_dba_user }} nologin"
+
+    - name: Kill remaining sessions
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid() and usename is not null and usename not in ('rdsadmin','gds_admin','rdsrepladmin') and datname='{{ db }}'"      
+
+    - name: Check that replication delay is small
+      command: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "select extract (epoch from now() - last_msg_receipt_time) as repl_lag from pg_stat_subscription where subname='my_sub_{{ db }}'"
+      register: replication_lag
+    - name: verify replication lag is low
+      fail: msg="Exiting ----------Replication lag is high"
+      when:  replication_lag.stdout|int  >  10
+
+- name: GCP part current primary
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Set app user to nologin
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -c "alter user {{ my_app_user }} nologin"
+
+    - name: Set dba user to nologin
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -c "alter user {{ my_dba_user }} nologin"
+
+    - name: Kill remaining sessions
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid() and usename is not null and usename not in ('rdsadmin','gds_admin','rdsrepladmin') and datname= '{{ db }}'"
+
+    - name: Check that replication delay is small
+      command: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -c "select pg_wal_lsn_diff(sent_lsn,replay_lsn) from pg_stat_replication where application_name='my_sub_{{ db }}'"
+      register: replication_lag
+    - name: verify replication lag is low
+      fail: msg="Exiting ----------Replication lag is high"
+      when:  replication_lag.stdout|int  >  50000
+
+    - name: One time sequence export
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -t -c "SELECT 'SELECT SETVAL(' || quote_literal(quote_ident(schemaname) || '.' || quote_ident(sequencename)) || ', ' || last_value || ');' FROM pg_sequences" > /tmp/{{ db }}_sequences.sql
+
+
+- name: RDS part new primary 2
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Check replica replication lag once more
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "select extract (epoch from now() - last_msg_receipt_time) as repl_lag from pg_stat_subscription where subname='my_sub_{{ db }}'"
+      register: replication_lag_aws
+      until: replication_lag_aws.stdout|int < 5
+      retries: 1000
+      delay: 1 
+
+    - name: Drop subscription
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_new_primary }} -c "drop subscription my_sub_{{ db }}"
+
+    - name: Check if publication exists
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_new_primary }} -c "select count(*) from pg_publication where pubname='my_pub_{{ db }}'"
+      register: count_pub
+
+    - name: Create publication
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_new_primary }} -c "CREATE PUBLICATION my_pub_{{ db }} FOR ALL TABLES;"
+      when:  count_pub.stdout|int  == 0
+
+    - name: Import sequences
+      shell:  psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_new_primary }} < /tmp/{{ db }}_sequences.sql
+
+
+- name: GCP part curr primary 2
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Drop publication
+      shell: psql -U postgres -d {{ db }} -p 5432 -h {{ gcp_host_curr_primary }} -c "drop publication my_pub_{{ db }}"
+
+    - name: Create subscription
+      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_curr_primary }} -c "CREATE SUBSCRIPTION my_sub_{{ db }} CONNECTION 'host={{ aws_host_new_primary }} port=5432 dbname={{ db }} user=gds_admin password= {{ admin_password }}' PUBLICATION my_pub_{{ db }} WITH (copy_data = false); "
+
+    - name: Show one-time replication status
+      shell: psql -U postgres -Atq -d {{ db }} -p 5432 -h {{ gcp_host_curr_primary }} -c "SELECT * FROM pg_stat_subscription;"
+      register: pglogical_repl_status
+    - debug: var=pglogical_repl_status.stdout
+
+
+- name: RDS part new primary 3
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: check if the new logical slave has succesfully connected to the new master
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_new_primary }} -c "select count(*) from pg_stat_replication where application_name='my_sub_{{ db }}'"
+      register: count_logical_slave
+    - name: verify it has connected
+      fail: msg="Exiting ----------No pglogical slave found"
+      when:  count_logical_slave.stdout  == "0"
+
+    - name: Pause for 30 seconds to check all is good
+      pause:
+        seconds: 30
+
+    - name: Find schemas
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "select schema_name from information_schema.schemata where schema_name not in ('heartbeat','dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Set app user to login
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "alter user {{ my_app_user }} login"
+
+    - name: Set dba user to login
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "alter user {{ my_dba_user }} login"      
+
+    - name: Privileges for app user 1/2
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "grant insert,update,delete on all tables in schema {{ item }} to {{ my_app_user}}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges for app user 2/2
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_new_primary }} -c "grant update on all sequences in schema {{ item }} to {{ my_app_user}}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+- name: GCP part curr primary 3
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - name: Find schemas
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -c "select schema_name from information_schema.schemata where schema_name not in ('heartbeat','dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Revoke privs from app user 1
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -c "revoke insert,update,delete on all tables in schema {{ item }} from {{ my_app_user}}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Revoke privs from app user 1
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -c "revoke update on all sequences in schema {{ item }} from {{ my_app_user}}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+#    - name: Set app user to login
+#      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_curr_primary }} -c "alter user {{ my_app_user }} login"
+
+    - name: Delete the temp sequences file
+      file: path=/tmp/{{ db }}_sequences.sql state=absent
+
+    - name: Update inventory
+      shell: psql -U postgres -d pg_admin_111 -At -p 5432 -h 10.183.193.251 -c "update replications set status='failback to RDS!', updated_at=now() where my_aws_host_master='{{ aws_host_new_primary }}' and db='{{ db }}'"
+      register: update_row
+    - debug: var=update_row.stdout

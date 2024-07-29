@@ -1,0 +1,45 @@
+#!/usr/bin/awk --
+{
+  Q_LEN += $1;
+  IOPS += $2;
+  READ_OPS += $3;
+  READ_KBPS += $4;
+  READ_MS += $5;
+  WRITE_OPS += $6;
+  WRITE_KBPS += $7;
+  WRITE_MS += $8;
+  PCT_BUSY += $9;
+}
+END {
+  if (NAGIOS == "yes" && PERF == "yes") {
+# iostat OK: | max_bytes_in=92.0;max_bytes_out=17564.0;max_tps=2423.0;max_tps_critical=7000.0;max_tps_warning=6000.0;max_util=100.1;sda_bytes_in=92.0;sda_bytes_out=17564.0;sda_tps=2423.0;sda_util=100.1
+    print                                             \
+      "iostat OK: | "                                 \
+      "gstat_cmdq_len=" Q_LEN / NUMDEV ";"           \
+      "gstat_iops=" IOPS / NUMDEV ";"                \
+      "gstat_rops=" READ_OPS / NUMDEV ";"            \
+      "gstat_rbps=" (READ_KBPS * 1024) / NUMDEV ";"  \
+      "gstat_rms=" READ_MS / NUMDEV ";"              \
+      "gstat_wops=" WRITE_OPS / NUMDEV ";"           \
+      "gstat_wbps=" (WRITE_KBPS * 1024) / NUMDEV ";" \
+      "gstat_wms=" WRITE_MS / NUMDEV ";"             \
+      "gstat_util=" PCT_BUSY / NUMDEV
+  } else if (NAGIOS == "yes" && (PCT_BUSY / NUMDEV > 60.0)) {
+    print "iostat WARN: utilization above 50%"
+  } else if (NAGIOS == "yes" && (PCT_BUSY / NUMDEV > 90.0)) {
+    print "iostat CRIT: utilization above 90%"
+  } else if (NAGIOS == "yes") {
+    print "iostat OK"
+  } else {
+    print                                             \
+      Q_LEN / NUMDEV " ",                             \
+      IOPS / NUMDEV " ",                              \
+      READ_OPS / NUMDEV " ",                          \
+      (READ_KBPS * 1024) / NUMDEV " ",                \
+      READ_MS / NUMDEV " ",                           \
+      WRITE_OPS / NUMDEV " ",                         \
+      (WRITE_KBPS * 1024) / NUMDEV " ",               \
+      WRITE_MS / NUMDEV " ",                          \
+      PCT_BUSY / NUMDEV
+  }
+}

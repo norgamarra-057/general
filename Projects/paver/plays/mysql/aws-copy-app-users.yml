@@ -1,0 +1,246 @@
+---
+###################################################
+# aws-copy-app-users.yml
+#
+# Description:  This play is intended to dump and copy the on-premise MySQL app users to an AWS RDS Instance.
+#
+# Parameters:  node=source_server 
+#              instance=instance_name_on_source [db=name] [skip_db=name]
+#              endpoint=aws_endpoint [skip_drop=yes]
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              node: gds-snc1-prod-db001s1.snc1
+#              instance: client_id_prod
+#              endpoint: dminorauroramysql56-0.cz37pbquwh5j.us-west-1.rds.amazonaws.com
+#
+# Version:     1.6.1
+# Date:        2019-12-03
+#
+# Notes:  1. .my.cnf is REQUIRED in the user's home directory, with the endpoint user name and password.  
+#         2. DROP GRANT is removed and REVOKE GRANT added as needed..  Add skip_drop=yes to override this.
+#
+###################################################
+
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - assert:
+        that:
+          - node is defined
+          - instance is defined
+          - endpoint is defined
+
+- name: Create Backup File from source and load into endpoint
+  become: true
+  hosts:
+    - "{{ node }}"
+  gather_facts: false
+  tasks:
+    - name: Confirm that ~/.my.cnf exists
+      block:
+        - name: Does ~/.my.cnf exist?
+          stat:
+            path: ~/.my.cnf
+          register: my_cnf
+
+        - name: Does it?
+          fail: 
+            msg: "~.my.cnf must exist on {{ node }}"
+          when: my_cnf.stat.exists == false
+
+    - name: Set datetime value
+      set_fact:
+         dt: "{{ '%Y%m%d-%H%M%S' | strftime }}"
+
+    - name: Create source backup location
+      file: path=/var/groupon/percona/backup owner=root group=wheel mode=0777 state=directory
+
+    - name: Build list of source databases to dump
+      block:
+        - set_fact:
+            skip_db_list: ",'{{ skip_db }}'"
+          when: skip_db is defined
+
+        - name: Get list of databases to dump, if db is not defined
+          shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT schema_name FROM information_schema.SCHEMATA WHERE schema_name NOT IN ('information_schema','mysql','performance_schema','sys','hydra','maatkit','gds_pm','percona','tmp'{{skip_db_list|default()}})"
+          changed_when: false
+          become: true
+          register: src_db_raw
+
+        - name: Build db list
+          set_fact:
+            src_db_list: "{{ src_db_raw.stdout_lines }}"
+      when: db is not defined
+
+    - name: Build list if db is defined
+      set_fact:
+        src_db_list: "['{{ db }}']"
+      when: db is defined
+
+    - name: Dump Application Users
+      shell: 
+      args:
+        cmd: /usr/local/bin/pt-show-grants --noheader --separate --ignore=root@localhost,root@%,root@127.0.0.1,dba_util@localhost,dba_util@%,dba_util@127.0.0.1,gds_mha@localhost,gds_mha@%,gds_mha@127.0.0.1,monitor@localhost,monitor@%,monitor@127.0.0.1,percona@localhost,percona@%,percona@127.0.0.1,playback_user@localhost,playback_user@%,playback_user@127.0.0.1,pt_heartbeat@localhost,pt_heartbeat@%,pt_heartbreat@127.0.0.1,replication@localhost,replication@%,replication@127.0.0.1,checkmk_mon@localhost,checkmk_mon@127.0.0.1,checkmk_mon@% -S/var/groupon/percona/{{ instance }}/mysql.sock > {{ instance }}-{{ dt }}.app_users.sql
+        chdir: /var/groupon/percona/backup
+      changed_when: false
+      
+    - name: Preserve Application Users file
+      shell:
+      args:
+        cmd: cp {{ instance }}-{{ dt }}.app_users.sql {{ instance }}-{{ dt }}.before.app_users.sql
+        chdir: /var/groupon/percona/backup
+      
+    - name: Look for global SELECT privs
+      shell:
+      args:
+        cmd: grep "GRANT SELECT ON \*\.\*" {{ instance }}-{{ dt }}.app_users.sql | awk '{print $6}'
+        chdir: /var/groupon/percona/backup
+      changed_when: false
+      register: select_out
+      
+    - set_fact:
+        select_lines: "{{ select_out.stdout_lines }}"
+        
+    - name: Add SELECT on databases
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        line: "GRANT SELECT ON `{{ item[0] }}`.* TO {{ item[1] }};"
+        state: present
+      with_nested:
+        - "{{ src_db_list }}"
+        - "{{ select_lines }}"
+        
+    - name: Convert Application Users - Remove global SELECT priv
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        regexp: 'GRANT SELECT ON \*\.\*'
+        replace: 'GRANT USAGE ON *.*'
+        
+    - name: Convert Application Users - Remove SUPER priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        regexp: '^GRANT SUPER'
+        state: absent
+        
+    - name: Convert Application Users - Remove SHUTDOWN priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        regexp: '^GRANT SHUTDOWN'
+        state: absent
+    
+    - name: Convert Application Users - Remove FILE priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        regexp: '^GRANT FILE'
+        state: absent
+    
+    - name: Convert Application Users - Remove CREATE TABLESPACE priv
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        regexp: '^GRANT CREATE TABLESPACE'
+        state: absent
+    
+    - name: Convert Application Users - Remove DROP priv
+      block:
+        - name: Remove GRANT DROP
+          lineinfile:
+            path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+            regexp: '^GRANT DROP'
+            state: absent
+  
+###############
+# Find users with Global ALL Privs and add REVOKE DROP, as needed.
+###############
+        - name: Look for ALL Privs and add REVOKE DROP, as needed.
+          shell: 
+          args:
+            cmd: grep "GRANT ALL PRIVILEGES ON " {{ instance }}-{{ dt }}.app_users.sql | awk '{print $5,"FROM",$7}'
+            chdir: /var/groupon/percona/backup
+          changed_when: false
+          register: awk_out
+      
+        - set_fact:
+            revoke_lines: "{{ awk_out.stdout_lines|default() }}"
+      
+        - name: Add REVOKE DROP, as needed.
+          lineinfile:
+            path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+            line: "REVOKE DROP ON {{ item }};"
+            state: present
+          with_items:
+            - "{{ revoke_lines }}"
+      when: skip_drop is not defined or skip_drop|upper != "YES"
+      
+ ##############
+ # Find users with Global All Privs and convert to allowed list
+ ##############
+    - name: Create allowed global privs list
+      set_fact:
+        global_priv_list: ['CREATE USER','PROCESS','RELOAD','REPLICATION CLIENT','REPLICATION SLAVE','SHOW DATABASES']
+                
+    - name: Get list of users with global privs
+      shell:
+      args:
+        cmd: grep "GRANT ALL PRIVILEGES ON \*\.\*" {{ instance }}-{{ dt }}.app_users.sql | awk '{print $7}'
+        chdir: /var/groupon/percona/backup
+      changed_when: false
+      register: users_out
+              
+    - set_fact:
+        users_list: "{{ users_out.stdout_lines|default() }}"
+                
+    - name: Convert GRANT ALL PRIVILEGES on *.* to allowed global privs
+      lineinfile:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        regexp: 'GRANT ALL PRIVILEGES ON \*\.\* TO '
+        line: 'GRANT {{ item[0] }} ON *.* TO {{ item[1] }}'
+        state: present
+      with_nested: 
+        - "{{ global_priv_list }}"
+        - "{{ users_list }}"
+                
+    - name: Replace remaining ALL PRIVS ON *.* and replace with GRANT USAGE, to preserv the pass
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        regexp: 'GRANT ALL PRIVILEGES ON \*\.\* TO '
+        replace: 'GRANT USAGE ON *.* TO '
+      with_items: 
+        - "{{ users_list }}"
+                
+    - name: Remove remaining *.* and replace with database.* 
+      replace:
+        path: /var/groupon/percona/backup/{{ instance }}-{{ dt }}.app_users.sql
+        regexp: '\*\.\* TO '
+        replace: '{{ item[0].* }} TO '
+      with_nested: 
+        - "{{ src_db_list }}"
+        - "{{ global_priv_list }}"
+      when: item[1] not in global_priv_list
+              
+    - name: Confirm each line ends with a semi-colan
+      shell:
+      args:
+        cmd: sed 's/;//g' {{ instance }}-{{ dt }}.app_users.sql > tmp.sql; sed 's/$/;/' tmp.sql > {{ instance }}-{{ dt }}.app_users.sql
+        chdir: /var/groupon/percona/backup
+              
+    - name: Remove tmp.sql
+      file: path=/var/groupon/percona/backup/tmp.sql state=absent
+
+    - name: Load application users
+      shell: 
+      args:
+        cmd: cat {{ instance }}-{{ dt }}.app_users.sql | mysql -h {{ endpoint }} -A mysql
+        chdir: /var/groupon/percona/backup
+      become: false
+      changed_when: false
+  
+    - name: Preserve After Application Users file
+      shell:
+      args:
+        cmd: mv {{ instance }}-{{ dt }}.app_users.sql {{ instance }}-{{ dt }}.after.app_users.sql
+        chdir: /var/groupon/percona/backup
+      ignore_errors: true

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# Check hydra status and raise critical error if it is not alive
+
+function test_status ()
+{
+  rm -f /var/service/hydra-{{ hydra_type }}/.log
+  sv 2 /var/service/hydra-{{ hydra_type }} >/dev/null 2>&1
+  sleep 1 >/dev/null 2>&1
+  test -s "/var/service/hydra-{{ hydra_type }}/.log" >/dev/null 2>&1
+  return $?
+}
+
+function hydra_status
+{
+  test_status || test_status || test_status
+  if [ $? -eq 0  ]; then
+    _status="Alive"
+  else
+    _status="Dead"
+  fi
+  case $_status in
+    "Alive")  echo "result=0; OK - Hydra {{ hydra_type }} is $_status"; _retcode=0 ;;
+            *)  echo "result=2; CRIT - Hydra {{ hydra_type }} is $_status"; _retcode=2 ;;
+  esac
+  return $_retcode
+}
+
+ServiceDescription="hydra_status"
+Output=$(hydra_status)
+ExitCode=$?
+
+echo "$ExitCode '$ServiceDescription' $Output"
+exit 0
+

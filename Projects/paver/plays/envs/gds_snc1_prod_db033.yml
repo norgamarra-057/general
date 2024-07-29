@@ -1,0 +1,9 @@
+---
+- hosts: gds_snc1_prod_db033
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: arrowhead_prod }
+  - { role: gds-mysql-ha, instance: arrowhead_ui_prod }
+  - { role: gds-mysql-ha, instance: ultron_prod }
+  - { role: gds-mysql-ha, instance: accounting_prod }

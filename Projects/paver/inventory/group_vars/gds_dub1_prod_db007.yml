@@ -1,0 +1,233 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.13.110.232 # gds-dub1-prod-db007m1
+  - 10.13.110.233 # gds-dub1-prod-db007s1
+  - 10.13.184.232 # gds-dub1-prod-db007m1
+  - 10.13.184.233 # gds-dub1-prod-db007s1
+
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+# List of all GDS instances in this timeline
+gds_instance_group: gds_prod_dub1_db007
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  pop_prod: # GDS-1663 - Decommed GDS-35832
+  custsvc_cscs_prod: # GDS-1817
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: lup1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60002
+    nodes:
+      - gds-dub1-prod-db007m1.dub1
+      - gds-dub1-prod-db007s1.dub1
+    master_carp_interface: vlan201
+    slave_carp_interface: vlan202
+    vhid: 102
+    slave_vhid: 102
+    master_vip: 10.13.110.102
+    slave_vips:
+      - 10.13.184.102
+    replication_ips:
+      - 10.13.250.89  # gds-dub1-prod-db007m1.dub1
+      - 10.13.250.202  # gds-dub1-prod-db007s1.dub1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.12.33.221/32  # custsvc-cscs-app1.dub1
+      - 10.13.158.144/32  # custsvc-cscs-app2.dub1
+      - 10.22.76.131/32   #  pit-prod-owagent1.snc1
+      - 10.20.76.125/32   #  pit-prod-owagent3.snc1
+      - 10.20.41.45/32   #  pit-prod-owagent4.snc1
+      - 10.20.71.49/32   #  pit-prod-owagent5.snc1
+      - 10.20.75.135/32   #  pit-prod-owagent6.snc1
+      - 10.20.77.59/32   #  pit-prod-etlname1.snc1
+      - 10.20.115.242/32   #  pit-prod-etldata1.snc1
+      - 10.20.83.180/32   #  pit-prod-etldata2.snc1
+      - 10.20.115.160/32   #  pit-prod-etldata3.snc1
+      - 10.20.115.156/32   #  pit-prod-etldata4.snc1
+      - 10.20.115.184/32   #  pit-prod-etldata5.snc1
+      - 10.20.115.247/32   #  pit-prod-etldata6.snc1
+      - 10.20.115.232/32   #  pit-prod-etldata7.snc1
+      - 10.20.115.229/32   #  pit-prod-etldata8.snc1
+      - 10.20.115.252/32   #  pit-prod-etldata9.snc1
+      - 10.20.115.32/32   #  pit-prod-etldata10.snc1
+      - 10.20.70.33/32   #  pit-prod-etldata11.snc1
+      - 10.20.70.28/32   #  pit-prod-etldata12.snc1
+      - 10.20.70.12/32   #  pit-prod-etldata13.snc1
+      - 10.20.83.133/32   #  pit-prod-etldata14.snc1
+      - 10.20.83.93/32   #  pit-prod-etldata15.snc1
+      - 10.20.83.165/32   #  pit-prod-etldata16.snc1
+      - 10.20.83.111/32   #  pit-prod-etldata17.snc1
+      - 10.20.83.201/32   #  pit-prod-etldata18.snc1
+      - 10.20.83.250/32   #  pit-prod-etldata19.snc1
+      - 10.20.83.187/32   #  pit-prod-etldata20.snc1
+      - 10.20.83.221/32   #  pit-prod-etldata21.snc1
+      - 10.20.83.61/32   #  pit-prod-etldata22.snc1
+      - 10.20.83.220/32   #  pit-prod-etldata23.snc1
+      - 10.20.83.231/32   #  pit-prod-etldata24.snc1
+      - 10.20.83.138/32   #  pit-prod-etldata25.snc1
+      - 10.20.83.163/32   #  pit-prod-etldata26.snc1
+      - 10.20.83.73/32   #  pit-prod-etldata27.snc1
+      - 10.20.83.207/32   #  pit-prod-etldata28.snc1
+      - 10.20.115.126/32   #  pit-prod-etldata29.snc1
+      - 10.20.115.238/32   #  pit-prod-etldata31.snc1
+      - 10.20.115.166/32   #  pit-prod-etldata32.snc1
+      - 10.20.115.237/32   #  pit-prod-etldata33.snc1
+      - 10.20.115.75/32   #  pit-prod-etldata34.snc1
+      - 10.20.73.91/32   #  pit-prod-etldata35.snc1
+      - 10.20.73.92/32   #  pit-prod-etldata36.snc1
+      - 10.20.73.116/32   #  pit-prod-etldata37.snc1
+      - 10.20.73.94/32   #  pit-prod-etldata38.snc1
+      - 10.20.78.118/32   #  pit-prod-etldata39.snc1
+      - 10.20.78.108/32   #  pit-prod-etldata40.snc1
+      - 10.20.78.103/32   #  pit-prod-etldata41.snc1
+      - 10.20.78.101/32   #  pit-prod-etldata42.snc1
+      - 10.20.78.80/32   #  pit-prod-etldata43.snc1
+      - 10.20.73.76/32   #  pit-prod-etldata44.snc1
+      - 10.20.73.77/32   #  pit-prod-etldata45.snc1
+      - 10.20.73.78/32   #  pit-prod-etldata46.snc1
+      - 10.20.115.217/32   #  pit-prod-etldata47.snc1
+      - 10.20.115.227/32   #  pit-prod-etldata48.snc1
+      - 10.20.115.61/32   #  pit-prod-etldata49.snc1
+      - 10.20.115.74/32   #  pit-prod-etldata50.snc1
+      - 10.20.115.96/32   #  pit-prod-etldata51.snc1
+      - 10.20.78.99/32   #  pit-prod-etldata52.snc1
+      - 10.20.74.134/32   #  pit-prod-etldata53.snc1
+      - 10.20.74.139/32   #  pit-prod-etldata54.snc1
+      - 10.20.74.142/32   #  pit-prod-etldata55.snc1
+      - 10.20.74.143/32   #  pit-prod-etldata56.snc1
+      - 10.20.74.167/32   #  pit-prod-etldata57.snc1
+      - 10.20.74.172/32   #  pit-prod-etldata58.snc1
+      - 10.20.74.175/32   #  pit-prod-etldata59.snc1
+      - 10.20.74.177/32   #  pit-prod-etldata60.snc1
+      - 10.20.74.180/32   #  pit-prod-etldata61.snc1
+      - 10.20.74.185/32   #  pit-prod-etldata62.snc1
+      - 10.20.70.191/32   #  pit-prod-etldata63.snc1
+      - 10.20.70.142/32   #  pit-prod-etldata64.snc1
+      - 10.20.70.251/32   #  pit-prod-etldata65.snc1
+      - 10.20.70.164/32   #  pit-prod-etldata66.snc1
+      - 10.20.70.181/32   #  pit-prod-etldata67.snc1
+      - 10.20.115.57/32   #  pit-prod-etldata68.snc1
+      - 10.20.115.43/32   #  pit-prod-etldata69.snc1
+      - 10.20.115.55/32   #  pit-prod-etldata70.snc1
+      - 10.20.115.116/32   #  pit-prod-etldata71.snc1
+      - 10.20.115.88/32   #  pit-prod-etldata72.snc1
+      - 10.20.70.38/32   #  pit-prod-etldata73.snc1
+      - 10.20.70.39/32   #  pit-prod-etldata74.snc1
+      - 10.20.70.40/32   #  pit-prod-etldata75.snc1
+      - 10.20.70.41/32   #  pit-prod-etldata76.snc1
+      - 10.20.70.42/32   #  pit-prod-etldata77.snc1
+      - 10.20.78.33/32   #  pit-prod-etldata78.snc1
+      - 10.20.78.37/32   #  pit-prod-etldata79.snc1
+      - 10.20.78.30/32   #  pit-prod-etldata80.snc1
+      - 10.20.78.253/32   #  pit-prod-etldata81.snc1
+      - 10.20.77.147/32   #  pit-prod-etldata82.snc1
+      - 10.20.77.138/32   #  pit-prod-etldata83.snc1
+      - 10.20.77.179/32   #  pit-prod-etldata84.snc1
+      - 10.20.77.69/32   #  pit-prod-etldata85.snc1
+      - 10.20.74.69/32   #  pit-prod-etldata86.snc1
+      - 10.20.74.70/32   #  pit-prod-etldata87.snc1
+      - 10.20.74.71/32   #  pit-prod-etldata88.snc1
+      - 10.20.74.72/32   #  pit-prod-etldata89.snc1
+      - 10.20.74.73/32   #  pit-prod-etldata90.snc1
+      - 10.20.74.74/32   #  pit-prod-etldata91.snc1
+      - 10.20.74.75/32   #  pit-prod-etldata92.snc1
+      - 10.20.74.76/32   #  pit-prod-etldata93.snc1
+      - 10.20.74.125/32   #  pit-prod-etldata94.snc1
+      - 10.20.74.124/32   #  pit-prod-etldata95.snc1
+      - 10.20.74.123/32   #  pit-prod-etldata96.snc1
+      - 10.20.74.122/32   #  pit-prod-etldata97.snc1
+      - 10.20.74.121/32   #  pit-prod-etldata98.snc1
+      - 10.20.74.120/32   #  pit-prod-etldata99.snc1
+      - 10.20.74.89/32   #  pit-prod-etldata100.snc1
+      - 10.20.77.187/32   #  pit-prod-etldata101.snc1
+      - 10.20.77.226/32   #  pit-prod-etldata102.snc1
+      - 10.20.74.36/32   #  pit-prod-etldata126.snc1
+      - 10.20.74.38/32   #  pit-prod-etldata127.snc1
+      - 10.20.74.35/32   #  pit-prod-etldata128.snc1
+      - 10.20.74.41/32   #  pit-prod-etldata129.snc1
+      - 10.20.74.42/32   #  pit-prod-etldata130.snc1
+      - 10.20.74.33/32   #  pit-prod-etldata131.snc1
+      - 10.20.74.44/32   #  pit-prod-etldata132.snc1
+      - 10.20.74.55/32   #  pit-prod-etldata133.snc1
+      - 10.20.74.57/32   #  pit-prod-etldata134.snc1
+      - 10.20.74.58/32   #  pit-prod-etldata135.snc1
+      - 10.20.74.59/32   #  pit-prod-etldata136.snc1
+      - 10.20.74.60/32   #  pit-prod-etldata137.snc1
+      - 10.20.74.12/32   #  pit-prod-etldata138.snc1
+      - 10.20.74.14/32   #  pit-prod-etldata139.snc1
+      - 10.20.74.13/32   #  pit-prod-etldata140.snc1
+      - 10.20.74.15/32   #  pit-prod-etldata141.snc1
+      - 10.20.74.16/32   #  pit-prod-etldata142.snc1
+      - 10.20.74.17/32   #  pit-prod-etldata143.snc1
+      - 10.20.74.18/32   #  pit-prod-etldata144.snc1
+      - 10.20.74.19/32   #  pit-prod-etldata145.snc1
+      - 10.20.74.20/32   #  pit-prod-etldata146.snc1
+      - 10.20.74.21/32   #  pit-prod-etldata147.snc1
+      - 10.20.74.23/32   #  pit-prod-etldata148.snc1
+      - 10.20.74.34/32   #  pit-prod-etldata149.snc1
+      - 10.20.74.25/32   #  pit-prod-etldata150.snc1
+      - 10.20.74.29/32   #  pit-prod-etldata151.snc1
+      - 10.20.78.60/32   #  pit-prod-etldata152.snc1
+      - 10.20.74.50/32   #  pit-prod-etldata153.snc1
+      - 10.20.74.51/32   #  pit-prod-etldata154.snc1
+      - 10.20.74.48/32   #  pit-prod-etldata155.snc1
+      - 10.20.74.47/32   #  pit-prod-etldata156.snc1
+      - 10.20.74.52/32   #  pit-prod-etldata157.snc1
+      - 10.20.78.59/32   #  pit-prod-etldata158.snc1
+      - 10.20.78.63/32   #  pit-prod-etldata159.snc1
+      - 10.20.78.66/32   #  pit-prod-etldata160.snc1
+      - 10.20.78.71/32   #  pit-prod-etldata161.snc1
+      - 10.20.78.72/32   #  pit-prod-etldata162.snc1
+      - 10.20.78.73/32   #  pit-prod-etldata163.snc1
+      - 10.20.78.74/32   #  pit-prod-etldata164.snc1
+      - 10.20.78.75/32   #  pit-prod-etldata165.snc1
+      - 10.20.78.78/32   #  pit-prod-etldata166.snc1
+      - 10.20.83.49/32   #  pit-prod-etldata167.snc1
+      - 10.20.78.94/32   #  pit-prod-etldata168.snc1
+      - 10.20.78.65/32   #  pit-prod-etldata169.snc1
+      - 10.20.83.172/32   #  pit-prod-etldata170.snc1
+      - 10.20.83.222/32   #  pit-prod-etldata171.snc1
+      - 10.20.83.83/32   #  pit-prod-etldata172.snc1
+      - 10.20.78.169/32   #  pit-prod-etldata173.snc1
+      - 10.20.83.246/32   #  pit-prod-etldata174.snc1
+      - 10.20.78.21/32   #  pit-prod-etldata175.snc1
+      - 10.20.83.158/32   #  pit-prod-etldata176.snc1
+      - 10.20.69.87/32   #  pit-prod-etldata-mronly1.snc1
+      - 10.20.69.86/32   #  pit-prod-etldata-mronly2.snc1
+      - 10.20.69.85/32   #  pit-prod-etldata-mronly3.snc1
+      - 10.20.69.88/32   #  pit-prod-etldata-mronly4.snc1
+      - 10.20.69.89/32   #  pit-prod-etldata-mronly5.snc1
+      - 10.20.69.90/32   #  pit-prod-etldata-mronly6.snc1
+      - 10.20.69.91/32   #  pit-prod-etldata-mronly7.snc1
+      - 10.20.69.92/32   #  pit-prod-etldata-mronly8.snc1
+      - 10.20.69.93/32   #  pit-prod-etldata-mronly9.snc1
+      - 10.20.69.95/32   #  pit-prod-etldata-mronly10.snc1
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    dba_account_name: custsvc_cscs_prod_dba
+    dba_src_cidrs: 
+    ports:
+      mysqld: 20002
+#  mpp_offer: # GDS-2481 - Decommed GDS-35832
+#  eurebro_hive_hue_prod: # GDS-2563 - Decommed GDS-35832
+#  groupon_works_prod: # GDS-2677 - Decommed GDS-35832
+#  gkb_prod: # GDS-2805 - Decommed GDS-35832
+#  cyclops_india_prod: # GDS-3105 Decommed GPROD-159289
+#  megatron_prod: # GDS-320021 Decommed GDS-3400
+#  editorialservice_prod: # GDS-4289 - Decommed GDS-35832
+#  ssu_prod : # GDS-4818 - Decommed GDS-35832
+#  goods_intl_prod : # GDS-xxxx - Decommed GDS-35832

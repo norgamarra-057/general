@@ -1,0 +1,23 @@
+---
+- hosts: gds_snc1_stg_db022
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: wilson_uat }
+  - { role: gds-mysql-ha, instance: taxonomy_service_uat }
+  - { role: gds-mysql-ha, instance: mossy_service_uat }
+  - { role: gds-mysql-ha, instance: gifting_service_uat }
+  - { role: gds-mysql-ha, instance: mpp_offer_uat }
+  - { role: gds-mysql-ha, instance: janus_uat }
+  - { role: gds-mysql-ha, instance: num_uat }
+  - { role: gds-mysql-ha, instance: collab_contract_uat }
+  - { role: gds-mysql-ha, instance: gdoop_oozie_uat }
+  - { role: gds-mysql-ha, instance: birdcage_uat }
+  - { role: gds-mysql-ha, instance: glive_3rd_party_uat }
+  - { role: gds-mysql-ha, instance: killbill_uat }
+  - { role: gds-mysql-ha, instance: hive_app_stg }
+  - { role: gds-mysql-ha, instance: dealservice_uat }
+  - { role: gds-mysql-ha, instance: dm_api_uat }
+  - { role: gds-mysql-ha, instance: orders_uat }
+
+

@@ -1,0 +1,22 @@
+---
+- name: verify backup control group
+  group: name=backup gid=50000
+
+- name: verify backup user accounts
+  user: name="{{ item['user'] }}" comment="{{ item['user'] }} backup user" shell='/bin/tcsh'
+    uid="{{ backup_users[item.user].uid }}" state='present' group='backup'
+    home="{{ delorean_backup_pools[item.pool]['base_dir'] }}/{{ item['user'] }}"
+    append=yes non_unique=yes
+  with_items: delorean_backup_users
+
+- name: verify backup user home directory ownership
+  file: path="{{ delorean_backup_pools[item.pool]['base_dir'] | default('/var/groupon/delorean/pools/us') }}/{{ item['user'] }}" state=directory owner=root group=wheel
+  with_items: delorean_backup_users
+
+- name: verify backup user push subdir
+  file: path="{{ delorean_backup_pools[item.pool]['base_dir'] | default('/var/groupon/delorean/pools/us') }}/{{ item['user'] }}/push_backups" state=directory owner={{ item['user'] }} group=backup
+  with_items: delorean_backup_users
+
+- name: copy sshd_config
+  copy: src="{{ lookup('env','PWD') }}/roles/delorean/files/sshd_config" dest=/etc/ssh/sshd_config owner=root group=wheel mode=0644
+  notify: sshd_restart

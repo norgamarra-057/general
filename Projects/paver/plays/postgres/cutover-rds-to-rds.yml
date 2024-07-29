@@ -1,0 +1,173 @@
+---
+- name: Ensure command line variables are set and daas part 0
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - aws_host_primary is defined
+          - db is defined
+          - aws_host_replica is defined
+          - my_dba_user is defined
+          - my_app_user is defined
+          - admin_password is defined
+
+
+    - name: Set app user to nologin
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "alter user {{ my_app_user }} nologin"
+
+    - name: Set dba user to nologin
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "alter user {{ my_dba_user }} nologin"
+
+    - name: Kill remaining sessions
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid() and application_name not like 'pglogical%' and usename is not null and usename not in ('rdsadmin','gds_admin','rdsrepladmin') and datname ='{{ db }}'"      
+
+
+- name: Aws part 1 primary 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - name: Set app user to nologin
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "alter user {{ my_app_user }} nologin"
+
+    - name: Set dba user to nologin
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "alter user {{ my_dba_user }} nologin"
+
+    - name: find schemas
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_primary }} -c "select schema_name from information_schema.schemata where schema_name not in ('dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Privileges 1/2
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "revoke insert,update,delete on all tables in schema {{ item }} from {{ my_app_user}}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Privileges 2/2
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "revoke update on all sequences in schema {{ item }} from {{ my_app_user}}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Kill remaining sessions
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid() and application_name not like 'pglogical%' and usename is not null and usename not in ('rdsadmin','gds_admin','rdsrepladmin') and datname ='{{ db }}'"      
+
+    - name: Check replication delay
+      command: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select pg_wal_lsn_diff(pg_current_wal_lsn(),replay_lsn) from pg_stat_replication where application_name like '{{ db }}%subscription'"
+      register: replication_lag_final
+      until: replication_lag_final.stdout|int == 0
+      retries: 1000
+      delay: 1
+
+    - name: One time sequence push
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "SELECT pglogical.synchronize_sequence( seqoid ) FROM pglogical.sequence_state"
+
+
+- name: Aws part 2 replica 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - name: Drop subscription
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_replica }} -c "select pglogical.drop_subscription('{{ db }}_rds_pg11_subscription')"
+
+    - name: Drop node
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_replica }} -c "select pglogical.drop_node('{{ db }}_rds_pg11_subscriber')"
+
+#    - name: Check if provider exists
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pglogical.node_interface where if_name='{{ db }}_aws_provider'"
+#      register: count_provider
+
+#    - name: Create provider
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "SELECT pglogical.create_node(node_name := '{{ db }}_aws_provider', dsn := 'host=127.0.0.1 port=5432  dbname={{ db }} user=gds_admin password={{ admin_password }}')"
+#      when:  count_provider.stdout|int  == 0
+
+#    - name: find schemas
+#      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_primary }} -c "select schema_name from information_schema.schemata where schema_name not in ('dba','ext','information_schema') AND schema_name not like 'pg_%'"
+#      register: pgschemas
+
+#    - name: Add tables
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "SELECT pglogical.replication_set_add_all_tables('default', '{ {{ item }} }'::text[])"
+#      with_items: "{{ pgschemas.stdout_lines }}"
+
+#    - name: Add sequences
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "SELECT pglogical.replication_set_add_all_sequences('default', '{ {{ item }} }'::text[],true )"
+#      with_items: "{{ pgschemas.stdout_lines }}"
+
+- name: Aws part 2 primary 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - name: Drop provider
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select pglogical.drop_node('{{ db }}_aws_provider')"
+
+#    - name: Check if subscriber exists
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select count(*) from pglogical.node_interface where if_name='{{ db }}_rds_pg11_subscriber'"
+#      register: count_subscriber
+
+#    - name: Create subscriber
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "SELECT pglogical.create_node(node_name := '{{ db }}_rds_pg11_subscriber', dsn := 'port=5432 dbname={{ db }} user=gds_admin')" 
+#      when:  count_subscriber.stdout|int  == 0
+
+#    - name: Check if subscription exists
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select count(*) from pglogical.subscription where sub_name='{{ db }}_rds_pg11_subscription'"
+#      register: count_subscription
+
+#    - name: Create subscription
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c " SELECT pglogical.create_subscription(subscription_name := '{{ db }}_rds_pg11_subscription', provider_dsn := 'host={{ aws_host_replica }} port=5432 dbname={{ db }} user=gds_admin password={{ admin_password }} sslmode=disable', replication_sets := '{default}'::text[], synchronize_data := false );"
+#      when:  count_subscription.stdout|int  == 0
+
+#    - name: Check that replication has been initiated
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select status from pglogical.show_subscription_status()"
+#      register: aws_repl_status
+#      until: aws_repl_status.stdout == "replicating"
+#      retries: 1000      
+
+
+- name: Aws part 3 replica 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+#    - name: check if the new logical slave has succesfully connected to the new master
+#      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pg_stat_replication where application_name='{{ db }}_rds_pg11_subscription'"
+#      register: count_pglogical_slave
+#    - name: verify it has connected
+#      fail: msg="Exiting ----------No pglogical slave found"
+#      when:  count_pglogical_slave.stdout  == "0"
+
+    - name: Set app user to login
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "alter user {{ my_app_user }} login"
+
+    - name: Set dba user to login
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "alter user {{ my_dba_user }} login"      
+
+    - name: find schemas
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_replica }} -c "select schema_name from information_schema.schemata where schema_name not in ('dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Privileges for app user 1/3
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "grant insert,update,delete on all tables in schema {{ item }} to {{ my_app_user}}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Privileges for app user 2/3
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "grant update on all sequences in schema {{ item }} to {{ my_app_user}}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Privileges for app user 3/3
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "grant usage on schema pglogical to {{ my_dba_user }}"
+
+    - name: remove the extension
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "drop extension pglogical"

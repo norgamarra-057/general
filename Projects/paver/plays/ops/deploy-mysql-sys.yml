@@ -1,0 +1,68 @@
+---
+- name: Deploy sys schema to mysql instances
+  become: yes
+  hosts: "{{ target }}"
+  vars:
+    - mysql_sys:
+        url: https://github.com/MarkLeith/mysql-sys/archive
+        version: 1.5.1
+        src: ../../roles/gds_mysql/files/mysql_sys.zip
+        src2: ../../roles/gds_mysql/files/gds_sys_views.sql
+        dest: /tmp
+        sqlfile: sys_56.sql
+        sqlfile2: gds_sys_views.sql
+        filename: mysql_sys.zip
+  tasks:
+    - name: check prereqs
+      assert:
+        that:
+          - instance_name is defined
+          - target is defined
+
+    - name: see is sys schema is defined
+      shell: "mysql sys 2>/dev/null"
+      register: sys_schema_check
+      ignore_errors: yes
+
+    - name: see if sys schema is old
+      shell: "echo 'select sys_version from sys.version;' | mysql 2>/dev/null | grep {{ mysql_sys.version }}"
+      register: sys_schema_version_check
+      ignore_errors: yes
+      when: sys_schema_check|success
+    
+    - name: see if GDS views are defined
+      shell: "mysql -e \"select table_name from information_schema.tables where table_schema='sys' and table_name='gds_frequent_queries'\" 2>/dev/null  | grep gdsl"
+      register: gds_sys_check
+      ignore_errors: yes
+      when: sys_schema_check|success
+    
+    - name: create dest dir
+      file:
+        dest: "{{ mysql_sys.dest }}"
+        state: directory
+      when: sys_schema_check|failed or sys_schema_version_check|failed
+    
+    - name: put sys schema on host
+      copy: 
+        src: "{{ mysql_sys.src }}"
+        dest: "{{ mysql_sys.dest }}"
+      register: src_file
+    
+    - name: put GDS sys views on host
+      copy: 
+        src: "{{ mysql_sys.src2 }}"
+        dest: "{{ mysql_sys.dest }}"
+      register: src_file2
+    
+    - name: extract sys schema
+      command: "unzip -o {{ mysql_sys.dest }}/{{ mysql_sys.filename}} -d {{ mysql_sys.dest }}"
+
+    - name: Define socket location
+      set_fact:
+        mysql_instance_socket: "/var/groupon/percona/{{ instance_name }}/mysql.sock"
+        
+    - name: import sys schema
+      shell: "cd {{ mysql_sys.dest }}/mysql-sys-{{ mysql_sys.version }} && mysql -S {{ mysql_instance_socket }} < {{ mysql_sys.sqlfile }}"
+        
+    - name: create gds sys views
+      shell: "cd {{ mysql_sys.dest }} && mysql -S {{ mysql_instance_socket }} < {{ mysql_sys.sqlfile2 }}"

@@ -1,0 +1,15 @@
+---
+- name: Set sync=disabled on postgres directories
+  hosts: gds_all
+  become: yes
+  vars:
+    - fs_name: tank/var/groupon/postgresql
+  tasks:
+    - name: See if FS is provisioned
+      command: "zfs list -H -o name {{ fs_name }}"
+      always_run: yes
+      ignore_errors: yes
+      register: zfs_fs_check
+    - name: Set sync=disabled if it is
+      command: "zfs set sync=disabled {{ fs_name }}"
+

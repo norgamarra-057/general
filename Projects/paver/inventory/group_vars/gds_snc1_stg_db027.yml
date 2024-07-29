@@ -1,0 +1,104 @@
+---
+gds_carp_peers:
+  - 10.23.36.254  # gds-snc1-stg-db027m1
+  - 10.23.36.255  # gds-snc1-stg-db027s1
+  - 10.23.37.254  # gds-snc1-stg-db027m1
+  - 10.23.37.255  # gds-snc1-stg-db027s1
+
+gds_carp_interfaces:
+  - vlan336
+  - vlan337
+
+gds_instance_group: gds_snc1_stg_db027
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  # tronicon_stg: # GDS-11913 # decomm - GDS-33865
+  # geekon_gapi_stg: # GDS-12226 # decomm - GDS-33865
+  # kb_subscriptions_stg: # GDS-12246 # Migrated to AWS: GDS-29206  # decomm - GDS-33865
+  # getaways_maris_stg: # GDS-12562  # decomm - GDS-33865
+  # cs_classify_sv_stg: # GDS-12602  # decomm - GDS-33865
+  # geoplaces_stg: # GDS-12431 # decomm - GDS-33865
+  # merchant_sse_stg: # GDS-12697 # decomm - GDS-33865
+  # orders_msg_stg: # GDS-12704 __SOX__ # decomm - GDS-33865
+  # appointmentengine_stg: # GDS-12988 # decomm - GDS-33865
+  # avail_engine_stg: # GDS-13012 # GDS-28688 - Migrated to RDS # decomm - GDS-33865 
+  # dora_consumer_stg: # GDS-12993 # decomm - GDS-33865
+  # confluence_stg: # GDS-13088 # decomm - GDS-33865
+  # be_3rd_party_stg: # GDS-13099 # GDS-28719 - Migrated to RDS # decomm - GDS-33865
+  # clo_consent_stg: # GDS-13159  # decomm - GDS-33865
+  # giftcard_service_stg: # GDS-13576  # decomm - GDS-33865
+  # myticket_stg: # GDS-13613  # decomm - GDS-33865
+  # relevance_pt_stg: # GDS-13733  # decomm - GDS-33865
+  # relevance_smoke_stg: # GDS-13734  # decomm - GDS-33865
+  # raasmon_stg: # GDS-14104  # decomm - GDS-33865
+# GDS-26262 destroyed  bidding_srv_stg: # GDS-13994  
+  # relev_airflow_stg: # GDS-14121 # decomm - GDS-33865
+  # vch_smart_srch_stg: # GDS-14138 # Migrated to AWS: GDS-28650 # decomm - GDS-33865
+  # login_stg: # GDS-14161 # decomm - GDS-33865
+  # afl_reconciliation_stg: # GDS-14157 # decomm - GDS-33865
+  # jla_stg: # GDS-14300 # decomm - GDS-33865
+  # stores_stg: # GDS-10776 # decomm - GDS-33865
+  # glive_inventory_stg: # GDS-14379 # decomm - GDS-33865
+  # client_id_stg: # GDS-14378 # decomm - GDS-33865
+  # birdcage_dw_stg: # GDS-14788 # decomm - GDS-33865
+  # service_portal_stg: # GDS-15135 # decomm - GDS-33865
+  # status_dashboard_stg: # GDS-15305 # decomm - GDS-33865
+  # netops_api_stg: # GDS-15469 # decomm - GDS-33865
+  # shopify_adapter_stg: # GDS-15565 # decomm - GDS-33865
+  # rocketman_v2_stg: # GDS-15643 # decomm - GDS-33865
+  # relevance_airflow2_stg: # GDS-15441 # decomm - GDS-33865
+# pest_stg: # GDS-15826 destroyxed GDS-27672 
+  # content_flag_srv_stg: # GDS-16084 # decomm - GDS-33865
+  # hive_stg: # GDS-16087 # decomm - GDS-33865
+  # getaways_geo_stg: # GDS-16090 # decomm - GDS-33865
+  # starman_stg: # GDS-16088 # decomm - GDS-33865
+  # glive_gia_stg: # GDS-16092 # decomm - GDS-33865
+  # performance_test_stg: # GDS-16282 # decomm - GDS-33865
+  # offboarding_portal_stg: # GDS-16464 # decomm - GDS-33865
+  # ad_inv_serv_stg: # GDS-16631 # decomm - GDS-33865
+  # dfs_stg: # GDS-16771 # decomm - GDS-33865
+  # analytics_stg: # GDS-16791 # decomm - GDS-33865
+  # ddns_stg: # GDS-16791 # decomm - GDS-33865
+  # ingestion_stg: # GDS-17168 # decomm - GDS-33865
+  # wf_stats_stg: # GDS-17103 # decomm - GDS-33865
+  # succ_stg: # GDS-17213 # decomm - GDS-33865
+  # salesforce_stg: # GDS-17239 # decomm - GDS-33865
+  # fingerprint_stg: # GDS-17291 # decomm - GDS-33865
+  # ticket_ingest_stg: # GDS-17315 # decomm - GDS-33865
+  # valkyrie_emea_stg: # GDS-17410 # decomm - GDS-33865
+  # dynamic_dns_stg: # GDS-17263 # decomm - GDS-33865
+  # crystal_stg: # GDS-17512 # decomm - GDS-33865
+ # quartz_stg: # GDS-17620 decommission GDS-31874
+  # users_service_inte_stg: # GDS-17612 # decomm - GDS-33865
+  # olympia_stg: # GDS-17675 # decomm - GDS-33865
+  # jtier_dash_stg: # GDS-17696 # decomm - GDS-33865
+  # orders_stg: # GDS-17949 # decomm - GDS-33865
+  # dmapi2_stg: # GDS-17949 # decomm - GDS-33865
+  # mmi_stg: # GDS-18227 # decomm - GDS-33865
+  # coffee_dogfood_stg: # GDS-18228 # decomm - GDS-33865
+  # deal_book_stg: # GDS-18223 # decomm - GDS-33865
+  # tracks_stg: # GDS-18248 # decomm - GDS-33865
+  # getaways_search_stg: # GDS-18225 # decomm - GDS-33865
+  # merchant_wallet_stg: # GDS-18822 # decomm - GDS-33865
+  # momentum_stg: # GDS-19147 # decomm - GDS-33865
+  # love_stg: # GDS-19170 # decomm - GDS-33865
+  # gdoop_drelephant_stg: # GDS-19185 # decomm - GDS-33865
+  # vol2_msg_to_ledger_stg: # GDS-19450 # decomm - GDS-33865
+  # vas_infrastructure_stg: # GDS-19497 # decomm - GDS-33865
+  # good_store_api_stg: # GDS-18463 # decomm - GDS-33865
+  # cost_extraction_stg: # GDS-19668 # decomm - GDS-33865
+  # cloud_mig_track_stg: # GDS-20230 # decomm - GDS-33865
+  # rocketmanv2_trans_stg: # GDS-20281 # decomm - GDS-33865
+  # afl_portal_stg: # GDS-20289 # decomm - GDS-33865
+# si_forecast_portal_stg destroyed GDS-20328
+  # goods_receiver_stg: # GDS-20430 # decomm - GDS-33865
+  # getaways_cont_srv_stg: # GDS-20514 # decomm - GDS-33865
+  # rpa_rundeck_stg: # GDS-21031 # decomm - GDS-33865
+  # ana_cmd_center_stg: # GDS-21134 # decomm - GDS-33865
+  # merchant_market_stg: # GDS-21582 # decomm - GDS-33865
+  # merchant_trans_stg: # GDS-21937 # decomm - GDS-33865
+  # cust_case_mgt_stg: # GDS-23126 # decomm - GDS-33865
+  # rta_analytics_stg: # GDS-23180 # decomm - GDS-33865
+  # groupon_sim_stg: # GDS-23254 # decomm - GDS-33865
+  # gso_merch_success_stg: # GDS-23779 # decomm - GDS-33865

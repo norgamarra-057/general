@@ -1,0 +1,58 @@
+#!/usr/local/bin/ruby
+# ============================================================================
+# Copyright (c) 2011 Groupon.
+# ============================================================================
+
+require 'etc'
+require 'rubygems'
+require 'monitoring_script_multithreshold'
+require 'yaml'
+
+class CheckMySQLQuery < MonitoringScriptMultithreshold
+  SERVICE_NAME = 'mysql_query'
+  SERVICE_DESC = 'Runs a query on a Mysql server'
+
+  OPTIONS = {
+    :database  => { :text => "MySQL database", :short => "D", :type => :string,  :required => false },
+    :host      => { :text => "MySQL hostname", :short => "H", :type => :string,  :required => false, :default => '127.0.0.1' },
+    :password  => { :text => "MySQL password", :short => "W", :type => :string,  :required => false, :default => "" },
+    :port      => { :text => "MySQL port",     :short => "P", :type => :string,  :required => false, :default => "3306" },
+    :query     => { :text => "Query to run",   :short => "Q", :type => :string,  :required => true },
+    :ssl       => { :text => "Use SSL",        :short => "S", :type => :boolean, :required => false, :default => false },
+    :user      => { :text => "MySQL user",     :short => "U", :type => :string,  :required => false, :default => 'root' },
+    :verbose   => { :text => "Verbose",        :short => "V", :type => :bool },
+  }
+
+  def service_check
+    options[:port] = options[:port].to_i
+    options[:username] = options.delete(:user)
+    begin
+      require 'mysql'
+      conn = Mysql.new(options[:host], options[:username], options[:password], options[:database], options[:port])
+      result = conn.query(options[:query])
+
+      result.each_hash do |record|
+        record.each do |key, val|
+          set_metric(key, val)
+        end
+      end
+    rescue LoadError
+      require 'mysql2'
+      conn = Mysql2::Client.new(options)
+      result = conn.query(options[:query])
+
+      result.each do |record|
+        record.each do |key, val|
+          set_metric(key, val)
+        end
+      end
+    end
+
+    if options[:thresholds]
+      evaluate_thresholds
+    else
+      set_status(STATUS_OK)
+    end
+  end
+end
+CheckMySQLQuery.new.run!

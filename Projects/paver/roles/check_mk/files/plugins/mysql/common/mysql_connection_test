@@ -1,0 +1,17 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# instances to check
+echo '<<<mysql_connection_test>>>'
+for mysqlinstance in $(grep -e '\[.*\]' $MK_CONFDIR/mysql.cfg | sed -e 's/\[//g' -e 's/\]//g' | tr '\n' ' ');do
+    currentinstance=$(grep -A3 "\[${mysqlinstance}\]" $MK_CONFDIR/mysql.cfg)
+    port=$(echo "$currentinstance" | grep "port=" | sed -e 's/port=//')
+    socket=$(echo "$currentinstance" | grep "socket=")
+    vip=$(echo "$currentinstance" | grep "vip=" | sed -e 's/vip=//')
+    name=$(echo "${port} - ${mysqlinstance}")
+
+    vip_output=$(nc -z ${vip} 3306 &>/dev/null;echo $?)
+
+    echo "[[$name]]"
+    echo "${vip_output}"
+    sleep 0.5
+done

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Simple Helper script for mi.sh
+if [ -z "$1" ]; then
+  echo ' [!] please provide an instance name!'
+  exit 2
+fi
+
+mi.sh -u "$1"

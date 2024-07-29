@@ -1,0 +1,60 @@
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - db is defined
+          - gcp_host_replica is defined
+          - aws_host_primary is defined
+
+    - name: find users
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_primary }} -c "SELECT DISTINCT(grantee) FROM information_schema.table_privileges where grantee not in ('PUBLIC','gds_admin','checkmk_mon')"
+      register: pgmyusers
+
+    - name: export globals
+      shell: pg_dumpall -U gds_admin -p 5432 -h {{ aws_host_primary }} --no-role-passwords -g > /tmp/{{ db }}_globals.sql
+
+    - name: export schema
+      shell: pg_dump -U gds_admin  -F p -s -f /tmp/{{ db }}_schema.sql -p 5432 -h {{ aws_host_primary }} {{ db }}
+
+    - name: export globals part 2
+      shell: cat /tmp/{{ db }}_globals.sql | grep {{ item }} > /tmp/configs_{{ db }}_{{ item }}.sql
+      with_items: "{{ pgmyusers.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: export schema part 2
+      shell: cat /tmp/{{ db }}_schema.sql | grep {{ item }} > /tmp/privs_{{ db }}_{{ item }}.sql
+      with_items: "{{ pgmyusers.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Apply configs
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} < /tmp/configs_{{ db }}_{{ item }}.sql
+      with_items: "{{ pgmyusers.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Apply privs
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} < /tmp/privs_{{ db }}_{{ item }}.sql
+      with_items: "{{ pgmyusers.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Delete the temp globals file
+      file: path=/tmp/{{ db }}_globals.sql state=absent
+
+    - name: Delete the temp schema file
+      file: path=/tmp/{{ db }}_schema.sql state=absent
+
+    - name: Delete the temp globals files 
+      file: path=/tmp/configs_{{ db }}_{{ item }}.sql state=absent
+      with_items: "{{ pgmyusers.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Delete the temp privs files
+      file: path=/tmp/privs_{{ db }}_{{ item }}.sql state=absent
+      with_items: "{{ pgmyusers.stdout_lines }}"
+      ignore_errors: yes
+
+
+

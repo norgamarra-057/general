@@ -1,0 +1,3 @@
+---
+freebsd_cloned_interfaces: lagg0 vlan324 vlan325
+gds_cluster: gds_prod_snc1_db019

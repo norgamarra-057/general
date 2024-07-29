@@ -1,0 +1,61 @@
+---
+- hosts: database_mysql_backup_targets
+  connection: local
+  gather_facts: False
+  serial: 1
+  vars:
+    ssh_keys_dir: "database-delorean-mysql-ssh-keys.local"
+    ssh_key_to_yaml_file: "gen-sshkeys-yaml.sh"
+    ssh_key_to_yaml_dir: "roles/mysql_db_backup_cron/files"
+    ssh_key_to_yaml_path: "{{ ssh_key_to_yaml_dir }}/{{ ssh_key_to_yaml_file }}"
+    ssh_key_vault_file: "mysql_db_backup_keys_vault.yml"
+    ssh_key_vault_dir: "roles/mysql_db_backup_cron/vars"
+    ssh_key_vault_path: "{{ ssh_key_vault_dir }}/{{ ssh_key_vault_file }}"
+    # ssh_key_vault_pass_file_name: "mysql_db_backup_keys.pass"
+    # ssh_key_vault_pass_file_dir: "roles/mysql_db_backup_cron/vars"
+    # ssh_key_vault_pass_file_path: "{{ ssh_key_vault_pass_file_dir }}/{{ ssh_key_vault_pass_file_name }}"
+  vars_files:
+    - "{{ lookup('env','PWD') }}/{{ ssh_key_vault_path }}"
+  tasks:
+    - name: "Create local and temporary ssh key directory: {{ lookup('env','PWD') }}/{{ ssh_keys_dir | realpath }}"
+      local_action: file path="{{ lookup('env','PWD') }}/{{ ssh_keys_dir }}" state=directory mode=0700
+
+    - name: "Locally generate ssh key(s)"
+      local_action: shell /usr/bin/ssh-keygen -q -t rsa -b 2048 -O clear -C "root@{{ inventory_hostname }}/delorean_mysql_db_backup" -f "{{ lookup('env','PWD') }}/{{ ssh_keys_dir }}/{{ inventory_hostname }}" creates="{{ lookup('env','PWD') }}/{{ ssh_keys_dir }}/{{ inventory_hostname }}" < /dev/null
+      register: key_generated
+      when: "inventory_hostname not in mysql_db_backup_keys"
+
+    # - name: "Checking to make sure that {{ lookup('env','PWD') }}/{{ ssh_key_vault_pass_file_path }} exists"
+    #   local_action: stat path="{{ lookup('env','PWD') }}/{{ ssh_key_vault_pass_file_path }}"
+    #   register: ssh_key_vault_pass_file_exists
+
+    # - fail: msg="SSH Key Vault Password file does not exist {{ lookup('env','PWD') }}/{{ ssh_key_vault_pass_file_path }}"
+    #   when: ssh_key_vault_pass_file_exists.stat.exists == False
+
+    # - fail: msg="SSH Key Vault Password Mode not 0600 ({{ lookup('env','PWD') }}/{{ ssh_key_vault_pass_file_path }})"
+    #   when: ssh_key_vault_pass_file_exists.stat.mode != '0600'
+
+    - name: "Test to see if we need to decrypt the vault {{ ssh_key_vault_file }}"
+      local_action: command /usr/bin/head -1 {{ lookup('env','PWD') }}/{{ ssh_key_vault_path }}
+      ignore_errors: True
+      register: vault_format
+      changed_when: False
+
+    # - name: "Decrypt vault {{ ssh_key_vault_file }}"
+    #   local_action: command ansible-vault decrypt --vault-password-file={{ lookup('env','PWD') }}/{{ ssh_key_vault_pass_file_path }} {{ lookup('env','PWD') }}/{{ ssh_key_vault_path }}
+    #   ignore_errors: True
+    #   register: vault_decrypted
+    #   when: vault_format and vault_format.stdout.startswith('$ANSIBLE_VAULT;') and key_generated
+    #   changed_when: False
+
+    - name: "Append {{ inventory_hostname }}'s ssh key to decrypted YAML vault"
+      local_action: command {{ lookup('env','PWD') }}/{{ ssh_key_to_yaml_path }} {{ lookup('env','PWD') }}/{{ ssh_key_vault_path }} {{ lookup('env','PWD') }}/{{ ssh_keys_dir }}/{{ inventory_hostname }}
+      register: key_appended
+      changed_when: key_appended.stdout != 'keys_appended=0'
+      when: key_generated is not defined or key_generated.changed
+
+    # - name: "Encrypt vault {{ ssh_key_vault_file }}"
+    #   local_action: command ansible-vault encrypt --vault-password-file={{ lookup('env','PWD') }}/{{ ssh_key_vault_pass_file_path }} {{ lookup('env','PWD') }}/{{ ssh_key_vault_path }}
+    #   ignore_errors: False
+    #   register: vault_encrypted
+    #   when: key_appended.changed or vault_decrypted.changed or vault_format.stdout == '---'

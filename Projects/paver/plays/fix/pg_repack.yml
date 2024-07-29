@@ -1,0 +1,47 @@
+---
+###################################################
+# pg_repack.yml
+#
+# Description:  This playbook is for install pg_repack for postgres.
+#
+# Parameters:  node=gds-server
+#
+# Example: ansible-playbook -i inventory/gds-staging plays/fix/pg_repack.yml -e "node=gds_snc1_stg_db011"
+#
+# Notes:  1. Playbook will install the package pg_repack
+#
+###################################################
+- name: Validate global settings
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Assert that required params are set
+      assert:
+        that:
+          - node is defined
+
+- name: Validate settings for target host
+  hosts:
+    - "{{ node }}"
+  gather_facts: false
+  tasks:
+    - name: Fail if there are no instances defined for target host
+      fail:
+        msg: "no instances defined for {{ node }}"
+      when: gds_instances is not defined
+
+- name: FreeBSD | Install
+  hosts: "{{ node }}"
+  gather_facts: False 
+  tasks:
+    - name: Install pg_repack
+      become: yes 
+      pkgng: name="{{ item }}" state=present
+      with_items: 
+        - gds-pg_repack-1.3.3
+
+    - name: Install extension pg_repack
+      command: psql -U postgres -A -t -d {{ item.value.dbnames | min | regex_replace('\\[','') | regex_replace('\\]','')  }} -p {{ item.value.ports.postgresql_raw }} -c "CREATE EXTENSION IF NOT EXISTS pg_repack;"
+      when: item.value.type == "postgresql"
+      with_dict: gds_instances

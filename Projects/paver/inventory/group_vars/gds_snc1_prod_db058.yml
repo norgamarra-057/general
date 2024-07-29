@@ -1,0 +1,200 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.22.182.228 # gds-snc1-prod-db058m1
+  - 10.22.182.229 # gds-snc1-prod-db058s1
+  - 10.22.183.228 # gds-snc1-prod-db058m1
+  - 10.22.183.229 # gds-snc1-prod-db058s1
+gds_instance_group: gds_prod_snc1_db058
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan334
+  - vlan335
+# List of all GDS instances in this timeline
+gds_instances:
+  #es2_deal_indexer_prod: #  GDS-10143 #Decom #GPROD-214853
+
+  #mls_yang_prod: #  GDS-10355 #Decom GDS-35459
+
+
+  # fingerprint_prod: #  GDS-10290 # decommissioned ##
+  #mls_bult_prod: #  GDS-10533  #GPROD #GPROD-195831
+
+
+#  rise_prod: #  GDS-10616 #Decomm GDS-34366#
+
+  # minos_prod: # GDS-10844 #Decom # GDS-33572
+
+#  activiti_snc1_prod: # GDS-10909 #Dcomm GDS-29584 
+
+#  activiti_sac1_prod: # GDS-10911 - decom-ed
+
+#  taxonomyv2_prod: # GDS-11133 #Decomm GDS-34366
+
+#  sonar_qube_prod: # GDS-11262 #Decomm GDS-32166#
+
+  cert_authority_prod: # GDS-11470
+    type: postgresql
+    dbnames:
+      - certificate_authority_prod
+    schemas:
+      certificate_authority_prod:
+        - certificate_authority
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60011
+    master_vip: 10.22.182.111
+    slave_vips:
+      - 10.22.183.111
+    replication_ips:
+      - 10.22.148.68  # gds-snc1-prod-db058m1.snc1
+      - 10.22.148.16 # gds-snc1-prod-db058s1.snc1
+      - 10.32.121.35  # gds-sac1-prod-db058m1
+      - 10.32.121.51 # gds-sac1-prod-db058s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.38.126/32 # ci-sonarqube1.snc1
+      - 10.22.38.29/32 # ci-sonarqube2.snc1
+      - 10.22.217.174/32   # ca1.snc1
+      - 10.20.132.24/32   # ca2.snc1
+      - 10.22.70.37/32   # ca3.snc1
+      - 10.32.168.137/32   # ca1.sac1
+      - 10.32.248.8/32   # ca2.sac1
+      - 10.32.234.36/32   # ca3.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: cert_authority_prod_dba
+    app_account_name: cert_authority_prod_app
+    dba_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.38.126/32 # ci-sonarqube1.snc1
+      - 10.22.38.29/32 # ci-sonarqube2.snc1
+      - 10.22.217.174/32   # ca1.snc1
+      - 10.20.132.24/32   # ca2.snc1
+      - 10.22.70.37/32   # ca3.snc1
+      - 10.32.168.137/32   # ca1.sac1
+      - 10.32.248.8/32   # ca2.sac1
+      - 10.32.234.36/32   # ca3.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20030
+      pgbouncer_session: 20031
+      postgresql_raw: 20032
+    extra_variables:
+      max_connections: 54
+      pglogical: 'on'
+  #merch_index_prod: # GDS-11470 #Decom #GPROD-223734
+
+
+  #clo_consent_prod: # GDS-12012# decommissioned
+
+  #essence_prod: # GDS-12059 #decom GPROD-190343
+
+
+#  quantum_lead_prod: # GDS-12308 #Decomm GDS-34366#
+
+  #pbs_prod: # GDS-12558 #GPROD #GPROD-195826
+
+
+#  ambari_qed_prod: # GDS-12576 #Decomm  GDS-33547 #
+
+  netbox_prod: # GDS-12687
+    type: postgresql
+    dbnames:
+      - netbox_prod
+    schemas:
+      netbox_prod:
+        - netbox
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60018
+    master_vip: 10.22.182.118
+    slave_vips:
+      - 10.22.183.118
+    replication_ips:
+      - 10.22.148.68  # gds-snc1-prod-db058m1.snc1
+      - 10.22.148.16 # gds-snc1-prod-db058s1.snc1
+      - 10.32.121.35  # gds-sac1-prod-db058m1
+      - 10.32.121.51 # gds-sac1-prod-db058s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.20.87.150/32 # ipam1.snc1
+      - 10.12.37.39/32 # ipam1.dub1
+      - 10.32.152.141/32 # ipam1.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: netbox_prod_dba
+    app_account_name: netbox_prod_app
+    dba_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.20.87.150/32 # ipam1.snc1
+      - 10.12.37.39/32 # ipam1.dub1
+      - 10.32.152.141/32 # ipam1.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20051
+      pgbouncer_session: 20052
+      postgresql_raw: 20053
+    extra_variables:
+      pglogical: 'on'
+    hydra:
+      ids:
+        - dee18334-866a-bdc7-9d32-9e35b26b55a6
+        - fa463128-1d7d-e574-8968-5af0198f48e1
+      default_primary: gds-snc1-prod-db058m1.snc1
+      cascading:
+        gds-snc1-prod-db058m1.snc1:
+          gds-sac1-prod-db058s1.sac1: 10.32.121.35 # gds-sac1-prod-db058m1.sac1
+        gds-snc1-prod-db058s1.snc1:
+          gds-sac1-prod-db058m1.sac1: 10.32.121.51 # gds-sac1-prod-db058s1.sac1
+
+
+  #test_trig_tool_prod: # GDS-12678 #Decom #GPROD-223732
+  #regla_sac1_prod: # GDS-12837 #Decom #GPROD-195828

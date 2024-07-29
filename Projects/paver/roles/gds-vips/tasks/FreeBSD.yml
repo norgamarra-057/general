@@ -1,0 +1,4 @@
+---
+- include_tasks: rc.yml
+- include_tasks: vips.yml
+- include_tasks: assemble.yml

@@ -1,0 +1,5 @@
+---
+- name: make sure authorized system accounts have their accounts (RedHat)
+  user: name="{{ item }}" comment="{{ users[item].name }}" shell='/sbin/nologin'
+        uid="{{ users[item].uid }}" state='present' group="{{ item }}" append='yes'
+  with_items: system_accounts

@@ -1,0 +1,23 @@
+---
+- name: Check zpool status
+  hosts: gds_all
+  become: true
+  tasks:
+    - name: Collect pools available
+      shell: zpool list -H -o name
+      register: zpool_list
+      always_run: true
+      changed_when: false
+
+    - name: Check zpool status
+      shell: zpool list -Ho health {{ item }} | grep -w ONLINE | wc -l
+      with_items: zpool_list.stdout_lines
+      when: zpool_list.stdout_lines is defined
+      register: zpool_status
+      always_run: true
+      changed_when: false
+
+    - name: Fail if error
+      fail: zpool status check failed for {{ item }}
+      when: zpool_status is defined and item.stdout == 0
+      with_items: zpool_status.results

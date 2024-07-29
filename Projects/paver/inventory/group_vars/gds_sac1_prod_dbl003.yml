@@ -1,0 +1,13 @@
+---
+gds_carp_peers:
+  - 10.32.86.214  # gds-sac1-prod-dbl003m1
+  - 10.32.86.215  # gds-sac1-prod-dbl003s1
+  - 10.32.80.214  # gds-sac1-prod-dbl003m1
+  - 10.32.80.215  # gds-sac1-prod-dbl003s1
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+gds_instance_group: gds_prod_sac1_dbl003
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:

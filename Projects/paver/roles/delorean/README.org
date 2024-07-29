@@ -1,0 +1,62 @@
+# -*- mode: org -*-
+#+STARTUP: overview
+#+STARTUP: content
+#+STARTUP: showall
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+* Managing delorean Backups
+  The delorean infrastructure supports two different methods of ingesting backup data:
+
+  1) PULL - Using a secured set of ssh keys, the backup server will ssh to the target host and stream data in the directory specified to itself via a simple cron job/shell script
+  2) PUSH - Backup users can be given a separate private ssh key that will allow them chrooted, sftp-only access to their zfs dataset on the backup server;  they can use this key to push backups via sftp to the push_backups subdir of their home directory
+
+  Both mechanisms are configured via ansible, with the basic procedures (and tasks common to both) outlined below.
+
+** Adding backup users (common)
+  Regardless of which ingestion method you choose, it requires a valid backup user.  All backup users share a uid/gid on the backup hosts (998) and are routed to the appropriate zfs dataset by their unique name/ssh key combination.
+
+  To add a new backup user to a given backup cluster:
+  1. Add the user definition to inventory/group_vars/delorean_all.yml if it isn't already there
+  2. Add a zfs dataset for the user to 'host_zfs' in inventory/group_vars/delorean_<cluster>.yml;  make sure to add this so it's a child of the correct regulatory domain (only us and sox currently)
+  3. Add the user to 'delorean_backup_users' in inventory/group_vars/delorean_<cluster>.yml;  'pool' refers to the regulatory domain referenced above
+  4. Once the user is configured, you need to run site.yml to create the appropriate zfs datasets, users, and directory structures:
+  : ansible-playbook -i inventory/delorean-production site.yml
+
+** Generating SSH keys (common)
+  After the user is configured, SSH pairs must be generated.  Use the following steps to generate keys:
+  1. Decrypt the ssh key vaults:
+    : ansible-vault decrypt roles/delorean/vars/pull_backup_ssh_keys_vault.yml
+    : ansible-vault decrypt roles/delorean/vars/push_backup_ssh_keys_vault.yml
+  2. Run the key generation play:
+    : ansible-playbook -i inventory/delorean-production plays/delorean-gen-ssh-keys.yml
+  3. Run the key installation play:
+    : ansible-playbook -i inventory/delorean-production plays/delorean-install-keys.yml
+  4. Re-encrypt the ssh key vaults:
+    : ansible-vault encrypt roles/delorean/vars/pull_backup_ssh_keys_vault.yml
+    : ansible-vault encrypt roles/delorean/vars/push_backup_ssh_keys_vault.yml
+
+  NOTE:  The PULL keys should be kept secure and not shared beyond ops FOR ANY REASON.  The only keys that should ever be shared are the PUSH keys.
+
+** Configuring PULL backup jobs (pull)
+  To configure a pull backup job:
+  1. Add the job definition to inventory/group_vars/delorean_<cluster>.yml; supported fields:
+    * directory: the directory to be backed up from the source host
+    * pool: the regulatory domain (currently one of us/sox)
+    * target: the destination backup target on the backup server (full path will be: /var/groupon/delorean/pools/<pool>/<target>)
+    * frequency: the frequency of the backup job;  currently only 'daily' is supported
+    * template: use a custom template, location - roles/delorean/templates/<template>.sh.j2
+  2. Add the host being backed up to inventory/delorean-production under the [delorean_backup_targets] section
+  3. Run the play to manage the jobs:
+    : ansible-playbook -i inventory/delorean-production plays/delorean-install-jobs.yml
+
+** Configuring PUSH backup jobs (push)
+  Push backups are very straightforward.  Once you've generated/installed keys per the above instructions, simply provide the team doing the push with the private ssh key for their backup user from roles/delorean/vars/push_backup_ssh_keys_vault.yml (you'll need to decrypt the vault, obviously).  MAKE SURE NOT TO GIVE OUT THE PULL KEYS.
+
+  Backups are pushed to the push_backups subdir of each user's home directory.  The directory structure is separate due to the permissions required for the chrooting of the sftp session.
+
+  A useful one-liner for pushing via sftp:
+  : echo -e "cd push_backups\nput myfile" | sftp -b - -oIdentityFile=backup_user.key backup_user@bys01m1.snc1
+
+** Self-service restore
+  Getting access to backups for restore purposes simply involves providing the team in question with their PUSH ssh backup key (it's the one used for sftp access), and using sftp as above:
+  : sftp -oIdentityFile=backup_user.key

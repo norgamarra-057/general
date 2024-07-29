@@ -1,0 +1,126 @@
+###
+### BEGIN: gds_dev_mysql_*
+###
+[gds_dev_mysql_masters_dub1]
+# empty
+
+[gds_dev_mysql_masters_snc1]
+# gds-snc1-dev-db001m1.snc1 # GDS-4465
+
+[gds_dev_mysql_masters_snc2]
+# empty
+
+[gds_dev_mysql_slaves_dub1]
+# empty
+
+[gds_dev_mysql_slaves_snc1]
+# gds-snc1-dev-db001s1.snc1 # GDS-4466
+
+[gds_dev_mysql_slaves_snc2]
+# empty
+
+[gds_dev_mysql_masters:children]
+gds_dev_mysql_masters_dub1
+gds_dev_mysql_masters_snc1
+gds_dev_mysql_masters_snc2
+
+[gds_dev_mysql_slaves:children]
+gds_dev_mysql_slaves_dub1
+gds_dev_mysql_slaves_snc1
+gds_dev_mysql_slaves_snc2
+
+[gds_dev_mysql:children]
+gds_dev_mysql_masters
+gds_dev_mysql_slaves
+
+
+
+###
+### BEGIN: gds_dev_postgresql_*
+###
+[gds_dev_postgresql_masters_dub1]
+# empty
+
+[gds_dev_postgresql_masters_snc1]
+gds-snc1-dev-db001m1.snc1
+
+[gds_dev_postgresql_masters_snc2]
+# empty
+
+[gds_dev_postgresql_slaves_dub1]
+# empty
+
+[gds_dev_postgresql_slaves_snc1]
+
+[gds_dev_postgresql_slaves_snc2]
+# empty
+
+[gds_dev_postgresql_masters:children]
+gds_dev_postgresql_masters_dub1
+gds_dev_postgresql_masters_snc1
+gds_dev_postgresql_masters_snc2
+
+[gds_dev_postgresql_slaves:children]
+gds_dev_postgresql_slaves_dub1
+gds_dev_postgresql_slaves_snc1
+gds_dev_postgresql_slaves_snc2
+
+[gds_dev_postgresql:children]
+gds_dev_postgresql_masters
+gds_dev_postgresql_slaves
+
+[gds_postgresql:children]
+gds_dev_postgresql
+
+
+###
+### BEGIN: GDS-wide aggregate groups
+###
+[gds_dev_masters:children]
+gds_dev_mysql_masters
+gds_dev_postgresql_masters
+
+[gds_dev_slaves:children]
+gds_dev_mysql_slaves
+gds_dev_postgresql_slaves
+
+[gds_dev_dbs:children]
+gds_dev_masters
+gds_dev_slaves
+
+[gds_dev_all:children]
+gds_dev_dbs
+
+[gds_all:children]
+gds_dev_all
+
+[FreeBSD:children]
+gds_dev_all
+
+[FreeBSD:vars]
+ansible_python_interpreter=/usr/local/bin/python2.7
+
+
+###
+### BEGIN: GDS-replication domain groups
+###
+[gds_dev_snc1_db001]
+gds-snc1-dev-db001m1.snc1
+
+[dc_dub1_dev:children]
+gds_dev_mysql_masters_dub1
+gds_dev_mysql_slaves_dub1
+gds_dev_postgresql_masters_dub1
+gds_dev_postgresql_slaves_dub1
+
+[dc_snc1_dev:children]
+gds_dev_mysql_masters_snc1
+gds_dev_mysql_slaves_snc1
+gds_dev_postgresql_masters_snc1
+gds_dev_postgresql_slaves_snc1
+
+[dc_snc2_dev:children]
+gds_dev_mysql_masters_snc2
+gds_dev_mysql_slaves_snc2
+gds_dev_postgresql_masters_snc2
+gds_dev_postgresql_slaves_snc2

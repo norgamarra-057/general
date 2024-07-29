@@ -1,0 +1,48 @@
+---
+- name: Percona | MHA | gds_mha_sudoers
+  template:
+    src: mha/mha_sudoers.j2
+    dest: /usr/local/etc/sudoers.d/gds_mha
+    owner: root
+    group: wheel
+    mode: 0440
+
+- name: Percona | MHA | gds_mha .ssh directory
+  file:
+    name: /home/gds_mha/.ssh
+    state: directory
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0700
+
+- name: Percona | MHA | gds_mha public key
+  copy:
+    src: mha_ssh/pub
+    dest: /home/gds_mha/.ssh/authorized_keys
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0600
+
+- name: Percona | MHA | gds_mha public key
+  copy:
+    src: mha_ssh/pub
+    dest: /home/gds_mha/.ssh/id_rsa.pub
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0600
+
+- name: Percona | MHA | gds_mha private key
+  copy:
+    src: mha_ssh/priv
+    dest: /home/gds_mha/.ssh/id_rsa
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0600
+
+- name: Percona | MHA | md5sum for MHA
+  copy:
+    src: mha_ssh/md5sum
+    dest: /usr/local/bin/md5sum
+    owner: root
+    group: wheel
+    mode: 0755

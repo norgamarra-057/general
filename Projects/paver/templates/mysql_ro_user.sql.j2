@@ -1,0 +1,4 @@
+GRANT USAGE ON *.* TO {{ ro_account_name }}@'%' IDENTIFIED BY '{{ ro_password }}' WITH MAX_USER_CONNECTIONS {{ ro_connection_limit }};
+{% for db in dbnames %}
+GRANT SELECT ON {{ db }}.* TO {{ ro_account_name }}@'%';
+{% endfor %}

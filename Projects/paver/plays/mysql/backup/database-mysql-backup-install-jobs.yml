@@ -1,0 +1,40 @@
+---
+- name: Install Backup Jobs on delorean
+  hosts: delorean_all
+  become: True
+  vars:
+    delorean_jobs_dir: /var/groupon/delorean/jobs/database
+    delorean_lock_dir: /var/groupon/delorean/lock
+    delorean_logs_dir: /var/groupon/delorean/logs/database
+    delorean_data_dir: /var/groupon/delorean/data/database
+    delorean_lock_timeout: 3600
+  tasks:
+    - name: delorean | Backup Data Directory
+      file: path="{{ delorean_data_dir }}" state=directory owner=root group=wheel mode=0750
+
+    - name: delorean | Backup Jobs Directory
+      file: path="{{ delorean_jobs_dir }}" state=directory owner=root group=wheel mode=0755
+
+    - name: delorean | Backup Lock Directory
+      file: path="{{ delorean_lock_dir }}" state=directory owner=root group=wheel mode=0755
+
+    - name: delorean | Backup Logs Directory
+      file: path="{{ delorean_logs_dir }}" state=directory owner=root group=wheel mode=0750
+
+    - name: delorean | Install Backup Jobs
+      template: src="../roles/mysql_db_backup_cron/templates/mysql_backup.sh.j2" dest="{{ delorean_jobs_dir }}/{{ item }}.sh" owner=root group=wheel mode=0754
+      when: hostvars[item].delorean_server == inventory_hostname
+      with_items: groups['database_mysql_backup_targets']
+
+    - name: delorean | Daily Database Backup Script
+      template:
+        src="../roles/mysql_db_backup_cron/templates/mysql_backup_full_run.sh.j2"
+        dest="{{ delorean_jobs_dir }}_full.sh"
+        owner=root group=wheel mode=0754
+
+    - name: delorean | Daily Database Backup Job
+      cron:
+        name="Database Full Backup"
+        job="{{ delorean_jobs_dir }}_full.sh"
+        hour="6"
+        minute="6"

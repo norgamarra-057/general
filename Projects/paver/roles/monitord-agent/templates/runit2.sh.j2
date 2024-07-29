@@ -1,0 +1,12 @@
+#!/bin/sh --
+
+/var/service/monitord_agent/gen_monitord_config
+
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst -v \
+    -e /var/service/monitord_agent/env \
+    -n 15 \
+    -m {{ 200 * 1024 * 1024 }} \
+  /var/groupon/encap/{{ monitord_name.stdout }}/bin/monitord --no-daemonize \
+    -v -o -c /var/groupon/monitord/config.yml

@@ -1,0 +1,70 @@
+---
+###################################################
+# pre-destroy-instance.yml
+#
+# Description:  This playbook is intended to prepare a Postgresql DaaS instance from a GDS server for decommissioning.
+#               WARNING!!!! This playbook will shutdown Postgres, pgbouncer (sessions/transaction) as well as remove check_MK monitoring.
+#               Make ABSOLUTELY SURE this is the proper instance on the proper server before you begin!
+#
+# Parameters:  node=gds-server 
+#              instance=instance_name_on_server
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              node: gds-snc1-test-db002s1.snc1
+#              instance: duke_nukem
+#
+# Notes:  1. Playbook will connect to the instance to check for existing connections.  If any other than 'postgres',
+#            it will abort.  
+#         2. It will remove the following for the instance:  check_MK configuration.
+#         3. It will shutdown pgbouncer (session and transaction) and postgresql.
+#
+###################################################
+
+- import_playbook: "{{ playbook_dir }}/../common/check-params.yml"
+- import_playbook: "{{ playbook_dir }}/tasks/facts.yml"
+- import_playbook: "{{ playbook_dir }}/tasks/status.yml"
+- import_playbook: "{{ playbook_dir }}/tasks/connections.yml"
+
+- name: Pre-destroy Postgresql Instance
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Pre-destroy | Postgres | Remove check_mk instance configuration
+      ini_file:
+        dest: /etc/check_mk/postgres.cfg
+        section: "{{ instance }}"
+        no_extra_spaces: yes
+        state: absent
+        backup: yes
+      ignore_errors: true
+    
+    - name: Pre-destroy | Postgres | Stop pgbouncer(s)
+      runit:
+        name: "{{pgbouncer_runit_service_dir }}-{{ item }}"
+        service_dir: "{{ service_root }}"
+        service_src: "{{ groupon_service_root }}"
+        state: killed
+      with_items: "{{ postgresql_modes }}"
+
+    - name: Pre-destroy | Postgres | Stop Postgresql server
+      runit:
+        name: "{{ postgresql_runit_service_dir }}"
+        service_dir: "{{ service_root }}"
+        service_src: "{{ groupon_service_root }}"
+        state: killed
+
+    - name: Pre-destroy | Postgres | Create pre-destroy directory, if needed
+      file:
+        path: /var/groupon/pre-destroyed
+        state: directory
+
+    - name: Pre-destroy | Postgres | Log pre-destroy
+      lineinfile:
+        path: "/var/groupon/pre-destroyed/{{ instance }}"
+        create: yes
+        state: present
+        line: "{{ instance }} was pre-destroyed at {{ '%Y/%m/%d %H-%M-%S' | strftime }}"

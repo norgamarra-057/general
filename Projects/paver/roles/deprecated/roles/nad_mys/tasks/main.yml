@@ -1,0 +1,25 @@
+---
+- name: GDS Mysql Cluster | variable check | gds_cluster
+  fail: 'msg="CONFIG ERROR: For GDS MySQL Clusters, gds_cluster must be specified in host_vars/{{ inventory_hostname }}.yml"'
+  when: gds_cluster is not defined or 'gds_cluster' not in hostvars[inventory_hostname]
+
+- name: GDS Mysql Cluster | variable check | postgresql_raw
+  fail: 'msg="CONFIG ERROR: For GDS MySQL Clusters, postgresql_raw must be specified"'
+  when: gds_instances[instance_name].ports.mysqld is not defined
+
+- name: nad_mys | derived variables
+  tags:
+    - nad_mys
+  include_vars: derived_vars.yml
+
+- name: nad | OS-specific variables
+  tags:
+    - nad_mys
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "../defaults/{{ ansible_os_family }}.yml"
+    - "../defaults/defaults.yml"
+
+- name: nad | install
+  include_tasks: FreeBSD.yml tags=nad_mys
+  when: ansible_os_family == 'FreeBSD'

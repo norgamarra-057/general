@@ -1,0 +1,35 @@
+---
+- name: Install Backup Jobs on delorean
+  hosts: delorean_all
+  become: True
+  vars:
+    ssh_key_vault_file: "mysql_db_backup_keys_vault.yml"
+    ssh_key_vault_dir: "roles/mysql_db_backup_cron/vars"
+    ssh_key_vault_path: "{{ ssh_key_vault_dir }}/{{ ssh_key_vault_file }}"
+  vars_files:
+    - "{{ lookup('env','PWD') }}/{{ ssh_key_vault_path }}"
+  tasks:
+    - name: delorean | SSH Key Directory
+      file: path="{{ delorean_private_keys_dir }}" state=directory owner=root group=wheel mode=0750
+
+    - name: delorean | Install Host Identify Files
+      copy: dest="{{ delorean_private_keys_dir }}/{{ item }}.key" content="{{ mysql_db_backup_keys[item].private_ssh_key }}\n" owner=root group=wheel mode=0400
+      when: hostvars[item].delorean_server == inventory_hostname
+      with_items: groups['database_mysql_backup_targets']
+
+- hosts: database_mysql_backup_targets
+  become: True
+  vars:
+    ssh_key_vault_file: "mysql_db_backup_keys_vault.yml"
+    ssh_key_vault_dir: "roles/mysql_db_backup_cron/vars"
+    ssh_key_vault_path: "{{ ssh_key_vault_dir }}/{{ ssh_key_vault_file }}"
+  vars_files:
+    - "{{ lookup('env','PWD') }}/{{ ssh_key_vault_path }}"
+  tasks:
+    - name: Add authorized_keys for root user
+      authorized_key: user=root
+        key="{{ mysql_db_backup_keys[inventory_hostname].public_ssh_key }}"
+        manage_dir=no
+# TODO(seanc@): Modern SSH includes support for SSH key options, which
+# would allow us to include the following line:
+#        key_options="clear,force-command=\"/bin/hostname\",source-address=\"{{ hostvars[delorean_server].ansible_all_ipv4_addresses | join(',') }}\""

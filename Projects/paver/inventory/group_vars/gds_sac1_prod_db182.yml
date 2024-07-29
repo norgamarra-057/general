@@ -1,0 +1,209 @@
+---
+gds_carp_peers:
+  - 10.32.124.228  # gds-sac1-prod-db182m1
+  - 10.32.124.229  # gds-sac1-prod-db182s1
+  - 10.32.125.228  # gds-sac1-prod-db182m1
+  - 10.32.125.229  # gds-sac1-prod-db182s1
+gds_carp_interfaces:
+  - vlan202
+  - vlan203
+gds_instance_group: gds_prod_sac1_db182
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  users_prod: # GDS-5203
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 40
+      max_connections_force: 8000
+      max_user_connections_force: 7980
+      innodb_buffer_pool_size_mb_force: 200000
+      innodb_flush_neighbors_force: 0
+      log_slow_rate_limit: 11
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+      relay_log_recovery_force: ON
+      expire_logs_days: 99
+    type: mysql
+    write_origin: sac1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-sac1-prod-db182m1.sac1
+      - gds-sac1-prod-db182s1.sac1
+    master_carp_interface: vlan202
+    slave_carp_interface: vlan203
+    vhid: 82
+    slave_vhid: 82
+    master_vip: 10.32.124.82
+    slave_vips:
+      - 10.32.125.82
+    replication_ips:
+      - 10.32.121.118 # gds-sac1-prod-db182m1.sac1
+      - 10.32.121.93 # gds-sac1-prod-db182s1.sac1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.32.103.209/32  # gds-admin01.sac1
+      - 10.32.105.121/32   # consumer-data-service-app1.sac1
+      - 10.32.57.4/32   # consumer-data-service-app2.sac1
+      - 10.32.148.208/32   # consumer-data-service-app3.sac1
+      - 10.32.154.124/32   # consumer-data-service-utility1.sac1
+      - 10.32.103.135/32   # consumer-data-service-utility2.sac1
+      - 10.32.160.246/32   # users-service-app1.sac1
+      - 10.32.170.158/32   # users-service-app2.sac1
+      - 10.32.164.218/32   # users-service-app3.sac1
+      - 10.32.57.146/32   # users-service-app4.sac1
+      - 10.32.69.107/32   # users-service-utility1.sac1
+      - 10.32.148.130/32   # users-service-utility2.sac1
+      - 10.32.55.200/32   # push-dispatcher1.sac1
+      - 10.32.140.114/32   # push-dispatcher2.sac1
+      - 10.32.150.229/32   # push-dispatcher3.sac1
+      - 10.32.144.114/32   # push-dispatcher4.sac1
+      - 10.32.148.125/32   # push-dispatcher5.sac1
+      - 10.32.168.220/32   # push-dispatcher6.sac1
+      - 10.32.49.200/32   # push-dispatcher7.sac1
+      - 10.32.71.173/32   # push-dispatcher8.sac1
+      - 10.32.140.32/32   # push-dispatcher9.sac1
+      - 10.32.62.94/32   # push-dispatcher10.sac1
+      - 10.32.74.53/32   # push-dispatcher11.sac1
+      - 10.32.166.91/32   # push-dispatcher12.sac1
+      - 10.32.69.215/32   # push-dispatcher13.sac1
+      - 10.32.103.230/32   # push-dispatcher14.sac1
+      - 10.32.94.37/32   # push-dispatcher15.sac1
+      - 10.32.110.139/32   # push-dispatcher16.sac1
+      - 10.32.142.141/32   # push-dispatcher17.sac1
+      - 10.32.229.175/32   # push-dispatcher18.sac1
+      - 10.32.57.240/32   # push-dispatcher19.sac1
+      - 10.32.100.3/32   # push-dispatcher20.sac1
+      - 10.32.162.93/32   # rocketman1.sac1
+      - 10.32.57.108/32   # rocketman2.sac1
+      - 10.32.168.228/32   # rocketman3.sac1
+      - 10.32.160.129/32   # rocketman4.sac1
+      - 10.32.164.197/32   # rocketman5.sac1
+      - 10.32.166.82/32   # rocketman6.sac1
+      - 10.32.254.64/32   # push-dispatcher21.sac1
+      - 10.32.254.72/32   # push-dispatcher22.sac1
+      - 10.32.254.74/32   # push-dispatcher23.sac1
+      - 10.32.254.205/32   # push-dispatcher24.sac1
+      - 10.32.254.218/32   # push-dispatcher25.sac1
+      - 10.32.254.222/32   # push-dispatcher26.sac1
+      - 10.32.254.225/32   # push-dispatcher27.sac1
+      - 10.32.254.229/32   # push-dispatcher28.sac1
+      - 10.32.178.84/32   # push-dispatcher29.sac1
+      - 10.32.49.195/32   # push-dispatcher30.sac1
+      - 10.32.254.236/32   # push-dispatcher31.sac1
+      - 10.32.254.238/32   # push-dispatcher32.sac1
+      - 10.32.170.246/32   # push-dispatcher33.sac1
+      - 10.32.254.200/32   # push-dispatcher34.sac1
+      - 10.32.254.252/32   # push-dispatcher35.sac1
+      - 10.32.254.249/32   # push-dispatcher36.sac1
+      - 10.32.254.227/32   # push-dispatcher37.sac1
+      - 10.32.254.246/32   # push-dispatcher38.sac1
+      - 10.32.254.202/32   # gdoop-job-submitter1-sox.sac1
+      - 10.32.254.65/32   # gdoop-job-submitter2-sox.sac1
+      - 10.32.100.160/32   # gdoop-worker1-sox.sac1
+      - 10.32.37.90/32   # gdoop-worker2-sox.sac1
+      - 10.32.93.193/32   # gdoop-worker3-sox.sac1
+      - 10.32.105.142/32   # gdoop-worker4-sox.sac1
+      - 10.32.76.171/32   # gdoop-worker5-sox.sac1
+      - 10.32.55.10/32   # gdoop-worker6-sox.sac1
+      - 10.32.62.242/32   # gdoop-worker7-sox.sac1
+      - 10.32.40.211/32   # gdoop-worker8-sox.sac1
+      - 10.32.110.187/32   # gdoop-worker9-sox.sac1
+      - 10.32.74.31/32   # gdoop-worker10-sox.sac1
+      - 10.32.100.10/32   # gdoop-worker11-sox.sac1
+      - 10.32.37.197/32   # gdoop-worker12-sox.sac1
+      - 10.32.93.173/32   # gdoop-worker13-sox.sac1
+      - 10.32.105.192/32   # gdoop-worker14-sox.sac1
+      - 10.32.76.233/32   # gdoop-worker15-sox.sac1
+      - 10.32.55.132/32   # gdoop-worker16-sox.sac1
+      - 10.32.62.51/32   # gdoop-worker17-sox.sac1
+      - 10.32.40.152/32   # gdoop-worker18-sox.sac1
+      - 10.32.110.98/32   # gdoop-worker19-sox.sac1
+      - 10.32.74.15/32   # gdoop-worker20-sox.sac1
+      - 10.32.100.253/32   # gdoop-worker21-sox.sac1
+      - 10.32.37.141/32   # gdoop-worker22-sox.sac1
+      - 10.32.93.7/32   # gdoop-worker23-sox.sac1
+      - 10.32.105.21/32   # gdoop-worker24-sox.sac1
+      - 10.32.176.199/32   # gdoop-megatron-slave1.sac1
+      - 10.32.234.137/32   # gdoop-megatron-slave2.sac1
+      - 10.32.88.235/32   # gdoop-megatron-slave3.sac1
+      - 10.32.248.234/32   # pit-prod-megatron-master1.sac1
+      - 10.32.168.147/32   # pit-prod-megatron-master2.sac1
+      - 10.32.208.64/32   # pit-prod-megatron-master3.sac1
+      - 10.34.72.17/32   # push-dispatcher39.sac1
+      - 10.34.17.182/32   # push-dispatcher40.sac1
+      - 10.34.57.33/32   # push-dispatcher41.sac1
+      - 10.34.71.127/32   # push-dispatcher42.sac1
+      - 10.32.67.29/32   # push-dispatcher44.sac1
+      - 10.34.50.7/32   # push-dispatcher45.sac1
+      - 10.34.176.98/32   # push-dispatcher46.sac1
+      - 10.34.48.155/32   # push-dispatcher47.sac1
+      - 10.34.102.180/32   # push-dispatcher48.sac1
+      - 10.34.128.60/32   # push-dispatcher49.sac1
+      - 10.34.99.93/32   # push-dispatcher50.sac1
+      - 10.34.1.86/32   # push-dispatcher51.sac1
+      - 10.34.66.85/32   # push-dispatcher52.sac1
+      - 10.34.72.18/32   # push-dispatcher54.sac1
+      - 10.34.17.104/32   # push-dispatcher55.sac1
+      - 10.34.57.190/32   # push-dispatcher56.sac1
+      - 10.34.71.195/32   # push-dispatcher57.sac1
+      - 10.34.103.69/32   # push-dispatcher58.sac1
+      - 10.32.67.21/32   # push-dispatcher59.sac1
+      - 10.34.50.240/32   # push-dispatcher60.sac1
+      - 10.34.176.164/32   # push-dispatcher61.sac1
+      - 10.34.48.94/32   # push-dispatcher62.sac1
+      - 10.34.128.186/32   # push-dispatcher64.sac1
+      - 10.34.99.83/32   # push-dispatcher65.sac1
+      - 10.34.1.159/32   # push-dispatcher66.sac1
+      - 10.34.66.62/32   # push-dispatcher67.sac1
+      - 10.32.227.47/32   # push-dispatcher68.sac1
+      - 10.34.103.193/32   # push-dispatcher43.sac1
+      - 10.32.227.161/32   # push-dispatcher53.sac1
+      - 10.34.102.234/32   # push-dispatcher63.sac1
+      - 10.22.233.191/32   # cde-thirdparty1.snc1
+      - 10.32.233.248/32   # cde-thirdparty1.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: users_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 10.22.74.119/32  # gds-admin01.sac1
+      - 50.115.209.4/32   #b1.sac1
+      - 50.115.209.5/32   #b2.sac1
+    ports:
+      mysqld: 20001
+    playback_enabled: false
+    playback:
+      peers:
+        - node: gds-sac1-prod-db182m1.sac1
+          peer: gds-sac1-prod-db182s1.sac1
+        - node: gds-sac1-prod-db182s1.sac1
+          peer: gds-sac1-prod-db182m1.sac1
+      manage_mysql_slowlogd: 1
+      mysql_user_to_check: thepoint_db
+      user: playback_user
+      password: mee5pieK
+      schema: groupon_user_production
+      thread_pool_size: 100
+      user_connection_threshold: 15
+      playback_connection_timeout: 20
+      mysql_slowlogd_port: 30001
+    admin_redirect_peers:
+      - 10.22.148.230/32 # gds-snc1-prod-db181m1.snc1
+      - 10.22.148.237/32 # gds-snc1-prod-db181s1.snc1
+      - 10.32.121.118/32 # gds-sac1-prod-db181m1.sac1
+      - 10.32.121.93/32 # gds-sac1-prod-db181s1.sac1

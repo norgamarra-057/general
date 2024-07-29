@@ -1,0 +1,19 @@
+- name: Playback fact for instance
+  set_fact:
+    playback_fact: "{{ gds_instances[instance_name]['playback'] }}"
+
+- name: Playback fact for peers
+  set_fact:
+    playback_peers: "{{ gds_instances[instance_name]['playback']['peers'] | default('playback_not_configured') }}"
+
+- name: Detect node and peer
+  set_fact:
+    playback_node: "{{ item.node }}"
+    playback_peer: "{{ item.peer }}"
+  when: playback_enabled and item.node == ansible_fqdn
+  with_items: playback_peers
+
+- name: Playback static facts
+  set_fact:
+    playback_runit_service_path: "/var/groupon/service/playback_{{ instance_name }}_{{ playback_node }}_{{ playback_peer }}"
+    playback_runit_service_link_path: "/var/service/playback_{{ instance_name }}_{{ playback_node}}_{{ playback_peer }}"

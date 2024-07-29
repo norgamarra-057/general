@@ -1,0 +1,7 @@
+# Ansible managed
+
+{% if item['value']['playback'] is defined %}
+# Port for percona playback if playback based cache replication is configured
+pass in log proto tcp from <gds-replication-peers> to <gds-replication-peers> port {{ item['value']['playback']['mysql_slowlogd_port'] }}
+{% endif %}
+

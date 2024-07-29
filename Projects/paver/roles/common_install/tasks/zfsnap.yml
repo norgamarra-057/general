@@ -1,0 +1,98 @@
+---
+# Values from: https://github.com/zfsnap/zfsnap/wiki/zfSnap-periodic.conf
+- name: FreeBSD | periodic.conf zfSnap
+  lineinfile:
+     dest: /etc/periodic.conf
+     regexp: '^[#]*{{ item.name }}=.*'
+     line: '{{ item.name }}="{{ item.value }}"'
+  with_items:
+    # Be explicit about the defaults so we don't have to look this up
+    - { name: hourly_zfsnap_ttl, value: '1d' }
+    - { name: daily_zfsnap_ttl, value: '1w' }
+    - { name: weekly_zfsnap_ttl, value: '1m' }
+    - { name: monthly_zfsnap_ttl, value: '6m' }
+    - { name: reboot_zfsnap_ttl, value: '1w' }
+
+    - { name: hourly_zfsnap_enable, value: 'YES' }
+    - { name: hourly_zfsnap_flags, value: '' }
+    - { name: hourly_zfsnap_verbose, value: 'YES' }
+    - { name: hourly_zfsnap_recursive_fs, value: 'tank zroot' }
+
+    - { name: daily_zfsnap_delete_enable, value: 'YES' }
+    - { name: daily_zfsnap_delete_flags, value: '' }
+    - { name: daily_zfsnap_delete_verbose, value: 'YES' }
+    - { name: daily_zfsnap_recursive_fs, value: 'tank zroot' }
+
+    - { name: weekly_zfsnap_delete_enable, value: 'YES' }
+    - { name: weekly_zfsnap_delete_flags, value: '' }
+    - { name: weekly_zfsnap_delete_verbose, value: 'YES' }
+    - { name: weekly_zfsnap_recursive_fs, value: 'tank zroot' }
+
+    - { name: reboot_zfsnap_enable, value: 'YES' }
+    - { name: reboot_zfsnap_recursive_fs, value: 'tank zroot' }
+    - { name: reboot_zfsnap_verbose, value: 'YES' }
+    - { name: reboot_zfsnap_flags, value: '' }
+
+- name: FreeBSD | periodic.conf zfSnap hourly snapshots
+  cron:
+    name="znSnap Hourly snapshot for {{ item.name }}"
+    special_time=hourly
+    job="/usr/local/sbin/zfSnap -a {{ item.hourly_ttl | default('1d') }} -p hourly- -R {{ item.name }}"
+  when: host_zfsnap is defined and item.hourly and not item.recursive and inventory_hostname not in groups['delorean_slaves']
+  with_items: "{{ host_zfsnap }}"
+
+- name: FreeBSD | periodic.conf zfSnap recursive hourly snapshots
+  cron:
+    name="znSnap Hourly Recursive snapshot for {{ item.name }}"
+    special_time=hourly
+    job="/usr/local/sbin/zfSnap -a {{ item.hourly_ttl | default('1d') }} -p hourly- -r {{ item.name }}"
+  when: host_zfsnap is defined and item.hourly and item.recursive and inventory_hostname not in groups['delorean_slaves']
+  with_items: "{{ host_zfsnap }}"
+
+- name: FreeBSD | periodic.conf zfSnap daily snapshots
+  cron:
+    name="znSnap Daily snapshot for {{ item.name }}"
+    special_time=daily
+    job="/usr/local/sbin/zfSnap -a {{ item.daily_ttl | default('1w') }} -p daily- -R {{ item.name }}"
+  when: host_zfsnap is defined and item.daily and not item.recursive and inventory_hostname not in groups['delorean_slaves']
+  with_items: "{{ host_zfsnap }}"
+
+- name: FreeBSD | periodic.conf zfSnap recursive daily snapshots
+  cron:
+    name="znSnap Daily Recursive snapshot for {{ item.name }}"
+    special_time=daily
+    job="/usr/local/sbin/zfSnap -a {{ item.daily_ttl | default('1w') }} -p daily- -r {{ item.name }}"
+  when: host_zfsnap is defined and item.daily and item.recursive and inventory_hostname not in groups['delorean_slaves']
+  with_items: "{{ host_zfsnap }}"
+
+- name: FreeBSD | periodic.conf zfSnap weekly snapshots
+  cron:
+    name="znSnap Weekly snapshot for {{ item.name }}"
+    special_time=weekly
+    job="/usr/local/sbin/zfSnap -a {{ item.weekly_ttl | default('1m') }} -p weekly- -R {{ item.name }}"
+  when: host_zfsnap is defined and item.weekly and not item.recursive and inventory_hostname not in groups['delorean_slaves']
+  with_items: "{{ host_zfsnap }}"
+
+- name: FreeBSD | periodic.conf zfSnap recursive weekly snapshots
+  cron:
+    name="znSnap Weekly Recursive snapshot for {{ item.name }}"
+    special_time=weekly
+    job="/usr/local/sbin/zfSnap -a {{ item.weekly_ttl | default('1m') }} -p weekly- -r {{ item.name }}"
+  when: host_zfsnap is defined and item.weekly and item.recursive and inventory_hostname not in groups['delorean_slaves']
+  with_items: "{{ host_zfsnap }}"
+
+- name: FreeBSD | periodic.conf zfSnap monthly snapshots
+  cron:
+    name="znSnap Monthly snapshot for {{ item.name }}"
+    special_time=monthly
+    job="/usr/local/sbin/zfSnap -a {{ item.monthly_ttl | default('6m') }} -p monthly- -R {{ item.name }}"
+  when: host_zfsnap is defined and item.monthly and not item.recursive and inventory_hostname not in groups['delorean_slaves']
+  with_items: "{{ host_zfsnap }}"
+
+- name: FreeBSD | periodic.conf zfSnap recursive monthly snapshots
+  cron:
+    name="znSnap Monthly Recursive snapshot for {{ item.name }}"
+    special_time=monthly
+    job="/usr/local/sbin/zfSnap -a {{ item.monthly_ttl | default('6m') }} -p monthly- -r {{ item.name }}"
+  when: host_zfsnap is defined and item.monthly and item.recursive and inventory_hostname not in groups['delorean_slaves']
+  with_items: "{{ host_zfsnap }}"

@@ -1,0 +1,17 @@
+---
+- name: Audit CDDB
+  hosts: gds_all
+  become: yes
+  tasks:
+
+    - name: Last changes 
+      shell: '/usr/lib/postgresql/9.3/bin/psql stardeals_db -U postgres -c "select * from liquibase.databasechangelog where dateexecuted = ( select max(dateexecuted) from liquibase.databasechangelog ) "'
+      register: last_changes
+
+    - debug: var=last_changes.stdout_lines
+
+    - name: User list 
+      shell: '/usr/lib/postgresql/9.3/bin/psql stardeals_db -U postgres -c "\du+"'
+      register: user_list
+
+    - debug: var=user_list.stdout_lines

@@ -1,0 +1,14 @@
+---
+gds_carp_peers:
+  - 10.34.185.242  # gds-sac1-prod-db052m1
+  - 10.34.185.243  # gds-sac1-prod-db052s1
+  - 10.34.161.242  # gds-sac1-prod-db052m1
+  - 10.34.161.243  # gds-sac1-prod-db052s1
+gds_carp_interfaces:
+  - vlan206
+  - vlan207
+gds_instance_group: gds_prod_sac1_db052
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  orders_prod: # decommed GDS-25462 # GDS-18513  # __SOX__

@@ -1,0 +1,38 @@
+---
+- name: Daas part set facts
+  gather_facts: False
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+          - aws_host is defined
+
+    - set_fact:
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+
+- name: Aws part 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+
+    - name: Get params
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -xc "select name,setting from pg_settings where name in ('shared_preload_libraries','max_connections','max_worker_processes','max_replication_slots','max_wal_senders','rds.logical_replication','max_logical_replication_workers','max_sync_workers_per_subscription');"
+      register: rds_params
+    - debug: var=rds_params.stdout

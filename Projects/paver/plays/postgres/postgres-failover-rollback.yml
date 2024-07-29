@@ -1,0 +1,77 @@
+---
+###################################################
+# 
+#
+# Description:  This play should only be used when the postgres-failover.yml has failed and has left the master 
+#               db at a state where it is probably down and not accepting connections (datallowconn set to off).
+#               The arguments are the same as in the postgres-failover.yml play. In the end, the current_master 
+#               once again be the master, and the current_slave will be the slave. Attention to not use is it
+#               if the slave instance has already been promoted to r/w!!!!
+#
+#
+
+- name: Ensure command line variables are set
+  gather_facts: False
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - current_master is defined
+          - instance is defined
+          - current_slave is defined
+
+- name: Get slave IP
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ current_slave}}'
+  tasks:
+    - name: get IP slave
+      shell: ifconfig lagg0 | grep 'inet' | awk -F ' ' '{ print $2 }'
+      register: current_slave_ip
+#    - debug: var=current_slave_ip.stdout
+
+
+- name: Master changes
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ current_master }}'
+  tasks:
+
+    - set_fact: my_slave_ip={{ hostvars[current_slave]['current_slave_ip']['stdout'] }}
+
+    - name: Start the instance
+      shell: sv start /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/
+
+    - name: Pause for 10 seconds to let db start accepting connections
+      pause:
+        seconds: 10
+
+    - name: Find if slave exists
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select client_addr from pg_stat_replication where client_addr='{{ my_slave_ip }}'"
+      register: slave_ip
+      until: slave_ip.stdout  !=  ""
+      retries: 100
+      delay: 1
+#    - debug: var=slave_ip.stdout
+
+    - name: Move rw vip back to the master
+      shell: cat /etc/rc.conf.local | grep {{ gds_instances[instance].master_vip }} | grep -o 'vhid.*' | awk '{print $2}'
+      register: my_vhid
+#    - debug: var=my_vhid.stdout
+
+    - name: Move rw vip back to the master
+      shell: ifconfig {{ gds_carp_interfaces.0 }} vhid {{ my_vhid.stdout }} state master
+
+    - name: Confirm rw_vip is back on the master
+      shell: /var/groupon/check_mk/checks/check_db_postgres_vip_generic -v {{ gds_instances[instance].master_vip }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'OK - VIP is OK'
+      register: rw_vip_on_master_final
+      until: rw_vip_on_master_final.stdout  !=  ""
+      retries: 50
+      delay: 1
+#    - debug: var=rw_vip_on_master_final.stdout
+
+    - name: Allow connections to this database again
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "update pg_database set datallowconn='t' where datname='{{ gds_instances[instance].dbnames.0 }}'"

@@ -1,0 +1,14 @@
+--- 
+#- hosts: gds
+#  become: yes
+#  vars_files:
+#    - 'defaults/main.yml'
+#  tasks:
+#    - include: 'roles/postgres_setup.yml'
+
+- hosts: local
+  become: yes
+  vars_files:
+    - 'defaults/{{ansible_os_family}}.yml'
+  roles:
+  - { role: create_db, when: ansible_os_family == 'FreeBSD' }

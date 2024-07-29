@@ -1,0 +1,29 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_num_tables>>>'
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        OUTPUT="$(echo "SELECT count(*)
+                        FROM pg_stat_all_tables;" |\
+        psql -X -p ${Port} -U postgres --variable ON_ERROR_STOP=1 -d ${dbname} -A -t -F' ')"
+        echo "$OUTPUT"
+        sleep 0.5
+done

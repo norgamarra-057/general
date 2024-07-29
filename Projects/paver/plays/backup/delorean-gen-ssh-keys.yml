@@ -1,0 +1,50 @@
+---
+- hosts: delorean_masters
+  connection: local
+  gather_facts: false
+  serial: 1
+  vars:
+    ansible_python_interpreter: /usr/bin/python
+    public_keys_dir: "{{ lookup('env','PWD') }}/roles/delorean/files/public_keys"
+    push_ssh_keys_dir: "delorean-push-ssh-keys.local"
+    pull_ssh_keys_dir: "delorean-pull-ssh-keys.local"
+    ssh_key_to_yaml_script: "{{ lookup('env','PWD') }}/roles/mysql_db_backup_cron/files/gen-sshkeys-yaml.sh"
+    pull_ssh_key_vault_file: "{{ lookup('env','PWD') }}/roles/delorean/vars/pull_backup_ssh_keys_vault.yml"
+    push_ssh_key_vault_file: "{{ lookup('env','PWD') }}/roles/delorean/vars/push_backup_ssh_keys_vault.yml"
+  vars_files:
+    - "{{ pull_ssh_key_vault_file }}"
+    - "{{ push_ssh_key_vault_file }}"
+    - "{{ lookup('env','PWD') }}/inventory/group_vars/delorean_all.yml"
+  tasks:
+    - name: "create local and temporary pull ssh key directory: {{ lookup('env','PWD') }}/{{ pull_ssh_keys_dir | realpath }}"
+      local_action: file path="{{ lookup('env','PWD') }}/{{ pull_ssh_keys_dir }}" state=directory mode=0700
+
+    - name: "create local and temporary push ssh key directory: {{ lookup('env','PWD') }}/{{ push_ssh_keys_dir | realpath }}"
+      local_action: file path="{{ lookup('env','PWD') }}/{{ push_ssh_keys_dir }}" state=directory mode=0700
+
+    - name: "locally generate pull ssh key(s)"
+      local_action: shell /usr/bin/ssh-keygen -q -t rsa -b 2048 -O clear -C "{{ item.key }}@delorean/backups" -f "{{ lookup('env','PWD') }}/{{ pull_ssh_keys_dir }}/{{ item.key }}"
+      register: pull_key_generated
+      with_dict: backup_users
+      when: "item.key not in pull_backup_ssh_keys.keys()"
+
+    - name: "locally generate push ssh key(s)"
+      local_action: shell /usr/bin/ssh-keygen -q -t rsa -b 2048 -O clear -C "{{ item.key }}@delorean/backups" -f "{{ lookup('env','PWD') }}/{{ push_ssh_keys_dir }}/{{ item.key }}"
+      register: push_key_generated
+      with_dict: backup_users
+      when: "item.key not in push_backup_ssh_keys.keys()"
+
+    - name: "append pull ssh keys to decrypted yaml vault"
+      local_action: command {{ ssh_key_to_yaml_script }} {{ pull_ssh_key_vault_file }} {{ lookup('env','PWD') }}/{{ pull_ssh_keys_dir }}/{{ item.key }}
+      register: pull_key_appended
+      changed_when: pull_key_appended.stdout != 'pull_keys_appended=0'
+      when: pull_key_generated is not defined or pull_key_generated.changed
+      with_dict: backup_users
+
+    - name: "append push ssh keys to decrypted yaml vault"
+      local_action: command {{ ssh_key_to_yaml_script }} {{ push_ssh_key_vault_file }} {{ lookup('env','PWD') }}/{{ push_ssh_keys_dir }}/{{ item.key }}
+      register: push_key_appended
+      changed_when: push_key_appended.stdout != 'push_keys_appended=0'
+      when: push_key_generated is not defined or push_key_generated.changed
+      with_dict: backup_users
+

@@ -1,0 +1,78 @@
+---
+- name: FreeBSD | local_unbound | chroot dir
+  file:
+    path: /var/unbound
+    owner: root
+    group: unbound
+    mode: 0775
+    state: directory
+
+- name: FreeBSD | local_unbound | rc.conf enable
+  lineinfile: 
+    dest: /etc/rc.conf
+    regexp: '^[#]*{{ item.name }}=.*'
+    line: '{{ item.name }}="{{ item.value }}"'
+  with_items:
+    - name: local_unbound_enable 
+      value: YES
+  notify:
+    - local_unbound start
+
+- name: FreeBSD | local_unbound | unbound-anchor
+  command: /usr/sbin/unbound-anchor -va /var/unbound/root.key
+  args:
+    creates: /var/unbound/root.key
+  register: unbound_anchor_result
+  notify:
+    - local_unbound reload
+  changed_when: "unbound_anchor_result.rc == 1"
+  failed_when: "unbound_anchor_result.stdout_lines[1] != 'success: the anchor is ok'"
+
+- name: FreeBSD | local_unbound | root.key perms
+  file:
+    path: /var/unbound/root.key
+    owner: root
+    group: unbound
+    mode: 0644
+
+# From ftp://FTP.INTERNIC.NET/domain/named.cache
+- name: FreeBSD | local_unbound | root.hints
+  copy:
+    src: root.hints
+    dest: /var/unbound/root.hints
+    mode: 0644
+    owner: root
+    group: unbound
+  notify:
+    - local_unbound reload
+
+- name: FreeBSD | local_unbound | unbound.conf
+  template:
+    src: local_unbound.conf.j2
+    dest: /var/unbound/unbound.conf
+    mode: 0644
+    owner: root
+    group: unbound
+  notify:
+    - local_unbound reload
+
+- name: FreeBSD | local_unbound | forward.conf (resolv.conf)
+  template:
+    src: local_unbound-forward.conf.j2
+    dest: /var/unbound/forward.conf
+    mode: 0644
+    owner: root
+    group: unbound
+  notify:
+    - local_unbound reload
+
+- name: FreeBSD | local_unbound | start
+  service: name=local_unbound state=started
+
+- name: FreeBSD | local_unbound | resolv.conf
+  template:
+    src=local_unbound-resolv.conf.j2
+    dest=/etc/resolv.conf
+    mode=0644
+    owner=root
+    group=wheel

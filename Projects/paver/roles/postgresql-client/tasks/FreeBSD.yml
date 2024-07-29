@@ -1,0 +1,4 @@
+- name: PostgreSQL Server | FreeBSD | packages | install client {{ item }}
+  pkgng: name={{ item }} state=present
+  with_items:
+  - postgresql{{ postgresql_port_major }}-client

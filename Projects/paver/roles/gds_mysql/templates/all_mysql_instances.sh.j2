@@ -1,0 +1,24 @@
+#!/usr/local/bin/bash
+
+arg=$1
+percona_root="{{ percona_root }}"
+
+instances=`mi.sh -l | cut -c 3-`
+
+for instance in ${instances}
+do
+  echo -n "${instance}: "
+  cmd_type=`echo "${arg}" | awk '{print $1}'`
+
+  mysql -S ${percona_root}/${instance}/mysql.sock --silent --silent -e "${arg}";
+  ret=$?
+  if [ ${ret} -ne 0 ]
+  then
+    echo "ERROR"
+  else
+    if [ ${cmd_type} == "set" ]
+    then
+      echo "OK"
+    fi
+  fi
+done

@@ -1,0 +1,4 @@
+---
+# Create parent if it doens't exist
+- name: collectd5 install
+  pkgng: name=collectd5 state=present

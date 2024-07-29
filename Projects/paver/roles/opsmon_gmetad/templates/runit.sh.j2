@@ -1,0 +1,9 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst -v\
+    -e {{gmetad_service_path}}/env \
+        -u ganglia:ganglia  \
+  /usr/local/sbin/gmetad -d 1 \
+    -c {{ gmetad_service_path }}/gmetad.conf

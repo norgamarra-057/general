@@ -1,0 +1,26 @@
+---
+- include_tasks: FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'
+
+- name: sudo | sudoers.d
+  file:
+    path=/usr/local/etc/sudoers.d
+    state=directory
+    owner=root
+    group=wheel
+    mode="0750"
+
+- name: sudo | sudoers
+  template:
+    dest=/usr/local/etc/sudoers
+    src=sudoers.j2
+    backup="yes"
+    validate='/usr/local/sbin/visudo -cf %s'
+    mode="0440"
+
+# - name: sudo | permissions
+#   file:
+#     path="/usr/local/etc/sudoers"
+#     owner=root
+#     group=wheel
+#     mode="0440"

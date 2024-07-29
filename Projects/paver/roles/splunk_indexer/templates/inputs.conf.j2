@@ -1,0 +1,19 @@
+[monitor:///var/log/auth.log]
+index = os
+sourcetype = securelog
+disabled = false
+[monitor:///var/log/maillog]
+index = os
+sourcetype = maillog
+disabled = false
+[monitor:///var/log/messages]
+index = os
+sourcetype = syslog
+disabled = false
+[monitor:///var/log/secure]
+index = os
+sourcetype = securelog
+disabled = false
+[monitor:///var/groupon/log/splunk/clean-dispatch.log]
+sourcetype = splunk_clean_dispatch
+disabled = false

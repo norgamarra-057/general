@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+Defaults env_reset
+Defaults secure_path="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+
+root ALL=(ALL:ALL) ALL
+%wheel ALL=(ALL) NOPASSWD: ALL
+%_konami ALL=(ALL) NOPASSWD: ALL
+#includedir /usr/local/etc/sudoers.d

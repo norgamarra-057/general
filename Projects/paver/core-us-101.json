@@ -1,0 +1,7 @@
+srcpoint: 10.213.128.12
+endpoint: 10.182.192.84
+src_dbs: ["afl_rta","getaways_partner_gwl","megatron_stable","my_core_us_526_stg"]
+src_users: ["afl_rta","c_stg_usr_ro","getaways_partner_app","getaways_partner_dba","mtdata_rw","replication","replicauser"]
+REPLICA_INST_NAME: my-core-us-526-stg-0
+env: stable
+AWS_CNAME: my-core-us-526-stg.cluster-ccoxqscq6x7v.us-west-1.rds.amazonaws.com.

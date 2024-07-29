@@ -1,0 +1,6 @@
+---
+- name: Update repository settings
+  hosts: gds_all
+  become: true
+  roles:
+    - ports

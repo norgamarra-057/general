@@ -1,0 +1,148 @@
+---
+- name: FreeBSD | Install Splunk
+  become: yes 
+  pkgng: name="{{ item }}" state=present
+  with_items: 
+  - splunkforwarder
+
+- name: Fix permissions log dir for MySQL
+  become: yes
+  file: path=/var/groupon/percona/{{ item.key }}/log mode=0775
+  ignore_errors: yes
+  when: item.value.type == "mysql"
+  with_dict: "{{ gds_instances }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Fix permissions error.log for MySQL
+  become: yes
+  file: path=/var/groupon/percona/{{ item.key }}/log/error.log mode=0644
+  ignore_errors: yes
+  when: item.value.type == "mysql"
+  with_dict: "{{ gds_instances }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: FreeBSD | runit | svlogd directory
+  become: yes
+  file:
+    path=/var/groupon/service/splunk_forwarder/log/main
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+  changed_when: False
+
+- name: FreeBSD | runit | directories (read-only)
+  become: yes
+  file: path="{{ item }}" state=directory owner=root group=wheel mode=0755
+  with_items:
+    - /var/groupon/service/splunk_forwarder
+    - /var/groupon/service/splunk_forwarder/bin
+    - /var/groupon/service/splunk_forwarder/env
+    - /var/groupon/service/splunk_forwarder/log
+
+- name: FreeBSD | runit | splunkforwarder directory
+  become: yes
+  file:
+    path=/opt/splunkforwarder
+    state=directory
+    owner=splunk
+    group="{{ foreman_groups[users['splunk'].group ].gid }}"
+    mode=0755
+  notify:
+    - splunk_forwarder restart
+
+- name: FreeBSD | runit | environment
+  become: yes
+  copy: dest=/var/groupon/service/splunk_forwarder/env/PATH
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - splunk_forwarder restart
+
+- name: FreeBSD | runit | script
+  become: yes
+  template:
+    dest=/var/groupon/service/splunk_forwarder/run2
+    mode=0755
+    src=runit2.sh.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | runit | script
+  become: yes
+  template:
+    dest=/var/groupon/service/splunk_forwarder/run
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | runit | script
+  become: yes
+  template:
+    dest=/var/groupon/service/splunk_forwarder/finish
+    mode=0755
+    src=finish.sh.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | runit | log script
+  become: yes
+  template:
+    dest=/var/groupon/service/splunk_forwarder/log/run
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - splunk_forwarder log restart
+
+- name: Splunk Forwarder | service discovery consul
+  stat: path="/var/service/consul"
+  register: discovery_consul
+  tags: config
+
+- name: Splunk Forwarder | service discovery hydra-agent
+  stat: path="/var/service/hydra-agent"
+  register: discovery_hydra
+  tags: config
+
+- name: Splunk Forwarder | config | render inputs.conf
+  become: yes
+  template:
+    src=inputs.conf.j2
+    dest=/opt/splunkforwarder/etc/system/local/inputs.conf
+    owner=splunk
+    group="{{ foreman_groups[users['splunk'].group ].gid }}"
+  notify:
+    - splunk_forwarder restart
+  tags: config
+
+- name: Splunk Forwarder | config | render output.conf
+  become: yes
+  template:
+    src=outputs.conf.j2
+    dest=/opt/splunkforwarder/etc/system/local/outputs.conf
+    owner=splunk
+    group="{{ foreman_groups[users['splunk'].group ].gid }}"
+  notify:
+    - splunk_forwarder restart
+  tags: config
+
+- name: FreeBSD | runit | splunk_forwarder enable
+  become: yes
+  file:
+    src: /var/groupon/service/splunk_forwarder
+    dest: /var/service/splunk_forwarder
+    owner: root
+    group: wheel
+    state: link
+
+- name: FreeBSD | runit | wait_for service.
+  become: yes
+  pause: seconds=3

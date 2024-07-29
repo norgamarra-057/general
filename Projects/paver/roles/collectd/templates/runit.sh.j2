@@ -1,0 +1,10 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst \
+    -e {{ collectd_service_dir }}/env \
+    -u {{ collectd_username }}:{{ collectd_groupname }} \
+  /usr/local/sbin/collectd -f \
+    -C {{ collectd_config_dir }}/collectd.config \
+

@@ -1,0 +1,10 @@
+---
+- hosts: gds_sac1_prod_db059
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: ls_va_orders_prod }
+  - { role: gds-mysql-ha, instance: ls_va_users_prod }
+  - { role: gds-mysql-ha, instance: ls_va_deals_prod }
+  - { role: gds-mysql-ha, instance: ls_va_travel_prod }
+  - { role: gds-mysql-ha, instance: ls_va_subscript_prod }

@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS {{ item }};
+USE {{ item }};
+CREATE TABLE IF NOT EXISTS `heartbeat` (
+  `ts` varchar(26) NOT NULL,
+  `server_id` int(10) unsigned NOT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `position` bigint(20) unsigned DEFAULT NULL,
+  `relay_master_log_file` varchar(255) DEFAULT NULL,
+  `exec_master_log_pos` bigint(20) unsigned DEFAULT NULL,
+  PRIMARY KEY (`server_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

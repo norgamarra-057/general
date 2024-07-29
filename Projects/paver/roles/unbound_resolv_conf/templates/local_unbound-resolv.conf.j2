@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+# FIXME(seanc@): local lookup is broken. When this is fixed, 127.0.0.1 will
+# be the only nameserver uncommented.
+{% if dns.search is defined %}
+search {{ dns.search }}
+{% endif -%}
+{% if dns.domain is defined %}
+domain {{ dns.domain }}
+{% endif -%}
+# nameserver 127.0.0.1
+{% for ns in dns['zones']['.']['nameservers'] %}
+nameserver {{ ns }}
+{% endfor %}
+options ndots:1 timeout:0.3 attempts:31 rotate no_tld_query

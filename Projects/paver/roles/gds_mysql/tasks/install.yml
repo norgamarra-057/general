@@ -1,0 +1,39 @@
+- name: Percona | FreeBSD | runit | directories (read-only)
+  file:
+    path="{{ item }}"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - "{{ percona_service_dir }}"
+    - "{{ percona_service_dir }}/env"
+    - "{{ percona_service_dir }}/log"
+
+- name: Percona | FreeBSD | runit | directory | svlogd
+  file:
+    path="{{ percona_service_dir }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+
+- name: Percona | FreeBSD | my.cnf
+  template:
+    dest: "{{ percona_service_dir }}/my.cnf"
+    src: my.cnf.j2
+    owner: root
+    group: wheel
+    mode: 0644
+  tags:
+    - mysql-config
+
+- name: Percona | FreeBSD | check for installed db
+  shell: ls {{ percona_datadir }}/mysql/db.MYD
+  register: install_done
+  ignore_errors: true
+
+- name: "Percona | FreeBSD | mysql_install_db cluster | {{ gds_cluster }}"
+  command: "/usr/local/bin/mysql_install_db --datadir={{ percona_datadir }} --basedir=/usr/local --defaults-file={{ percona_service_dir }}/my.cnf"
+  become_user: "{{ gds_instances[instance_name].unix_user }}"
+  when: install_done.rc != 0

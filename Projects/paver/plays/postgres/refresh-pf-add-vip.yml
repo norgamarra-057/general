@@ -1,0 +1,41 @@
+---
+- name: Parent tree
+  become: true
+  gather_facts: false
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+     - name: set the facts
+       set_fact:
+         firewall_ips: "{{ gds_instances[target_instance].firewall_permitted_src_cidrs }}"
+         dba_ips: "{{ gds_instances[target_instance].dba_src_cidrs }}"
+
+     - name: Update sources file
+       lineinfile:
+         dest: /etc/pf.conf.d/tables/{{ target_instance }}-srcs.table
+         line: "{{ item }}"
+       with_items: "{{ firewall_ips }}"
+
+     - name: Reload pf
+       shell: /etc/rc.d/pf reload
+       register: pf_reload
+     - debug: var=pf_reload.stdout
+
+     - name: Data directory
+       shell: psql -U postgres -At -p {{ gds_instances[target_instance].ports.postgresql_raw }} -c 'show data_directory'
+       register: data_dir
+       when: inst_type == "postgresql"
+
+     - name: Update pg_hba.conf
+       lineinfile:
+         dest: "{{ data_dir.stdout }}/pg_hba.conf"
+         line: "host    {{ gds_instances[target_instance].dbnames.0 }}     {{ gds_instances[target_instance].dba_account_name }}        {{ item }}              md5"
+       when: inst_type == "postgresql"
+       with_items: "{{ dba_ips }}"
+
+     - name: Reload postgres
+       shell: psql -U postgres -At -p {{ gds_instances[target_instance].ports.postgresql_raw }} -c 'select pg_reload_conf()'
+       register: psql_reload
+       when: inst_type == "postgresql"
+     - debug: var=psql_reload.stdout
+       when: inst_type == "postgresql"

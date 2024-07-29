@@ -1,0 +1,9 @@
+---
+- name: MySQL state check (VIP, read-only)
+  hosts: gds_all
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Check slave status for each instance
+      shell: /usr/local/sbin/check_state.sh -e
+      changed_when: false

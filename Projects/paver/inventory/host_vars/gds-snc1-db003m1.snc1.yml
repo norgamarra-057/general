@@ -1,0 +1,18 @@
+---
+gds_cluster: gds_prod_snc1_db003
+postgresql_port_major: '93'
+
+percona_client_version: '5.6.19.67.0'
+percona_server_version: '5.6.19.67.0'
+percona_version: '56'
+percona_toolkit_version: 2.2.6
+ganglia_version: '3.4.0_6'
+ganglia_cluster: snc1_db004
+
+carp_cluster : 'db004'
+carp_interface : igb0
+carp_failover_weight : "20"
+carp_vhid : '1'
+carp_master_weight : '50'
+carp_password : 'A1Z9B5'
+carp_ip_aliases : '10.30.16.10/32'

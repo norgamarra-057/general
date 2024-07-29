@@ -1,0 +1,4 @@
+---
+- name: Upgrade all ZFS pools
+  command: zpool upgrade -a
+

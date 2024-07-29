@@ -1,0 +1,11 @@
+---
+- name: install nginx
+  pkgng:
+   name: nginx
+   state: present
+
+- name: nginx http read | FreeBSD
+  sysrc: name=accf_http_load value="YES" file=/boot/loader.conf
+  when: ansible_os_family == 'FreeBSD'
+  notify:
+    - accept filter load

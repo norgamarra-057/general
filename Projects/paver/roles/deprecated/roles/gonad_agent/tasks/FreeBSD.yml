@@ -1,0 +1,134 @@
+---
+- name: GONAD | FreeBSD | directory | gonad agent
+  file:
+    path="/var/groupon/gonad"
+    state=directory
+    owner=monitord
+    group=monitord
+    mode=0755
+    recurse=yes
+
+- name: GONAD | FreeBSD | runit | directories (read-only)
+  file: path="{{ item }}" state=directory owner=root group=wheel mode=0755
+  with_items:
+    - /var/service/gonad_agent
+    - /var/service/gonad_agent/bin
+    - /var/service/gonad_agent/env
+    - /var/service/gonad_agent/log
+
+
+- name: GONAD | FreeBSD | check | check_pgstats
+  template:
+    dest="/var/service/gonad_agent/bin/check_pgstats.go"
+    mode=0755
+    src=check_pgstats.go.j2
+    owner=root
+    group=wheel
+
+- name: GONAD | FreeBSD | check | check_errors_ipmi_entries
+  template:
+    dest="/var/service/gonad_agent/bin/check_errors_ipmi_entries.go"
+    mode=0755
+    src=check_errors_ipmi_entries.go.j2
+    owner=root
+    group=wheel
+
+# SQL NEEDED TO BE WORKING PROPERLY
+#- name: GONAD | FreeBSD | check | check_postgres_replication_lag
+#  template:
+#    dest="/var/service/gonad_agent/bin/check_postgres_replication_lag.go"
+#    mode=0755
+#    src=check_postgres_replication_lag.go.j2
+#    owner=root
+#    group=wheel
+#
+
+- name: GONAD | FreeBSD | check | check_saturation_top
+  template:
+    dest="/var/service/gonad_agent/bin/check_saturation_top.go"
+    mode=0755
+    src=check_saturation_top.go.j2
+    owner=root
+    group=wheel
+
+
+- name: GONAD | FreeBSD | check | check_utilization_ps
+  template:
+    dest="/var/service/gonad_agent/bin/check_utilization_ps.go"
+    mode=0755
+    src=check_utilization_ps.go.j2
+    owner=root
+    group=wheel
+
+- name: GONAD | FreeBSD | check | check_utilization_top
+  template:
+    dest="/var/service/gonad_agent/bin/check_utilization_top.go"
+    mode=0755
+    src=check_utilization_top.go.j2
+    owner=root
+    group=wheel
+
+- name: GONAD | FreeBSD | check | check_utilization_vmstat
+  template:
+    dest="/var/service/gonad_agent/bin/check_utilization_vmstat.go"
+    mode=0755
+    src=check_utilization_vmstat.go.j2
+    owner=root
+    group=wheel
+
+
+- name: GONAD | FreeBSD | check | check_utilization_vmstat
+  template:
+    dest="/var/service/gonad_agent/bin/gonad.go"
+    mode=0755
+    src=gonad.go.j2
+    owner=root
+    group=wheel
+
+
+- name: GONAD | FreeBSD | runit | svlogd directory
+  file:
+    path=/var/service/gonad_agent/log/main
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+  changed_when: False
+
+
+
+- name: GONAD | FreeBSD | runit | environment
+  copy: dest=/var/service/gonad_agent/env/PATH
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - gonad_agent restart
+
+- name: GONAD | FreeBSD | runit | script
+  template:
+    dest=/var/service/gonad_agent/run
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - gonad_agent restart
+
+- name: GONAD | FreeBSD | runit | log script
+  template:
+    dest=/var/service/gonad_agent/log/run
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+#  notify:
+#    - monitord_agent log restart
+
+- name: GONAD | FreeBSD | runit | monitord cron
+  cron:
+    name="monitord-agent reload"
+    special_time=hourly
+    job="/usr/local/sbin/sv term /var/service/gonad_agent/"

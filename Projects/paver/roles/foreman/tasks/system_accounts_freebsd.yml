@@ -1,0 +1,11 @@
+---
+- name: make sure authorized system accounts have their accounts (FreeBSD)
+  user: 
+    name: "{{ item }}" 
+    comment: "{{ users[item].name }}" 
+    shell: "{{ users[item].shell | default('/usr/sbin/nologin') }}"
+    uid: "{{ users[item].uid }}" 
+    state: present 
+    group: "{{ users[item].group }}" 
+    append: yes
+  with_items: system_accounts

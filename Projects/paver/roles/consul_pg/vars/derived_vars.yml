@@ -1,0 +1,4 @@
+---
+# Directory used by runit for nad on this host
+postgresql_data_dir: "/var/groupon/service/postgresql-{{ gds_cluster }}-{{ instance_name }}/data/"
+consul_service_dir: /var/groupon/service/consul

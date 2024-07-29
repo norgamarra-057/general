@@ -1,0 +1,8 @@
+---
+- hosts: delorean_all
+  become: yes
+  roles:
+    - delorean
+  tags:
+    - add_user
+    - delorean

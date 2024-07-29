@@ -1,0 +1,184 @@
+---
+monitors:
+  disk_space:
+    run_every: 60
+    shell_command: "/usr/local/libexec/check_disk_space_all -t min_free_pct=20:10"
+  iostat:
+    run_every: 60
+    shell_command: "/usr/local/libexec/nagios/check_freebsd_iostat.sh -N -P -i 15s"
+  load:
+    run_every: 60
+    shell_command: "/usr/local/libexec/nagios/check_load -w 12:12:12 -c 18:18:18"
+  mem:
+    run_every: 60
+    shell_command: "/usr/local/libexec/nagios/check_fbsd_mem -p"
+  net_eth0:
+    run_every: 60
+    shell_command: "/usr/local/libexec/check_sar -S net -D eth0 -t bytes_in=65M:95M,bytes_out=65M:95M"
+  ntp:
+    run_every: 300
+    shell_command: "/usr/local/nagios/libexec/check_ntp_time -H ns1 -w 0.5 -c 1"
+  ssh:
+    run_every: 60
+    shell_command: "/usr/local/libexec/check_ssh -w 0.5 -c 1"
+  swap:
+    run_every: 60
+    shell_command: "/usr/local/libexec/nagios/check_swap -w 50% -c 25%"
+  cpu:
+    run_every: 120
+    shell_command: "/usr/local/libexec/nagios/check_cpu_usage -w 80 -c 100"
+
+
+{% for instance in gds_instances.keys() %}
+{% if gds_instances[instance].type == 'postgresql' -%}
+# {{ instance }}
+  cpu_bsd_{{ gds_instances[instance].ports.postgresql_raw }}:
+    notify: false
+    run_every: 120
+    shell_command: "/usr/local/libexec/nagios/check_cpu_usage -w 80 -c 100"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  iostat_{{ gds_instances[instance].ports.postgresql_raw }}:
+    notify: false
+    run_every: 120
+    shell_command: "/usr/local/libexec/nagios/check_freebsd_iostat.sh -N -P -i 15s"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  load_bsd_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 120
+    notify: false
+    shell_command: "/usr/local/libexec/nagios/check_load -w 12:12:12 -c 18:18:18"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  pgbouncer_backends_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 120
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgbouncer_backends --host=localhost --dbpass=gds123123"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+  
+  pgbouncer_pool_active_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 120
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgb_pool_cl_active --host=localhost --dbpass=gds123123
+      --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  pgbouncer_pool_maxwait_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 240
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgb_pool_maxwait --host=localhost --dbpass=gds123123 --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  pgbouncer_pool_waiting_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 120
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgb_pool_cl_waiting --host=localhost --dbpass=gds123123
+      --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+
+  pgbouncer_sv_active_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 120
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgb_pool_sv_active --host=localhost --dbpass=gds123123
+      --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  pgbouncer_sv_idle_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 120
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgb_pool_sv_idle --host=localhost --dbpass=gds123123 --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  pgbouncer_sv_login_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 240
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgb_pool_sv_login --host=localhost --dbpass=gds123123
+      --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  pgbouncer_sv_tested_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 240
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgb_pool_sv_tested --host=localhost --dbpass=gds123123
+      --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  pgbouncer_sv_used_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 120
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname=pgbouncer --dbuser=gdsmon
+      --port={{ gds_instances[instance].ports.pgbouncer_txn }} --action=pgb_pool_sv_used --host=localhost --dbpass=gds123123 --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+
+  postgres_backends_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      \ --dbuser=postgres --port={{ gds_instances[instance].ports.postgresql_raw }} --action=backends --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  postgres_commit_ratio_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      --dbuser=postgres --port={{ gds_instances[instance].ports.postgresql_raw }} --action=commitratio --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  postgres_dbstats_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: "/usr/local/bin/dbstats_delta.sh {{ gds_instances[instance].ports.postgresql_raw }} {{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+  
+
+  postgres_hit_ratio_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      --dbuser=postgres --port={{ gds_instances[instance].ports.postgresql_raw }} --action=hitratio --include={{ gds_instances[instance].dbnames.0 }}"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  postgres_txn_idle_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      --dbuser=postgres --port={{ gds_instances[instance].ports.postgresql_raw }} --action=txn_idle -w 900s -c 1500s"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  postgres_txn_time_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      --dbuser=postgres --port={{ gds_instances[instance].ports.postgresql_raw }} --action=txn_time -w 60m -c 24h"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  postgres_txn_wraparound_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      --dbuser=postgres --port={{ gds_instances[instance].ports.postgresql_raw }} --action=txn_wraparound"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  postgres_wal_files_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: "/usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      --dbuser=postgres --port={{ gds_instances[instance].ports.postgresql_raw }} --action=wal_files -w 20000 -c 25000"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  postgresql_locks_{{ gds_instances[instance].ports.postgresql_raw }}:
+    run_every: 60
+    shell_command: /usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      --dbuser=postgres    --port={{ gds_instances[instance].ports.postgresql_raw }} --action=locks -w "total=1500:waiting=5:exclusive=3"
+      -c "total=2000:waiting=10:exclusive=20" --include={{ gds_instances[instance].dbnames.0 }}
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+  postgresql_replication_lag_{{ gds_instances[instance].ports.postgresql_raw }}:
+    max_check_attempts: 5
+    run_every: 60
+    shell_command: /usr/local/bin/check_postgres_new.pl --dbname={{ gds_instances[instance].dbnames.0 }}
+      --dbuser=postgres --port={{ gds_instances[instance].ports.postgresql_raw }} --action=custom_query --query="SELECT pg_xlog_location_diff(write_location,
+      replay_location) AS result, pg_xlog_location_diff(write_location, replay_location)
+      AS replication_delay_bytes FROM pg_catalog.pg_stat_replication WHERE application_name
+      = 'walreceiver' ORDER BY replication_delay_bytes DESC LIMIT 1" -w 1G -c 5G --valtype=size
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.postgresql_raw }}
+
+{% endif %}
+{% endfor %}
+
+
+cluster: gds_postgresql
+results_url: http://monitord:8080/results

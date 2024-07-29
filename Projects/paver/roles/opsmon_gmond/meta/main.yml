@@ -1,0 +1,6 @@
+---
+dependencies:
+  - { role: ganglia }
+  - { role: opsmon_gmetad }
+  - { role: ports, when: "ansible_os_family == 'FreeBSD'" }
+  - { role: runit }

@@ -1,0 +1,10 @@
+---
+consul_client_addr: 0.0.0.0
+consul_data_dir: /var/service/consul/data
+consul_conf_dir: /var/service/consul
+consul_conf_file: "{{ consul_conf_dir }}/consul.json"
+consul_version: 1.0.3
+consul_sha256sum: d09efe0ab74e464390a5f0652c21de45a834bb6d865b9a57e568e0d29423e234
+consul_checks:
+  - consul_config_check.sh
+  - consul_status.sh

@@ -1,0 +1,8 @@
+---
+- include_tasks: install.yml
+  tags:
+    - install_check_mk
+
+- include_tasks: config.yml
+  tags:
+    - config_check_mk

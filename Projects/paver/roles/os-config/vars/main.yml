@@ -1,0 +1,3 @@
+---
+freebsd_arc_max: '{{ (ansible_memtotal_mb * 0.40) / 1024 | int }}'
+freebsd_arc_min: '{{ (ansible_memtotal_mb * 0.05) / 1024 | int }}'

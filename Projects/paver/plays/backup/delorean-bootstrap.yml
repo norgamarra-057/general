@@ -1,0 +1,10 @@
+---
+- hosts: delorean_all
+  become: yes
+  roles:
+    - os-config
+    - foreman
+    - common_install
+    - openntpd
+  post_tasks:
+    - include: roles/ports/tasks/audit.yml

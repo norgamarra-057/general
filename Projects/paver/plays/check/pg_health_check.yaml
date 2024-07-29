@@ -1,0 +1,125 @@
+---
+- name: Health check PG 
+  hosts: gds_all
+  become: yes
+  tasks:
+
+    - name: Ifconfig status
+      shell: " ifconfig"
+      register: ifconfig_status
+
+    - debug: var=ifconfig_status.stdout_lines
+
+    - name: PG instances status
+      shell: " sv stat /var/service/postgresql-* "
+      register: instances_status
+
+    - debug: var=instances_status.stdout_lines
+
+    - name: PG instances on a host
+      shell: " /bin/ls -lha /var/service/postgresql-* | /usr/bin/wc -l "
+      register: host_pg_instances
+
+    - debug: var=host_pg_instances.stdout_lines
+
+    - name: PG instances on check_mk
+      shell: "/usr/bin/egrep 'port=|portexception' /etc/check_mk/postgres.cfg | /usr/bin/wc -l "
+      register: check_pg_instances 
+
+    - debug: var=check_pg_instances.stdout_lines
+
+    - name: Fail if all the instnaces are not in check mk 
+      fail:
+        msg: "ERROR Incompatible instances x config check_mk"
+      when: host_pg_instances.stdout_lines != check_pg_instances.stdout_lines
+
+    - name: PF status
+      shell: "bash /usr/lib/check_mk_agent/local/120/pf_status.sh"
+      changed_when: false
+      register: check_pg_pf_status
+
+    - debug: var=check_pg_pf_status.stdout_lines
+
+    - name: DB VIP status
+      shell: "bash /usr/lib/check_mk_agent/local/120/postgres_db_vip.sh"
+      changed_when: false
+      register: check_pg_db_vip_status
+      ignore_errors: yes
+
+    - debug: var=check_pg_db_vip_status.stdout_lines
+
+    - name: DB VIP generic status
+      shell: "bash /usr/lib/check_mk_agent/local/120/postgres_db_vip_generic.sh"
+      changed_when: false
+      register: check_pg_db_vip_generic_status
+
+    - debug: var=check_pg_db_vip_generic_status.stdout_lines
+
+
+    - name: Copy check postgres pgbouncer session
+      copy:
+        src: "../../roles/check_mk/files/locals/postgresql/common/postgres_db_pgbouncer_session.sh"
+        dest: "/usr/lib/check_mk_agent/postgres_db_pgbouncer_session.sh"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: zfs zfs-snapshots
+      shell: "bash /usr/lib/check_mk_agent/postgres_db_pgbouncer_session.sh"
+      changed_when: false
+      register: pgbouncer_session_status
+      ignore_errors: yes
+
+    - debug: var=pgbouncer_session_status.stdout_lines
+
+
+    - name: pg replication master status
+      shell: "bash /usr/lib/check_mk_agent/local/120/postgres_db_replication.sh"
+      changed_when: false
+      register: pg_repl_master_status
+      ignore_errors: yes
+
+
+    - debug: var=pg_repl_master_status.stdout_lines
+
+    - name: pg replication slave status
+      shell: "bash /usr/lib/check_mk_agent/local/120/postgres_db_replication_slave.sh"
+      changed_when: false
+      register: pg_repl_slave_status
+      ignore_errors: yes
+
+    - debug: var=pg_repl_slave_status.stdout_lines
+
+
+    - name: Copy check zfs-snapshots
+      copy:
+        src: "../../roles/check_mk/files/locals/all/common/zfs_snapshots.sh"
+        dest: "/usr/lib/check_mk_agent/plugins/zfs_snapshots.sh"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: zfs zfs-snapshots
+      shell: "bash /usr/lib/check_mk_agent/plugins/zfs_snapshots.sh"
+      changed_when: false
+      register: pg_zfs_status
+      ignore_errors: yes
+
+    - debug: var=pg_zfs_status.stdout_lines
+
+    - name: Copy check pg size and version
+      copy:
+        src: "../../roles/check_mk/files/locals/postgresql/common/postgres_db_size_version.sh"
+        dest: "/usr/lib/check_mk_agent/postgres_db_size_version.sh"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: pg size and version
+      shell: "bash /usr/lib/check_mk_agent/postgres_db_size_version.sh"
+      changed_when: false
+      register: pg_size_version
+      ignore_errors: yes
+
+    - debug: var=pg_size_version.stdout_lines
+

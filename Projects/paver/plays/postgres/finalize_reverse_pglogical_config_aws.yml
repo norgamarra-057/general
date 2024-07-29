@@ -1,0 +1,50 @@
+---
+- name: Daas part 1
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+          - aws_host is defined
+
+    - set_fact:
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+
+    - name: Drop subscription
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select pglogical.drop_subscription('{{ my_db_name }}_pg94_subscription')"
+
+    - name: Drop node
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select pglogical.drop_node('{{ my_db_name }}_pg94_subscriber')"
+
+- name: Aws part 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+
+    - name: Drop node
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -c "select pglogical.drop_node('{{ my_db_name }}_aws_provider')"
+
+    - name: Drop extension
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "drop extension pglogical"
+
+
+
+

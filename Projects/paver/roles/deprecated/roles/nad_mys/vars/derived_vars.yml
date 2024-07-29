@@ -1,0 +1,3 @@
+---
+# Directory used by runit for nad on this host
+nad_mys_service_dir: "/var/groupon/service/nad_mys"

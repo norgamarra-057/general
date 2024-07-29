@@ -1,0 +1,29 @@
+- name: Percona | monitoring | monitoring dir
+  file:
+    name: "{{ monitoring_template_dir }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: Percona | monitoring | monitoring template
+  template:
+    src: monitoring.yml.j2
+    dest: "{{ monitoring_template_dir }}/{{ instance_name }}.yml"
+    owner: root
+    group: wheel
+    mode: 0755
+
+#- name: Set consul instance name
+#  tags: consul_check
+#  set_fact:
+#    consul_instance_name:  "gds-daas-prod-{{ instance_name|regex_replace('_(dev|uat|stg|prod)$', '')|regex_replace('[_]', '-') }}"
+
+#- name: Add consul probes
+#  tags: consul_check
+#  template:
+#    src: mysql_consul_probe.j2
+#    dest: /var/groupon/service/consul/etc/{{ instance_name }}.json
+#    owner: root
+#    group: wheel
+#    mode: 0750

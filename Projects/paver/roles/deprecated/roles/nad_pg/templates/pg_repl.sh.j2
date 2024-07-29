@@ -1,0 +1,3 @@
+#!/bin/sh --
+QUERY="SELECT pg_xlog_location_diff(write_location, replay_location) AS result FROM pg_catalog.pg_stat_replication WHERE application_name = 'walreceiver' ORDER BY 1 DESC LIMIT 1;"
+psql -U postgres -At -p {{ gds_instances[instance_name].ports.postgresql_raw }} {{ gds_instances[instance_name]['dbnames'][0] }} -c "$QUERY" | awk '{ printf("delay\tL\t%d\n",$1); }'

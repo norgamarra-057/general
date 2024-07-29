@@ -1,0 +1,19 @@
+#!/bin/sh --
+
+SETUID_FLAGS=""
+
+if [ `/usr/bin/id -u -r` -eq 0 ]; then
+    SETUID_FLAGS="-u monitord:monitord"
+elif [ `/usr/bin/id -u -r` -ne `/usr/bin/id -u -r monitord` ]; then
+    /usr/bin/printf "%s can only be run as the monitord user\n" "$0"
+    exit 1
+fi
+
+/usr/local/sbin/chpst \
+    ${SETUID_FLAGS} \
+    -e /var/service/monitord_agent/env \
+    -n 15 \
+    -m {{ 100 * 1024 * 1024 }} \
+  /var/groupon/encap/{{ monitord_name.stdout }}/bin/gen_monitord_config \
+    -v \
+    -f /var/groupon/monitord/config.yml

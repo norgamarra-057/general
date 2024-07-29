@@ -1,0 +1,40 @@
+- hosts: all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+   
+   - name: Check @@relay_log_recovery MySQL
+     shell: |
+      exec 2>&1
+      relay_log_recovery="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e "SHOW GLOBAL VARIABLES WHERE Variable_name = 'relay_log_recovery'" -t -s -N|tail -n -2|head -n +1|sed 's/  *//g'|cut -d '|' -f 3)"
+      if [ "ON" != "$relay_log_recovery" ]
+      then
+       echo -n "Server: {{ inventory_hostname }} Instance: {{ item.key }} relay_log_recovery = $relay_log_recovery"
+      fi  
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: 
+      - item.value.type == 'mysql'
+      - gds_instances is defined
+     changed_when: False
+     loop_control:
+       label: "{{ item.key }}"
+
+
+   - name: Append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: 
+      - item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: Check @@relay_log_recovery MySQL Report
+     debug:
+       msg: "{{ outputs }}"
+

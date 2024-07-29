@@ -1,0 +1,1 @@
+table <groupon-bastion-hosts> persist file "/etc/pf.conf.d/tables/groupon-bastion-hosts.table"

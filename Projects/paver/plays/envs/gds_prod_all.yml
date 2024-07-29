@@ -1,0 +1,6 @@
+---
+- hosts: gds_prod_all
+  become: yes
+  roles:
+    - gds_firewall
+

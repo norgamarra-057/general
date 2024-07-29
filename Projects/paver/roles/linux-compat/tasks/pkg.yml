@@ -1,0 +1,6 @@
+---
+- name: Install linux base package
+  pkgng:
+    name: linux_base-c6
+    state: present
+

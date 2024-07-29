@@ -1,0 +1,156 @@
+---
+- name: Install packages
+  pkgng:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ipmitool
+    - libstatgrab
+    - dmidecode
+    - mcelog
+
+- name: Install packages
+  pkgng:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - muse
+  when: '"10" in ansible_distribution_release'
+
+- name: Set rc.conf
+  lineinfile:
+    dest: /etc/rc.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^inetd_enable', line: 'inetd_enable=yes' }
+    - { regexp: '^inetd_flags', line: 'inetd_flags=-wW' }
+
+- name: Copy check_mk_agent
+  copy:
+    src: check_mk_agent
+    dest: "/usr/local/bin"
+    owner: root
+    group: wheel
+    mode: 0655
+
+- name: Set /etc/services
+  lineinfile:
+    dest: /etc/services
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^check_mk', line: 'check_mk        6556/tcp   #check_mk agent' }
+
+- name: Set /etc/inetd.conf
+  lineinfile:
+    dest: /etc/inetd.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^check_mk', line: 'check_mk  stream  tcp nowait  root  /usr/local/bin/check_mk_agent check_mk_agent' }
+  register: inetd_conf
+
+- name: Set /etc/hosts.allow
+  lineinfile:
+    dest: /etc/hosts.allow
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^check_mk_agent : 10.20.52.8 : allow', line: 'check_mk_agent : 10.20.52.8 : allow' }
+    - { regexp: '^check_mk_agent : 10.8.11.8 : allow', line: 'check_mk_agent : 10.8.11.8 : allow' }
+    - { regexp: '^check_mk_agent : 10.32.55.143 : allow', line: 'check_mk_agent : 10.32.55.143 : allow' }
+    - { regexp: '^check_mk_agent : ALL : deny', line: 'check_mk_agent : ALL : deny' }
+
+- name: Start Inetd
+  command: /etc/rc.d/inetd restart
+  when: inetd_conf|changed
+
+- name: Create check_mk directory
+  file: path=/var/groupon/check_mk state=directory
+
+- name: Ensure plugins target directory exists 1
+  file:
+    dest: "/usr/lib/check_mk_agent/plugins"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+
+- name: Ensure plugins target directory exists 2
+  file:
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+
+- name: Ensure locals target directory exists
+  file:
+    dest: "/usr/lib/check_mk_agent/local/{{ frequency }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+
+- set_fact:
+    plugins_all_common: "{{ plugins['all']['common'] | default([]) }}"
+    plugins_all_common_120: "{{ plugins['all']['common_120'] | default([]) }}"
+    locals_all_common: "{{ locals['all']['common'] | default([]) }}"
+    
+- name: Copy generic plugins
+  copy:
+    src: "plugins/all/common/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  with_items: "{{ plugins_all_common }}"
+
+- name: Ensure plugins-120 target directory  exists
+  file:
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: wheel
+    recurse: yes
+
+- name: Copy generic plugins 120
+  copy:
+    src: "plugins/all/common_120/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/plugins/{{ frequency }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  with_items: "{{ plugins_all_common_120 }}"
+
+- name: Copy generic locals
+  copy:
+    src: "locals/all/common/{{ item }}"
+    dest: "/usr/lib/check_mk_agent/local/{{ frequency }}/{{ item }}"
+    owner: root
+    group: wheel
+    mode: 0655
+  with_items: "{{ locals_all_common }}"
+
+- name: Create .pgpass file
+  command: touch ~/.pgpass
+  when: db_type == 'postgresql'
+
+- name: set proper mode for the .pgpass file
+  command: chmod 0600 ~/.pgpass
+  when: db_type == 'postgresql'
+
+- name: Create config for the .pgpass file
+  lineinfile: dest=~/.pgpass line="localhost:*:pgbouncer:gdsmon:gds123123"
+  when: db_type == 'postgresql'
+
+- include_tasks: install_db_common.yml
+  when: db_type is defined
+
+- include_tasks: install_db_inst.yml
+  when: db_type is defined and inst_type is defined

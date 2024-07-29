@@ -1,0 +1,61 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - master_server is defined
+          - instance is defined
+          - app_password is defined
+          - dba_password is defined
+        msg: "One or more command line options are not defined: master_server, instance, app_password, dba_password"
+
+- name: Ensure host level variables are set
+  gather_facts: False
+  hosts:
+    - "{{ master_server }}"
+  tasks:
+    - set_fact:
+        instance_port: "{{ gds_instances[instance]['ports']['postgresql_raw'] | int }}"
+        dbnames: "{{ gds_instances[instance]['dbnames'] }}"
+        schemas: "{{ gds_instances[instance]['schemas'] }}"
+        dba_account_name: "{{ gds_instances[instance]['dba_account_name'] }}"
+        app_account_name: "{{ gds_instances[instance]['app_account_name'] }}"
+        app_connection_limit: "{{ gds_instances[instance]['extra_variables']['app_connection_limit']|default('10') }}"
+    - assert:
+        that:
+          - instance_port is defined
+          - dbnames is defined
+          - schemas is defined
+          - dba_account_name is defined
+          - app_account_name is defined
+        msg: "One or more variables are not defined: instance_port, dbnames, schemas, dba_account_name or app_account_name"
+    
+- name: Install initial Postgres database(s), schema(s) and users
+  gather_facts: False
+  hosts:
+    - "{{ master_server }}"
+  tasks:
+
+  - name: Building set search_path part 1
+    set_fact: all_schemas="{{ schemas[item] }}"
+    with_items: "{{ dbnames }}"
+    register: all_results
+
+  - name: Building set search_path part 2
+    set_fact: schema_list="{% for i in all_results.results %}{{i.ansible_facts.all_schemas}}{% endfor %}"
+
+  - name: Create pg_initial_users.sql and upload
+    template: src=../../templates/pg_initial_users.sql.j2 dest=/tmp/pg_initial_users.sql mode=0644 force=yes
+
+  - name: Load pg_initial_users.sql
+    command: psql -U postgres -d postgres -p {{ instance_port }} -f /tmp/pg_initial_users.sql
+    ignore_errors: True
+    when: dryrun is not defined
+
+  - name: Remove pg_initial_users.sql
+    file: path=/tmp/pg_initial_users.sql state=absent
+    ignore_errors: True
+    when: preserve is not defined 

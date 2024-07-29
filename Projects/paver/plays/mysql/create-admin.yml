@@ -1,0 +1,14 @@
+---
+# Create MHA configuration for MySQL instance
+- import_playbook: "{{ playbook_dir }}/../common/check-params.yml"
+
+- name: Create MHA configuration
+  become: true
+  hosts:
+    - "{{ node }}"
+  roles:
+    - role: gds_mha_manager
+      instance_name: "{{ instance }}"
+    - role: gds-mha-instance
+      instance_name: "{{ instance }}"
+

@@ -1,0 +1,74 @@
+---
+#- include: params.yml
+
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Create /etc/check_mk directory 
+      file: path=/etc/check_mk state=directory
+
+    - name: Get instance names
+      shell: ls /var/groupon/postgresql/data94 | cut -c21- | sed 's/^/  /' | awk '{print $0":"}'   > /etc/check_mk/local_instances.yml
+      register: instance_names
+#    - debug: var=instance_names.stdout
+
+
+    - name: Add header1
+      shell: echo 'inst_name:' | cat - /etc/check_mk/local_instances.yml > /etc/check_mk/temp && mv /etc/check_mk/temp /etc/check_mk/local_instances.yml
+
+    - name: Add header2
+      shell: echo '---' | cat - /etc/check_mk/local_instances.yml > /etc/check_mk/temp && mv /etc/check_mk/temp /etc/check_mk/local_instances.yml
+
+    - fetch: src=/etc/check_mk/local_instances.yml dest=files/temp/ flat=yes validate_checksum=yes fail_on_missing =yes
+
+    - include_vars: "files/temp/local_instances.yml"
+
+    - name: delete file postgres.cfg
+      file: path=/etc/check_mk/postgres.cfg state=absent
+
+    - name: create postgres.cfg
+      file: path=/etc/check_mk/postgres.cfg state=touch owner=root group=wheel mode=0644
+
+
+    - name: create final file master
+      lineinfile:
+        dest: /etc/check_mk/postgres.cfg
+        regexp: '^[#]*{{ item.key }}=.*'
+        line: '[{{ item.key }}] \nport={{ gds_instances[item.key].ports.postgresql_raw }}\nvip= {{ gds_instances[item.key].master_vip }} \ndbname={{ gds_instances[item.key].dbnames.0 }}'
+      when:  inst_type == "master"
+      with_dict: "{{inst_name}}"
+
+
+    - name: create final file slave
+      lineinfile:
+        dest: /etc/check_mk/postgres.cfg
+        regexp: '^[#]*{{ item.key }}=.*'
+        line: '[{{ item.key }}] \nport={{ gds_instances[item.key].ports.postgresql_raw }}\nvip= {{ gds_instances[item.key].slave_vips.0 }} \ndbname={{gds_instances[item.key].dbnames.0 }}'
+      when:  inst_type == "slave"
+      with_dict: "{{inst_name}}"
+
+    - name: create final file romaster
+      lineinfile:
+        dest: /etc/check_mk/postgres.cfg
+        regexp: '^[#]*{{ item.key }}=.*'
+        line: '[{{ item.key }}] \nport={{ gds_instances[item.key].ports.postgresql_raw }}\nvip= {{ gds_instances[item.key].master_vip }} \ndbname={{ gds_instances[item.key].dbnames.0 }}'
+      when:  inst_type == "romaster"
+      with_dict: "{{inst_name}}"
+
+
+
+
+
+- name: a play that runs entirely on the ansible host
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Delete the temp file
+      file: path=files/temp/local_instances.yml state=absent
+
+
+
+

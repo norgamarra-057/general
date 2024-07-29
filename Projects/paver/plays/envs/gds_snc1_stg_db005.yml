@@ -1,0 +1,59 @@
+---
+- hosts: gds_snc1_stg_db005
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: coupon_stg }
+  - { role: gds-mysql-ha, instance: audience_emea_stg }
+  - { role: gds-mysql-ha, instance: cds_stg }
+  - { role: gds-mysql-ha, instance: merchbrandsvc_stg }
+  - { role: gds-mysql-ha, instance: commeng_stg }
+  - { role: gds-mysql-ha, instance: contract_service_stg }
+  - { role: gds-mysql-ha, instance: custsvc_stg }
+  - { role: gds-mysql-ha, instance: dealestate_stg }
+  - { role: gds-mysql-ha, instance: event_data_stg }
+  - { role: gds-mysql-ha, instance: ol_book_inv_svc_stg }
+  - { role: gds-mysql-ha, instance: geo_lupa_stg }
+  - { role: gds-mysql-ha, instance: getaways_notif_stg }
+  - { role: gds-mysql-ha, instance: goods_cbt_emea_stg }
+  - { role: gds-mysql-ha, instance: goods_inven_mgt_stg }
+  - { role: gds-mysql-ha, instance: getaways_content_stg }
+  - { role: gds-mysql-ha, instance: goods_po_gateway_stg }
+  - { role: gds-mysql-ha, instance: goods_wlm_stg }
+  - { role: gds-mysql-ha, instance: mastermerchant_stg }
+  - { role: gds-mysql-ha, instance: goods_shipment_stg }
+  - { role: gds-mysql-ha, instance: rocketman_perf_stg }
+  - { role: gds-mysql-ha, instance: medusa_stg }
+  - { role: gds-mysql-ha, instance: merchant_sse_stg }
+  - { role: gds-mysql-ha, instance: mos_data_stg }
+  - { role: gds-mysql-ha, instance: paygw_stg }
+  - { role: gds-mysql-ha, instance: pricing_service_stg }
+  - { role: gds-mysql-ha, instance: stores_stg }
+  - { role: gds-mysql-ha, instance: pricing_diff_stg }
+  - { role: gds-mysql-ha, instance: deal_wiz_stg }
+  - { role: gds-mysql-ha, instance: seodeals_stg }
+  - { role: gds-mysql-ha, instance: gpn_perf_stg }
+  - { role: gds-mysql-ha, instance: paygw_perf_stg }
+  - { role: gds-mysql-ha, instance: dora_stg }
+  - { role: gds-mysql-ha, instance: trvl_pymt_recons_stg }
+  - { role: gds-mysql-ha, instance: config_wizard_stg }
+  - { role: gds-mysql-ha, instance: ultron_stg }
+  - { role: gds-mysql-ha, instance: chnl_man_integ_stg }
+  - { role: gds-mysql-ha, instance: coupons-revproc_stg }
+  - { role: gds-mysql-ha, instance: cs_api_stg }
+  - { role: gds-mysql-ha, instance: fast_stg }
+  - { role: gds-mysql-ha, instance: ranger_stg }
+  - { role: gds-mysql-ha, instance: bookingtool_stg }
+  - { role: gds-mysql-ha, instance: cia_customer_stg }
+  - { role: gds-mysql-ha, instance: ls_voucher_arch_stg }
+  - { role: gds-mysql-ha, instance: staas_stg }
+  - { role: gds-mysql-ha, instance: content_assembly_stg }
+  - { role: gds-mysql-ha, instance: ls_va_deals_stg }
+  - { role: gds-mysql-ha, instance: ls_va_travel_stg }
+  - { role: gds-mysql-ha, instance: ls_va_users_stg }
+  - { role: gds-mysql-ha, instance: ls_va_subscrip_stg }
+  - { role: gds-mysql-ha, instance: goods_forecast_stg }
+  - { role: gds-mysql-ha, instance: lex_emea_stg }
+  - { role: gds-mysql-ha, instance: voucher_txn_stg }
+  - { role: gds-mysql-ha, instance: chan_man_int_tvl_stg }
+  

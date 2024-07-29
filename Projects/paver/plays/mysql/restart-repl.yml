@@ -1,0 +1,52 @@
+---
+###################################################
+# restart-repl.yml
+#
+# Description:  This play is intended to stop and restart replication on all instances of a server.
+#
+# Parameters:  node=source_server 
+#
+# Version:     1.0.0
+# Date:        2020-03-09
+#
+###################################################
+
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+
+- name: Stop and restart replication on host
+  gather_facts: false
+  become: true
+  hosts:
+    - "{{ node }}"
+
+  tasks:
+    - name: Install py27-MySQLdb for mysql_replication module
+      pkgng:
+        name: py27-MySQLdb
+        state: present
+      become: true
+
+    - name: Stop Replication
+      mysql_replication:
+        login_unix_socket: /var/groupon/percona/{{ item.key }}/mysql.sock
+        mode: stopslave
+      no_log: true
+      ignore_errors: true
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+
+    - name: Start Replication
+      mysql_replication:
+        login_unix_socket: /var/groupon/percona/{{ item.key }}/mysql.sock
+        mode: startslave
+      no_log: true
+      ignore_errors: true
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"

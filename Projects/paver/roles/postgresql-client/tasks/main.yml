@@ -1,0 +1,36 @@
+---
+# NOTE: Check to ensure that this is always set on a per-host basis. Keep the
+# supported values in sync with postgresql-server/main.yml.
+
+- name: PostgreSQL Client | FreeBSD | variable check
+  fail: 'msg="CONFIG ERROR: postgresql_port_major must be set and a valid value (\"93\",\"94\",\"11\")"'
+  when: postgresql_port_major is not defined or postgresql_port_major not in ('93','94','11')
+
+- include_tasks: FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'
+
+- name: PostgreSQL Client | pg_config
+  command: /usr/bin/which pg_config
+  register: pg_config_path
+  changed_when: False
+  when: pg_config_path is not defined
+
+- name: PostgreSQL Client | pg_config -- sysconfdir
+  command: "{{ pg_config_path.stdout }} --sysconfdir"
+  register: pg_config_sysconfdir
+  changed_when: False
+  when: pg_config_sysconfdir is not defined
+
+- name: PostgreSQL Client | pg_config | SYSCONFDIR
+  file:
+    path: "{{ pg_config_sysconfdir.stdout }}"
+    state: directory
+    mode: 0755
+
+- name: PostgreSQL Client | psqlrc
+  copy:
+    src: psqlrc
+    dest: "{{ pg_config_sysconfdir.stdout }}/psqlrc"
+    mode: 0644
+    owner: root
+    group: wheel

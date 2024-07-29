@@ -1,0 +1,4 @@
+---
+ipmicfg_dir: /var/ipmicfg
+ipmicfg_zip: IPMICFG_1.24.1_build.160222.zip
+ipmicfg_version: "{{ ipmicfg_zip | regex_replace('[.]zip', '') }}"

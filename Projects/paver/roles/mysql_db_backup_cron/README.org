@@ -1,0 +1,53 @@
+# -*- mode: org -*-
+* Useful commands:
+** Generate SSH keys
+1. Decrypt vault containing SSH keys
+   : ansible-vault decrypt roles/mysql_db_backup_cron/vars/mysql_db_backup_keys_vault.yml
+2. Ensure that all hosts in inventory/database-production have an ssh
+   key pair stored in
+   roles/mysql_db_backup_cron/vars/mysql_db_backup_keys_vault.yml (hard
+   coded in the play, but can be overridden by passing "-a
+   ssh_key_vault_path=/path/to/vault.yml" to ansible-playbook)
+   : ansible-playbook -i inventory/database-production plays/database-mysql-backup-gen-missing-ssh-keys.yml
+3. Re-encrypt vault containing SSH keys
+   : ansible-vault encrypt roles/mysql_db_backup_cron/vars/mysql_db_backup_keys_vault.yml
+** Generate SSH keys using a vault password
+   : ansible-playbook --vault-password-file=roles/mysql_db_backup_cron/vars/mysql_db_backup_keys.pass -i inventory/database-production --limit arrowhead-db2.snc1,audience-db2.snc1 plays/database-mysql-backup-gen-missing-ssh-keys.yml
+* TODO
+1. Create a dedicated playbook for private SSH keys that are missing
+   out of the vault.
+2. Create a new task that decrypts the vault
+3. Create a new task that appends the hostkeys to the vault if they're
+   missing in the vault.
+4. Create a new task that re-encrypts the vault
+5. Creates the delorean-mysql-backup user on delorean01.snc1
+6. Install each of the private SSH keys on the delorean01.snc1 host,
+   each in its own file.
+7. Install the public key as a root authorized key on each of the
+   target hosts, but limit the key so that it can only be used to
+   invoke the innodbex program
+8. Create a ZFS dataset on delorean01.snc1 for use with the mysql dumps.
+9. Create a ZFS dataset for each host underneath the mysqldump
+   delorean01.snc1 dataset.
+10. Set a quota for each per-host dataset.
+11. Manually execute each host's backup job
+12. Generates the delorean backup job on delorean01.snc1. The job must:
+    * Be able to fan out using the -P argumen to xargs(1).
+    * Stores the output for each host in the per-host ZFS dataset
+    * Makes sure that at the start of each backup there is 110% space
+      of the previously completed backup. Free space is reclaimed by
+      deleting the oldest backup first until sufficient free space is
+      available.
+* Useful snippets:
+#+begin_src
+- name: ensure backup directories are present
+  action: file path=/var/backups/{{ item }} state=directory
+          owner=backup group=backup mode=0700
+  with_items: groups['all'] # or groups['group_name']
+  tags:
+    - backup
+#+end_src
+#+STARTUP: overview
+#+STARTUP: content
+#+STARTUP: showall
+#+STARTUP: showeverything

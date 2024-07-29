@@ -1,0 +1,46 @@
+
+###################################################################
+# Ansible managed
+###################################################################
+{% if gds_instances is defined  %}
+{% for instance in gds_instances.keys() %}
+{% if gds_instances[instance].type == 'mysql' -%}
+
+# {{ instance }}
+[monitor:///var/groupon/percona/{{ instance }}/log/error.log]
+index = main
+sourcetype = mysql:errorLog
+disabled = false
+
+{% endif %}
+{% if gds_instances[instance].type == 'postgresql' -%}
+
+# {{ instance }}
+[monitor:///var/service/postgresql-{{ gds_instance_group }}-{{ instance }}/log/main/current]
+index = main
+sourcetype = postgres
+disabled = false
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if discovery_consul.stat.exists  %}
+# consul
+[monitor:///var/service/consul/log/main/current]
+index = main
+sourcetype = consul-gds
+disabled = false
+{% endif %}
+
+{% if discovery_hydra.stat.exists  %}
+# Hydra
+[monitor:///var/service/hydra-agent/log/main/current]
+index = main
+sourcetype = gds-hydra
+disabled = false
+{% endif %}
+
+###################################################################
+# End Ansible managed
+###################################################################
+

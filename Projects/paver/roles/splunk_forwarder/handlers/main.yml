@@ -1,0 +1,12 @@
+---
+- name: splunk_forwarder start
+  become: yes
+  command: /usr/local/sbin/sv start /var/service/splunk_forwarder
+  
+- name: splunk_forwarder restart
+  become: yes
+  command: /usr/local/sbin/sv term /var/service/splunk_forwarder
+
+- name: splunk_forwarder log restart
+  become: yes
+  command: /usr/local/sbin/sv term /var/service/splunk_forwarder/log

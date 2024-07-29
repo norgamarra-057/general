@@ -1,0 +1,18 @@
+---
+# Base directory for all clusters running {{ postgresql_port_major }}
+postgresql_datadir: "{{ postgresql_root }}/data{{ postgresql_port_major }}"
+
+# Absolute path of a given cluster
+postgresql_cluster_path: "{{ postgresql_datadir }}/{{ gds_cluster }}-{{ instance_name }}"
+
+# The actual path to a cluster's PGDATA. The "/data" suffix is to allow
+# PostgreSQL to gracefully detect that ZFS (or NFS) has not mounted
+# properly. "foo/data" should *NEVER* be a ZFS dataset, it should always be a
+# directory or it is possible in some failure scenarios to loose data.
+postgresql_pgdata: "{{ postgresql_cluster_path }}/data/"
+
+# Directory used by runit for each instance of PostgreSQL on this host.
+postgresql_service_dir: "/var/groupon/service/postgresql-{{ gds_cluster }}-{{ instance_name }}"
+
+# pgbouncer service directory pre-fix
+pgbouncer_service_dir: "/var/service/pgbouncer-{{ gds_cluster }}-{{ instance_name }}"

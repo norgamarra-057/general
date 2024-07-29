@@ -1,0 +1,6 @@
+---
+- name: Deploy mcelog
+  hosts: gds_all
+  become: yes
+  roles:
+    - mcelog

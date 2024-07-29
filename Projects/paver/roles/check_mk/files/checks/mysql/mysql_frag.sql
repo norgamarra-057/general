@@ -1,0 +1,4 @@
+SELECT TABLE_NAME, (DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024 AS sizeMb,DATA_FREE / 1024 / 1024 AS data_free_MB
+FROM information_schema.tables
+WHERE engine LIKE 'InnoDB'
+AND DATA_FREE > 10 * 1024 * 1024;

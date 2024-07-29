@@ -1,0 +1,11 @@
+---
+- name: GONAD | FreeBSD | create group
+  group: name="gonad" gid="{{ users['gonad'].group }}"
+
+- name: system account
+  user: name=gonad state=present
+        uid="{{ users['gonad'].uid }}" group="{{ users['gonad'].group }}"
+
+- include_tasks: FreeBSD.yml
+
+

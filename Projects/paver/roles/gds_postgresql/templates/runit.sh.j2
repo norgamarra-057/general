@@ -1,0 +1,9 @@
+#!/bin/sh --
+exec 2>&1
+
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst \
+    -e {{ postgresql_service_dir }}/env \
+    -u {{ gds_instance_username }}:{{ users[gds_instance_username].group }} \
+  /usr/local/bin/postgres -D {{ postgresql_pgdata }}

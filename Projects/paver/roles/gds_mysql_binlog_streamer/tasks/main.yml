@@ -1,0 +1,15 @@
+---
+
+- name: GDS mysql binlog streamer | variable check
+  fail: 'msg="CONFIG ERROR: from_database must be defined"'
+  when: from_host is not defined 
+
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "../defaults/{{ ansible_os_family }}.yml"
+    - "../defaults/default.yml"
+
+- include_vars: derived_vars.yml
+
+- include_tasks: FreeBSD.yml tags=binlog_streamer
+  when: ansible_os_family == 'FreeBSD'

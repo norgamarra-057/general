@@ -1,0 +1,160 @@
+---
+gds_carp_peers:
+  - 10.32.124.246  # gds-sac1-prod-db013m1
+  - 10.32.124.247  # gds-sac1-prod-db013s1
+  - 10.32.125.246  # gds-sac1-prod-db013m1
+  - 10.32.125.247  # gds-sac1-prod-db013s1
+gds_carp_interfaces:
+  - vlan202
+  - vlan203
+gds_instance_group: gds_prod_sac1_db013
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  da_prn_abst_app_prod: # GDS-8453  Decommissioned GDS-32297 
+# Decommed GDS-32299  drinking_bird_prod: # GDS-8456
+# Decommed GDS-32298  glive_3rd_party_prod: # GDS-8457  # __SOX__ 
+#  flying_dutchman_prod: # GDS-8459 - Decommed GDS-28927
+#  problem_mgmt_prod: # GDS-8460 Decommissioned GPROD-186117
+#  local_intelli_prod: # GDS-8462 Decommissioned GPROD-186124
+
+  hive_prod: # GDS-8463
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 4000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60011
+    nodes:
+      - gds-sac1-prod-db013m1.sac1
+      - gds-sac1-prod-db013s1.sac1
+    master_carp_interface: vlan202
+    slave_carp_interface: vlan203
+    vhid: 151
+    slave_vhid: 151
+    master_vip: 10.32.124.151
+    slave_vips:
+      - 10.32.125.151
+    replication_ips:
+      - 10.32.114.59 # gds-sac1-prod-db013m1.sac1
+      - 10.32.114.167 # gds-sac1-prod-db013s1.sac1
+      - 10.22.142.230 # gds-snc1-prod-db013m1.snc1
+      - 10.22.142.154 # gds-snc1-prod-db013s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.217/32   # gdoop-hive-server1.snc1
+      - 10.20.112.109/32   #gdoop-job-submitter1.snc1
+      - 10.22.81.222/32   #gdoop-job-submitter2.snc1
+      - 10.20.71.185/32   #gdoop-job-submitter3.snc1
+      - 10.22.76.241/32   #gdoop-owagent2.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.74.147/32  #gdoop-hive-server2.snc1
+      - 10.22.7.161/32   # gdoop-janus-hive-server1.snc1
+      - 10.22.217.152/32   # gdoop-util1.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: hive_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.22.74.217/32   # gdoop-hive-server1.snc1
+    ports:
+      mysqld: 20011
+    admin_redirect_peers:
+      - 10.22.74.217/32   # gdoop-hive-server1.snc1
+      - 10.20.112.109/32   #gdoop-job-submitter1.snc1
+      - 10.22.81.222/32   #gdoop-job-submitter2.snc1
+      - 10.20.71.185/32   #gdoop-job-submitter3.snc1
+    hydra:
+      ids:
+        - 47c85248-083b-9956-dad2-980e99e0f2be
+        - a89cb31e-7120-185b-5e0b-db4aee84d4ec
+      default_primary: gds-snc1-prod-db013m1.snc1
+      cascading:
+        gds-sac1-prod-db013m1.sac1:
+          gds-snc1-prod-db013s1.snc1: 10.22.142.230 # gds-snc1-prod-db013m1.snc1
+        gds-sac1-prod-db013s1.sac1:
+          gds-snc1-prod-db013m1.snc1: 10.22.142.154 # gds-snc1-prod-db013s1.snc1
+
+
+#  goods_stores_prod: # GDS-8465  # __SOX__ 
+
+
+#  blacklist_rule_prod: # GDS-8466 Decommission GPROD-185844
+
+
+#  codeburner_prod: # GDS-8468 Decommissioned GPROD-185854
+
+
+#  deployboy_prod: # GDS-8469
+
+# Decommed GDS-32300  goods_ob_control_prod: # GDS-8470
+
+
+#  shipment_tracker_prod: # GDS-8471
+
+
+#  rpa_rundeck_prod: # GDS-21029
+
+#  almighty_prod: # GDS-21500 #Decommissioned GPROD-185839
+
+
+#  merchant_market_prod: # GDS-21583 Decommissioned GDS-32296 
+
+
+  opt_knowledge_prod: # GDS-21845
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 2000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60024
+    nodes:
+      - gds-sac1-prod-db013m1.sac1
+      - gds-sac1-prod-db013s1.sac1
+    master_carp_interface: vlan202
+    slave_carp_interface: vlan203
+    vhid: 153
+    slave_vhid: 153
+    master_vip: 10.32.124.153
+    slave_vips:
+      - 10.32.125.153
+    replication_ips:
+      - 10.32.114.59 # gds-sac1-prod-db013m1.sac1
+      - 10.32.114.167 # gds-sac1-prod-db013s1.sac1
+      - 10.22.142.230 # gds-snc1-prod-db013m1.snc1
+      - 10.22.142.154 # gds-snc1-prod-db013s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.53.109/32   # optimize-stats8.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: opt_knowledge
+    dba_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+    ports:
+      mysqld: 20024

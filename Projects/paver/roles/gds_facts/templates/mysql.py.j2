@@ -1,0 +1,62 @@
+#!{{ ansible_python_interpreter }} --
+
+# FIXME (seanc@): https://www.youtube.com/watch?v=jyaLZHiJJnE&t=0m1s
+#
+# This fact assumes that the default_ipv4 address used to generate a
+# server_id is unique in a replication timeline and that replication
+# timelines won't cross their streams: "correct enough" but not ideal.
+#
+# This is correct because InstanceA shouldn't leak data to InstanceB's
+# timeline (data could only be partially replicated).  Consequently, we make
+# the assumption that reusing the same server_id between all MySQL instances
+# on a given host is acceptable because each instance is in a new replication
+# timeline.
+#
+# Since it is easy to generate a unique server_id for every instance within
+# the same host and mitigate future misconfigurations where InstanceB somehow
+# begins replicating data to InstanceA's timeline, it's worth it.
+#
+# https://www.youtube.com/watch?v=3OOF0FpKiYk&t=0m15s
+#
+# If a MySQL user thinks they're special, I don't want to be concerned with
+# the possibility that GDS will be covered in white gooey substances if the
+# streams are intentionally crossed.
+
+import getopt
+import json
+import socket
+import struct
+import sys
+
+cli_args = {}
+mysql_facts = {}
+
+def parse_args():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "i:", ["ipv4="])
+    except getopt.GetoptError as err:
+        None
+
+    for opt, arg in opts:
+        if opt in ("-i", "--ipv4"):
+            cli_args['ipv4_address'] = arg
+        else:
+            assert False, "invalid CLI option"
+
+# https://dev.mysql.com/doc/refman/5.6/en/replication-options.html#option_mysqld_server-id
+def get_mysql_server_id():
+    if 'ipv4_address' in cli_args:
+        ansible_default_ipv4_address = cli_args['ipv4_address']
+    else:
+        ansible_default_ipv4_address = '{{ ansible_default_ipv4.address }}'
+
+    if ansible_default_ipv4_address is not None:
+        mysql_facts['default_server_id'] = "%d" % (socket.ntohl(struct.unpack("I", socket.inet_aton(ansible_default_ipv4_address))[0]),)
+
+def dump_facts(facts):
+    print json.dumps(facts, sort_keys=True, indent=4, separators=(',', ': '))
+
+if __name__ == '__main__':
+    parse_args()
+    get_mysql_server_id()
+    dump_facts(mysql_facts)

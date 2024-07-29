@@ -1,0 +1,6 @@
+---
+- name: Load mysql facts
+  tags:
+    - facts
+  set_fact: "{{ item.key }}={{ item.value }}"
+  with_dict: "{{ gds_instances[instance_name]['mysqld_options'] | default({}) }}"

@@ -1,0 +1,9 @@
+---
+- name: install gettext
+  vars:
+  become: true
+  hosts: 
+    - all
+  tasks:
+    - name: fix gettext
+      shell: yes | pkg install gettext

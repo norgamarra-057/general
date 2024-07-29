@@ -1,0 +1,225 @@
+---
+# Numerically GID sorted list of groups.  GIDs and names are not sync'ed or
+# mirrored in to ops-config in any way.
+#
+# The primary group for users must be between 10000 and 10999, inclusive, and
+# represents a given department that a user belongs to.  Each user can have
+# auxilary groups, starting at GID 12000.
+#
+# Each major department gets 10000 gid's for sub-dividing its departments.
+#
+# GID range 12000:12999 is reserved for corporate attributes (e.g. employee
+# vs contractor, PCI background checked, MFA/2FA enabled, etc).
+#
+# The various constraints for each group must all evaluate to TRUE.  The
+# constraints are put in place in order to ensure compliance and appropriate
+# separation of duties.
+foreman_groups:
+  splunk:
+    gid: 545
+    constraints:
+      - CHECK(LENGTH(groups) == 1 AND 'splunk' IN (groups))
+  _system:
+    # Generic label for a system account
+    gid: 900
+    constraints:
+      - CHECK(groups.each{|g| g.gid < 1000) # Ruby
+  _konami:
+    # Escallation group, temporary sudo root access
+    gid: 911
+    constraints:
+      - CHECK(LENGTH(groups) == 0)
+  _monitoring:
+    gid: 998
+    constraints:
+      - CHECK(groups.each{|g| g.gid < 1000) # Ruby
+  _log:
+    # System Account for runit's svlogd
+    gid: 999
+    constraints:
+      - CHECK(LENGTH(groups) == 1 AND '_log' IN (groups))
+  eng:
+    # Generic Engineering. GIDs: 13000:13999
+    gid: 10000
+    constraints:
+      - CHECK('gna' NOT IN (group,groups))
+      - CHECK('infosec' NOT IN (group, groups))
+      - CHECK('ops' NOT IN (group,groups))
+  ops:
+    # Ops: Generic Group. GIDs: 14000:14999
+    gid: 10001
+    constraints:
+      - CHECK('eng' NOT IN (group, groups))
+      - CHECK('gna' NOT IN (group,groups))
+      - CHECK('infosec' NOT IN (group, groups))
+  infosec:
+    # Infosec: Generic Group. GIDs: 15000:15999
+    gid: 10002
+    constraints:
+      - CHECK('eng' NOT IN (group,groups))
+      - CHECK('gna' NOT IN (group,groups))
+      - CHECK('ops' NOT IN (group,groups))
+  gna:
+    # Random Business Users with accounts. GIDs: 16000:16999
+    gid: 10003
+    constraints:
+      - CHECK('eng' NOT IN (group,groups))
+      - CHECK('infosec' NOT IN (group,groups))
+      - CHECK('ops' NOT IN (group,groups))
+  grpn:
+    # Groupon Employee
+    gid: 12000
+    constraints:
+      - CHECK('grpn_c' NOT IN (group,groups))
+  grpn_c:
+    # Groupon Contractor
+    gid: 12001
+    constraints:
+      - CHECK('grpn' NOT IN (group,groups))
+  pci:
+    # PCI approved user
+    gid: 12002
+    constraints:
+      - CHECK('mfa' IN (groups))
+  mfa:
+    # Multi-Factor Authentication enabled for user
+    gid: 12003
+  eng_releng_red:
+    # Release Engineering for red applications. Engineers can't commit to red
+    # applications.  Only release engineers have the constraint placed on
+    # them where they can't commit to applications of the opposite color
+    # (i.e. pure developers can commit to repositories of either color).
+    gid: 13000
+    constraints:
+      - CHECK('eng' IN (group,groups))
+      - CHECK('eng_dev_red' NOT IN (group,groups))
+      - CHECK('eng_releng_blue' NOT IN (group,groups))
+  eng_releng_blue:
+    # Release Engineering for blue applications. Engineers can't commit to
+    # blue applications.  Only release engineers have the constraint placed
+    # on them where they can't commit to applications of the opposite color
+    # (i.e. pure developers can commit to repositories of either color).
+    gid: 13001
+    constraints:
+      - CHECK('eng' IN (group,groups))
+      - CHECK('eng_dev_blue' NOT IN (group,groups))
+      - CHECK('eng_releng_red' NOT IN (group,groups))
+  eng_dev_red:
+    # Engineering for red applications.
+    gid: 13002
+    constraints:
+      - CHECK('eng' IN (group,groups))
+  eng_dev_blue:
+    # Release Engineering for blue applications.
+    gid: 13003
+    constraints:
+      - CHECK('eng' IN (group,groups))
+  ops_soc:
+    # Ops: Tier 1 Support
+    gid: 14000
+    constraints:
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_dba' NOT IN (group,groups))
+      - CHECK('ops_eng' NOT IN (group,groups))
+      - CHECK('ops_neteng' NOT IN (group,groups))
+      - CHECK('ops_sa' NOT IN (group,groups))
+      - CHECK('ops_ses' NOT IN (group,groups))
+      - CHECK('ops_sre' NOT IN (group,groups))
+  ops_sre:
+    # Ops: Tier 2 Support
+    gid: 14001
+    constraints:
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_dba' NOT IN (group,groups))
+      - CHECK('ops_eng' NOT IN (group,groups))
+      - CHECK('ops_neteng' NOT IN (group,groups))
+      - CHECK('ops_sa' NOT IN (group,groups))
+      - CHECK('ops_ses' NOT IN (group,groups))
+      - CHECK('ops_soc' NOT IN (group,groups))
+  ops_neteng:
+    # Ops: Tier 3 Network Support
+    gid: 14002
+    constraints:
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_dba' NOT IN (group,groups))
+      - CHECK('ops_eng' NOT IN (group,groups))
+      - CHECK('ops_sa' NOT IN (group,groups))
+      - CHECK('ops_ses' NOT IN (group,groups))
+      - CHECK('ops_soc' NOT IN (group,groups))
+      - CHECK('ops_sre' NOT IN (group,groups))
+  ops_sa:
+    # Ops: Tier 3 OS Support
+    gid: 14003
+    constraints:
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_dba' NOT IN (group,groups))
+      - CHECK('ops_eng' NOT IN (group,groups))
+      - CHECK('ops_neteng' NOT IN (group,groups))
+      - CHECK('ops_ses' NOT IN (group,groups))
+      - CHECK('ops_soc' NOT IN (group,groups))
+      - CHECK('ops_sre' NOT IN (group,groups))
+  ops_dba:
+    # Ops: Tier 3 Database Support
+    gid: 14004
+    constraints:
+      - CHECK('mfa' IN (groups))
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_eng' NOT IN (group,groups))
+      - CHECK('ops_neteng' NOT IN (group,groups))
+      - CHECK('ops_sa' NOT IN (group,groups))
+      - CHECK('ops_ses' NOT IN (group,groups))
+      - CHECK('ops_soc' NOT IN (group,groups))
+      - CHECK('ops_sre' NOT IN (group,groups))
+  ops_ses:
+    # Ops: System Engineering Specialist
+    gid: 14005
+    constraints:
+      - CHECK('mfa' IN (groups))
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_dba' NOT IN (group,groups))
+      - CHECK('ops_eng' NOT IN (group,groups))
+      - CHECK('ops_neteng' NOT IN (group,groups))
+      - CHECK('ops_sa' NOT IN (group,groups))
+      - CHECK('ops_soc' NOT IN (group,groups))
+      - CHECK('ops_sre' NOT IN (group,groups))
+  ops_gds_app:
+    # Ops: GDS-managed application
+    gid: 14006
+    constraints:
+      - CHECK(LENGTH(groups) == 1 AND 'ops_gds_app' IN (groups))
+  ops_eng:
+    # Ops: System Engineering Specialist
+    gid: 14007
+    constraints:
+      - CHECK('mfa' IN (groups))
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_dba' NOT IN (group,groups))
+      - CHECK('ops_neteng' NOT IN (group,groups))
+      - CHECK('ops_sa' NOT IN (group,groups))
+      - CHECK('ops_ses' NOT IN (group,groups))
+      - CHECK('ops_soc' NOT IN (group,groups))
+      - CHECK('ops_sre' NOT IN (group,groups))
+  ops_tdo:
+    # Ops: Technical Duty Officer
+    gid: 14008
+    constraints:
+      - CHECK('mfa' IN (groups))
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_dba' NOT IN (group,groups))
+      - CHECK('ops_neteng' NOT IN (group,groups))
+      - CHECK('ops_sa' NOT IN (group,groups))
+      - CHECK('ops_ses' NOT IN (group,groups))
+      - CHECK('ops_soc' NOT IN (group,groups))
+      - CHECK('ops_sre' NOT IN (group,groups))
+  ops_imoc:
+    # Ops: IMOC 
+    gid: 14009
+    constraints:
+      - CHECK('mfa' IN (groups))
+      - CHECK('ops' IN (group,groups))
+      - CHECK('ops_dba' NOT IN (group,groups))
+      - CHECK('ops_neteng' NOT IN (group,groups))
+      - CHECK('ops_sa' NOT IN (group,groups))
+      - CHECK('ops_ses' NOT IN (group,groups))
+      - CHECK('ops_soc' NOT IN (group,groups))
+      - CHECK('ops_sre' NOT IN (group,groups))

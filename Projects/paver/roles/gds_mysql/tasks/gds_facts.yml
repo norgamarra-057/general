@@ -1,0 +1,22 @@
+---
+# FIXME(seanc@): Ideally ansible would allow us to change the setup module's
+# default fact_path to something site-specific, such as
+# /var/groupon/ansible/facts.d.  We don't live in that world today, but note
+# it here so we can move to that world in the future.
+- name: Ansible | facts.d | directory
+  file:
+    name: /etc/ansible/facts.d
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: GDS | facts.d | mysql
+  template:
+    dest: /etc/ansible/facts.d/mysql.fact
+    src: mysql.py.j2
+    owner: root
+    group: wheel
+    mode: 0755
+
+- setup: fact_path=/etc/ansible/facts.d

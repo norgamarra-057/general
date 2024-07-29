@@ -1,0 +1,6 @@
+---
+- name: Setup VIPs
+  hosts: gds_all
+  become: yes
+  roles:
+    - gds-vips

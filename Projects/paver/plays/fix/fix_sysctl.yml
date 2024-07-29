@@ -1,0 +1,40 @@
+---
+- name: Fix and applied sysctl for hosts
+  hosts: gds_all
+  become: yes
+  vars:
+    - max_threads_key: kern.threads.max_threads_per_proc
+    - want_threads: 8192
+    - sysctl_file: /etc/sysctl.conf
+    - sysctl_backup_file: /etc/sysctl.conf.bkp
+    - first_sysctl_key: debug.minidump
+  tasks:
+    - name: See if sysctl backup if present
+      stat:
+        path: "{{ sysctl_backup_file }}"
+      register: sysctl_backup
+
+    - name: Backup original sysctl file
+      command: "cp {{ sysctl_file }} {{ sysctl_backup_file }}"
+      register: sysctl_backup
+      when: not sysctl_backup.stat.exists
+
+    - name: Clean up sysctl
+      shell: >
+        cat {{ sysctl_backup_file }} | egrep -v '^($|#)' | 
+        tail -r | sed '/^{{ first_sysctl_key }}/q' | 
+        tail -r > {{ sysctl_file }}
+
+    - name: Collect value of max_threads_per_proc for our test
+      command: "sysctl -n {{ max_threads_key }}"
+      register: maxthreads
+      always_run: yes
+
+    - name: Inform if max_threads_per_proc is below threshold
+      debug: msg="host maxthreads is below limit ({{ maxthreads.stdout }} < {{ want_threads }})"
+      when: maxthreads.stdout|int < want_threads|int
+      ignore_errors: yes
+
+    - name: Apply change
+      command: "sysctl -i -f {{ sysctl_file }}"
+      when: maxthreads.stdout|int < want_threads|int

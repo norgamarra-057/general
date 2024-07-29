@@ -1,0 +1,62 @@
+---
+#################################################
+# test_backup.yml
+#
+# Description:  This play tests a delorean backup of a production server.
+#
+# Parameters:  --limit gds-snc1-test-db001m1.snc1 -e "vip_name=gds-snc1-prod-user-lists-api-ro-vip.snc1"
+#
+#              vip_name needs to be an SNC1 prod RO vip.
+#
+#
+#  NOTES: you must have your ssh key on gds-snc1-test-db001m1.snc1
+#         you may need to refresh the git repo in /var/groupon/delorean on gds-snc1-test-db001m1.snc1
+# Examples: 
+#            ansible-playbook -i inventory/gds-test plays/backup/test_backup.yml --limit gds-snc1-test-db001m1.snc1 -e "vip_name=gds-snc1-prod-user-lists-api-ro-vip.snc1"
+#
+##################################################
+
+- name: MySQL Prod Backup Test
+  hosts: all
+  #connection: local
+  become: true
+  become_method: sudo
+  become_user: root
+  gather_facts: false
+  tasks:
+    - assert:
+        that:
+          - vip_name is defined
+
+    - name: Copy backup test file
+      copy:
+        src: "../../roles/gds_mysql/files/test_backup.sh"
+        dest: "/tmp/test_backup.sh"
+        #owner: root
+        #group: wheel
+        mode: 0775
+
+    - name: Stop test restore mysql service
+      shell: sv stop /var/groupon/service/gds_restore_test-mysql/
+      changed_when: false
+      register: stop_test_service
+      ignore_errors: yes
+
+    - debug: var=stop_test_service.stdout_lines
+
+    - name: Run Backup Test Script
+      become: false
+      shell: /usr/local/bin/bash /tmp/test_backup.sh "{{ vip_name }}"
+      changed_when: false
+      register: test_backup_script
+      ignore_errors: yes
+
+    - debug: var=test_backup_script.stdout_lines
+
+    - name: Start test restore mysql service
+      shell: sv start /var/groupon/service/gds_restore_test-mysql/
+      changed_when: false
+      register: start_test_service
+      ignore_errors: yes
+
+    - debug: var=start_test_service.stdout_lines

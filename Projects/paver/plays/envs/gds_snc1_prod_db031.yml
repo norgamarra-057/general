@@ -1,0 +1,10 @@
+---
+- hosts: gds_snc1_prod_db031
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: merchant_wallet_prod }
+  - { role: gds-mysql-ha, instance: getaways_stgdata_prod }
+  - { role: gds-mysql-ha, instance: goods_ims_prod }
+  - { role: gds-mysql-ha, instance: prod_etl_snc1_prod }
+  - { role: gds-mysql-ha, instance: be_3rd_party_prod }

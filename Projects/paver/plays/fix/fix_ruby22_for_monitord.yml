@@ -1,0 +1,23 @@
+- name: Fix ruby22 for monitord
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Ruby 2.2 check
+      shell: "ruby --version | egrep '^ruby 2.2' | wc -l"
+      register: is_ruby_22
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Gserver gem check
+      shell: "gem list | egrep '^gserver' | wc -l"
+      register: is_gserver_installed
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Install gserver gem
+      shell: gem install gserver
+      when: is_ruby_22.stdout|int == 1 and is_gserver_installed.stdout|int == 0
+
+    - name: Restart monitord
+      shell: sv restart monitord_agent
+      when: is_ruby_22.stdout|int == 1 and is_gserver_installed.stdout|int == 0

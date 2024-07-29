@@ -1,0 +1,123 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import datetime
+import json
+import re
+
+DOCUMENTATION = '''
+---
+module: sysrc
+version_added: tbd
+short_description: Sets various rc.conf style parameters using sysrc(1)
+description:
+    - The M(sysrc) module takes a name followed by a value.
+    - The given name/value pair will be set in the specified file.
+options:
+  file:
+    description:
+      - The name of the file sysrc(1) will act on
+    required: false
+    default: /etc/rc.conf
+  name:
+    description:
+      - The name of the value being set in 'file'
+    required: true
+    default: null
+  value:
+    description:
+      - The value being set. Only required when state is set to present.
+    required: false
+    default: null
+  state:
+    description:
+      - Whether or not the value should be present or not in the 'file'
+    required: false
+    default: present
+'''
+
+EXAMPLES = '''
+# Example to adjust the hostname:
+- sysrc: name=hostname value=host123.example.org
+- sysrc: name=ntpd_enable state=absent
+- sysrc: name=sendmail_enable value=NONE
+- sysrc: name=daily_status_zfs_enable value=YES file=/etc/periodic.conf
+'''
+
+
+SYSRC_BIN = '/usr/sbin/sysrc'
+
+def get_current_value(module, name):
+    args = [SYSRC_BIN, '-i', '-n']
+    args.append(name)
+    rc, out, err = module.run_command(args)
+    if out is None:
+        out = ''
+    return out
+
+def main():
+    module = AnsibleModule(
+        argument_spec = dict(
+            file=dict(type='str'),
+            name=dict(required=True, type='str'),
+            value=dict(),
+            state=dict(default='present', choices=['present', 'absent']),
+        )
+    )
+
+    changed = False
+    file = module.params['file']
+    name = module.params['name']
+    state = module.params['state']
+    value = module.params['value']
+    current_value = None
+
+    args = [SYSRC_BIN, '-n']
+    if file is not None and file != '':
+        args.append('-f')
+        args.append(file)
+
+    if state == 'absent':
+        if name == '':
+            module.fail_json(rc=256, msg="missing 'name' parameter when state == absent")
+        current_value = get_current_value(module, name)
+        args.append('-x')
+        args.append(name)
+
+    if state == 'present':
+        if name == '' or value == '':
+            module.fail_json(rc=256, msg="missing 'name' and 'value' are required parameters when state == present")
+        args.append('%s=%s' % (name, value))
+
+    startd = datetime.datetime.now()
+    rc, out, err = module.run_command(args)
+    endd = datetime.datetime.now()
+    delta = endd - startd
+
+    if out is None:
+        out = ''
+    if err is None:
+        err = ''
+
+    if state == 'absent' and current_value != out:
+        changed = True
+    elif state == 'present':
+        md = re.match(r'^(.*) -> (.*)$', out)
+        changed = md and md.group(1) != md.group(2)
+    else:
+        module.fail_json(rc=256, msg="internal error")
+
+    module.exit_json(
+        cmd     = args,
+        stdout  = out.rstrip("\r\n"),
+        stderr  = err.rstrip("\r\n"),
+        rc      = rc,
+        start   = str(startd),
+        end     = str(endd),
+        delta   = str(delta),
+        changed = changed
+    )
+
+# import module snippets
+from ansible.module_utils.basic import *
+main()

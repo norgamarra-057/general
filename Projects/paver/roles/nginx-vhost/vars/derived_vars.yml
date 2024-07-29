@@ -1,0 +1,6 @@
+---
+nginx_temp_path: /tmp/nginx
+nginx_runit_service_dir: /var/groupon/service/nginx-vhost
+nginx_confdir: "{{ nginx_runit_service_dir }}"
+nginx_vhost_confdir: "{{ nginx_runit_service_dir }}/vhosts"
+nginx_runit_link_service_dir: /var/service/nginx-vhost

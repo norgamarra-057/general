@@ -1,0 +1,53 @@
+---
+###################################################
+# fix_instance_name_in_client.yml
+#
+# Description:   This playbook extracts each MySQL instance name and adds to each /root/.my.cnf-* file.
+#                For example:
+#                [client]
+#                user = root
+#                password =
+#                port = 3306
+#                socket = /var/groupon/percona/artifactory_stg/mysql.sock
+#                default-character-set = utf8
+#                
+#                [mysql]
+#                syslog
+#                prompt='[\\R:\\m:\\s] artifactory_stg <\\d> '
+#                
+#                [mysqldump]
+#                max_allowed_packet = 32M
+#                quick
+#                routines 
+#                ...
+#
+# Usage:        ansible-playbook -i inventory/gds-stage plays/check/fix_instance_name_in_client.yml [--limit=server(s)]
+# become:       false
+# gather_facts: false
+#
+# Parameters:   None (Note:  limit maybe used)
+#
+# Requirements: None
+#
+# Notes:        Will apply changes to all configured instances on each server.
+###################################################
+
+- name: Update client my.cnf files as needed
+  gather_facts: false
+  become: true
+  hosts: all
+  tasks:
+    - name: Loop through instances, adding instance prompt, if missing
+      ini_file:
+        dest: "/root/.my.cnf-{{ item.key }}"
+        section: mysql
+        option: prompt
+        value: "'[\\\\R:\\\\m:\\\\s] {{ item.key }} <\\\\d> '"
+        owner: root
+        group: wheel
+        mode: 0600
+        state: present
+      no_log: true
+      when: item.value.type == "mysql"
+      with_dict: gds_instances
+      ignore_errors: true

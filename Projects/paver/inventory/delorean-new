@@ -1,0 +1,13 @@
+### -*- mode: conf; -*-
+
+# Basic inventory for new boxes
+
+[delorean_all]
+delorean001m1.dub1
+
+[FreeBSD:children]
+delorean_all
+
+[FreeBSD:vars]
+ansible_python_interpreter=/usr/local/bin/python2.7
+

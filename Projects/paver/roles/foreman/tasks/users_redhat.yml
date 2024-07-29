@@ -1,0 +1,27 @@
+---
+- name: make sure authorized users have their accounts (RedHat)
+  user: name="{{ item }}" comment="{{ users[item].name }}" shell='/bin/bash'
+        uid="{{ users[item].uid }}" state='present' groups="{{ users[item].groups|join(',') }}" group="{{ users[item].group }}"
+        append='yes' #login_class="{{ item.login_class | default('default') }}"
+  when: item in users
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+
+- name: Ensure nonexistent directory does not exist (RedHat)
+  file: name="/nonexistent-directory" state='absent'
+
+- name: users with invalid home directory (RedHat)
+  user: name="{{ item }}" state='present' home="/nonexistent-directory" create="no"
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+  when: item in users and users[item].homedir is defined and users[item].homedir == False

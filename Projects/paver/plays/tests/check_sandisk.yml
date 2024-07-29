@@ -1,0 +1,10 @@
+---
+- name: check drives
+  hosts: all
+  become: yes
+  tasks:
+    - name: See if ada0 is SanDisk
+      shell: camcontrol devlist -v | grep ada0
+      register: ada0_type
+    - debug: var=ada0_type.stdout
+      when: ada0_type.stdout|search('SanDisk') and ansible_hostname|search('.snc1')

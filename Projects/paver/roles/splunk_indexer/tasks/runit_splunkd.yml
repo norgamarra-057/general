@@ -1,0 +1,90 @@
+## runit for splunkd
+
+- name: splunk | runit | splunkd | create directory for script
+  file:
+    path=/var/service/splunkd/
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+
+- name: splunk | runit | splunkd | create directory for log
+  file:
+    path=/var/service/splunkd/log/
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+
+- name: splunk | runit | splunkd | create directory for svlogd
+  file:
+    path=/var/service/splunkd/log/main
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+  changed_when: False
+
+- name: splunk | runit | splunkd | create directory for env
+  file:
+    path=/var/service/splunkd/env/
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+
+- name: splunk | runit | splunkd | add env var SPLUNK_HOME
+  copy:
+    dest=/var/service/splunkd/env/SPLUNK_HOME
+    content={{ splunk_home_dir }}
+    owner=splunk
+    group=splunk
+    mode=0644
+  notify:
+    - splunkd restart
+
+- name: splunk | runit | splunkd | add env var LICENSE_MANAGER
+  copy:
+    dest=/var/service/splunkd/env/LICENSE_MANAGER
+    content={{ splunk_license_server }}
+    owner=splunk
+    group=splunk
+    mode=0644
+  notify:
+    - splunkd restart
+
+- name: splunk | runit | splunkd | keeping splunkd down
+  file:
+    state: touch
+    path: /var/service/splunkd/down
+
+- name: splunk | runit | splunkd | startup script (start)
+  template:
+    dest=/var/service/splunkd/run
+    mode=0744
+    src=splunkd_run_runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - splunkd restart
+
+- name: splunk | runit | splunkd | startup script (stop)
+  template:
+    dest=/var/service/splunkd/finish
+    mode=0744
+    src=splunkd_finish_runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - splunkd restart
+
+- name: splunk | runit | splunkd | startup script log
+  template:
+    dest=/var/service/splunkd/log/run
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - splunkd log restart

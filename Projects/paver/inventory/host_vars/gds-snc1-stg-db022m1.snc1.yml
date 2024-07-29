@@ -1,0 +1,7 @@
+---
+freebsd_cloned_interfaces: lagg0 vlan326 vlan327
+gds_cluster: gds_snc1_stg_db022
+
+
+pgbouncer_version: '1.5.4_3'
+postgresql_port_major: '94'

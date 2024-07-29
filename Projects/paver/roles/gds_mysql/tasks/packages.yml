@@ -1,0 +1,51 @@
+---
+- name: Percona | FreeBSD | 12packages
+  pkgng:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - pv
+    - vim
+    - rubygem-mysql
+    - rubygem-mysql2
+    - percona56-server
+    - percona56-client
+    - xtrabackup
+    - gds/mysql-slowlogd
+    - gds/p5-mha4mysql-node
+    - gds/p5-mha4mysql-manager
+    - sysbench
+    - p5-DBD-mysql
+    - percona-toolkit
+    - socat
+    # deprecated after moving FreeBSD ports tree to 12.0 in October 2019
+    #- percona-playback
+    #- php55
+    #- php55-mysql
+    #- php55-mysqli
+  when: '"12" in ansible_distribution_release'
+
+- name: Percona | FreeBSD | packages
+  pkgng:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - pv
+    - vim
+    - rubygem-mysql
+    - rubygem-mysql2
+    - gds-percona56-client
+    - gds-percona56-server
+    - gds-percona-toolkit
+    - gds-percona-xtrabackup
+    - gds-percona-playback
+    - gds-mysql-slowlogd
+    - gds-mha4mysql-node
+    - gds-mha4mysql-manager
+    - gds-sysbench
+    - p5-DBD-mysql
+    - php55
+    - php55-mysql
+    - php55-mysqli
+    - socat
+  when: '"10" in ansible_distribution_release'

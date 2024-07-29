@@ -1,0 +1,4 @@
+---
+gds_cluster: gds_prod_snc1_db007
+postgresql_port_major: '93'
+pgbouncer_version: '1.5.4_3'

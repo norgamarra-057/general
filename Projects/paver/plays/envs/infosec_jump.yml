@@ -1,0 +1,13 @@
+---
+- hosts: infosec_jump
+  become: yes
+  vars:
+    - base_dir: "{{ inventory_dir }}/../"
+  roles:
+    - os-config
+    - common_install
+    - openntpd
+#    - monitord-agent
+    - mosh
+  post_tasks:
+    - include: "{{ base_dir }}/roles/ports/tasks/audit.yml"

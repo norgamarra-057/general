@@ -1,0 +1,9 @@
+---
+circonus_broker_id: 25
+nad_api_hostname: circonus-api-vip-ns.snc1
+nad_api_key: 203395fc-824e-4b11-81aa-682df206b12e
+nad_config_dir: /usr/local/etc/node-agent.d
+nad_gid: 979
+nad_groupname: _nad
+nad_uid: 979
+nad_username: _nad

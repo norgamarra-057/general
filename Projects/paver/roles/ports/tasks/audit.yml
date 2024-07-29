@@ -1,0 +1,10 @@
+---
+# FIXME(pboros@): temporarily disabled because of the bash vulnerability
+# - name: FreeBSD | ports | vulnxml download
+#   command: /usr/sbin/pkg audit -F creates=/var/db/pkg/vuln.xml
+
+# - name: FreeBSD | ports | audit
+#   command: /usr/sbin/pkg audit
+#   changed_when: False
+#   register: pkgaudit_result
+  # failed_when: "pkgaudit_result.stdout != '0 problem(s) in the installed packages found.'"

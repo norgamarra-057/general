@@ -1,0 +1,25 @@
+---
+- name: Mysql Perf check 
+  hosts: gds_all
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Check Instance | templates | render mysql_perf_check.sh
+      template: 
+        src=../../templates/perf_check/mysql_perf_check.sh.j2
+        dest=/tmp/mysql_perf_check.sh
+        owner=root
+        group=wheel
+        mode=0755
+      changed_when: False
+
+    - name: Check Instance | Check instance
+      command: sh /tmp/mysql_perf_check.sh 
+      register: aux
+      changed_when: False
+
+    - name: Check Instance | Delete tmp pg_check.sh
+      file: path=/tmp/mysql_perf_check.sh state=absent
+      changed_when: False
+
+    - debug: var=aux.stdout_lines

@@ -1,0 +1,138 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+
+    - set_fact:
+        pglogical_status={{ gds_instances[instance].extra_variables.pglogical }}
+      ignore_errors: yes
+
+    - set_fact:
+        my_dba_user={{ gds_instances[instance].dba_account_name }}
+      ignore_errors: yes
+
+    - set_fact:
+        my_db_schema={{ gds_instances[instance].schemas }}
+      ignore_errors: yes
+
+    - set_fact:
+        my_master_vip={{ gds_instances[instance].master_vip }}
+      ignore_errors: yes
+
+    - set_fact:
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+      ignore_errors: yes
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+      ignore_errors: yes
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+      ignore_errors: yes
+
+    - debug:
+        msg="  ---------pglogical variable is not set to on"
+      when:  pglogical_status is not defined or pglogical_status != 'on'
+
+    - debug:
+        msg="  ---------database is not defined"
+      when:  my_db_name is not defined
+
+    - debug:
+        msg="  --------- dba user is not defined"
+      when:  my_dba_user is not defined
+
+    - debug:
+        msg="  --------- dba user is not defined"
+      when:  my_db_schema is not defined
+
+    - debug:
+        msg="  --------- master vip is not defined"
+      when:  my_master_vip is not defined
+
+
+- name: Daas part (master)
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_first_db: "{{ hostvars[daas_host]['my_first_db'] }}"
+        my_dba_user: "{{ hostvars[daas_host]['my_dba_user'] }}"
+        my_master_vip: "{{ hostvars[daas_host]['my_master_vip'] }}"
+        my_db_schema: "{{ hostvars[daas_host]['my_db_schema'] }}"
+      ignore_errors: yes
+
+    - name: check if package is installed
+      shell: pkg info pglogical | grep Installed | wc -l
+      register: is_pglogical_installed
+
+    - debug: 
+        msg: The pglogical package will need to be installed
+      when:  is_pglogical_installed.stdout|int  ==  0
+
+    - name: Check version
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select version()" | grep '9.4.8'
+      register: pg_master_version
+      ignore_errors: yes
+    - debug: 
+        msg: "pg version is not 9.4.8"
+      when:  pg_master_version.stdout  ==  ""
+
+    - name: Check if restart is actually needed 1/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='wal_level' and setting='logical'"
+      register: current_wal_level_count
+
+    - name: Check if restart is actually needed 2/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='shared_preload_libraries' and setting like '%pglogical'"
+      register: current_preload_libraries_count
+
+    - name: Check if restart is actually needed 3/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_wal_senders' and setting::int > 9"
+      register: max_wal_senders_count
+
+    - name: Check if restart is actually needed 4/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_replication_slots' and setting::int > 9"
+      register: max_replication_slots_count
+
+    - name: Check if restart is actually needed 5/5
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_settings where name='max_worker_processes' and setting::int > 7"
+      register: max_worker_processes_count
+
+
+    - debug: 
+        msg: "Database will need to be restarted"
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Check for missing primary keys
+      shell: psql -U postgres -d {{ my_db_name }} -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "with  my_Q1 as (SELECT n.nspname as schema,c.relname as table FROM pg_class c JOIN pg_namespace n ON n.oid =  c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND  con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['tiger','pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ) select count(*) from my_Q1" 
+      register: table_no_pks
+
+    - name: Check for missing unique constraints and indexes
+      shell: psql -U postgres -d {{ my_db_name }} -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "with my_Q1 as (SELECT n.nspname as schema,c.relname as mytable FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ), my_Q2 as (SELECT rel.relname FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname not in ('pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext') AND contype = 'u'), my_Q3 as(select tbl.relname as table_name from pg_index pgi join pg_class idx on idx.oid = pgi.indexrelid join pg_namespace insp on insp.oid = idx.relnamespace join pg_class tbl on tbl.oid = pgi.indrelid join pg_namespace tnsp on tnsp.oid = tbl.relnamespace where pgi.indisunique and tnsp.nspname not in ('pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext','pg_toast')) select count(*) from my_Q1 where mytable NOT in (select relname from my_Q2) and mytable NOT in (select table_name from my_Q3)"
+      register: table_no_uniqs
+      when: table_no_pks.stdout|int > 0
+
+    - debug: 
+        msg: "There are PKs missing"
+      when:  'table_no_pks.stdout|int > 0'
+
+    - name: List of tables missing PKs
+      shell: psql -U postgres -d {{ my_db_name }} -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "with my_Q1 as (SELECT n.nspname as schema,c.relname as mytable FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ) select mytable from my_Q1"
+      register: tables_no_pks
+    - debug: var=tables_no_pks.stdout

@@ -1,0 +1,108 @@
+---
+- name: install consul packages
+  pkgng: name={{ item }} state=present
+  with_items:
+    - consul
+    - consul-template
+
+- name: create data directory
+  file:
+    path={{ consul_data_dir }}
+    state=directory
+    owner=root
+    group=wheel
+
+- name: create config directory
+  file:
+    path={{ consul_conf_dir }}
+    state=directory
+    owner=root
+    group=wheel
+
+- name: consul create service directory
+  file:
+    path={{ consul_service_dir }}
+    owner=root
+    group=wheel
+    state=directory
+    mode=0755
+
+- name: consul create service directories
+  file:
+    path={{ consul_service_dir }}/{{item}}
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - env
+    - etc
+    - log
+
+- name: consul runit directories mode(writable)
+  file:
+    path="{{ consul_service_dir }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+
+- name: setup runit env
+  copy:
+    dest={{ consul_service_dir }}/env/PATH
+    content=/usr/local/bin:/usr/bin:/bin
+    owner=root
+    group=wheel
+    mode=0644
+
+
+- name: consul get the value for GOMAXPROCS
+  shell: /sbin/sysctl -n hw.ncpu
+  register: value_gomaxprocs
+  ignore_errors: true
+  changed_when: false
+  always_run: true
+
+- name: setup runit env GOMAXPROCS
+  copy:
+    dest={{ consul_service_dir }}/env/GOMAXPROCS
+    content={{ value_gomaxprocs.stdout }}
+    owner=root
+    group=wheel
+    mode=0644
+
+- name: startup script
+  template:
+    src=svlogd.sh.j2
+    dest={{ consul_service_dir }}/log/run
+    owner=root
+    group=wheel
+    mode=0755
+
+- name: consul startup configuration encrypt
+  template:
+    src=encrypt.json.bootstrap.j2
+    dest={{ consul_service_dir }}/etc/encrypt.json
+    owner=root
+    group=wheel
+    mode=0755
+
+- name: consul startup script for runit
+  template:
+    src=run.j2
+    dest={{ consul_service_dir }}/run
+    owner=root
+    group=wheel
+    mode=0744
+
+- name: consul create symlink in /var/service
+  file:
+    src={{ consul_service_dir }}
+    dest=/var/service/consul
+    owner=root
+    group=wheel
+    state=link
+
+#- name: wait for consul to start
+#  wait_for: port={{ consul_port }}

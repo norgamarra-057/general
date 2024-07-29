@@ -1,0 +1,65 @@
+---
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+          - instance is defined
+          - days is defined
+
+- name: Ensure host level settings look OK
+  gather_facts: false
+  become: true
+  hosts:
+    - "{{ node }}"
+
+  tasks:
+
+    - name: Edit my.cnf and set expire_logs_days 
+      lineinfile: dest=/var/groupon/service/{{ instance }}-mysql/my.cnf state=present regexp='^expire_logs_days' line='expire_logs_days                = {{ days }}' backup=yes
+      ignore_errors: true
+
+    # - name: Edit my.cnf and set relay_log_purge = 1
+    #   lineinfile: dest=/var/groupon/service/{{ instance }}-mysql/my.cnf state=present regexp='^relay_log_purge' line='relay_log_purge                 = 1' backup=yes
+    #   ignore_errors: true
+
+    - name: check expire_logs_days.
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "select @@expire_logs_days"
+      register: expire_logs_days_check
+      changed_when: false
+
+    - name: Report current expire_logs_days (old value)
+      debug: msg="expire_logs_days = {{ expire_logs_days_check.stdout }}"
+
+    - name: Set expire_logs_days.
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "set global expire_logs_days = {{ days }}"
+      when:  expire_logs_days_check.stdout <= days
+
+    - name: check expire_logs_days.
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "select @@expire_logs_days"
+      register: expire_logs_days
+      changed_when: false
+
+
+    # - name: check relay_log_purge.
+    #   shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "select @@relay_log_purge"
+    #   register: relay_log_purge_check
+    #   changed_when: false
+
+    # - name: Set relay_log_purge.
+    #   shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "set global relay_log_purge = 1"
+    #   when: relay_log_purge_check.stdout == '0'
+
+    # - name: check relay_log_purge.
+    #   shell: mysql -BN -uroot -S/var/groupon/percona/{{ instance }}/mysql.sock -e "select @@relay_log_purge"
+    #   register: relay_log_purge
+    #   changed_when: false
+
+    - name: Report expire_logs_days
+      debug: msg="expire_logs_days = {{ expire_logs_days.stdout }}"
+
+    # - name: Report relay_log_purge
+    #   debug: msg='relay_log_purge = {{ relay_log_purge.stdout }}'

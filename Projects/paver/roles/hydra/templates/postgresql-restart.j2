@@ -1,0 +1,7 @@
+#!/usr/local/bin/bash
+
+set -e
+
+sv int "$1"
+sv -w 60 stop "$1"
+sv -w 60 start "$1"

@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: Robert Barabas
+  description: Wrapper role around gds_mysql and gds-mysql-instance
+  company: Groupon
+  min_ansible_version: 1.2
+dependencies:
+  - role: gds_mysql
+    instance_name: "{{ instance }}"
+  - role: gds-mha-instance
+    instance_name: "{{ instance }}"
+  - role: gds_mha_manager

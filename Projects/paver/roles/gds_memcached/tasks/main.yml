@@ -1,0 +1,16 @@
+---
+- name: GDS Memcached | default value check
+  fail: 'msg="CONFIG ERROR: for pgbouncer, mode must be either transaction mode or session"'
+  when: mode not in ('session','transaction')
+
+- name: GDS Memcached | variable check
+  fail: 'msg="CONFIG ERROR: For GDS PostgreSQL Clusters, gds_cluster must be specified in host_vars/{{ inventory_hostname }}.yml"'
+  when: gds_cluster is not defined or 'gds_cluster' not in hostvars[inventory_hostname]
+
+- include_vars: ../vars/derived_vars.yml
+
+- include_tasks: FreeBSD.yml tags=pgbouncer
+  when: ansible_os_family == 'FreeBSD'
+#
+#
+#ansible_all_ipv4_addresses

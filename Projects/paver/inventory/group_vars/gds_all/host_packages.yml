@@ -1,0 +1,34 @@
+---
+# List of programs/packages that should exist on all GDS machines
+host_packages:
+  # FIXME: re: bash(1): "CVE-2014-6271 looks like a variant of a problem we
+  # fixed ~30 years ago in Research UNIX sh(1)." Is this actually necessary?
+  - bash-static
+  - curl
+  # - git-core
+  - gnu-watch
+  - mtr-nox11
+  - nano
+  - pbzip2
+  - pigz
+  - pstree
+  - python27
+  - ruby
+  - rubygem-rake
+  - screen
+  - tmux
+  # - vim-lite
+  - wget
+  - zfs-stats
+  - zfsnap
+  - smartmontools
+
+# List of programs/packages that should not exist
+host_packages_legacy:
+  - mysql56-server
+  - mysql56-client
+  - percona56-server
+  - percona56-client
+  - percona-tookit
+  - xtrabackup
+  - sysbench

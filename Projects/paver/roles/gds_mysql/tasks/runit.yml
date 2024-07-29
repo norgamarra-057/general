@@ -1,0 +1,37 @@
+- name: Percona | FreeBSD | runit | environment
+  copy:
+    dest="{{ percona_service_dir }}/env/PATH"
+    content="/usr/local/bin:/usr/bin:/bin"
+    owner=root
+    group=wheel
+    mode=0644
+
+- name: Percona | FreeBSD | runit | symlink error log to /dev/stdout
+  file: src=/dev/stdout dest={{ percona_instance_path }}/error.log state=link force=yes
+
+- name: Percona | FreeBSD | runit | log
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ percona_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: Percona | FreeBSD | runit | run
+  template:
+    src: runit.sh.j2
+    dest: "{{ percona_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: Percona | FreeBSD | runit | enable
+  file:
+    src: "{{ percona_service_dir }}"
+    dest: "/var/service/{{ instance_name }}-{{ gds_cluster }}-mysql"
+    owner: root
+    group: wheel
+    state: link
+
+- name: Percona | FreeBSD | runit | wait for mysql start
+  wait_for: port={{ gds_instances[instance_name]['ports']['mysqld'] }}

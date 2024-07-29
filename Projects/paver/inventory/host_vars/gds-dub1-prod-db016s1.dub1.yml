@@ -1,0 +1,4 @@
+---
+freebsd_cloned_interfaces: lagg0 vlan201 vlan202
+gds_cluster: gds_prod_dub1_db016
+postgresql_port_major: '94'

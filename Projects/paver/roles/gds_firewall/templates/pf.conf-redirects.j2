@@ -1,0 +1,40 @@
+# Ansible managed
+
+{% if item.value.admin_redirect_peers is defined %}  
+# Custom redirects from administrative IP address (in case VIPs cannot be used)
+{% if item.value.type == 'mysql' %}
+{% for ip in item.value.admin_redirect_peers %}
+rdr inet proto tcp from {{ ip }} to <gds-replication-peers> port {{ item.value.ports.mysqld }} tag gds-admin-redirect -> 127.0.0.1 port {{ item.value.ports.mysqld }}
+{% endfor %}
+{% endif %}
+{% if item.value.type == 'postgresql' %}
+{% for ip in item.value.admin_redirect_peers %}
+rdr inet proto tcp from {{ ip }} to <gds-replication-peers> port {{ item.value.ports.pgbouncer_txn  }} tag gds-admin-redirect -> 127.0.0.1 port {{ item.value.ports.pgbouncer_txn  }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if item.value.type == 'postgresql' %}
+# Redirect for {{ item.key }} PostgreSQL/pgbouncer traffic
+rdr inet proto tcp from <gds-{{ item.key }}-srcs> to <gds-{{ item.key }}-vips> port $pgbouncer_txn_port tag gds-client -> 127.0.0.1 port {{ item.value.ports.pgbouncer_txn }}
+rdr inet proto tcp from <gds-{{ item.key }}-srcs> to <gds-{{ item.key }}-vips> port $pgbouncer_session_port tag gds-client -> 127.0.0.1 port {{ item.value.ports.pgbouncer_session }}
+rdr inet proto tcp from <gds-{{ item.key }}-srcs> to <gds-{{ item.key }}-vips> port $postgresql_raw tag gds-client -> 127.0.0.1 port {{ item.value.ports.postgresql_raw }}
+# Redirect for {{ item.key }} replication
+rdr on !carp inet proto tcp from <gds-replication-peers> to any port {{ item.value.ports.postgresql_raw }} tag gds-replication -> 127.0.0.1 port {{ item.value.ports.postgresql_raw }}
+rdr on !carp inet proto tcp from <gds-replication-peers> to <gds-{{ item.key }}-vips> port $postgresql_raw tag gds-replication -> 127.0.0.1 port {{ item.value.ports.postgresql_raw }}
+
+{% elif item.value.type == 'mysql' %}
+# Redirect for {{ item.key }} mysql traffic
+rdr inet proto tcp from <gds-{{ item.key }}-srcs> to <gds-{{ item.key }}-vips> port $mysqld_port tag gds-client -> 127.0.0.1 port {{ item.value.ports.mysqld }}
+# Redirect for {{ item.key }} replication
+rdr on !carp inet proto tcp from <gds-replication-peers> to any port {{ item.value.ports.mysqld }} tag gds-replication -> 127.0.0.1 port {{ item.value.ports.mysqld }}
+rdr on !carp inet proto tcp from <gds-admin-hosts> to any port {{ item.value.ports.mysqld }} tag gds-replication -> 127.0.0.1 port {{ item.value.ports.mysqld }}
+
+{% elif item.value.type == 'memcached' %}
+# Redirect for {{ item.key }} memcached traffic
+rdr inet proto { tcp, udp } from <gds-{{ item.key }}-srcs> to <gds-{{ item.key }}-vips> port $memcached_port tag gds-client -> 127.0.0.1 port {{ item.value.ports.memcached }}
+
+{% elif item.value.type == 'redis' %}
+# Redirect for {{ item.key }} redis traffic
+rdr inet proto tcp from <gds-{{ item.key }}-srcs> to <gds-{{ item.key }}-vips> port $redis_port tag gds-client -> 127.0.0.1 port {{ item.value.ports.redis }}
+{% endif %}

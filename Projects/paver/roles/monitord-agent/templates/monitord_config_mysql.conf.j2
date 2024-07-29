@@ -1,0 +1,82 @@
+---
+monitors:
+  disk_space:
+    run_every: 60
+    shell_command: "/usr/local/libexec/check_disk_space_all -t min_free_pct=20:10"
+  iostat:
+    run_every: 60
+    shell_command: "/usr/local/libexec/nagios/check_freebsd_iostat.sh -N -P -i 15s"
+  load:
+    run_every: 60
+    shell_command: "/usr/local/libexec/nagios/check_load -w 12:12:12 -c 18:18:18"
+  mem:
+    run_every: 60
+    shell_command: "/usr/local/libexec/nagios/check_fbsd_mem -p"
+  net_eth0:
+    run_every: 60
+    shell_command: "/usr/local/libexec/check_sar -S net -D eth0 -t bytes_in=65M:95M,bytes_out=65M:95M"
+  ntp:
+    run_every: 300
+    shell_command: "/usr/local/nagios/libexec/check_ntp_time -H ns1 -w 0.5 -c 1"
+  ssh:
+    run_every: 60
+    shell_command: "/usr/local/libexec/check_ssh -w 0.5 -c 1"
+  swap:
+    run_every: 60
+    shell_command: "/usr/local/libexec/nagios/check_swap -w 50% -c 25%"
+  cpu:
+    run_every: 120
+    shell_command: "/usr/local/libexec/nagios/check_cpu_usage -w 80 -c 100"
+
+
+{% for instance in gds_instances.keys() %}
+{% if gds_instances[instance].type == 'mysql' -%}
+# {{ instance }}
+{#   cpu_bsd_{{ gds_instances[instance].ports.mysqld }}:
+    notify: false
+    run_every: 120
+    shell_command: "/usr/local/libexec/nagios/check_cpu_usage -w 80 -c 100"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.mysqld }}
+
+  iostat_{{ gds_instances[instance].ports.mysqld }}:
+    notify: false
+    run_every: 120
+    shell_command: "/usr/local/libexec/nagios/check_freebsd_iostat.sh -N -P -i 15s"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.mysqld }}
+
+  load_bsd_{{ gds_instances[instance].ports.mysqld }}:
+    run_every: 120
+    notify: false
+    shell_command: "/usr/local/libexec/nagios/check_load -w 12:12:12 -c 18:18:18"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.mysqld }} #}
+
+  mysql_{{ gds_instances[instance].ports.mysqld }}:
+    run_every: 60
+    shell_command: "/usr/local/libexec/check_mysql --user monitor --password od7IEWr2xKgSie --host 127.0.0.1 --port {{ gds_instances[instance].ports.mysqld }} -t connections_used_percentage=85:95,locked_transactions=50:100,uncheckpointed_bytes=1.25G:1.5G,history_list=10M:15M,com_select_sec=25000:30000"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.mysqld }}
+  
+{#   mysql_auto_increment_capacity_{{ gds_instances[instance].ports.mysqld }}:
+    run_every: 600
+    shell_command: "/usr/local/libexec/check_mysql_autoinc --user dba_util --password TTvktI5g-utF --host 127.0.0.1 --port {{ gds_instances[instance].ports.mysqld }} -t max_auto_increment_percent=80:90"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.mysqld }}
+  
+  mysql_disk_space_{{ gds_instances[instance].ports.mysqld }}:
+    run_every: 600
+    shell_command: "/usr/local/libexec/check_mysql_disk_space -s /var/groupon/percona/{{ instance }}/mysql.sock -d /var/groupon/percona/{{ instance }}/data"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.mysqld }}
+  
+  mysql_slave_{{ gds_instances[instance].ports.mysqld }}:
+    run_every: 60 
+    shell_command: "/usr/local/libexec/check_mysql_slave --user monitor --password od7IEWr2xKgSie --host 127.0.0.1 --port {{ gds_instances[instance].ports.mysqld }} -t slave_lag=15:60"
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.mysqld }}
+  
+  mysql_threads_running_{{ gds_instances[instance].ports.mysqld }}:
+    run_every: 60
+    shell_command: /usr/local/libexec/check_mysql_query  --user monitor --password od7IEWr2xKgSie --host 127.0.0.1 --port {{ gds_instances[instance].ports.mysqld }} --query "select variable_value as threads_running from information_schema.global_status where variable_name='Threads_running'" -t threads_running=50:100
+    spoof_host: nil:{{ ansible_hostname }}-port{{ gds_instances[instance].ports.mysqld }} #}
+{% endif %}
+{% endfor %}
+
+
+cluster: gds_mysql
+results_url: http://monitord:8080/results

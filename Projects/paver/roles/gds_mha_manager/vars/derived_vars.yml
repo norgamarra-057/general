@@ -1,0 +1,16 @@
+---
+# Base directory for all mysql clusters
+percona_instance_path: "{{ percona_root }}/{{ instance_name }}"
+percona_datadir: "{{ percona_instance_path }}/data"
+percona_logdir: "{{ percona_instance_path }}/log"
+percona_tmpdir: "{{ percona_instance_path }}/tmp"
+
+# Directory used by runit for each instance of percona on this host.
+percona_service_dir: "/var/service/{{ instance_name }}-mysql"
+percona_temp_service_dir: "/var/svc/tmp/{{ instance_name }}-mysql"
+
+pt_heartbeat_service_dir: "/var/service/{{ instance_name }}_pt-heartbeat"
+pt_heartbeat_temp_service_dir: "/var/svctmp/{{ instance_name }}_pt-heartbeat"
+
+slowlog_rotator_service_dir: "/var/service/{{ instance_name }}_slowlog-rotator"
+slowlog_rotator_temp_service_dir: "/var/svctmp/{{ instance_name }}_slowlog-rotator"

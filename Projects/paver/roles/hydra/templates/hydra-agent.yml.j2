@@ -1,0 +1,103 @@
+# Ansible managed
+#   Version 6.5.3
+#Host Configuration
+
+consul:
+  url: http://localhost:8500
+#logging:
+#  logPackages:
+#    com.groupon.gds.hydra.agent.mysql.jdbc.MysqlJdbc: TRACE
+proofOfLifeFile: /var/service/hydra-agent/.log
+host:
+  hostName: {{ inventory_hostname }}
+  hostIp: {{ ansible_default_ipv4.address }}
+  dataCenter: {{ datacenter }}
+  services:{% if gds_instances.values()|selectattr('hydra','defined')|list|length == 0 %} []{% endif %}
+
+{% for instance in gds_instances.keys() %}
+{% if gds_instances[instance].hydra is defined %}
+    - name: {{ instance | replace("_","-") }}
+      instance:
+{% if inventory_hostname.endswith('m1.' + datacenter) %}
+        id: {{ gds_instances[instance].hydra.ids[0] }}
+        address: {{ gds_instances[instance].master_vip }}
+{% else %}
+        id: {{ gds_instances[instance].hydra.ids[1] }}
+        address: {{ gds_instances[instance].slave_vips[0] }}
+{% endif %}
+        internalAddress: {{ ansible_default_ipv4.address }}
+{% if gds_instances[instance]['type'] == 'mysql' %}
+        port: {{ gds_instances[instance].ports['mysqld'] }}
+{% endif %}
+{% if gds_instances[instance]['type'] == 'postgresql' %}
+        port: {{ gds_instances[instance].ports['postgresql_raw'] }}
+{% endif %}
+        externalDomain: hydra
+{% if (gds_instances[instance].hydra.cascading is defined) 
+  and (gds_instances[instance].hydra.cascading[inventory_hostname] is defined)
+  and not (gds_instances[instance].hydra.cascading[inventory_hostname] is mapping) %}
+{% if gds_instances[instance].hydra.cascading[inventory_hostname].split(':')|length > 1 %}
+        followedAddress: {{ gds_instances[instance].hydra.cascading[inventory_hostname].split(':')[0] }}
+        followedPort: {{ gds_instances[instance].hydra.cascading[inventory_hostname].split(':')[1] }}
+{% else %}
+        followedAddress: {{ gds_instances[instance].hydra.cascading[inventory_hostname] }}
+{% endif %}
+{% endif %}
+        suCommand: sudo
+        suUser: {{ gds_instances[instance].unix_user }}
+        config:
+{% if gds_instances[instance]['type'] == 'mysql' %}
+          type: mysql
+          user: dba_util
+          password: TTvktI5g-utF
+          jdbcAddress: localhost
+          retryJoinAsStandbyInterval: 10
+{% if (gds_instances[instance].hydra.cascading is defined) 
+  and (gds_instances[instance].hydra.cascading[inventory_hostname] is defined)
+  and (gds_instances[instance].hydra.cascading[inventory_hostname] is mapping) %}
+          followRules: {{ gds_instances[instance].hydra.cascading[inventory_hostname]|to_yaml }}
+{% endif %}
+{% if (gds_instances[instance].hydra.priority is defined) %}
+          electionPriorities: {{ gds_instances[instance].hydra.priority|to_yaml }}
+{% endif %}
+          mysql_bin: /usr/local/libexec
+          mysql_data: /var/groupon/percona/{{ instance }}/data
+          mysql_pid_file: /var/groupon/percona/{{ instance }}/mysql.pid
+          mysql_binlog_cud_filters:
+           - percona.heartbeat
+          mysql_binlog_query_filters:
+           - ^use `percona`; REPLACE INTO `percona`\.`heartbeat`.*$
+          mysql_binlog_batch_size: {{ (gds_instances[instance].hydra.extras|default({}))['mysql_binlog_batch_size']|default(8192) }}
+          mysql_binlog_batch_sleep_interval: {{ (gds_instances[instance].hydra.extras|default({}))['mysql_binlog_batch_sleep_interval']|default(2000) }}
+          initialCheckCommand: sudo bash /var/service/hydra-agent/check_vip.sh {% if inventory_hostname.endswith('m1.' + datacenter) %}{{ gds_instances[instance].master_vip }}{% else %}{{ gds_instances[instance].slave_vips[0] }}{% endif %}
+
+          startCommand: sudo sv -w 60 start /var/service/{{ instance }}-{{ gds_cluster }}-mysql
+          stopCommand: sudo sv -w 60 stop /var/service/{{ instance }}-{{ gds_cluster }}-mysql
+          restartCommand: sudo sv -w 60 restart /var/service/{{ instance }}-{{ gds_cluster }}-mysql
+          stonithCommand: sudo sv -w 60 stop /var/service/{{ instance }}-{{ gds_cluster }}-mysql
+{% endif %}
+{% if gds_instances[instance]['type'] == 'postgresql' %}
+          type: postgresql
+          user: postgres
+          password: ''
+          jdbcAddress: localhost
+{% if (gds_instances[instance].hydra.cascading is defined) 
+  and (gds_instances[instance].hydra.cascading[inventory_hostname] is defined)
+  and (gds_instances[instance].hydra.cascading[inventory_hostname] is mapping) %}
+          followRules: {{ gds_instances[instance].hydra.cascading[inventory_hostname]|to_yaml }}
+{% endif %}
+{% if (gds_instances[instance].hydra.priority is defined) %}
+          electionPriorities: {{ gds_instances[instance].hydra.priority|to_yaml }}
+{% endif %}
+          pg_bin: /usr/local/bin
+          pg_data: /var/groupon/postgresql/data{{ postgresql_port_major }}/{{ gds_cluster }}-{{ instance }}/data
+          initialCheckCommand: sudo bash /var/service/hydra-agent/check_vip.sh {% if inventory_hostname.endswith('m1.' + datacenter) %}{{ gds_instances[instance].master_vip }}{% else %}{{ gds_instances[instance].slave_vips[0] }}{% endif %}
+
+          startCommand: sudo /var/service/hydra-agent/postgresql-start /var/service/postgresql-{{ gds_cluster }}-{{ instance }}
+          stopCommand: sudo /var/service/hydra-agent/postgresql-stop /var/service/postgresql-{{ gds_cluster }}-{{ instance }}
+          restartCommand: sudo /var/service/hydra-agent/postgresql-restart  /var/service/postgresql-{{ gds_cluster }}-{{ instance }}
+          stonithCommand: sudo /var/service/hydra-agent/postgresql-stonith /var/service/postgresql-{{ gds_cluster }}-{{ instance }}
+          demoteCommand: sudo /var/service/hydra-agent/postgresql-demote /var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}
+{% endif %}
+{% endif %}
+{% endfor %}

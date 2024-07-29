@@ -1,0 +1,14 @@
+# The L2ARC feed is a single threaded process, and by default tuned
+# for 2006 era hardware.  Set these to greatly increase the warm up
+# time on L2ARC. (minutes instead of hours)
+vfs.zfs.l2arc_write_max=400000000
+vfs.zfs.l2arc_write_boost=400000000
+vfs.zfs.l2arc_headroom=16
+
+# Change this to 0 if you want sequential reads to be candidates for
+# L2ARC:
+vfs.zfs.l2arc_noprefetch=1
+
+# Change this to 0 if your L2ARC device can handle reads and write
+# simultaneously (most can these days)
+vfs.zfs.l2arc_norw=0

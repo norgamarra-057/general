@@ -1,0 +1,24 @@
+---
+- name: Put check_instances.sh in place for MHA
+  tags:
+   - mysql-scripts
+  copy:
+    src: mha/check_instances.sh
+    dest: /home/gds_mha/check_instances.sh
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0755
+
+- name: Deploy failover scripts for MHA
+  tags:
+   - mysql-scripts
+  copy:
+    src: mha/{{ item }}
+    dest: /home/gds_mha/{{ item }}
+    owner: gds_mha
+    group: ops_gds_app
+    mode: 0755
+  with_items:
+    - failover_instance.sh
+    - failover_instances.sh
+

@@ -1,0 +1,86 @@
+---
+###################################################
+# compare_mysql_var.yml
+#
+# Description:   This playbook pulls configured and running MySQL variables for a single host, for each configured instance.
+#                It then compares then and flags them with 'Out-of-Sync' if they are not equal. 
+#                It finishes by writing the 'report' to a local txt file on the box running the play 
+#                (default is /tmp/'node'_'variable'.txt).
+#
+# Usage:        ansible-playbook -i inventory/gds-stage plays/check/compare_mysql_var.yml -e "@check.json"
+# become:       false
+# gather_facts: false
+# 
+# Parameters:   node=server mysql_check=variable_name [report_file=/path/to/file]
+#
+#               Parms can also be passed via a json file as -e "@check.json"
+#
+#               Sample file:
+#               node: gds-snc1-prod-db001s1.snc1
+#               mysql_check: innodb_buffer_pool_size
+#               report_file: /tmp/test.txt
+# 
+# Requirements: filter_plugins: conv_kb_mb_gb_bytes.py, split_first.py
+#
+# Notes:        1. Variables that match will have Status: OK.  
+#               2. Variables that don't match will have Status: Out-of-Sync
+#               3. Variables that exist in MySQL, but are not defined, will have Status: N/A
+#                  and report a configured value as: 'Using System Default'.
+#               4. Variable that doesn't exist will cause the playbook to halt with an error.
+###################################################
+
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+          - mysql_check is defined
+
+- name: Generate Configured vs Running MySQL Variable Report
+  gather_facts: false
+  become: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Retrieve configured and running MySQL variable
+      shell: grep {{ mysql_check }} /var/groupon/service/{{ item }}-mysql/my.cnf | awk '{ print $1,$3 }' ; mysql -BN -uroot -S/var/groupon/percona/{{ item }}/mysql.sock -e"show global variables like '{{ mysql_check }}'" | awk '{ print $1,$2 }'
+      with_items: 
+        - "{{ gds_instances.keys() }}"
+      ignore_errors: true
+      changed_when: false
+      register: show_results
+
+    - name: Check that a valid MySQL variable was provided
+      local_action: fail msg="{{ mysql_check }} is not a valid MySQL variable"
+      with_items: "{{ show_results.results }}"
+      no_log: true
+      when: item['stdout_lines'][0] is not defined
+
+    - name: Set Report file location
+      set_fact:
+        report_file: "/tmp/{{ node }}_{{ mysql_check }}.txt"
+      when: report_file is not defined
+
+    - name: Initialize Report file
+      local_action: shell echo "Configured vs Running MySQL Variable Report for {{ node }} at `date`" > {{ report_file }}
+      run_once: true
+      no_log: true
+
+    - name: Generate Report Part 1
+      local_action: shell echo "Instance{{':'}} '{{ item['item'] }}', Variable{{':'}} '{{ item['stdout_lines'][0]|split_first }}', Configured{{':'}} '{{ item['stdout_lines'][0]|conv_values }}', Running{{':'}} '{{ item['stdout_lines'][1]|conv_values }}', Status{{':'}}{% if (item['stdout_lines'][0]|conv_values|string) == (item['stdout_lines'][1]|conv_values|string) %} OK {% else %} Out-of-Sync {% endif %}" >> {{ report_file }}
+      with_items: "{{ show_results.results }}"
+      no_log: true
+      when: item['stdout_lines'][1] is defined
+
+    - name: Generate Report Part 2, if needed
+      local_action: shell echo "Instance{{':'}} '{{ item['item'] }}', Variable{{':'}} '{{ item['stdout_lines'][0]|split_first }}', Configured{{':'}} 'Using System Default', Running{{':'}} '{{ item['stdout_lines'][0]|conv_values }}', Status{{':'}} N/A" >> {{ report_file }}
+      with_items: "{{ show_results.results }}"
+      no_log: true
+      when: item['stdout_lines'][1] is not defined
+
+    - name: Report Generated
+      debug: msg="Generated{{':'}} {{ report_file }}"
+

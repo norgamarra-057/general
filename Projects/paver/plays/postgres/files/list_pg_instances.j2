@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+function lookup_port {
+    conf="$1"
+    cat "${conf}" | grep 'port =' | awk '{ print $3}'
+}
+
+function list_instances {
+
+    files=$(ls /var/groupon/postgresql/data{{postgresql_port_major}}/*/data/postgresql.conf 2>/dev/null)
+    for f in ${files}; do
+    instance=$(dirname ${f} | sed 's/.*-//' | sed 's/.data*//') 
+    port=$(lookup_port ${f})
+    echo "  ${port}       ${instance}"
+    done
+}
+
+list_instances

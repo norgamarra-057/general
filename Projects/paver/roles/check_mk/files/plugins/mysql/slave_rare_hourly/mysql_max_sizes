@@ -1,0 +1,31 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# instances to check
+echo '<<<mysql_max_sizes>>>'
+for mysqlinstance in $(grep -e '\[.*\]' $MK_CONFDIR/mysql.cfg | sed -e 's/\[//g' -e 's/\]//g' | tr '\n' ' ');do
+    currentinstance=$(grep -A3 "\[${mysqlinstance}\]" $MK_CONFDIR/mysql.cfg)
+    port=$(echo "$currentinstance" | grep "port=" | sed -e 's/port=//')
+    socket=$(echo "$currentinstance" | grep "socket=")
+    name=$(echo "${port} - ${mysqlinstance}")
+
+    result=$(mysql -u root -P ${port} --${socket} -e "SELECT (SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 0)
+                                                      AS size FROM information_schema.TABLES
+                                                      GROUP BY table_schema
+                                                      ORDER BY 1 desc limit 1)
+                                                      AS max_db_size,
+                                                      (SELECT round(((data_length + index_length) / 1024 / 1024), 0)
+                                                      AS size FROM information_schema.TABLES
+                                                      ORDER BY size DESC limit 1)
+                                                      AS max_table_size;" -s -N 2> /dev/null \
+                                                      | tr '\t' '\n')
+
+    exit_code=$(echo $?)
+
+    if [[ "${exit_code}" -eq "1" ]]; then
+        result="$(echo -e "-1\n1")"
+    fi
+
+    echo "[[$name]]"
+    echo "$result"
+    sleep 0.5
+done

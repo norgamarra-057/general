@@ -1,0 +1,29 @@
+- name: Assert args
+  gather_facts: False
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - aws_host is defined
+          - db_name is defined
+
+- name: Create config
+  gather_facts: False
+  hosts: 127.0.0.1
+  become: true
+  connection: local
+  tasks:
+
+  - name: Create sql and upload for 1.9
+    template: src=../../templates/utils_aws.sql.j2 dest=/tmp/utils_aws_{{ aws_host }}.sql mode=0644 force=yes
+
+  - name: Load sql
+    command: psql -U gds_admin -d {{ db_name }} -At -p 5432 -h {{ aws_host }} -f /tmp/utils_aws_{{ aws_host }}.sql
+    ignore_errors: True
+
+  - name: Remove sql
+    file: path=/tmp/utils_aws_{{ aws_host }}.sql state=absent
+    ignore_errors: True
+    when: preserve is not defined
+

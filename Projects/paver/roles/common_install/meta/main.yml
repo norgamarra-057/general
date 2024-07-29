@@ -1,0 +1,5 @@
+---
+dependencies:
+  - { role: resolv_conf }
+  - { role: ports, when: "ansible_os_family == 'FreeBSD'" }
+  - zfsupgrade

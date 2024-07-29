@@ -1,0 +1,75 @@
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - db is defined
+          - gcp_host_replica is defined
+
+
+    - name: find schemas
+      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_replica }} -c "select schema_name from information_schema.schemata where schema_name not in ('dba','ext','information_schema','my_new_topo','topology') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Privileges 01/3
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant usage on schema {{ item }} to postgres;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 01/3
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant all on schema {{ item }} to postgres;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 02/3
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant select,insert,update,delete on all tables in schema {{ item }} to postgres;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 03/3
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant select,update on all sequences in schema {{ item }} to postgres;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 011/3
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant all on schema {{ item }} to gds_admin;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 011/3
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant usage on schema {{ item }} to gds_admin;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 022/3
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant select,insert,update,delete on all tables in schema {{ item }} to gds_admin;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 033/3
+      shell: psql -U postgres -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant select,update on all sequences in schema {{ item }} to gds_admin;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 08/10
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant select,insert,update,delete on all tables in schema {{ item }} to postgres;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+    - name: Privileges 09/10
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant select,update on all sequences in schema {{ item }} to postgres;"
+      with_items: "{{ pgschemas.stdout_lines }}"
+      ignore_errors: yes
+
+
+    - name: Privileges 10/11
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "select schemaname || '.' || tablename  FROM pg_catalog.pg_tables where tableowner = 'gds_admin'"
+      register: admintables
+
+    - name: Privileges 10/11
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "grant select,update on {{ item }} to postgres;"
+      with_items: "{{ admintables.stdout_lines }}"
+      ignore_errors: yes

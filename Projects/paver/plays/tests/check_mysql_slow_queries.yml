@@ -1,0 +1,15 @@
+---
+- name: Look for slow queries on MySQL hosts
+  hosts: gds_all
+  become: yes
+  vars:
+    - time_limit: 1
+    - number_of_queries: 10
+  tasks:
+    - name: Run slow query check
+      shell: "/usr/local/sbin/check_slow_queries.sh -t {{ time_limit }} -n {{ number_of_queries }}"
+      changed_when: false
+      register: slow_queries
+
+    - name: Output results
+      debug: var=slow_queries.stdout_lines

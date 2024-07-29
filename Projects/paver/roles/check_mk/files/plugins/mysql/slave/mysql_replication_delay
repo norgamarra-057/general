@@ -1,0 +1,24 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# instances to check
+echo '<<<mysql_replication_delay>>>'
+for mysqlinstance in $(grep -e '\[.*\]' $MK_CONFDIR/mysql.cfg | sed -e 's/\[//g' -e 's/\]//g' | tr '\n' ' ');do
+    currentinstance=$(grep -A3 "\[${mysqlinstance}\]" $MK_CONFDIR/mysql.cfg)
+    port=$(echo "$currentinstance" | grep "port=" | sed -e 's/port=//')
+    socket=$(echo "$currentinstance" | grep "socket=")
+    name=$(echo "${port} - ${mysqlinstance}")
+
+    result=$(mysql -u root -P ${port} --${socket} -e "SELECT round(min(unix_timestamp(now()) - unix_timestamp(concat(substr(ts,1,10), ' ', substr(ts,12,8)))))
+                                                      AS lag_sec
+                                                      FROM percona.heartbeat;" -s -N 2> /dev/null)
+
+    exit_code=$(echo $?)
+
+    if [[ "${exit_code}" -eq "1" ]]; then
+        result="-1"
+    fi
+
+    echo "[[$name]]"
+    echo "$result"
+    sleep 0.5
+done

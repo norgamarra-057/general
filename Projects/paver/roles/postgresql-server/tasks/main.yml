@@ -1,0 +1,9 @@
+---
+# NOTE: Check to ensure that this is always set on a per-host basis. Keep the
+# supported values in sync with postgresql-client/main.yml.
+- name: PostgreSQL Server | FreeBSD | variable check
+  fail: 'msg="CONFIG ERROR: For PostgreSQL Server, postgresql_port_major must be specified in host_vars/{{ inventory_hostname }}.yml and a valid value (\"94\")"'
+  when: postgresql_port_major is not defined or 'postgresql_port_major' not in hostvars[inventory_hostname] or postgresql_port_major not in ('93','94','11')
+
+- include_tasks: FreeBSD.yml tags=postgres,postgresql
+  when: ansible_os_family == 'FreeBSD'

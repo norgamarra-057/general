@@ -1,0 +1,5 @@
+#!/bin/sh --
+QUERY="select case when ((select count(*) from pg_stat_activity where state not in ('idle','idle in transaction') and query not ilike '%vacuum%' and pid <> pg_backend_pid()) > 0) then (select extract(epoch from (now() - xact_start)) as result from pg_stat_activity where state not in ('idle','idle in transaction') and query not ilike '%vacuum%' order by xact_start asc limit 1) else 0 end;"
+psql -U postgres -At -p {{ gds_instances[instance_name].ports.postgresql_raw }} {{ gds_instances[instance_name]['dbnames'][0] }} -c "$QUERY" | awk '{ printf("idle\tL\t%d\n",$1); }'
+QUERY="select case when ((select count(*) from pg_stat_activity where state not in ('idle','idle in transaction') and query not ilike '%vacuum%' and pid <> pg_backend_pid()) > 0) then (select extract(epoch from (now() - xact_start)) as result from pg_stat_activity where state not in ('idle','idle in transaction') and query not ilike '%vacuum%' order by xact_start asc limit 1) else 0 end;"
+psql -U postgres -At -p {{ gds_instances[instance_name].ports.postgresql_raw }} {{ gds_instances[instance_name]['dbnames'][0] }} -c "$QUERY" | awk '{ printf("time\tL\t%d\n",$1); }'

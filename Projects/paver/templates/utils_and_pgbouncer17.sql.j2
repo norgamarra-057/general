@@ -1,0 +1,221 @@
+create schema if not exists ext;
+create schema if not exists dba;
+create extension if not exists dblink with schema ext;
+create extension if not exists postgres_fdw with schema ext;
+
+CREATE SERVER pgbouncer_trx FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '127.0.0.1', port '{{ pgbouncer_trx_port }}', dbname 'pgbouncer');
+
+CREATE SERVER pgbouncer_ses FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host '127.0.0.1', port '{{ pgbouncer_ses_port }}', dbname 'pgbouncer');
+
+create user mapping for postgres server pgbouncer_trx options (user 'gdsmon', password 'gds123123');
+create user mapping for postgres server pgbouncer_ses options (user 'gdsmon', password 'gds123123');
+
+
+
+ create or replace view dba.pgbouncer_trx_view_servers AS SELECT 
+ type,"user",database,state,addr,port,local_addr,local_port,connect_time,request_time,ptr,link,remote_pid
+ FROM ext.dblink('pgbouncer_trx'::text, 'show servers'::text) _(type text, "user" text, database text, state text, addr text, port integer, local_addr text, local_port 
+ integer, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text, 
+ remote_pid bigint, tls text);
+
+ create or replace view dba.pgbouncer_trx_view_clients AS SELECT 
+ type,"user",database,state,addr,port,local_addr,local_port,connect_time,request_time,ptr,link
+ FROM ext.dblink('pgbouncer_trx'::text, 'show clients'::text) _(type text, "user" text, database text, state text, addr text, port integer, local_addr text, local_port 
+ integer, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text, 
+ remote_pid bigint, tls text);
+
+ create or replace view dba.pgbouncer_ses_view_servers AS SELECT 
+ type,"user",database,state,addr,port,local_addr,local_port,connect_time,request_time,ptr,link,remote_pid
+ FROM ext.dblink('pgbouncer_ses'::text, 'show servers'::text) _(type text, "user" text, database text, state text, addr text, port integer, local_addr text, local_port 
+ integer, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text, 
+ remote_pid bigint, tls text);
+
+ create or replace view dba.pgbouncer_ses_view_clients AS SELECT 
+ type,"user",database,state,addr,port,local_addr,local_port,connect_time,request_time,ptr,link
+ FROM ext.dblink('pgbouncer_ses'::text, 'show clients'::text) _(type text, "user" text, database text, state text, addr text, port integer, local_addr text, local_port 
+ integer, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text, 
+ remote_pid bigint, tls text);
+
+ create or replace view dba.pgbouncer_ses_config AS SELECT key,value,changeable
+ FROM ext.dblink('pgbouncer_ses'::text, 'show config'::text) _(key text,value text, changeable text);
+
+ create or replace view dba.pgbouncer_trx_config AS SELECT key,value,changeable
+ FROM ext.dblink('pgbouncer_trx'::text, 'show config'::text) _(key text,value text, changeable text);
+
+
+ create or replace view dba.pids_clients_servers_trx as 
+ select a.pid,a.datname,a.usename,a.application_name,a.backend_start,a.xact_start,a.query_start,a.state_change,
+ a.waiting,a.state as pg_state, a.query,
+ b.type as cl_type,b.user as cl_user,b.database as cl_database,b.state as cl_state,b.addr,b.port as cl_port,b.local_port as cl_local_port,b.connect_time as 
+cl_connect_time,b.request_time as cl_request_time,
+ b.ptr as cl_ptr,b.link as cl_link,
+ c.type as srv_type,c.user as srv_user,c.database as srv_database,c.state as srv_state,c.local_port as srv_local_port,c.port as srv_port,
+ c.connect_time as srv_connect_time,c.request_time as srv_request_time,c.ptr as srv_ptr,c.link as srv_link, c.remote_pid
+ from pg_stat_activity a, dba.pgbouncer_trx_view_clients b, dba.pgbouncer_trx_view_servers c where a.pid!=pg_backend_pid() and b.ptr=c.link and 
+a.pid=c.remote_pid ;
+
+ create or replace view dba.pids_clients_servers_ses as 
+ select a.pid,a.datname,a.usename,a.application_name,a.backend_start,a.xact_start,a.query_start,a.state_change,
+ a.waiting,a.state as pg_state, a.query,
+ b.type as cl_type,b.user as cl_user,b.database as cl_database,b.state as cl_state,b.addr,b.port as cl_port,b.local_port as cl_local_port,b.connect_time as 
+cl_connect_time,b.request_time as cl_request_time,
+ b.ptr as cl_ptr,b.link as cl_link,
+ c.type as srv_type,c.user as srv_user,c.database as srv_database,c.state as srv_state,c.local_port as srv_local_port,c.port as srv_port,
+ c.connect_time as srv_connect_time,c.request_time as srv_request_time,c.ptr as srv_ptr,c.link as srv_link
+ from pg_stat_activity a, dba.pgbouncer_ses_view_clients b, dba.pgbouncer_ses_view_servers c where a.pid!=pg_backend_pid() and b.ptr=c.link and 
+a.pid=c.remote_pid ;
+
+create or replace view dba.pgbouncer_trx_pools AS SELECT
+database,"user",cl_active,cl_waiting,sv_active,sv_idle,sv_used,sv_tested,sv_login,maxwait,pool_mode
+FROM ext.dblink('pgbouncer_trx'::text, 'show pools'::text) _(database text, "user" text, cl_active bigint,
+cl_waiting bigint, sv_active bigint, sv_idle bigint, sv_used bigint, sv_tested bigint, sv_login bigint,maxwait
+bigint, pool_mode text);
+
+create or replace view dba.pgbouncer_trx_stats AS SELECT
+database,total_requests,total_received,total_sent,total_query_time,avg_req,avg_recv,avg_sent,avg_query
+FROM ext.dblink('pgbouncer_trx'::text, 'show stats'::text) _(database text,total_requests
+bigint,total_received bigint,total_sent bigint,total_query_time bigint,avg_req bigint,avg_recv bigint,avg_sent
+bigint,avg_query bigint);
+
+create or replace view dba.pgbouncer_ses_pools AS SELECT
+database,"user",cl_active,cl_waiting,sv_active,sv_idle,sv_used,sv_tested,sv_login,maxwait,pool_mode
+FROM ext.dblink('pgbouncer_ses'::text, 'show pools'::text) _(database text, "user" text, cl_active bigint,
+cl_waiting bigint, sv_active bigint, sv_idle bigint, sv_used bigint, sv_tested bigint, sv_login bigint,maxwait
+bigint, pool_mode text);
+
+create or replace view dba.pgbouncer_ses_stats AS SELECT
+database,total_requests,total_received,total_sent,total_query_time,avg_req,avg_recv,avg_sent,avg_query
+FROM ext.dblink('pgbouncer_ses'::text, 'show stats'::text) _(database text,total_requests
+bigint,total_received bigint,total_sent bigint,total_query_time bigint,avg_req bigint,avg_recv bigint,avg_sent
+bigint,avg_query bigint);
+
+create or replace view dba.find_blocking_queries as
+SELECT blocked_locks.pid     AS blocked_pid,
+         blocked_activity.usename  AS blocked_user,
+         blocking_locks.pid     AS blocking_pid,
+         blocking_activity.usename AS blocking_user,
+         blocked_activity.query    AS blocked_statement,
+         blocking_activity.query   AS current_statement_in_blocking_process
+   FROM  pg_catalog.pg_locks         blocked_locks
+    JOIN pg_catalog.pg_stat_activity blocked_activity  ON blocked_activity.pid = blocked_locks.pid
+    JOIN pg_catalog.pg_locks         blocking_locks
+        ON blocking_locks.locktype = blocked_locks.locktype
+        AND blocking_locks.DATABASE IS NOT DISTINCT FROM blocked_locks.DATABASE
+        AND blocking_locks.relation IS NOT DISTINCT FROM blocked_locks.relation
+        AND blocking_locks.page IS NOT DISTINCT FROM blocked_locks.page
+        AND blocking_locks.tuple IS NOT DISTINCT FROM blocked_locks.tuple
+        AND blocking_locks.virtualxid IS NOT DISTINCT FROM blocked_locks.virtualxid
+        AND blocking_locks.transactionid IS NOT DISTINCT FROM blocked_locks.transactionid
+        AND blocking_locks.classid IS NOT DISTINCT FROM blocked_locks.classid
+        AND blocking_locks.objid IS NOT DISTINCT FROM blocked_locks.objid
+        AND blocking_locks.objsubid IS NOT DISTINCT FROM blocked_locks.objsubid
+        AND blocking_locks.pid != blocked_locks.pid
+    JOIN pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid
+   WHERE NOT blocked_locks.GRANTED and blocking_locks.granted is true;
+
+create or replace view dba.find_bloat as
+select schemaname,tablename,tbloat,wastedbytes,iname,ibloat,wastedibytes from (
+SELECT
+  current_database(), schemaname, tablename, /*reltuples::bigint, relpages::bigint, otta,*/
+  ROUND((CASE WHEN otta=0 THEN 0.0 ELSE sml.relpages::FLOAT/otta END)::NUMERIC,1) AS tbloat,
+  CASE WHEN relpages < otta THEN 0 ELSE bs*(sml.relpages-otta)::BIGINT END AS wastedbytes,
+  iname, /*ituples::bigint, ipages::bigint, iotta,*/
+  ROUND((CASE WHEN iotta=0 OR ipages=0 THEN 0.0 ELSE ipages::FLOAT/iotta END)::NUMERIC,1) AS ibloat,
+  CASE WHEN ipages < iotta THEN 0 ELSE bs*(ipages-iotta) END AS wastedibytes
+FROM (
+  SELECT
+    schemaname, tablename, cc.reltuples, cc.relpages, bs,
+    CEIL((cc.reltuples*((datahdr+ma-
+      (CASE WHEN datahdr%ma=0 THEN ma ELSE datahdr%ma END))+nullhdr2+4))/(bs-20::FLOAT)) AS otta,
+    COALESCE(c2.relname,'?') AS iname, COALESCE(c2.reltuples,0) AS ituples, COALESCE(c2.relpages,0) AS ipages,
+    COALESCE(CEIL((c2.reltuples*(datahdr-12))/(bs-20::FLOAT)),0) AS iotta -- very rough approximation, assumes all cols
+  FROM (
+    SELECT
+      ma,bs,schemaname,tablename,
+      (datawidth+(hdr+ma-(CASE WHEN hdr%ma=0 THEN ma ELSE hdr%ma END)))::NUMERIC AS datahdr,
+      (maxfracsum*(nullhdr+ma-(CASE WHEN nullhdr%ma=0 THEN ma ELSE nullhdr%ma END))) AS nullhdr2
+    FROM (
+      SELECT
+        schemaname, tablename, hdr, ma, bs,
+        SUM((1-null_frac)*avg_width) AS datawidth,
+        MAX(null_frac) AS maxfracsum,
+        hdr+(
+          SELECT 1+COUNT(*)/8
+          FROM pg_stats s2
+          WHERE null_frac<>0 AND s2.schemaname = s.schemaname AND s2.tablename = s.tablename
+        ) AS nullhdr
+      FROM pg_stats s, (
+        SELECT
+          (SELECT current_setting('block_size')::NUMERIC) AS bs,
+          CASE WHEN SUBSTRING(v,12,3) IN ('8.0','8.1','8.2') THEN 27 ELSE 23 END AS hdr,
+          CASE WHEN v ~ 'mingw32' THEN 8 ELSE 4 END AS ma
+        FROM (SELECT version() AS v) AS foo
+      ) AS constants
+      GROUP BY 1,2,3,4,5
+    ) AS foo
+  ) AS rs
+  JOIN pg_class cc ON cc.relname = rs.tablename
+  JOIN pg_namespace nn ON cc.relnamespace = nn.oid AND nn.nspname = rs.schemaname AND nn.nspname <> 'information_schema'
+  LEFT JOIN pg_index i ON indrelid = cc.oid
+  LEFT JOIN pg_class c2 ON c2.oid = i.indexrelid
+) AS sml
+) as foo
+where (tbloat > 30 and wastedbytes > 500000000) or (ibloat > 30 and wastedibytes > 500000000) or (tbloat > 15 and wastedbytes > 1000000000) or
+(ibloat > 15 and wastedibytes > 1000000000) and schemaname!='postgres';
+
+
+create or replace view dba.find_trx_wrap as
+SELECT relname,age(relfrozenxid) as xid_age,pg_size_pretty(pg_table_size(oid)) as table_size
+FROM pg_class 
+WHERE relkind = 'r' and pg_table_size(oid) > 10
+ORDER BY age(relfrozenxid) DESC LIMIT 30;
+
+create or replace view dba.find_non_default_settings as
+select name,source,setting from pg_settings where source != 'default' and source != 'override'
+and name not in ('DateStyle','TimeZone','default_text_search_config','lc_messages','lc_monetary','lc_numeric',
+'lc_time','log_checkpoints','log_connections','log_destination','log_disconnections','log_duration','log_filename',
+'log_line_prefix','log_lock_waits','log_temp_files','log_timezone','track_activity_query_size','track_functions',
+'track_io_timing','update_process_title','max_stack_depth','application_name','archive_command','archive_mode','port','shared_preload_libraries')
+ORDER BY 2,1;
+
+create or replace view dba.find_oldest_trx_running as
+select extract(epoch from (now() - xact_start)) as duration, * from pg_stat_activity where state not in
+('idle','idle in transaction') and query not ilike  '%vacuum%' and pid != pg_backend_pid() order by xact_start asc limit 1;
+
+create or replace view dba.find_oldest_idle_in_trx as
+select extract(epoch from (now() - xact_start)) as duration, * from pg_stat_activity where state in
+('idle in transaction') order by xact_start asc limit 1;
+
+create or replace view dba.find_master_replication_lag as
+select client_addr as slave_ip,round(pg_xlog_location_diff(pg_current_xlog_location(),replay_location)/1048576) as mb_lag
+from pg_catalog.pg_stat_replication where application_name = 'walreceiver';
+
+create or replace view dba.find_slave_replication_lag_in_mb as
+select round(pg_xlog_location_diff(pg_last_xlog_receive_location(),pg_last_xlog_replay_location())/1048576) as mb_lag;
+
+create or replace view dba.find_timestamp_of_last_trx as 
+select pg_last_xact_replay_timestamp() as last_trx, now();
+
+create or replace view dba.find_top_Qs_running as
+select count(*),query from pg_stat_activity where state='active' and pid != pg_backend_pid() group by 2 order by 1 desc limit 5;
+
+create or replace view dba.find_slow_Qs_running as
+select query,now() - query_start from pg_stat_activity where state='active' and query_start <= now() - interval '1 second' and pid != 
+pg_backend_pid() order by 2 desc limit 5;
+
+
+create or replace view dba.av_needed as
+with myQ1 as (
+select relname,unnest(reloptions::text[]) as my_option from  pg_class where reloptions is not null
+)
+select c.relname,pg_size_pretty(pg_relation_size(relid)) as size,
+current_setting('autovacuum_vacuum_threshold') as av_base, current_setting('autovacuum_vacuum_scale_factor') as av_scale_factor_def,
+(current_setting('autovacuum_vacuum_threshold')::int + (current_setting('autovacuum_vacuum_scale_factor')::float * c.reltuples))
+as av_thresh_def, SUBSTRING (my_option FROM 32)::float as av_scale_factor_over,
+(current_setting('autovacuum_vacuum_threshold')::int + ((SUBSTRING (my_option FROM 32)::float)* c.reltuples)) as av_thresh_over,
+s.n_dead_tup,last_vacuum,last_autovacuum,last_analyze,last_autoanalyze
+from pg_stat_user_tables s join pg_class c ON s.relname = c.relname left outer join myQ1 on c.relname = myQ1.relname
+where (my_option like 'autovacuum_vacuum_scale_factor%' or my_option is NULL)
+and (current_setting('autovacuum_vacuum_threshold')::int + (current_setting('autovacuum_vacuum_scale_factor')::float * c.reltuples)) > 10000 and
+pg_relation_size(relid) > 10000000 order by n_dead_tup/(current_setting('autovacuum_vacuum_threshold')::int + (current_setting('autovacuum_vacuum_scale_factor')::float *
+c.reltuples)) desc limit 30;

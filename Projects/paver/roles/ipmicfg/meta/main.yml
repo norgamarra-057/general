@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  author: Robert Barabas
+  description: Ansible role for rolling out SuperMicro's IPMICFG utility to FreeBSD
+  company: Groupon
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 1.2
+dependencies:
+  - linux-compat

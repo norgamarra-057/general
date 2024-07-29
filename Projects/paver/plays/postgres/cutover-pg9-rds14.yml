@@ -1,0 +1,193 @@
+---
+- name: Ensure command line variables are set and daas part 0
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+          - aws_host is defined
+          - admin_password is defined
+
+    - set_fact: 
+        pglogical_status={{ gds_instances[instance].extra_variables.pglogical }}
+        my_db_schema={{ gds_instances[instance].schemas }}
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+        my_dba_user={{ gds_instances[instance].dba_account_name }}
+        my_app_user={{ gds_instances[instance].app_account_name }} 
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+
+    - name: check if pglogical is on
+      fail: msg="Exiting ---------pglogical variable is not set to on"
+      when:  pglogical_status is not defined or pglogical_status != 'on' 
+
+    - name: check if database is defined
+      fail: msg="Exiting ---------database is not defined"
+      when:  my_db_name is not defined
+
+    - name: check if db schema is defined
+      fail: msg="Exiting --------- dba user is not defined"
+      when:  my_db_schema is not defined
+
+    - name: check if app_user is defined
+      fail: msg="Exiting --------- dba user is not defined"
+      when:  my_app_user is not defined
+
+    - name: check if dba_user is defined
+      fail: msg="Exiting --------- dba user is not defined"
+      when:  my_dba_user is not defined
+
+    - name: get IP master
+      shell: ifconfig lagg0 | grep 'inet' | awk -F ' ' '{ print $2 }'
+      register: current_master_ip
+  
+  
+- name: Aws part 1
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_dba_user: "{{ hostvars[daas_host]['my_dba_user'] }}"
+        my_app_user: "{{ hostvars[daas_host]['my_app_user'] }}"
+
+    - name: Set app user to nologin
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "alter user {{ my_app_user }} nologin"
+
+    - name: Set dba user to nologin
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "alter user {{ my_dba_user }} nologin"
+
+    - name: Kill remaining sessions
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid() and application_name not like 'pglogical%' and usename is not null and usename not in ('rdsadmin','gds_admin','rdsrepladmin')"      
+
+    - name: Check that replication delay is small
+      command: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select extract(epoch from now() - last_updated)::integer as delay from heartbeat.repl_status where application_name like '{{ my_db_name }}%subscription';"
+      register: replication_lag
+    - name: verify replication lag is low
+      fail: msg="Exiting ----------Replication lag is high"
+      when:  replication_lag.stdout|int  >  10
+
+- name: Daas part 1
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+
+#    - name: Set the database to no-connect mode
+#      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "update pg_database set datallowconn='f' where datname = '{{ my_db_name }}'"
+  
+    - name: Set app user to nologin
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter user {{ my_app_user }} nologin"
+
+    - name: Set dba user to nologin
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter user {{ my_dba_user }} nologin"
+
+    - name: Kill remaining sessions
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid() and application_name not like 'pglogical%' and usename !='gds_admin'"
+
+    - name: Check replication delay
+      command: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_xlog_location_diff(pg_current_xlog_location(),write_location) from pg_stat_replication where application_name like '{{ my_db_name }}%subscription'"
+      register: replication_lag_final
+      until: replication_lag_final.stdout|int == 0
+      retries: 1000
+      delay: 1
+
+    - name: One time sequence push
+      shell: psql -U postgres -d {{ my_db_name }} -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "SELECT pglogical.synchronize_sequence( seqoid ) FROM pglogical.sequence_state"
+
+
+- name: Aws part 2
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_first_db: "{{ hostvars[daas_host]['my_first_db'] }}"
+        my_db_schema: "{{ hostvars[daas_host]['my_db_schema'] }}"
+        my_dba_user: "{{ hostvars[daas_host]['my_dba_user'] }}"
+        my_app_user: "{{ hostvars[daas_host]['my_app_user'] }}"
+        my_current_master_ip: "{{ hostvars[daas_host]['current_master_ip'].stdout }}"
+
+    - name: Check aws replication lag
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select extract ( epoch from now() - last_updated)::integer as secs from heartbeat.repl_status where master_host = '{{ my_current_master_ip }}' and application_name like '{{ my_db_name }}%subscription'"
+      register: replication_lag_aws
+      until: replication_lag_aws.stdout|int < 2
+      retries: 1000
+      delay: 1 
+
+    - name: Drop subscription
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -c "select pglogical.drop_subscription('{{ my_db_name }}_rds_pg10_subscription')"
+
+    - name: Drop node
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -c "select pglogical.drop_node('{{ my_db_name }}_rds_pg10_subscriber')"
+
+- name: Daas part 2
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_dba_user: "{{ hostvars[daas_host]['my_dba_user'] }}"
+        my_app_user: "{{ hostvars[daas_host]['my_app_user'] }}"
+
+    - name: Stop the heartbeat service
+      shell: sv down /var/service/{{ instance }}-pg_heartbeat
+
+#    - name: Set the database to connect mode
+#      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "update pg_database set datallowconn='t' where datname = '{{ my_db_name }}'"
+
+    - name: Drop provider
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select pglogical.drop_node('{{ my_db_name }}_provider')"
+
+
+- name: Aws part 3
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_dba_user: "{{ hostvars[daas_host]['my_dba_user'] }}"
+        my_app_user: "{{ hostvars[daas_host]['my_app_user'] }}"
+        my_db_schema: "{{ hostvars[daas_host]['my_db_schema'] }}"
+
+    - name: Set app user to login
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "alter user {{ my_app_user }} login"
+
+    - name: Set dba user to login
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "alter user {{ my_dba_user }} login"      
+
+    - name: Privileges for app user 1/2
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "grant insert,update,delete on all tables in schema {{ item }} to {{ my_app_user}}"
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Privileges for app user 2/2
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "grant update on all sequences in schema {{ item }} to {{ my_app_user}}"
+      with_items: "{{ my_db_schema[my_db_name] }}"
+

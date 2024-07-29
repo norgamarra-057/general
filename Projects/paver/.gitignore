@@ -1,0 +1,63 @@
+*.py[cod]
+
+# Ansible 
+*.retry
+
+# Local inventory files
+/inventory/*.local
+
+# Local directories
+/*.local/
+
+# Local password files
+*.pass
+*.password
+
+# C extensions
+*.so
+
+# Mac garbage
+.DS_Store
+
+# Ansible retry
+*.retry
+
+# Backup garbage
+*~
+*.bak
+*.swp
+\#*\#
+\.\#*
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+
+# Installer logs
+pip-log.txt
+ansible.log
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+roles/gds-consul-agent/files/consul

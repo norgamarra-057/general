@@ -1,0 +1,39 @@
+#!{{ ansible_python_interpreter }} --
+
+import getopt
+import json
+import socket
+import struct
+import sys
+
+cli_args = {}
+netops_facts = {}
+
+def parse_args():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "i:", ["ipv4="])
+    except getopt.GetoptError as err:
+        None
+
+    for opt, arg in opts:
+        if opt in ("-i", "--ipv4"):
+            cli_args['ipv4_address'] = arg
+        else:
+            assert False, "invalid CLI option"
+
+def get_vhid():
+    if 'ipv4_address' in cli_args:
+        ansible_default_ipv4_address = cli_args['ipv4_address']
+    else:
+        ansible_default_ipv4_address = '10.20.114.109'
+
+    if ansible_default_ipv4_address is not None:
+        netops_facts['server_last_octet'] = "%d" % (int((0xffffff00 | socket.ntohl(struct.unpack("I", socket.inet_aton(ansible_default_ipv4_address))[0])) ^ 0xffffff00))
+
+def dump_facts(facts):
+    print json.dumps(facts, sort_keys=True, indent=4, separators=(',', ': '))
+
+if __name__ == '__main__':
+    parse_args()
+    get_vhid()
+    dump_facts(netops_facts)

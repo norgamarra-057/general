@@ -1,0 +1,45 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - aws_host_primary is defined
+          - db is defined
+          - gcp_host_replica is defined
+
+
+    - name: find schemas
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_primary }} -c "select schema_name from information_schema.schemata where schema_name not in ('repack','heartbeat','dba','ext','information_schema','topology') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Find rowcount aws 0
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_primary }} -c "with myQ1 as (select a.schemaname as table_schema, a.relname as table_name, pg_size_pretty(pg_total_relation_size(a.relid)) as total_size, pg_size_pretty(pg_relation_size(a.relid)) as data_size, pg_size_pretty(pg_total_relation_size(a.relid) - pg_relation_size(a.relid)) as external_size, reltuples as rows_pglass, n_live_tup as rows_statusertables from pg_catalog.pg_statio_user_tables a, pg_class b, pg_stat_user_tables c where a.relname = b.relname and a.relname = c.relname order by pg_total_relation_size(a.relid) desc,pg_relation_size(a.relid)) select * from myQ1 where rows_pglass=0 or rows_statusertables=0 order by 1,2 asc"  >> /tmp/{{ db }}_nulls.txt
+
+    - name: Find rowcount gcp replica 0
+      shell: psql -U postgres -d {{ db }} -p 5432 -h {{ gcp_host_replica }} -c "with myQ1 as (select a.schemaname as table_schema, a.relname as table_name, pg_size_pretty(pg_total_relation_size(a.relid)) as total_size, pg_size_pretty(pg_relation_size(a.relid)) as data_size, pg_size_pretty(pg_total_relation_size(a.relid) - pg_relation_size(a.relid)) as external_size, reltuples as rows_pglass, n_live_tup as rows_statusertables from pg_catalog.pg_statio_user_tables a, pg_class b, pg_stat_user_tables c where a.relname = b.relname and a.relname = c.relname order by pg_total_relation_size(a.relid) desc,pg_relation_size(a.relid)) select * from myQ1 where rows_pglass=0 or rows_statusertables=0 order by 1,2 asc"  >> /tmp/{{ db }}_nulls.txt
+
+    - name: Find rowcount aws 0
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_primary }} -c "with myQ1 as (select a.schemaname as table_schema, a.relname as table_name, pg_size_pretty(pg_total_relation_size(a.relid)) as total_size, pg_size_pretty(pg_relation_size(a.relid)) as data_size, pg_size_pretty(pg_total_relation_size(a.relid) - pg_relation_size(a.relid)) as external_size, reltuples as rows_pglass, n_live_tup as rows_statusertables from pg_catalog.pg_statio_user_tables a, pg_class b, pg_stat_user_tables c where a.relname = b.relname and a.relname = c.relname order by pg_total_relation_size(a.relid) desc,pg_relation_size(a.relid)) select table_schema,table_name from myQ1 order by 1,2 asc"  >> /tmp/rowcount_aws_primary_0_{{ db }}.txt
+ 
+    - name: Find rowcount gcp replica 0
+      shell: psql -U postgres -d {{ db }} -p 5432 -h {{ gcp_host_replica }} -c "with myQ1 as (select a.schemaname as table_schema, a.relname as table_name, pg_size_pretty(pg_total_relation_size(a.relid)) as total_size, pg_size_pretty(pg_relation_size(a.relid)) as data_size, pg_size_pretty(pg_total_relation_size(a.relid) - pg_relation_size(a.relid)) as external_size, reltuples as rows_pglass, n_live_tup as rows_statusertables from pg_catalog.pg_statio_user_tables a, pg_class b, pg_stat_user_tables c where a.relname = b.relname and a.relname = c.relname order by pg_total_relation_size(a.relid) desc,pg_relation_size(a.relid)) select table_schema,table_name from myQ1 order by 1,2 asc"  >> /tmp/rowcount_gcp_replica_0_{{ db }}.txt
+
+    - name: Get difference for table nulls
+      command: diff /tmp/rowcount_aws_primary_0_{{ db }}.txt /tmp/rowcount_gcp_replica_0_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug table nulls
+      debug: msg="{{ diff.stdout }}"
+
+
+#    - name: Get rowcount aws
+#      shell: cat /tmp/rowcount_aws_primary_0_{{ db }}.txt >> /tmp/{{ db }}_nulls.txt
+
+#    - name: Get rowcount gcp
+#      shell: cat /tmp/rowcount_gcp_replica_0_{{ db }}.txt >> /tmp/{{ db }}_nulls.txt
+
+

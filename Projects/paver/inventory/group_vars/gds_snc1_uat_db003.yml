@@ -1,0 +1,128 @@
+---
+gds_carp_peers:
+  - 10.23.34.246  # gds-snc1-uat-db003m1
+  - 10.23.34.247  # gds-snc1-uat-db003s1
+  - 10.23.35.246  # gds-snc1-uat-db003m1
+  - 10.23.35.247  # gds-snc1-uat-db003s1
+gds_carp_interfaces:
+  - vlan334
+  - vlan335
+gds_instance_group: gds_snc1_uat_db003
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+# Decommed GDS-33475  dealestate_uat: # GDS-7334
+
+# Decommed GDS-33475  custsvc_uat: # GDS-7333
+# Decommed GDS-33475  audience_emea_uat: # GDS-7645
+
+# Decommed GDS-33475  eventdata_uat: # GDS-7336
+
+# destroyed GDS-30020  getawaysnotif_uat: # GDS-7339
+
+# Decommed GDS-33475  geo_lupa_uat: # GDS-7337
+
+# Decommed GDS-33475  gtwys_travelshop_uat: # GDS-7340
+
+# Decommed GDS-33475  goods_cbt_emea_uat: # GDS-7341
+
+# Decommed GDS-33475  deal_wiz_uat: # GDS-7761
+
+# Decommed GDS-33475 arrowhead_dev_uat: # GDS-7387
+
+# Decommed GDS-33475  goods_receiver_uat: # GDS-7343
+
+# Decommed GDS-33475  gwl_manager_uat: # GDS-7345
+
+# Decommed GDS-33475  latam_crm_msg_uat: # GDS-7346
+
+# Decommed GDS-33475  goods_shipment_uat: # GDS-7344
+
+# Decommed GDS-33475  merchant_sse_uat: # GDS-7350
+
+# Decommed GDS-33475  mos_customer_uat: # GDS-7351
+
+# Decommed GDS-33475  mastermerchant_uat: # GDS-7348
+
+# Decommed GDS-33475  medusa_uat: # GDS-7349
+
+# Decommed GDS-33475  paygw_uat: # GDS-7354
+
+# Decommed GDS-33475  mos_data_uat: # GDS-7352
+
+# Decommed GDS-33475  subs_billing_uat: # GDS-7356
+
+# Decommed GDS-33475  mos_data2_uat: # GDS-7353
+
+# Decommed GDS-33475  dora_uat: # GDS-8241
+
+# Decommed GDS-33475  janus_metrics_uat: # GDS-8242
+
+# destroyed GDS-26752  goods_store_2_uat: # GDS-8880
+
+# Decommed GDS-33475  configwizard2_uat: # GDS-8971
+
+# Decommed GDS-33475  walle_uat: # GDS-9047
+
+# Decommed GDS-33475  chnl_man_integ_uat: # GDS-9155
+
+# Decommed GDS-33475  cs_groupon_uat: # GDS-9295
+# Decommed GDS-33475 ranger_uat: # GDS-9392
+
+# Decommed GDS-33475  lba_uat: # GDS-9500
+
+#  booking_notif_uat: # GDS-9663 decommission GDS-31733
+
+# Decommed GDS-33475  booking_appoint_uat: # GDS-9664
+
+# Decommed GDS-33475  afl_programs_uat: # GDS-9958 __SOX__
+
+# Decommed GDS-33475  mo_jpat_uat: # GDS-10026
+
+# Decommed GDS-33475  vou_inv_uat: # GDS-10235
+
+# Decommed GDS-33475  staas_dev: # GDS-10563
+
+# Decommed GDS-33475  salesforce_latam_uat: # GDS-1063
+
+# Decommed GDS-33475  gazebo_uat: # GDS-10714
+
+# Decommed GDS-33475  booking_tool_uat: # GDS-11029
+
+# Decommed GDS-33475  goods_forecast_uat: # GDS-11138
+
+# Decommed GDS-33475  voucher_txn_uat: # GDS-11376
+
+# Decommed GDS-33475  chan_man_int_tvl_uat: # GDS-11680
+
+# Decommed GDS-33475  emea_booking_tool_uat: # GDS-11748
+
+# Decommed GDS-33475  bookingtool_uat: # GDS-11675
+
+# Decommed GDS-33475  tronicon_cms_uat: # GDS-11754
+
+# Decommed GDS-33475  gtw_maris_uat: # GDS-12561
+
+# Decommed GDS-33475  orders_msg_uat: # GDS-12703
+# Decommed GDS-33475  cs_classifysv_uat: # GDS-1290 # Decommissioned - GDS-305445
+
+# Decommed GDS-33475  load_balancer_uat: # GDS-12892
+
+# Decommed GDS-33475   lex_emea_uat: # GDS-12943
+
+# Decommed GDS-33475   plat_utiliz_uat: # GDS-13265
+
+# Decommed GDS-33475   dora_csm_svc_uat: # GDS-13538
+
+# Decommed GDS-33475  giftcard_service_uat: # GDS-13538
+# destroyed GDS-25550  artifactory_uat: # GDS-13755
+
+# Decommed GDS-33475   myticket_uat: # GDS-13709
+
+# Decommed GDS-33475   afl_recon_uat: # GDS-14156
+
+# Decommed GDS-33475   ultron_uat: # GDS-14260
+
+# Decommed GDS-33475  deal_catalog_uat: # GDS-14380
+
+# Decommed GDS-33475   mfa_tacacs_uat: # GDS-14598

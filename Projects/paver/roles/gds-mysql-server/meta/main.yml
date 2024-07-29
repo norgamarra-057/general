@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author: Robert Barabas
+  description: wrapper role to define server baseline and dependencies
+  company: Groupon
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 1.2
+dependencies:
+  #- consul
+  #- delorean
+  - gds_firewall
+  - os-config
+  - common_install
+  - openntpd
+#  - monitord-agent
+  - gds_motd
+  - gds-mysql-scripts
+#  - role: check_mk
+#    db_type: mysql

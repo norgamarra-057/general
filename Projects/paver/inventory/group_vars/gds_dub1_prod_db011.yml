@@ -1,0 +1,18 @@
+###############################################################
+#  REPLICATION(READ) ONLY CLUSTER
+############################################################### 
+---
+gds_carp_peers:
+  - 10.14.189.222  # gds-dub1-prod-db011m1
+  - 10.14.189.223  # gds-dub1-prod-db011s1
+  - 10.14.82.222  # gds-dub1-prod-db011m1
+  - 10.14.82.223  # gds-dub1-prod-db011s1
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+gds_instance_group: gds_prod_dub1_db011
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  voucherinventory_prod: # GDS-6059 - decommed GPROD-226766
+##  vis20_prod: # GDS-6059 # decomm'd GDS-34361

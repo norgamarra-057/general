@@ -1,0 +1,6 @@
+---
+- include_tasks: FreeBSD.yml
+  tags:
+    - mha
+    - mha-instance
+  when: ansible_os_family == 'FreeBSD'

@@ -1,0 +1,17 @@
+---
+freebsd_cloned_interfaces: lagg0 vlan324 vlan325
+gds_cluster: gds_prod_snc1_db024
+
+ops_carp:
+  vlan324:
+    anchor_address: 10.30.24.222/24
+    master_weight: 50
+    slave_base_weight: 100
+    failover_weight: 40
+  vlan325:
+    anchor_address: 10.30.25.222/24
+    master_weight: 50
+    slave_base_weight: 100
+    failover_weight: 40
+
+postgresql_port_major : '94'

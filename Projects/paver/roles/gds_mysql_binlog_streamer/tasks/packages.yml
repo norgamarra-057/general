@@ -1,0 +1,5 @@
+- name: GDS mysql binlog streamer | FreeBSD | packages | install gds packages
+  pkgng: 
+    name: "{{ item }}"
+    state: present
+  with_items: gds_ports

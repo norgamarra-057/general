@@ -1,0 +1,48 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+    datacenter: "{{ inventory_hostname | regex_replace('^.*\\.([^\\.]+)$', '\\1') }}"
+  tasks:
+   - name: FreeBSD | run | drop hydra from Consul
+     shell: |
+       exec 2>&1
+       echo -n "drop leader key "
+       curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace("_","-") }}/leader"
+       echo
+       {% if inventory_hostname.endswith('m1.' + datacenter) %}
+       echo -n "drop instance node keys "
+       curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace("_","-") }}/nodes/{{ item.value.hydra.ids[0] }}?recurse=true"
+       echo
+       echo -n drop instance node service
+       curl -s -X PUT "http://localhost:8500/v1/catalog/deregister" -d '{"Datacenter":"{{ datacenter }}","Node":"hydra@{{ inventory_hostname }}","ServiceId":"{{ item.value.hydra.ids[0] }}"}'
+       echo
+       {% else %}
+       echo -n "drop instance node keys "
+       curl -s -X DELETE "http://localhost:8500/v1/kv/hydra/services/{{ item.value.type }}/{{ item.key | replace("_","-") }}/nodes/{{ item.value.hydra.ids[1] }}?recurse=true"
+       echo
+       echo -n "drop instance node service "
+       curl -s -X PUT "http://localhost:8500/v1/catalog/deregister" -d '{"Datacenter":"{{ datacenter }}","Node":"hydra@{{ inventory_hostname }}","ServiceId":"{{ item.value.hydra.ids[1] }}"}'
+       echo
+       {% endif %}
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: item.value.hydra is defined and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"
+

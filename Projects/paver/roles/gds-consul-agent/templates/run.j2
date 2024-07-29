@@ -1,0 +1,6 @@
+#!/bin/sh --
+
+set -e
+exec /usr/local/sbin/chpst -e ./env \
+    /opt/consul/consul agent \
+        -config-dir={{ consul_conf_dir }}

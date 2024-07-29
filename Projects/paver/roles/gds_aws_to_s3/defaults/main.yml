@@ -1,0 +1,5 @@
+---
+mydumper:
+  statement_size: "10000"
+  rows:           "10000"
+  threads:        "8"

@@ -1,0 +1,11 @@
+---
+- name: pgbadger Load variables defaults
+  tags:
+    - pgbadger
+  include_vars: "../defaults/defaults.yml"
+
+- name: FreeBSD specific steps
+  tags:
+    - pgbadger
+  include_tasks: FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'

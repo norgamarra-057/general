@@ -1,0 +1,76 @@
+#!/usr/local/bin/ruby
+
+require 'rubygems'
+require 'monitoring_script_multithreshold_rate'
+
+class CheckNetstat < MonitoringScriptMultithresholdRate
+  SERVICE_NAME = "netstat"
+  SERVICE_DESC = "Report interface netstat metrics"
+  OPTIONS = {
+    :iface  => { :text => "Specific interface to check", :short => "i", :type => :string, :default => nil },
+    :test => { :text => "Set to use test values", :short => "T", :type => :bool, :default => false },
+  }
+
+  def initialize
+    super
+    CheckNetstat.const_set('RATE_METRICS', [])
+  end
+
+  def service_check
+    if options[:test]
+      output_arr = DATA.readlines
+    else
+      output_arr = IO.popen(['/usr/bin/netstat','-ibnW']).readlines
+    end
+
+    vars = [ "ipkts", "ierrs", "idrop", "ibytes", "opkts", "oerrs", "obytes", "coll"]
+    values = {}
+
+   output_arr.each do |line|
+      # Line format:
+      # Name    Mtu Network       Address              Ipkts Ierrs Idrop     Ibytes    Opkts Oerrs     Obytes  Coll
+      line_arr = line.split(' ')
+
+      if options[:iface] and line_arr[0] != options[:iface]
+        next # Skip unspecified interfaces
+      else
+        # Filter out unwanted or inactive interfaces
+        next if line_arr[0][-1] == '*' # Skip downed links
+        next if line_arr[0] == 'lo0'   # Don't care about loopback
+        next if line_arr.slice(4, 11).reject{|x| x == '0'}.length == 0 # Ignore idle interfaces
+      end
+      next if line_arr[2].start_with?('<Link') == false # Only want phys links
+
+      vars.each{|x| RATE_METRICS.push "#{line_arr[0]}_#{x}" }
+
+      output_arr = []
+      RATE_METRICS.each {|var_name| values[var_name] = 0}
+
+      values["#{line_arr[0]}_ipkts"] = line_arr[4].to_i
+      values["#{line_arr[0]}_ierrs"] = line_arr[5].to_i
+      values["#{line_arr[0]}_idrop"] = line_arr[6].to_i
+      values["#{line_arr[0]}_ibytes"] = line_arr[7].to_i
+      values["#{line_arr[0]}_opkts"] = line_arr[8].to_i
+      values["#{line_arr[0]}_oerrs"] = line_arr[9].to_i
+      values["#{line_arr[0]}_obytes"] = line_arr[10].to_i
+      values["#{line_arr[0]}_coll"] = line_arr[11].to_i
+    end
+
+    RATE_METRICS.each { |var_name| set_metric(var_name, values[var_name]) }
+
+    if options[:thresholds]
+      evaluate_thresholds # also calculates per-second rates
+    else
+      calc_rates # evaluate_thresholds above calls calc_rates internally
+      set_status(STATUS_OK)
+    end
+    # Only the computed per-second numbers are interesting, so remove the raw
+    # numbers from metric output.
+    @metrics.reject!{|m,v|RATE_METRICS.include? m}
+  end
+end
+CheckNetstat.new.run!
+
+__END__
+igb0   1500 <Link#3>      00:25:90:a0:54:e2 13957791     1     4 1534494579  4199026     0  478162985     0
+ix0   1500 <Link#3>      00:25:90:a0:54:e3 13957799     0     0 1535494579  4139026     0  472162985     1

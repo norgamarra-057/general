@@ -1,0 +1,7 @@
+---
+collectd_hostname: collectd_server.snc1
+collectd_config_dir: /var/service/collectd/etc
+collectd_gid: 980
+collectd_groupname: _collectd
+collectd_uid: 980
+collectd_username: _collectd

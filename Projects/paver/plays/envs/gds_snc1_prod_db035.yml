@@ -1,0 +1,13 @@
+---
+- hosts: gds_snc1_prod_db035
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: goods_inventory_prod }
+  - { role: gds-mysql-ha, instance: editorialwriters_prod }
+  - { role: gds-mysql-ha, instance: iamsam_prod }
+  - { role: gds-mysql-ha, instance: dealservice_prod }
+  - { role: gds-mysql-ha, instance: metrics_prod }
+  - { role: gds-mysql-ha, instance: larc_prod }
+
+

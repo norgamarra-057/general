@@ -1,0 +1,11 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst -v\
+    -e {{ memcached_path }}/env \
+    -u {{ memcached_user }}:{{ memcached_group }}  \
+ 	/usr/local/bin/memcached -v -p {{ memcached_tcp_port }} -U {{ memcached_udp_port }} \
+  -l {{ memcached_ip }} -m {{ memcached_max_mem }} -F -c {{ memcached_connections }} \
+  -f {{ memcached_factor }} -n {{ memcached_bytes }} 
+

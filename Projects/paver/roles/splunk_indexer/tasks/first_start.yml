@@ -1,0 +1,22 @@
+- name: splunk | binaries | chown all files to splunk:splunk before first run
+  file: 
+    path: /var/groupon/splunk/
+    recurse: yes
+    group: splunk
+    owner: splunk
+
+- name: splunk | binaries | chmod files before first run
+  shell: sudo -u splunk find /var/groupon/splunk/ -type f -exec chmod +r {} +
+
+- name: splunk | binaries | chmod dirs before first run
+  shell: sudo -u splunk find /var/groupon/splunk/ -type d -exec chmod +x {} +
+
+- name: splunk | binaries | first start - accept license
+  shell: su - splunk -c '/var/groupon/splunk/bin/splunk start --accept-license --answer-yes --no-prompt'
+#    creates: '/var/groupon/splunk/var/log/splunk/splunkd.log'
+
+- name: splunk | binaries | first start - pause for 180 seconds
+  shell: sleep 180
+
+- name: splunk | binaries | first stop
+  shell: sudo -u splunk /var/groupon/splunk/bin/splunk stop

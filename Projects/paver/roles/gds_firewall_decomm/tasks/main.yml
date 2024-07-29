@@ -1,0 +1,6 @@
+---
+- include_tasks: FreeBSD.yml
+  tags:
+    - firewall_decomm
+    - gds_firewall_decomm
+    - pf

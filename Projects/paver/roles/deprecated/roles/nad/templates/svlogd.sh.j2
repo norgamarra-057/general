@@ -1,0 +1,5 @@
+#!/bin/sh
+exec \
+    /usr/bin/env -i \
+    /usr/local/sbin/chpst -u _log:_log \
+    /usr/local/sbin/svlogd -b 65535 -tt ./main/

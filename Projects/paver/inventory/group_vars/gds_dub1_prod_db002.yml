@@ -1,0 +1,28 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.13.110.222 # gds-dub1-prod-db002m1
+  - 10.13.110.223 # gds-dub1-prod-db002s1
+  - 10.13.184.222 # gds-dub1-prod-db002m1
+  - 10.13.184.223 # gds-dub1-prod-db002s1
+gds_instance_group: gds_prod_dub1_db002
+gds_monitor_cluster_type: gds_postgresql
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+# List of all GDS instances in this timeline
+gds_instances:
+# destroyed GDS-20471  goods_inb_sched_prod:  # GDS-4926
+  #dealcap_prod:  # GDS-5176 #Decomm GDS-35611
+  #tpis_prod:  #GDS-6536
+ # ambari_prod: # GDS-7837 #Decomm GDS-35611
+#  crowd_prod: # GDS-7837(Decommed)
+#  proximity_notify_prod: # GDS-8278
+ # goods_inv_serv_prod: # GDS-8848 #Decomm GDS-35611
+#  qa_refund_serv_prod: # GDS-9704 __SOX__
+ # goods_mktprice_prod: # GDS-10388 # decommissioned
+  #fingerprint_prod: # GDS-10613 # decommissioned #
+#  activiti_dub1_prod: # GDS-10910 # Decomm GDS-29799#
+ # merch_rept_vouch_prod: # GDS-19620 #Decomm GDS-35611
+      
+##################  NO MORE INSTANCES  ###########################

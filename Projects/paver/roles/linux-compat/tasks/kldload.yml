@@ -1,0 +1,10 @@
+---
+- name: See if linux module is loaded
+  shell: "kldstat | grep linux"
+  register: linux_loaded
+  changed_when: false
+  failed_when: false
+
+- name: Load linux module
+  command: "kldload linux"
+  when: linux_loaded|failed

@@ -1,0 +1,36 @@
+#!/bin/sh --
+## Template handles single and multiple instances for postgres.
+## backups are executed serially so that the server won't be overloaded with IO and processing
+{% for inst in item.1.instance_name.split(' ') %}
+set -e
+umask 0027
+/usr/bin/lockf -t {{ delorean_lock_timeout }} "{{ delorean_lock_dir }}/{{ item.0 }}.lock" \
+  /usr/bin/ssh \
+    -c arcfour \
+    -o BatchMode=yes \
+    -o StrictHostKeyChecking=no \
+    -i {{ delorean_private_keys_dir }}/{{ item.1.target }}.key \
+  {{ item.0 }} \
+    "(sudo -H \
+    /usr/bin/env PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin \
+    /usr/local/bin/pg_dumpall -U postgres \
+      -g \
+    | /usr/local/bin/pigz -R -6 --processes 6)" 2> {{ delorean_logs_dir }}/{{ item.0 }}-{{ inst }}-globals.log \
+    1> {{ delorean_base_dir }}/pools/{{ item.1.pool }}/{{ item.1.target }}/{{ item.0 }}/{{ item.0 }}-postgresql-{{ inst }}-globals.tar.gz
+
+/usr/bin/lockf -t {{ delorean_lock_timeout }} "{{ delorean_lock_dir }}/{{ item.0 }}.lock" \
+  /usr/bin/ssh \
+    -c arcfour \
+    -o BatchMode=yes \
+    -o StrictHostKeyChecking=no \
+    -i {{ delorean_private_keys_dir }}/{{ item.1.target }}.key \
+  {{ item.0 }} \
+    "(sudo -H \
+    /usr/bin/env PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin \
+    /usr/local/bin/pg_dump -U postgres -F c -b {{ inst }})" 2> {{ delorean_logs_dir }}/{{ item.0 }}-{{ inst }}.log \
+    1> {{ delorean_base_dir }}/pools/{{ item.1.pool }}/{{ item.1.target }}/{{ item.0 }}/{{ item.0 }}-{{ inst }}-postgresql.dump
+
+#push the backup result to the monitoring system (aka monitord.colo:8000
+#/var/groupon/delorean/test/backupCheck.pl $? {{ item.0 }} {{ item.1.pool }} {{ item.1.target }}
+# this is hanging so commenting it out
+{% endfor %}

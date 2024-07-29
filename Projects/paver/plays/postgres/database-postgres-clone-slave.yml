@@ -1,0 +1,51 @@
+---
+- name: Validate global settings
+  hosts: 127.0.0.1 
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - master_server is defined
+          - slave_server is defined
+          - instance is defined
+
+- name: Ensure host level settings look OK
+  hosts:
+    - "{{ master_server }}"
+    - "{{ slave_server }}"
+  tasks:
+    - set_fact:
+        instance_port: "{{ gds_instances[instance]['ports']['postgresql_raw'] | int }}"
+        instance_user: "{{ gds_instances[instance]['unix_user'] }}"
+    - assert:
+        that:
+          - gds_instance_group is defined
+          - instance_port is defined
+          - instance_user is defined
+
+- name: Prepare slave
+  become: true
+  hosts:
+    - "{{ slave_server }}"
+  tasks:
+    - name: Service Status 
+      shell: sv stat /var/service/postgresql-{{ gds_instance_group }}-{{ instance }}/
+    - name: Stop the postgres service
+      shell: sv down /var/service/postgresql-{{ gds_instance_group }}-{{ instance }}/
+    - name: Service Status 
+      shell: sv stat /var/service/postgresql-{{ gds_instance_group }}-{{ instance }}/
+    - name: Wipe slave datadir
+      shell: rm -rf /var/groupon/postgresql/data{{postgresql_port_major}}/{{gds_instance_group}}-{{ instance }}/data/*
+    - name: pg_basebackup to pull data
+      shell: pg_basebackup -U postgres -R -D /var/groupon/postgresql/data{{postgresql_port_major}}/{{gds_instance_group}}-{{ instance }}/data/ -P -p {{instance_port}} -h {{ master_server }}
+    - name: Change Ownership of data dir
+      shell: chown -R {{ instance_user }}:ops_gds_app /var/groupon/postgresql/data{{postgresql_port_major}}/{{gds_instance_group}}-{{ instance }}/data/
+    - name: Set timeline on recovery.conf
+      lineinfile:
+        dest: /var/groupon/postgresql/data{{postgresql_port_major}}/{{gds_instance_group}}-{{ instance }}/data/recovery.conf
+        line: "recovery_target_timeline = 'latest'"
+    - name: Start the postgres Service 
+      shell: sv up /var/service/postgresql-{{ gds_instance_group }}-{{ instance }}/
+    - name: Service Status 
+      shell: sv stat /var/service/postgresql-{{ gds_instance_group }}-{{ instance }}/
+

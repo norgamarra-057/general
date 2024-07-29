@@ -1,0 +1,28 @@
+---
+# Create a MySQL instance
+- import_playbook: "{{ playbook_dir }}/../common/check-params.yml"
+
+- name: Create database instance
+  vars:
+    - innodb_io_capacity_force: 2000
+    - innodb_lru_scan_depth_force: 1000
+    - innodb_buffer_pool_size_mb_force: 8000
+    - auto_increment_offset_force: 1
+  become: true
+  hosts:
+    - "{{ node }}"
+  roles:
+#    - { role: consul }
+    - role: runit
+    - role: gds_firewall
+    - { role: check_mk, db_type: mysql, tags: checkit }
+    - { role: gds_mysql, 
+      instance_name: "{{ instance }}",
+      innodb_io_capacity: "{{ innodb_io_capacity_force }}",
+      innodb_lru_scan_depth: "{{ innodb_lru_scan_depth_force }}",
+      innodb_buffer_pool_size_mb: "{{ innodb_buffer_pool_size_mb_force }}",
+      auto_increment_offset: "{{ auto_increment_offset_force }}", 
+      tags: mpercona }
+#    - role: splunk_forwarder
+#    - { role: monitord-agent, tags: configuration }
+    - { role: gds-mysql-scripts, tags: mscripts }

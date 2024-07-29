@@ -1,0 +1,6 @@
+---
+- name: Consul reload
+  command: /usr/local/sbin/sv hup {{ consul_service_dir }}/
+
+- name: Consul log restart
+  command: /usr/local/sbin/sv hup "{{ consul_service_dir }}/log"

@@ -1,0 +1,163 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - assert:
+        that:
+          - gcp_host_master is defined
+          - db is defined
+          - gcp_host_replica is defined
+          - admin_password is defined
+          - my_app_user is defined
+          - my_dba_user is defined
+          - dba_user_password is defined
+          - app_user_password is defined
+
+- name: gcp master
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Create .pgpass file
+      command: touch ~/.pgpass
+
+    - name: set proper mode for the .pgpass file
+      command: chmod 0600 ~/.pgpass
+
+    - name: Create config for the .pgpass file aws replica
+      lineinfile: dest=~/.pgpass line="{{ gcp_host_replica }}:5432:*:{{ my_dba_user }}:{{ dba_user_password }}"
+
+    - name: Drop extension in aws
+      shell: psql -U gds_admin -d {{db }}  -Atq -p 5432 -h {{ gcp_host_master }} -c "drop extension if exists pglogical"
+
+    - name: Drop heartbeat schema
+      shell: psql -U gds_admin -d {{db }}  -Atq -p 5432 -h {{ gcp_host_master }} -c "drop schema if exists heartbeat cascade"
+
+    - name: Check for missing primary keys
+      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_master }} -c "with my_Q1 as (SELECT n.nspname as schema,c.relname as table FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ) select count(*) from my_Q1"
+      register: table_no_pks
+
+    - name: verify no PKs are missing
+      fail: msg="Exiting ----------There are PKs missing"
+      when:  'table_no_pks.stdout|int > 0'
+
+#    - name: Check for missing unique constraints and indexes
+#      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_master }} -c "with my_Q1 as (SELECT n.nspname as schema,c.relname as mytable FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ), my_Q2 as (SELECT rel.relname FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname not in ('pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext') AND contype = 'u'), my_Q3 as(select tbl.relname as table_name from pg_index pgi join pg_class idx on idx.oid = pgi.indexrelid join pg_namespace insp on insp.oid = idx.relnamespace join pg_class tbl on tbl.oid = pgi.indrelid join pg_namespace tnsp on tnsp.oid = tbl.relnamespace where pgi.indisunique and tnsp.nspname not in ('pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext','pg_toast')) select count(*) from my_Q1 where mytable NOT in (select relname from my_Q2) and mytable NOT in (select table_name from my_Q3)" 
+#      register: table_no_uniqs
+#      when: table_no_pks.stdout|int > 0
+
+#    - name: verify no uniqs are missing
+#      fail: msg="Exiting ----------There are unique constraints missing"
+#      when:  'table_no_pks.stdout|int > 0  and table_no_uniqs.stdout|int > 0'
+
+    - pause: prompt="There are primany keys missing, fix them and then press ENTER to continue..."
+      when:  'table_no_pks.stdout|int > 0'
+
+    - name: export globals
+      shell: pg_dumpall -U gds_admin -p 5432 -h {{ gcp_host_master }} --no-role-passwords -g | grep '{{ db }}' > /tmp/{{ db }}_globals.sql
+      ignore_errors: yes
+
+    - name: export schema
+      shell: pg_dump -U gds_admin -N dba -F p -s -f /tmp/{{ db }}_schema.sql -p 5432 -h {{ gcp_host_master }} {{ db }}
+
+    - name: find schemas
+      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_master }} -c "select schema_name from information_schema.schemata where schema_name not in ('dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Check if publication exists
+      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_master }} -c "select count(*) from pg_publication where pubname='my_pub_{{ db }}'"
+      register: count_pub
+
+    - name: Create publication
+      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_master }} -c "CREATE PUBLICATION my_pub_{{ db }} FOR ALL TABLES;"
+      when:  count_pub.stdout|int  == 0
+
+
+- name: Gcp part replica
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - name: Import users
+      shell: psql -U postgres -d postgres -Atq -p 5432 -h {{ gcp_host_replica }} < /tmp/{{ db }}_globals.sql
+      register: users_import
+      ignore_errors: yes
+
+    - name: Grant Role
+      shell: psql -U postgres -d postgres -Atq -p 5432 -h {{ gcp_host_replica }} -c "grant {{ my_dba_user }} to postgres"
+      ignore_errors: yes
+
+    - name: Set dba pass
+      shell: psql -U postgres -d postgres -Atq -p 5432 -h {{ gcp_host_replica }} -c "alter user {{ my_dba_user }} password '{{ dba_user_password }}'"
+
+    - name: Set app pass
+      shell: psql -U postgres -d postgres -Atq -p 5432 -h {{ gcp_host_replica }} -c "alter user {{ my_app_user }} password '{{ app_user_password }}'"
+
+    - name: Allow dba login
+      shell: psql -U postgres -d postgres -Atq -p 5432 -h {{ gcp_host_replica }} -c "alter user {{ my_dba_user }} login"
+
+    - name: Allow app login
+      shell: psql -U postgres -d postgres -Atq -p 5432 -h {{ gcp_host_replica }} -c "alter user {{ my_app_user }} login"
+
+    - name: Check if database exists
+      shell: psql -U postgres -d postgres -Atq -p 5432 -h {{ gcp_host_replica }} -c "select count(*) from pg_database where datname = '{{ db }}'"
+      register: count_database
+
+    - name: Create database
+      shell: psql -U postgres -d postgres -Atq -p 5432 -h {{ gcp_host_replica }} -c "create database {{ db }}"
+      when: 'count_database.stdout|int == 0'
+
+    - name: Import schema
+      shell: psql -U postgres -Atq -d {{ db }} -p 5432 -h {{ gcp_host_replica }} < /tmp/{{ db }}_schema.sql
+      register: db_import
+
+    - name: Create dba schema
+      shell: psql -U postgres -Atq -d {{ db }} -p 5432 -h {{ gcp_host_replica }} -c "create schema if not exists dba"
+
+    - name: Create ext schema
+      shell: psql -U postgres -Atq -d {{ db }} -p 5432 -h {{ gcp_host_replica }} -c "create schema if not exists ext"
+
+    - name: find schemas
+      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_replica }} -c "select schema_name from information_schema.schemata where schema_name not in ('dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Privileges 1/2
+      shell: psql -U {{ my_dba_user }} -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "revoke insert,update,delete on all tables in schema {{ item }} from {{ my_app_user }}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Privileges 2/2
+      shell: psql -U {{ my_dba_user }} -d {{ db }} -At -p 5432 -h {{ gcp_host_replica }} -c "revoke update on all sequences in schema {{ item }} from {{ my_app_user }}"
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Create subscription
+      shell: psql -U postgres -d {{ db }} -Atq -p 5432 -h {{ gcp_host_replica }} -c "CREATE SUBSCRIPTION my_sub_{{ db }} CONNECTION 'host={{ gcp_host_master }} port=5432 dbname={{ db }} user=gds_admin password={{ admin_password }}' PUBLICATION my_pub_{{ db }}; "
+ 
+    - name: Show one-time replication status 
+      shell: psql -U postgres -Atq -d {{ db }} -p 5432 -h {{ gcp_host_replica }} -c "SELECT * FROM pg_stat_subscription;"
+      register: pglogical_repl_status
+    - debug: var=pglogical_repl_status.stdout
+
+
+- name: a play that runs entirely on the bastion host
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - name: Delete the temp globals file
+      file: path=/tmp/{{ db }}_globals.sql state=absent
+
+    - name: Delete the temp schema file
+      file: path=/tmp/{{ db }}_schema.sql state=absent
+
+

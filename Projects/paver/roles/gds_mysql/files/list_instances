@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Simple Helper script for mi.sh
+mi.sh -l

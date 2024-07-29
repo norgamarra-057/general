@@ -1,0 +1,9 @@
+server {
+    server_name _;
+    access_log  /dev/stdout;
+    error_log   /dev/stderr;
+
+    listen       0.0.0.0:80 default_server accept_filter=httpready;
+
+    root /var/empty;
+}

@@ -1,0 +1,62 @@
+##############  REPLICATION ONLY CLUSTER ##############
+---
+gds_carp_peers:
+  - 10.13.110.214  # gds-dub1-prod-db009m1
+  - 10.13.110.215  # gds-dub1-prod-db009s1
+  - 10.13.184.214  # gds-dub1-prod-db009m1
+  - 10.13.184.215  # gds-dub1-prod-db009s1
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+gds_instance_group: gds_prod_dub1_db009
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  mfa_tacacs_prod: # GDS-14905 decommissioned GPROD-224455
+  goods_stores_prod: # GDS-16409  # __SOX__
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 4000
+      relay_log_recovery_force: ON
+      expire_logs_days: 30
+    type: mysql
+    write_origin: dub1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60002
+    nodes:
+      - gds-dub1-prod-db009m1.dub1
+      - gds-dub1-prod-db009s1.dub1
+    master_carp_interface: vlan201
+    slave_carp_interface: vlan202
+    vhid: 203
+    slave_vhid: 203
+    master_vip: 10.13.110.203
+    slave_vips:
+      - 10.13.184.203
+    replication_ips:
+      - 10.13.250.50      # gds-dub1-prod-db009m1.dub1
+      - 10.13.250.210     # gds-dub1-prod-db009s1.dub1
+      - 10.22.142.230     # gds-snc1-prod-db013m1.snc1
+      - 10.22.142.154     # gds-snc1-prod-db013s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.12.216.132/32  # gds-admin01.dub1
+      - 10.13.17.216/32   # gds-admin02.dub1
+      - 10.12.246.85/32   # goods-stores-api-app1.dub1
+      - 10.12.222.67/32   # goods-stores-api-app2.dub1
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    dba_account_name: goods_stores_prod_dba
+    dba_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+    ports:
+      mysqld: 20014
+#  tronicon_cms_prod: # GDS-21792, destroyed GDS-28038

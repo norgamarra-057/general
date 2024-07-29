@@ -1,0 +1,14 @@
+---
+- hosts: gds_dub1_prod_db003
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: dealservice_prod }
+  - { role: gds-mysql-ha, instance: merchant_data_prod }
+  - { role: gds-mysql-ha, instance: client_id_prod }
+  - { role: gds-mysql-ha, instance: goods_itemmaster_prod }
+  - { role: gds-mysql-ha, instance: gtwy_travel_inv_prod }
+  - { role: gds-mysql-ha, instance: coupon_prod }
+  - { role: gds-mysql-ha, instance: login_prod }
+  - { role: gds-mysql-ha, instance: janus_prod }
+  - { role: gds-mysql-ha, instance: staas_prod }

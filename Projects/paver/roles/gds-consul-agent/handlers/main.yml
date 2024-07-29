@@ -1,0 +1,16 @@
+---
+- name: consul start
+  become: yes
+  command: /usr/local/sbin/sv start /var/service/consul
+
+- name: consul restart
+  become: yes
+  command: /usr/local/sbin/sv restart /var/service/consul
+
+- name: consul reload
+  become: yes
+  command: /usr/local/sbin/sv reload /var/service/consul
+
+- name: consul log restart
+  become: yes
+  command: /usr/local/sbin/sv term /var/service/consul/log

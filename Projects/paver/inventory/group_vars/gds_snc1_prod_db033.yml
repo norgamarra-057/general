@@ -1,0 +1,37 @@
+---
+gds_carp_peers:
+  - 10.30.32.250  # gds-snc1-prod-db033m1
+  - 10.30.32.251  # gds-snc1-prod-db033s1
+  - 10.30.33.250  # gds-snc1-prod-db033m1
+  - 10.30.33.251  # gds-snc1-prod-db033s1
+gds_carp_interfaces:
+  - vlan332
+  - vlan333
+gds_instance_group: gds_prod_snc1_db033
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+# Decommed GPROD-248234  merchant_data_prod: # GDS-6252
+
+#  sem_prod: # GDS-5892 Decommissioned GDS-32554
+
+
+#  social_raf_prod: # GDS-5892 Decommissioned GPROD-185133
+
+
+#  crm_message_prod: # GDS-6346 Decommissioned GDS-32555
+
+
+#  geoplaces_prod: # GDS-6348 Decommissioned GPROD-225688
+
+#  arrowhead_prod: # GDS-6595 - Decommed GDS-35811
+
+#  arrowhead_ui_prod: # GDS-6521 - Decommed GDS-35811
+
+#  ideel_prod: # GDS-5992  # __SOX__  Decommissioned GPROD-188777
+
+#  br_booking_prod: # GDS-6702  # __SOX__ # Decommed GPROD-188388
+
+#  gdoop_hue_prod: # GDS-6699 Decommissioned GDS-32556
+  
+#  accounting_prod: # GDS-3568 - Decommed GDS-35811

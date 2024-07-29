@@ -1,0 +1,9 @@
+---
+- name: Check replication status for all instances
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Execute replication check
+      shell: /usr/local/sbin/check_mha_repl.sh
+      changed_when: false
+      register: replication_check

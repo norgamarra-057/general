@@ -1,0 +1,8 @@
+---
+- name: Local temporary ssh key directory
+  become: false
+  local_action: file path="ssh-keys" state=directory mode=0700
+
+- name: Locally generate ssh key
+  become: false
+  local_action: shell /usr/bin/ssh-keygen -q -t rsa -b 2048 -O clear -C "delorean@{{ inventory_hostname }}/mysql_db_backup" -f "ssh-keys/{{ inventory_hostname }}" creates="ssh-keys/{{ inventory_hostname }}" < /dev/null

@@ -1,0 +1,19 @@
+---
+# Fail if database has application connections
+- hosts: 
+  - "{{ node }}"
+  become: yes
+  gather_facts: false
+  tasks: 
+  - name: Check for application connections
+    shell: psql postgres postgres -p{{ postgresql_raw }} -qtc "select count(*) from pg_stat_activity where usename != 'postgres'" | awk '{ print $1}' | head -1
+    register: conn_check
+    when: postgresql_service_status is defined and postgresql_service_status.stdout == "run"
+    changed_when: false
+
+  - name: Fail if there are application level connections
+    fail: 
+      msg: "The instance seems to have application level connections, failing deliberately"
+    when: conn_check.stdout is defined and conn_check.stdout != "0"
+
+

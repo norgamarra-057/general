@@ -1,0 +1,13 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Copy check
+      copy:
+        src: ../../../roles/check_mk/files/checks/postgresql/check_db_replication_delay_master
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655

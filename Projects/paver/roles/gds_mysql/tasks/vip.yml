@@ -1,0 +1,78 @@
+---
+- name: Generate random key for a potential master VIP configuration
+  shell: echo "master-{{ instance_name }}-{{ gds_instance_group }}" | md5
+  register: rw_vip_key
+  changed_when: false
+
+- name: Generate random key for a potential slave VIP configuration
+  shell: echo "slave-{{ instance_name }}-{{ gds_instance_group }}" | md5
+  register: ro_vip_key
+  changed_when: false
+
+- name: Identify node ID
+  set_fact:
+    node_id: "{{ item.0 }}"
+  when: item.1 == ansible_fqdn
+  with_indexed_items: gds_instances[instance_name]['nodes']
+
+- name: Derive defaults (master host)
+  set_fact:
+    rw_vip_skew_default: 50
+    ro_vip_skew_default: 100
+  when: node_id|int == 0
+
+- name: Derive defaults (slave hosts)
+  set_fact:
+    rw_vip_skew_default: 100
+    ro_vip_skew_default: 50
+  when: node_id|int != 0
+
+- name: Derive settings for R/W VIP
+  set_fact:
+    rw_vip_addr: "{{ gds_instances[instance_name]['master_vip'] }}"
+    rw_vip_vhid: "{{ gds_instances[instance_name]['vhid'] }}"
+    rw_vip_vlan: "{{ gds_instances[instance_name]['master_carp_interface'] }}"
+    rw_vip_skew: "{{ gds_instances[instance_name]['master_skew'] | default(rw_vip_skew_default) }}"
+    rw_vip_advb: 5
+
+- name: Derive settings for R/O VIP
+  set_fact:
+    ro_vip_addr: "{{ gds_instances[instance_name]['slave_vips'][0] }}"
+    ro_vip_vhid: "{{ gds_instances[instance_name]['slave_vhid'] }}"
+    ro_vip_vlan: "{{ gds_instances[instance_name]['slave_carp_interface'] }}"
+    ro_vip_skew: "{{ gds_instances[instance_name]['slave_skew'] | default(ro_vip_skew_default) }}"
+    ro_vip_advb: 5
+
+- name: Ensure VLANs are in cloned interfaces
+  lineinfile:
+    dest: /etc/rc.conf.local
+    regexp: '^cloned_interfaces=["](((?!{{ item }}).)*?)[ ]*({{ item }})?["]'
+    line: 'cloned_interfaces="\1 {{ item }}"'
+    backrefs: yes
+  with_items:
+    - "{{ rw_vip_vlan }}"
+    - "{{ ro_vip_vlan }}"
+
+- name: Ensure main VLAN configuration exists for both VIPs
+  lineinfile:
+    dest: /etc/rc.conf.local
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: '^ifconfig_{{ rw_vip_vlan }}=.*'
+      line: 'ifconfig_{{ rw_vip_vlan }}="vlandev lagg0 vlan {{ rw_vip_vlan | regex_replace("vlan", "") }} up"'
+    - regexp: '^ifconfig_{{ ro_vip_vlan }}=.*'
+      line: 'ifconfig_{{ ro_vip_vlan }}="vlandev lagg0 vlan {{ ro_vip_vlan | regex_replace("vlan", "") }} up"'
+
+- name: Ensure R/W VIP is configured
+  lineinfile:
+    dest: /etc/rc.conf.local
+    regexp: "^ifconfig_.*vhid[ ]+{{ rw_vip_vhid }}.*alias[ ]+{{ rw_vip_addr }}/32"
+    line: 'ifconfig_{{ rw_vip_vlan }}_alias{{ rw_vip_vhid }}="vhid {{ rw_vip_vhid }} pass {{ rw_vip_key.stdout }} advbase {{ rw_vip_advb }} advskew {{ rw_vip_skew }} alias {{ rw_vip_addr }}/32"'
+
+- name: Ensure R/O VIP is configured
+  lineinfile:
+    dest: /etc/rc.conf.local
+    regexp: "^ifconfig_.*vhid[ ]+{{ ro_vip_vhid }}.*alias[ ]+{{ ro_vip_addr }}/32"
+    line: 'ifconfig_{{ ro_vip_vlan }}_alias{{ ro_vip_vhid }}="vhid {{ ro_vip_vhid }} pass {{ ro_vip_key.stdout }} advbase {{ ro_vip_advb }} advskew {{ ro_vip_skew }} alias {{ ro_vip_addr }}/32"'
+

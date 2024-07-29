@@ -1,0 +1,21 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+   - name: FreeBSD | run | restart
+     shell: |
+       sv -w 60 stop /var/service/hydra-agent || sv kill /var/service/hydra-agent
+       sv start /var/service/hydra-agent
+     executable: /usr/local/bin/bash
+     register: log_output
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ log_output.stdout_lines }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       var: outputs
+

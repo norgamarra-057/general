@@ -1,0 +1,21 @@
+### -*- mode: conf; -*-
+[monitoring_uat_splunk_indexers_snc1]
+splunk-freebsd1.snc1
+
+[monitoring_uat_splunk_indexers:children]
+monitoring_uat_splunk_indexers_snc1
+
+[monitoring_uat_all:children]
+monitoring_uat_splunk_indexers
+
+[monitoring_all:children]
+monitoring_uat_all
+
+[FreeBSD:children]
+monitoring_uat_all
+
+[FreeBSD:vars]
+ansible_python_interpreter=/usr/local/bin/python2.7
+
+[dc_snc1_uat:children]
+monitoring_uat_all

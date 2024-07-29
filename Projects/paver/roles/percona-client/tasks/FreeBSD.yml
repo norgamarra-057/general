@@ -1,0 +1,5 @@
+---
+- name: Percona Client | FreeBSD | percona-client
+  pkgng:
+    name="percona{{percona_version}}-client-{{ percona_client_version }}"
+    state=present

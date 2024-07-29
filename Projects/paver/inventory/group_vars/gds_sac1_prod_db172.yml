@@ -1,0 +1,374 @@
+---
+gds_carp_peers:
+  - 10.32.124.220  # gds-sac1-prod-db172m1
+  - 10.32.124.221  # gds-sac1-prod-db172s1
+  - 10.32.125.220  # gds-sac1-prod-db172m1
+  - 10.32.125.221  # gds-sac1-prod-db172s1
+gds_carp_interfaces:
+  - vlan202
+  - vlan203
+gds_instance_group: gds_prod_sac1_db172
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  pwa_prod: # GDS-1868
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 60
+      max_connections_force: 8000
+      max_user_connections_force: 7980
+      innodb_buffer_pool_size_mb_force: 200000
+      innodb_thread_sleep_delay_force: 0
+      innodb_flush_neighbors_force: 0
+      long_query_time_force: 1
+      log_slow_rate_limit_force: 11
+      log_warnings_force: 2
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+      group_concat_max_len_force: 16384
+      relay_log_recovery_force: ON
+      expire_logs_days: 99
+    type: mysql
+    write_origin: sac1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-sac1-prod-db172m1.sac1
+      - gds-sac1-prod-db172s1.sac1
+    master_carp_interface: vlan202
+    slave_carp_interface: vlan203
+    vhid: 72
+    slave_vhid: 72
+    master_vip: 10.32.124.72
+    slave_vips:
+      - 10.32.125.72
+    replication_ips:
+      - 10.32.121.73 # gds-sac1-prod-db172m1.sac1
+      - 10.32.121.222 # gds-sac1-prod-db172s1.sac1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.32.103.209/32  # gds-admin01.sac1
+      - 10.32.57.167/32  # gds-admin02.sac1
+      - 10.22.142.192/32 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.216/32 # gds-snc1-prod-db172s1.snc1
+      - 10.32.144.93/32   # dealservice-app1.sac1
+      - 10.32.74.33/32   # dealservice-app2.sac1
+      - 10.32.146.176/32   # dealservice-app3.sac1
+      - 10.32.140.87/32   # dealservice-app4.sac1
+      - 10.32.110.125/32   # dealservice-app5.sac1
+      - 10.32.69.133/32   # dealservice-app6.sac1
+      - 10.32.150.211/32   # dealservice-app7.sac1
+      - 10.32.142.118/32   # dealservice-app8.sac1
+      - 10.32.217.22/32   # dealservice-app9.sac1
+      - 10.32.160.91/32   # dealservice-app10.sac1
+      - 10.32.168.54/32   # dealservice-app11.sac1
+      - 10.32.55.13/32   # dealservice-app12.sac1
+      - 10.32.120.143/32   # dealservice-app13.sac1
+      - 10.32.97.214/32   # dealservice-app14.sac1
+      - 10.32.49.99/32   # dealservice-app15.sac1
+      - 10.32.150.150/32   # dealservice-utility1.sac1
+      - 10.32.160.88/32   # dealservice-utility2.sac1
+      - 10.32.217.78/32   # dealservice-utility3.sac1
+      - 10.32.71.181/32   # voucher-inventory-app1.sac1
+      - 10.32.213.141/32   # voucher-inventory-app2.sac1
+      - 10.32.142.155/32   # voucher-inventory-app3.sac1
+      - 10.32.120.197/32   # voucher-inventory-app4.sac1
+      - 10.32.209.155/32   # voucher-inventory-memcache1.sac1
+      - 10.32.174.131/32   # voucher-inventory-memcache2.sac1
+      - 10.32.152.35/32   # voucher-inventory-utility1.sac1
+      - 10.32.150.215/32   # voucher-inventory-utility2.sac1
+      - 10.32.55.15/32   # voucher-inventory-worker1.sac1
+      - 10.32.142.209/32   # voucher-inventory-worker2.sac1
+      - 10.32.105.168/32   # deal-ecosystem-app1.sac1
+      - 10.32.239.124/32   # deal-ecosystem-app2.sac1
+      - 10.32.110.78/32   # deal-ecosystem-app3.sac1
+      - 10.32.164.143/32   # deal-ecosystem-app4.sac1
+      - 10.32.170.210/32   # unity-jedi-app1.sac1
+      - 10.32.40.250/32   # unity-jedi-app2.sac1
+      - 10.32.152.178/32   # unity-jedi-app3.sac1
+      - 10.32.74.89/32   # unity-jedi-app4.sac1
+      - 10.32.233.5/32   # unity-jedi-app5.sac1
+      - 10.32.213.178/32   # unity-jedi-app6.sac1
+      - 10.32.110.221/32   # dealservice-app-rw1.sac1
+      - 10.32.93.187/32   # dealservice-app-rw2.sac1
+      - 10.32.231.41/32   # dealservice-app-rw3.sac1
+      - 10.32.105.71/32   # dealservice-app-rw4.sac1
+      - 10.32.142.18/32   # orders-app1.sac1
+      - 10.32.148.79/32   # orders-app2.sac1
+      - 10.32.62.17/32   # orders-app3.sac1
+      - 10.32.40.98/32   # orders-app4.sac1
+      - 10.32.158.104/32   # orders-app5.sac1
+      - 10.32.71.198/32   # orders-app6.sac1
+      - 10.32.162.175/32   # orders-app7.sac1
+      - 10.32.156.154/32   # orders-app8.sac1
+      - 10.32.76.104/32   # orders-app9.sac1
+      - 10.32.160.143/32   # orders-app10.sac1
+      - 10.32.152.76/32   # orders-app11.sac1
+      - 10.32.217.242/32   # orders-app12.sac1
+      - 10.32.110.219/32   # orders-app13.sac1
+      - 10.32.170.201/32   # orders-app14.sac1
+      - 10.32.112.144/32   # orders-app15.sac1
+      - 10.32.100.232/32   # orders-app16.sac1
+      - 10.32.158.243/32   # orders-app17.sac1
+      - 10.32.107.244/32   # orders-app18.sac1
+      - 10.32.107.6/32   # orders-app19.sac1
+      - 10.32.107.179/32   # orders-app20.sac1
+      - 10.32.107.132/32   # orders-app21.sac1
+      - 10.32.107.166/32   # orders-app22.sac1
+      - 10.32.107.176/32   # orders-app23.sac1
+      - 10.32.107.201/32   # orders-app24.sac1
+      - 10.20.41.52/32   # orders-irb1.snc1
+      - 10.22.216.57/32   # orders-irb2.snc1
+      - 10.32.150.32/32   # orders-irb1.sac1
+      - 10.32.142.63/32   # orders-irb2.sac1
+      - 10.20.41.131/32   # orders-irb-rw1.snc1
+      - 10.22.218.190/32   # orders-irb-rw2.snc1
+      - 10.32.140.193/32   # orders-irb-rw1.sac1
+      - 10.32.62.188/32   # orders-irb-rw2.sac1
+      - 10.32.69.36/32   # orders-read-batch3.sac1
+      - 10.32.103.205/32   # orders-read-app1.sac1
+      - 10.32.168.153/32   # orders-read-app2.sac1
+      - 10.32.213.38/32   # orders-read-app3.sac1
+      - 10.32.162.83/32   # orders-read-app4.sac1
+      - 10.32.105.194/32   # orders-read-app5.sac1
+      - 10.32.69.239/32   # orders-read-app6.sac1
+      - 10.32.49.229/32   # orders-read-app7.sac1
+      - 10.32.170.249/32   # orders-read-app8.sac1
+      - 10.32.208.85/32   # orders-read-app9.sac1
+      - 10.32.49.98/32   # orders-read-app10.sac1
+      - 10.32.176.191/32   # orders-read-app11.sac1
+      - 10.32.150.47/32   # orders-read-app12.sac1
+      - 10.32.154.235/32   # orders-read-app13.sac1
+      - 10.32.152.97/32   # orders-read-app14.sac1
+      - 10.32.254.204/32   # orders-read-app15.sac1
+      - 10.32.57.78/32   # orders-read-app16.sac1
+      - 10.32.74.28/32   # orders-read-app17.sac1
+      - 10.32.40.132/32   # orders-read-app18.sac1
+      - 10.32.108.220/32   # orders-read-app19.sac1
+      - 10.32.107.156/32   # orders-read-app20.sac1
+      - 10.32.69.52/32   # orders-read-app21.sac1
+      - 10.32.217.248/32   # orders-read-app22.sac1
+      - 10.32.224.68/32   # orders-read-app23.sac1
+      - 10.32.215.232/32   # orders-read-app24.sac1
+      - 10.32.174.115/32   # orders-read-app25.sac1
+      - 10.32.105.48/32   # orders-read-app26.sac1
+      - 10.32.162.184/32   # orders-read-app27.sac1
+      - 10.32.166.32/32   # orders-read-app28.sac1
+      - 10.32.223.213/32   # orders-read-app29.sac1
+      - 10.32.168.112/32   # orders-read-app30.sac1
+      - 10.32.140.240/32   # orders-read-app31.sac1
+      - 10.32.107.86/32   # orders-read-app32.sac1
+      - 10.32.148.90/32   # orders-read-app33.sac1
+      - 10.32.110.136/32   # orders-read-app34.sac1
+      - 10.32.112.197/32   # orders-read-app35.sac1
+      - 10.32.144.75/32   # orders-read-app36.sac1
+      - 10.32.49.7/32   # orders-read-app37.sac1
+      - 10.32.107.54/32   # orders-read-app38.sac1
+      - 10.32.110.32/32   # orders-read-app39.sac1
+      - 10.32.176.184/32   # orders-read-app40.sac1
+      - 10.32.239.161/32   # orders-read-app41.sac1
+      - 10.32.254.235/32   # orders-read-app42.sac1
+      - 10.32.112.118/32   # orders-read-app43.sac1
+      - 10.32.71.249/32   # orders-read-app44.sac1
+      - 10.32.74.58/32   # orders-read-app45.sac1
+      - 10.32.72.61/32   # orders-read-app46.sac1
+      - 10.32.107.61/32   # orders-read-app47.sac1
+      - 10.32.103.239/32   # orders-read-app48.sac1
+      - 10.32.37.137/32   # orders-read-app49.sac1
+      - 10.32.178.56/32   # orders-read-app50.sac1
+      - 10.32.120.64/32   # orders-read-app51.sac1
+      - 10.32.164.19/32   # orders-read-app52.sac1
+      - 10.32.170.93/32   # orders-worker1.sac1
+      - 10.32.231.52/32   # orders-worker2.sac1
+      - 10.32.160.246/32   # users-service-app1.sac1
+      - 10.32.170.158/32   # users-service-app2.sac1
+      - 10.32.164.218/32   # users-service-app3.sac1
+      - 10.32.57.146/32    # users-service-app4.sac1
+      - 10.32.69.107/32    # users-service-utility1.sac1
+      - 10.32.148.130/32   # users-service-utility2.sac1
+      - 10.32.140.126/32 # orders-sphinx1.sac1
+      - 10.32.146.187/32 # orders-sphinx2.sac1
+      - 10.32.231.25/32 # orders-utility1.sac1
+      - 10.32.213.161/32 # orders-utility2.sac1
+      - 10.32.156.80/32   # dealservice-app-rw5.sac1
+      - 10.32.71.41/32   # dealservice-app-rw6.sac1
+      - 10.32.150.131/32   # dealservice-app-rw7.sac1
+      - 10.32.176.46/32   # deal-ecosystem-app5.sac1
+      - 10.32.239.240/32   # deal-ecosystem-app6.sac1
+      - 10.32.224.192/32   # deal-ecosystem-app7.sac1
+      - 10.32.158.61/32   # deal-ecosystem-app8.sac1
+      - 10.32.253.6/32   # deal-ecosystem-app9.sac1
+      - 10.32.154.215/32   # darwin-indexer1.sac1
+      - 10.32.72.149/32   # voucher-inventory-app5.sac1
+      - 10.32.69.108/32   # voucher-inventory-app6.sac1
+      - 10.32.94.53/32   # voucher-inventory-app7.sac1
+      - 10.32.97.217/32   # voucher-inventory-app8.sac1
+      - 10.32.225.35/32   # voucher-inventory-app9.sac1
+      - 10.32.230.8/32   # voucher-inventory-app10.sac1
+      - 10.32.120.120/32   # voucher-inventory-app11.sac1
+      - 10.32.176.220/32   # voucher-inventory-app12.sac1
+      - 10.32.208.115/32   # voucher-inventory-app13.sac1
+      - 10.32.178.236/32   # voucher-inventory-app14.sac1
+      - 10.32.234.84/32   # voucher-inventory-app15.sac1
+      - 10.32.103.105/32   # voucher-inventory-app16.sac1
+      - 10.32.231.142/32   # voucher-inventory-app17.sac1
+      - 10.32.62.162/32   # voucher-inventory-app18.sac1
+      - 10.32.49.84/32   # voucher-inventory-app19.sac1
+      - 10.32.37.61/32   # voucher-inventory-app20.sac1
+      - 10.32.160.222/32   # voucher-inventory-app21.sac1
+      - 10.32.100.95/32   # voucher-inventory-app22.sac1
+      - 10.32.229.30/32   # voucher-inventory-app23.sac1
+      - 10.32.248.217/32   # voucher-inventory-app24.sac1
+      - 10.32.248.171/32   # voucher-inventory-jworker1.sac1
+      - 10.32.69.221/32   # voucher-inventory-jworker2.sac1
+      - 10.32.178.224/32   # voucher-inventory-app5.sac1
+      - 10.32.37.127/32   # voucher-inventory-app6.sac1
+      - 10.32.160.188/32   # voucher-inventory-app7.sac1
+      - 10.32.62.118/32   # voucher-inventory-app8.sac1
+      - 10.32.84.231/32   # voucher-inventory-app9.sac1
+      - 10.32.49.142/32   # voucher-inventory-app10.sac1
+      - 10.32.248.93/32   # voucher-inventory-app11.sac1
+      - 10.32.172.86/32   # deal-ecosystem-app10.sac1
+      - 10.32.178.157/32   # deal-ecosystem-app11.sac1
+      - 10.32.40.145/32   # deal-ecosystem-app12.sac1
+      - 10.32.37.8/32   # deal-ecosystem-app13.sac1
+      - 10.32.158.101/32   # deal-ecosystem-app14.sac1
+      - 10.32.170.140/32   # deal-ecosystem-app15.sac1
+      - 10.32.213.13/32   # deal-ecosystem-app16.sac1
+      - 10.32.152.171/32   # unity-jedi-app7.sac1
+      - 10.32.172.250/32   # unity-jedi-app8.sac1
+      - 10.32.234.33/32   # unity-jedi-app9.sac1
+      - 10.22.71.249/32   # unity-jedi-app1.snc1
+      - 10.20.77.166/32   # unity-jedi-app2.snc1
+      - 10.22.134.85/32   # unity-jedi-app3.snc1
+      - 10.32.72.59/32   # unity-jedi-app10.sac1
+      - 10.32.158.40/32   # unity-jedi-app11.sac1
+      - 10.32.97.110/32   # unity-jedi-app12.sac1
+      - 10.32.254.239/32   # users-service-app5.sac1
+      - 10.32.142.206/32   # users-service-app6.sac1
+      - 10.32.154.118/32   # users-service-app7.sac1
+      - 10.32.152.5/32   # users-service-app8.sac1
+      - 10.32.254.232/32   # users-service-app9.sac1
+      - 10.32.234.146/32   # users-service-app10.sac1
+      - 10.32.254.71/32   # users-service-app11.sac1
+      - 10.32.254.52/32   # dealservice-app16.sac1
+      - 10.32.254.222/32   # dealservice-app17.sac1
+      - 10.32.254.216/32   # dealservice-app18.sac1
+      - 10.32.254.223/32   # dealservice-app19.sac1
+      - 10.32.247.221/32   # dealservice-app20.sac1
+      - 10.32.254.51/32   # orders-read-batch1.sac1
+      - 10.32.254.224/32   # orders-read-batch2.sac1
+      - 10.32.254.55/32   # voucher-inventory-japp21.sac1
+      - 10.32.230.89/32   # voucher-inventory-japp22.sac1
+      - 10.32.254.203/32   # voucher-inventory-japp23.sac1
+      - 10.32.254.204/32   # voucher-inventory-japp24.sac1
+      - 10.32.247.83/32   # voucher-inventory-japp25.sac1
+      - 10.32.55.146/32   # dealservice-app-rw8.sac1
+      - 10.32.229.192/32   # dealservice-app-rw9.sac1
+      - 10.32.170.6/32   # dealservice-app-rw10.sac1
+      - 10.32.100.199/32   # dealservice-app-rw11.sac1
+      - 10.32.72.41/32   # users-service-app12.sac1
+      - 10.32.213.195/32   # users-service-app13.sac1
+      - 10.32.112.138/32   # users-service-app14.sac1
+      - 10.32.76.113/32   # users-service-app15.sac1
+      - 10.32.234.67/32   # users-service-app16.sac1
+      - 10.32.71.147/32   # users-service-app17.sac1
+      - 10.32.120.228/32   # users-service-app18.sac1
+      - 10.32.166.213/32   # users-service-app19.sac1
+      - 10.32.160.42/32   # users-service-app20.sac1
+      - 10.32.231.96/32   # users-service-app21.sac1
+      - 10.32.170.62/32   # voucher-inventory-ht-read-app1.sac1
+      - 10.32.172.20/32   # voucher-inventory-ht-read-app2.sac1
+      - 10.32.158.9/32   # voucher-inventory-ht-read-app3.sac1
+      - 10.32.152.166/32   # voucher-inventory-ht-read-app4.sac1
+      - 10.32.154.75/32   # voucher-inventory-lt-read-app5.sac1
+      - 10.32.146.155/32   # voucher-inventory-lt-read-app6.sac1
+      - 10.32.208.118/32   # voucher-inventory-lt-read-app7.sac1
+      - 10.32.57.218/32   # voucher-inventory-lt-read-app8.sac1
+      - 10.32.103.50/32   # voucher-inventory-ht-write-app1.sac1
+      - 10.32.248.146/32   # voucher-inventory-ht-write-app2.sac1
+      - 10.32.148.100/32   # voucher-inventory-ht-write-app3.sac1
+      - 10.32.158.220/32   # voucher-inventory-ht-write-app4.sac1
+      - 10.32.224.84/32   # voucher-inventory-lt-write-app1.sac1
+      - 10.32.178.29/32   # voucher-inventory-lt-write-app2.sac1
+      - 10.32.37.177/32   # voucher-inventory-lt-write-app3.sac1
+      - 10.32.164.177/32   # voucher-inventory-lt-write-app4.sac1
+      - 10.32.40.106/32   # voucher-inventory-worker3.sac1
+      - 10.32.76.99/32   # voucher-inventory-ht-read-app5.sac1
+      - 10.32.69.250/32   # voucher-inventory-ht-read-app6.sac1
+      - 10.32.37.231/32   # voucher-inventory-ht-read-app7.sac1
+      - 10.32.209.238/32   # voucher-inventory-ht-read-app8.sac1
+      - 10.32.74.190/32   # voucher-inventory-ht-read-app9.sac1
+      - 10.32.223.103/32   # voucher-inventory-ht-read-app10.sac1
+      - 10.32.108.152/32   # dealservice-app-rw12.sac1
+      - 10.32.108.136/32   # dealservice-app-rw13.sac1
+      - 10.32.108.232/32   # dealservice-app-rw14.sac1
+      - 10.211.64.0/19   # conSub1
+      - 10.211.96.0/19   # conSub2
+      - 10.211.142.0/24   # conSub3
+      - 10.32.107.99/32 # orders-read-batch4.sac1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: pwa_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 50.115.209.4/32   #b1.sac1
+      - 50.115.209.5/32   #b2.sac1
+    ports:
+      mysqld: 20001
+    playback_enabled: true
+    playback:
+      peers:
+        - node: gds-sac1-prod-db172m1.sac1
+          peer: gds-sac1-prod-db172s1.sac1
+        - node: gds-sac1-prod-db172s1.sac1
+          peer: gds-sac1-prod-db172m1.sac1
+      manage_mysql_slowlogd: 1
+      mysql_user_to_check: thepoint_db
+      user: playback_user
+      password: mee5pieK
+      schema: groupon_production
+      thread_pool_size: 100
+      user_connection_threshold: 15
+      playback_connection_timeout: 20
+      mysql_slowlogd_port: 30001
+    admin_redirect_peers:
+      - 10.22.142.192/32 # gds-snc1-prod-db017m1.snc1
+      - 10.22.142.216/32 # gds-snc1-prod-db017s1.snc1
+      - 10.22.142.197/32 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.246/32 # gds-snc1-prod-db172s1.snc1
+      - 10.22.142.197/32 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.246/32 # gds-snc1-prod-db172s1.snc1
+      - 10.22.142.177/32 # gds-snc1-prod-db173m1.snc1
+      - 10.22.142.77/32 # gds-snc1-prod-db173s1.snc1
+      - 10.22.142.214/32 # gds-snc1-prod-db174m1.snc1
+      - 10.22.142.247/32 # gds-snc1-prod-db174s1.snc1
+      - 10.22.142.19/32   # gds-snc1-prod-db175m1.snc1
+      - 10.22.142.229/32   # gds-snc1-prod-db175s1.snc1
+      - 10.22.142.229/32 # gds-snc1-prod-db017m2.snc1
+      - 10.32.114.27/32  # gds-sac1-prod-db017m1.sac1
+      - 10.32.114.128/32  # gds-sac1-prod-db017s1.sac1
+      - 10.32.121.73/32   #gds-sac1-prod-db172m1.sac1
+      - 10.32.121.222/32   #gds-sac1-prod-db172s1.sac1
+      - 10.32.121.53/32   #gds-sac1-prod-db173m1.sac1
+      - 10.32.121.68/32   #gds-sac1-prod-db173s1.sac1
+      - 10.32.121.187/32   #gds-sac1-prod-db174m1.sac1
+      - 10.32.121.206/32   #gds-sac1-prod-db174s1.sac1
+      - 10.32.121.203/32   #gds-sac1-prod-db175m1.sac1
+      - 10.32.114.98/32   #gds-sac1-prod-db175s1.sac1
+      - 10.13.250.142/32 # gds-dub1-prod-db171m1.dub1
+      - 10.13.250.115/32  # gds-dub1-prod-db171s1.dub1
+      - 10.13.250.163/32   #gds-dub1-prod-db172m1.dub1
+      - 10.13.250.125/32   #gds-dub1-prod-db172s1.dub1
+      - 10.13.250.42/32   #gds-dub1-prod-db173m1.dub1
+      - 10.13.250.217/32   #gds-dub1-prod-db173s1.dub1

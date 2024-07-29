@@ -1,0 +1,10 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst -v\
+    -e {{ pgbouncer_path }}/env \
+        -u pgbouncer:pgbouncer \
+  /usr/local/bin/pgbouncer \
+    --user='pgbouncer' \
+    {{ pgbouncer_path }}/etc/pgbouncer.ini

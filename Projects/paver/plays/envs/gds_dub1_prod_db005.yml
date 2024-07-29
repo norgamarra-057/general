@@ -1,0 +1,12 @@
+---
+- hosts: gds_dub1_prod_db005
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: goods_prod }
+  - { role: gds-mysql-ha, instance: gpn_prod }
+  - { role: gds-mysql-ha, instance: ol_book_avail_prod }
+  - { role: gds-mysql-ha, instance: ol_book_appnt_prod }
+  - { role: gds-mysql-ha, instance: mechazilla_prod }
+  - { role: gds-mysql-ha, instance: cs_api_prod }
+  - { role: gds-mysql-ha, instance: affiliate_prod }

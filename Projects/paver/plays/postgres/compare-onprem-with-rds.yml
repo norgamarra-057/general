@@ -1,0 +1,406 @@
+---
+- name: Ensure command line variables are set and daas part 1
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+          - aws_host is defined
+
+    - set_fact:
+        my_db_schema={{ gds_instances[instance].schemas }}
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+
+    - name: check if database is defined
+      fail: msg="Exiting ---------database is not defined"
+      when:  my_db_name is not defined
+
+    - name: check if db schema is defined
+      fail: msg="Exiting --------- dba user is not defined"
+      when:  my_db_schema is not defined
+
+    - name: Find tables onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select schemaname,relname from pg_stat_user_tables where schemaname in ('{{ item }}') order by 1,2" | sort >> /tmp/tables_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find views onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select table_schema as schema_name,table_name as view_name from information_schema.views where table_schema not in ('information_schema', 'pg_catalog','dba','pglogical') order by 1,2" | sort >> /tmp/views_onprem_{{ my_db_name }}.txt
+
+    - name: Find indexes onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select schemaname,relname,indexrelname from pg_stat_user_indexes where schemaname in ('{{ item }}') order by 1,2,3" | sort >> /tmp/indexes_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find indexes def onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select indexdef from pg_indexes where schemaname in ('{{ item }}') order by 1" | sort >> /tmp/indexesdef_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find columns onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select table_catalog,table_schema,table_name,column_name,data_type from information_schema.columns where table_schema in ('{{ item }}') order by 1,2,3,4,5" | sort >> /tmp/columns_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find nullable columns onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select table_schema,table_name,column_name,is_nullable from information_schema.columns where table_schema in ('{{ item }}') order by 1,2,3" >> /tmp/nullables_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find constraints onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "SELECT tc.constraint_name, tc.table_name, kcu.column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name where tc.table_schema IN ('{{ item }}') ORDER BY 1,2,3" | sort >> /tmp/constraints_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find sequences onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select sequence_schema,sequence_name,data_type from information_schema.sequences order by 1,2,3" | sort >> /tmp/sequences_onprem_{{ my_db_name }}.txt
+
+    - name: Find extensions onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select extname FROM pg_extension where extname not in ('pglogical_origin')" | sort >> /tmp/extensions_onprem_{{ my_db_name }}.txt
+
+    - name: Find functions onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "SELECT routines.routine_name, parameters.data_type, parameters.ordinal_position FROM information_schema.routines LEFT JOIN information_schema.parameters ON routines.specific_name=parameters.specific_name WHERE routines.specific_schema in ('{{ item }}') ORDER BY 1,2,3 " | sort >> /tmp/functions_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find types onprem
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "SELECT typname FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace WHERE nspname in ('{{ item }}') order by 1" | sort >> /tmp/types_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+#    - name: Find lob onprem
+#      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select count(*) from pg_largeobject" >> /tmp/lob_onprem_{{ my_db_name }}.txt
+
+
+    - name: Find rowcount onprem
+      shell: psql -U postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c " with myQ1 as (select a.schemaname as table_schema, a.relname as table_name, pg_size_pretty(pg_total_relation_size(a.relid)) as total_size, pg_size_pretty(pg_relation_size(a.relid)) as data_size, pg_size_pretty(pg_total_relation_size(a.relid) - pg_relation_size(a.relid)) as external_size, reltuples as rows_pglass, n_live_tup as rows_statusertables from pg_catalog.pg_statio_user_tables a, pg_class b, pg_stat_user_tables c where a.relname = b.relname and a.relname = c.relname order by pg_total_relation_size(a.relid) desc,pg_relation_size(a.relid) desc limit 15) select * from myQ1 order by 1,2 asc;" >> /tmp/rowcount_onprem_{{ my_db_name }}.txt
+
+    - name: Find if tables are missing from pglogical
+      shell: psql -U postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select relname,set_reloid from pg_stat_user_tables LEFT JOIN pglogical.replication_set_table on schemaname || '.' || relname = set_reloid::text where  set_reloid is null and schemaname in ('{{ item }}')" >> /tmp/missingtables_onprem_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+
+    - fetch: src=/tmp/tables_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/indexes_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/indexesdef_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/columns_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/constraints_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/sequences_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/extensions_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/functions_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/views_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/types_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+#    - fetch: src=/tmp/lob_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/rowcount_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/missingtables_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+    - fetch: src=/tmp/nullables_onprem_{{ my_db_name }}.txt dest=/tmp/ flat=yes validate_checksum=yes fail_on_missing=yes
+
+    - name: Delete the temp file 1
+      file: path=/tmp/tables_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 2
+      file: path=/tmp/indexes_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 3
+      file: path=/tmp/indexesdef_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 4
+      file: path=/tmp/columns_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 5
+      file: path=/tmp/constraints_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 6
+      file: path=/tmp/sequences_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 7
+      file: path=/tmp/extensions_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 8
+      file: path=/tmp/functions_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 9
+      file: path=/tmp/views_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 10
+      file: path=/tmp/types_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 11
+      file: path=/tmp/rowcount_onprem_{{ my_db_name }}.txt state=absent
+
+#    - name: Delete the temp file 11
+#      file: path=/tmp/lob_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 12
+      file: path=/tmp/missingtables_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 13
+      file: path=/tmp/nullables_onprem_{{ my_db_name }}.txt state=absent
+
+- name: Aws part 1
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_first_db: "{{ hostvars[daas_host]['my_first_db'] }}"
+        my_db_schema: "{{ hostvars[daas_host]['my_db_schema'] }}"
+
+
+    - name: Find tables aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select schemaname,relname from pg_stat_user_tables where schemaname in ('{{ item }}') order by 1,2" | sort >> /tmp/tables_aws_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find indexes aws
+      shell: psql -U gds_admin -d {{ my_db_name }}  -At -p 5432 -h {{ aws_host }} -c "select schemaname,relname,indexrelname from pg_stat_user_indexes where schemaname in ('{{ item }}') order by 1" | sort >> /tmp/indexes_aws_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find indexes def aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select indexdef from pg_indexes where schemaname in ('{{ item }}') order by 1" | sort >> /tmp/indexesdef_aws_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find columns aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select table_catalog,table_schema,table_name,column_name,data_type from information_schema.columns where table_schema in ('{{ item }}') order by 1,2,3,4,5" | sort >> /tmp/columns_aws_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find nullable columns aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select table_schema,table_name,column_name,is_nullable from information_schema.columns where table_schema in ('{{item }}') order by 1,2,3" >> /tmp/nullables_aws_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find constraints aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "SELECT tc.constraint_name, tc.table_name,kcu.column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name where tc.table_schema IN ('{{ item }}') ORDER BY 1,2,3" | sort >> /tmp/constraints_aws_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find heartbeat aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select last_updated,master_host from heartbeat.repl_status" > /tmp/heartbeat_aws_{{ my_db_name }}.txt
+      ignore_errors: yes
+
+    - name: Find sequences aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select sequence_schema,sequence_name,data_type from information_schema.sequences order by 1,2,3" | sort >> /tmp/sequences_aws_{{ my_db_name }}.txt
+
+    - name: Find extensions aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select extname FROM pg_extension where extname not in ('pglogical_origin')" | sort >> /tmp/extensions_aws_{{ my_db_name }}.txt
+
+    - name: Find functions aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select routines.routine_name, parameters.data_type, parameters.ordinal_position from information_schema.routines left join information_schema.parameters on routines.specific_name=parameters.specific_name where routines.specific_schema in ('{{ item }}') order by 1,2,3" | sort >> /tmp/functions_aws_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Find views aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select table_schema as schema_name,table_name as view_name from information_schema.views where table_schema not in ('information_schema', 'pg_catalog','dba','pglogical') order by 1,2 " | sort >> /tmp/views_aws_{{ my_db_name }}.txt
+
+    - name: Find types aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "SELECT typname FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace WHERE nspname in ('{{ item }}') order by 1" | sort >> /tmp/types_aws_{{ my_db_name }}.txt
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+#    - name: Find lob aws
+#      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select count(*) from pg_largeobject " >> /tmp/lob_aws_{{ my_db_name }}.txt
+
+    - name: Find rowcount aws
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -c " with myQ1 as (select a.schemaname as table_schema, a.relname as table_name, pg_size_pretty(pg_total_relation_size(a.relid)) as total_size, pg_size_pretty(pg_relation_size(a.relid)) as data_size, pg_size_pretty(pg_total_relation_size(a.relid) - pg_relation_size(a.relid)) as external_size, reltuples as rows_pglass, n_live_tup as rows_statusertables from pg_catalog.pg_statio_user_tables a, pg_class b, pg_stat_user_tables c where a.relname = b.relname and a.relname = c.relname order by pg_total_relation_size(a.relid) desc,pg_relation_size(a.relid) desc limit 15) select * from myQ1 order by 1,2 asc"  >> /tmp/rowcount_aws_{{ my_db_name }}.txt
+
+    - name: Get difference for tables
+      command: diff /tmp/tables_onprem_{{ my_db_name }}.txt /tmp/tables_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug tables
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for indexes
+      command: diff /tmp/indexes_onprem_{{ my_db_name }}.txt /tmp/indexes_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug indexes
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for indexes def
+      command: diff /tmp/indexesdef_onprem_{{ my_db_name }}.txt /tmp/indexesdef_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug indexes definitions
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for columns
+      command: diff /tmp/columns_onprem_{{ my_db_name }}.txt /tmp/columns_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug columns
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for constraints
+      command: diff /tmp/constraints_onprem_{{ my_db_name }}.txt /tmp/constraints_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug constraints
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for sequences
+      command: diff /tmp/sequences_onprem_{{ my_db_name }}.txt /tmp/sequences_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug sequences
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for extensions
+      command: diff /tmp/extensions_onprem_{{ my_db_name }}.txt /tmp/extensions_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug extensions
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for functions
+      command: diff /tmp/functions_onprem_{{ my_db_name }}.txt /tmp/functions_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug functions
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for views
+      command: diff /tmp/views_onprem_{{ my_db_name }}.txt /tmp/views_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug views
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for types
+      command: diff /tmp/types_onprem_{{ my_db_name }}.txt /tmp/types_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug types
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for nullable columns
+      command: diff /tmp/nullables_onprem_{{ my_db_name }}.txt /tmp/nullables_aws_{{ my_db_name }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug nullable columns
+      debug: msg="{{ diff.stdout }}"
+
+#    - name: Get difference for lob
+#      command: diff /tmp/lob_onprem_{{ my_db_name }}.txt /tmp/lob_aws_{{ my_db_name }}.txt
+#      failed_when: diff.rc > 1
+#      register: diff
+#    - name: debug lob
+#      debug: msg="{{ diff.stdout }}"
+
+    - name: Get tables missing from pglogical
+      command: diff /tmp/missingtables_onprem_{{ my_db_name }}.txt /dev/null
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug missing tables from pglogical
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Last aws replication heartbeat entry
+      command: cat /tmp/heartbeat_aws_{{ my_db_name }}.txt
+      register: last_heartbeat
+    - name: show heartbeat
+      debug: msg="{{ last_heartbeat.stdout }}"
+
+    - name: File set to null
+      shell: cat /dev/null > /tmp/myrowcount.txt
+
+    - name: Get rowcount onprem
+      shell: cat /tmp/rowcount_onprem_{{ my_db_name }}.txt >> /tmp/myrowcount.txt
+#      register: onprem_rowcount
+#    - name: show onprem rowcount
+#      debug: msg="{{ onprem_rowcount.stdout }}"
+
+    - name: Get rowcount aws
+      shell: cat /tmp/rowcount_aws_{{ my_db_name }}.txt >> /tmp/myrowcount.txt
+#      register: aws_rowcount
+#    - name: show aws rowcount
+#      debug: msg="{{ aws_rowcount.stdout }}"
+
+    - name: Delete the temp file 1
+      file: path=/tmp/tables_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 2
+      file: path=/tmp/indexes_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 3
+      file: path=/tmp/columns_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 4
+      file: path=/tmp/tables_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 5
+      file: path=/tmp/indexes_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 6
+      file: path=/tmp/columns_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 7
+      file: path=/tmp/heartbeat_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 8
+      file: path=/tmp/indexesdef_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 9
+      file: path=/tmp/indexesdef_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 10
+      file: path=/tmp/constraints_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 11
+      file: path=/tmp/constraints_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 12
+      file: path=/tmp/sequences_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 13
+      file: path=/tmp/sequences_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 14
+      file: path=/tmp/extensions_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 15
+      file: path=/tmp/extensions_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 16
+      file: path=/tmp/functions_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 17
+      file: path=/tmp/functions_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 18
+      file: path=/tmp/views_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 19
+      file: path=/tmp/views_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 20
+      file: path=/tmp/types_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 21
+      file: path=/tmp/types_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 21
+      file: path=/tmp/missingtables_onprem_{{ my_db_name }}.txt state=absent
+
+#    - name: Delete the temp file 22
+#      file: path=/tmp/lob_aws_{{ my_db_name }}.txt state=absent
+
+#    - name: Delete the temp file 23
+#      file: path=/tmp/lob_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 24
+      file: path=/tmp/rowcount_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 25
+      file: path=/tmp/rowcount_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 28
+      file: path=/tmp/missingtables_onprem_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 26
+      file: path=/tmp/nullables_aws_{{ my_db_name }}.txt state=absent
+
+    - name: Delete the temp file 27
+      file: path=/tmp/nullables_onprem_{{ my_db_name }}.txt state=absent

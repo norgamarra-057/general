@@ -1,0 +1,180 @@
+# TODO: don't do any of this if the service dir exists already
+# TODO: if additional schemas are defined, create them and the hertbeat table inside them
+
+- name: Percona | FreeBSD | pt-heartbeat | service dir (root)
+  file:
+    path="{{ pt_heartbeat_service_dir }}_{{item}}"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | pt-heartbeat | service dir (root) (additional schemas)
+  file:
+    path="{{ pt_heartbeat_service_dir }}_{{item}}"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | pt-heartbeat | service dir (env)
+  file:
+    path="{{ pt_heartbeat_service_dir }}_{{item}}/env"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | pt-heartbeat | service dir (env) (additional schemas)
+  file:
+    path="{{ pt_heartbeat_service_dir }}_{{item}}/env"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | pt-heartbeat | service dir (log)
+  file:
+    path="{{ pt_heartbeat_service_dir }}_{{item}}/log"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | pt-heartbeat | service dir (log) (additional schemas)
+  file:
+    path="{{ pt_heartbeat_service_dir }}_{{item}}/log"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | pt-heartbeat | directory | svlogd
+  file:
+    path="{{ pt_heartbeat_service_dir }}_{{ item }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | pt-heartbeat | directory | svlogd (additional schemas)
+  file:
+    path="{{ pt_heartbeat_service_dir }}_{{ item }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | pt-heartbeat | pt_heartbeat environment
+  copy:
+    dest="{{ pt_heartbeat_service_dir }}_{{ item }}/env/PATH"
+    content="/usr/local/bin:/usr/bin:/bin"
+    owner=root
+    group=wheel
+    mode=0644
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | pt-heartbeat | pt_heartbeat environment (additional schemas)
+  copy:
+    dest="{{ pt_heartbeat_service_dir }}_{{ item }}/env/PATH"
+    content="/usr/local/bin:/usr/bin:/bin"
+    owner=root
+    group=wheel
+    mode=0644
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | pt-heartbeat | pt-heartbeat configuration
+  template:
+    src: pt_heartbeat.conf.j2
+    dest: "{{ pt_heartbeat_service_dir }}_{{ item }}/pt-heartbeat.conf"
+    owner: root
+    group: wheel
+    mode: 0644
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | pt-heartbeat | pt-heartbeat configuration
+  template:
+    src: pt_heartbeat.conf.j2
+    dest: "{{ pt_heartbeat_service_dir }}_{{ item }}/pt-heartbeat.conf"
+    owner: root
+    group: wheel
+    mode: 0644
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | pt-heartbeat | log
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ pt_heartbeat_service_dir }}_{{ item }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | pt-heartbeat | log (additional schemas)
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ pt_heartbeat_service_dir }}_{{ item }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | pt-heartbeat | pt-heartbeat run
+  template:
+    src: pt_heartbeat_runit.sh.j2
+    dest: "{{ pt_heartbeat_service_dir }}_{{ item }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | pt-heartbeat | pt-heartbeat run (additional schemas)
+  template:
+    src: pt_heartbeat_runit.sh.j2
+    dest: "{{ pt_heartbeat_service_dir }}_{{ item }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | runit | enable
+  file:
+    src: "{{ pt_heartbeat_service_dir }}_{{ item }}"
+    dest: "/var/service/{{ instance_name }}-{{ gds_cluster }}-pt_heartbeat-{{ item }}"
+    owner: root
+    group: wheel
+    state: link
+  with_items:
+  - percona
+
+- name: Percona | FreeBSD | runit | enable (additional schema)
+  file:
+    src: "{{ pt_heartbeat_service_dir }}_{{ item }}"
+    dest: "/var/service/{{ instance_name }}-{{ gds_cluster }}-pt_heartbeat-{{ item }}"
+    owner: root
+    group: wheel
+    state: link
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined

@@ -1,0 +1,4 @@
+---
+freebsd_cloned_interfaces: lagg0 vlan202 vlan203
+gds_cluster: gds_prod_sac1_db017
+ansible_python_interpreter: /usr/local/bin/python2.7

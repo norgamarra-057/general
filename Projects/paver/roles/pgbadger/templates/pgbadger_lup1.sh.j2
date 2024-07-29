@@ -1,0 +1,10 @@
+#!/bin/sh --
+time_stamp=$(date +%Y_%m_%d)
+
+{% for lup1_instance in lup1_instances %}
+/bin/mkdir /grpn/pgbadger/lup1/{{ lup1_instance }}/$time_stamp/
+/usr/local/bin/pgbadger  -p '%m|%r|%d|%u|%c|%p|%x|%i|%s|' /grpn/pgbadger/lup1/{{ lup1_instance }}/*.log -o /grpn/pgbadger/lup1/{{ lup1_instance }}/$time_stamp/{{ lup1_instance }}-$time_stamp.html
+/bin/rm -rf /grpn/pgbadger/snc1/{{ lup1_instance }}/*.log
+{% endfor %}
+
+

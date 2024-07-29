@@ -1,0 +1,100 @@
+---
+###################################################
+# pre-destroy-instance.yml
+#
+# Description:  This playbook is intended to prepare a MySQL DaaS instance from a GDS server for decommissioning.
+#               WARNING!!!! This playbook will shutdown MySQL, pt-heartbeat and Playbook, as well as remove check_MK monitoring.
+#               Make ABSOLUTELY SURE this is the proper instance on the proper server before you begin!
+#
+# Parameters:  node=gds-server 
+#              instance=instance_name_on_server
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              node: gds-snc1-test-db002s1.snc1
+#              instance: duke_nukem
+#
+# Notes:  1. Playbook will connect to the instance to check for existing connections.  If any other than 'root',
+#            it will abort.  
+#         2. It will remove the following for the instance:  check_MK configuration
+#         3. It will shutdown MySQL, pt-heartbeat and Playback 
+#
+###################################################
+
+
+- include: "{{ playbook_dir }}/../common/check-params.yml"
+
+- name: Pre-destroy MySQL Instance
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - include: "{{ playbook_dir }}/tasks/facts.yml"
+    - include: "{{ playbook_dir }}/tasks/playback_facts.yml"
+      when: playback_enabled
+
+    - include: "{{ playbook_dir }}/tasks/playback_status.yml"
+      when: playback_enabled
+    
+    - include: "{{ playbook_dir }}/tasks/mysqlstatus.yml"
+    - include: "{{ playbook_dir }}/tasks/connections.yml"
+    - include: "{{ playbook_dir }}/tasks/heartbeatstatus.yml"
+
+- name: Pre-destroy | check_MK
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Pre-destroy | check_MK | Remove check_mk instance configuration
+      ini_file:
+        dest: /etc/check_mk/mysql.cfg
+        section: "{{ instance }}"
+        no_extra_spaces: yes
+        state: absent
+        backup: yes
+      ignore_errors: true
+
+- name: Pre-destroy | Shutdown MySQL and supporting services
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Pre-destroy | pt-heartbeat | Stop pt-heartbeat
+      runit:
+        name: "{{ pt_heartbeat_service_runit_path }}"
+        service_dir: /var/groupon/service
+        service_src: /var/groupon/service
+        state: killed
+      ignore_errors: true
+
+    - name: Pre-destroy | Playback | Stop Playback service
+      runit:
+        name: "playback_{{ instance }}_{{ playback_node }}_{{ playback_peer }}"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: killed
+      ignore_errors: true
+      when: playback_service_status is defined and playback_service_status == "run"
+
+    - name: Pre-destroy | MySQL | Stop MySQL server
+      runit:
+        name: "{{ instance }}-{{ gds_instance_group }}-mysql"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: killed
+
+    - name: Pre-destroy | MySQL | Create pre-destroy directory, if needed
+      file:
+        path: /var/groupon/pre-destroyed
+        state: directory
+
+    - name: Pre-destroy | MySQL | Log pre-destroy
+      lineinfile:
+        path: "/var/groupon/pre-destroyed/{{ instance }}"
+        create: yes
+        state: present
+        line: "{{ instance }} was pre-destroyed at {{ '%Y/%m/%d %H-%M-%S' | strftime }}"

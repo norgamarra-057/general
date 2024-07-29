@@ -1,0 +1,17 @@
+#!/bin/sh --
+AUTH_FILE={{ pgbouncer_path }}/etc/pgbouncer.users
+PSQL=/usr/local/bin/psql
+PGDATABASE=postgres
+PGPORT={{ gds_instances[instance_name].ports.postgresql_raw }}
+PGUSER=postgres
+TMPFILE=$( /usr/bin/mktemp {{ pgbouncer_path }}/etc/.pgbouncer.XXXXXXXX.tmp )
+umask 0027
+trap '/bin/rm -f "$TMPFILE"' EXIT
+
+${PSQL} -p ${PGPORT} -U${PGUSER} -d ${PGDATABASE} -qAtX -c 'SELECT $$"$$ || replace(usename, $$"$$, $$""$$) || $$" "$$ || replace(passwd, $$"$$, $$""$$) || $$"$$ FROM pg_catalog.pg_shadow WHERE passwd IS NOT NULL AND NOT (usecreatedb = TRUE OR usesuper = TRUE) AND usename NOT LIKE '"'"'%_dba'"'"' ORDER BY 1' > "$TMPFILE"
+
+if [ ! -s "$TMPFILE" ]; then
+	exit
+fi
+
+/bin/cat "$TMPFILE" > "$AUTH_FILE"

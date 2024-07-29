@@ -1,0 +1,19 @@
+---
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - target_host is defined
+          - db_type is defined and db_type in ['mysql', 'postgresql']
+          - inst_type is defined and inst_type in ['master', 'slave']
+
+- name: Install check_mk on target host
+  hosts:
+    - "{{ target_host }}"
+  become: yes
+  roles:
+    - role: check_mk
+      db_type: "{{ db_type }}"
+      inst_type: "{{ inst_type }}"

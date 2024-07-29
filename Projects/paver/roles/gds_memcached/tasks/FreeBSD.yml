@@ -1,0 +1,55 @@
+---
+- name: GDS Memcached | FreeBSD | runit | directories (read-only)
+  file:
+    path="{{ item }}"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - "{{ memcached_path }}"
+    - "{{ memcached_path }}/bin"
+    - "{{ memcached_path }}/env"
+    - "{{ memcached_path }}/log"
+
+
+- name: GDS Memcached | FreeBSD | runit | directories mode(writable)
+  file:
+    path="{{ memcached_path }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+
+
+- name: GDS Memcached | FreeBSD | runit | environment mode
+  copy: dest="{{ memcached_path }}/env/PATH"
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - memcached restart
+
+
+- name: GDS Memcached | FreeBSD | runit | log script mode
+  template:
+    dest="{{ memcached_path }}/log/run"
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - memcached log restart
+
+- name: GDS Memcached | FreeBSD | runit | run script mode
+  template:
+    dest="{{ memcached_path }}/run"
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+  #notify:
+  #  - memcached restart
+  

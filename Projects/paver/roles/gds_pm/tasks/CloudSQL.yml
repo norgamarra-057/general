@@ -1,0 +1,23 @@
+---
+###################################################
+# gds_pm/tasks/CloudSQL.yml
+#
+# Description:  This role installs and optionally nitializes
+#               the Partition Manager Stored Proceedures, Tables and Event.
+#
+# Parameters:  gcp_endpoint=GCP CloudSQL endpoint
+#
+# Notes:  1. Role will connect to the specific endpoint and will
+#            install and initialize the system, though with an
+#            empty partition_manager_control table.
+#
+#
+###################################################
+
+- name: GCP - Install partition manager sql file
+  shell: mysql -h {{ gcp_endpoint }} -e 'source {{ role_path }}/files/partition_manager.sql'
+  become: false
+
+- name: GCP - Initialize partition manager
+  shell: mysql -h {{ gcp_endpoint }} -e 'call gds_pm.partition_manager_tables'
+  become: false

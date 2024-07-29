@@ -1,0 +1,26 @@
+---
+- name: Validate global settings
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Assert that required params are set
+      assert:
+        that:
+          - node is defined
+          - instance is defined
+
+- name: Validate settings for target host
+  hosts:
+    - "{{ node }}"
+  gather_facts: false
+  tasks:
+    - name: Fail if there are no instances defined for target host
+      fail:
+        msg: "no instances defined for {{ node }}"
+      when: gds_instances is not defined
+
+    - name: Fail if instance is not defined for target host
+      fail:
+        msg: "instance {{ instance }} not found for {{ node }}"
+      when: instance not in gds_instances.keys()

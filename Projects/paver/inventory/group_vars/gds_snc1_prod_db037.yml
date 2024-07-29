@@ -1,0 +1,17 @@
+---
+gds_carp_peers:
+  - 10.30.32.222  # gds-snc1-prod-db037m1
+  - 10.30.32.223  # gds-snc1-prod-db037s1
+  - 10.30.33.222  # gds-snc1-prod-db037m1
+  - 10.30.33.223  # gds-snc1-prod-db037s1
+gds_carp_interfaces:
+  - vlan332
+  - vlan333
+gds_instance_group: gds_prod_snc1_db037
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+# destroyed GDS-27292  accounting_prod: # GDS-3568
+
+
+#  killbill_prod: # GDS-4717  # __SOX__  - Decommed GDS-35811

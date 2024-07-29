@@ -1,0 +1,2 @@
+---
+pgbouncer_path: '/var/groupon/service/pgbouncer-{{ gds_cluster }}-{{ instance_name }}-{{ pgbouncer_mode }}_mode'

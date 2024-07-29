@@ -1,0 +1,6 @@
+---
+- name: opensmtpd restart
+  command: /usr/local/sbin/sv term /var/service/opensmtpd
+
+- name: opensmtpd log restart
+  command: /usr/local/sbin/sv term /var/service/opensmtpd/log

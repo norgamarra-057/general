@@ -1,0 +1,13 @@
+---
+- hosts: gds_snc1_stg_db027
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: dev_workflow_stg }
+  - { role: gds-mysql-ha, instance: affiliate_stg }
+  - { role: gds-mysql-ha, instance: hawk_proxysv_stg }
+  - { role: gds-mysql-ha, instance: iamsam_stg }
+  - { role: gds-mysql-ha, instance: metro_draft_stg }
+  - { role: gds-mysql-ha, instance: vis_stg }
+  - { role: gds-mysql-ha, instance: cust_case_mgt_stg }
+  - { role: gds-mysql-ha, instance: test01mysql_stg }

@@ -1,0 +1,26 @@
+- name: Percona | fulltext | ft_stopword_file
+  template:
+    src: "fulltext/ft_stopword_file_{{ instance_name }}.j2"
+    dest: "{{ percona_service_dir }}/ft_stopword_file"
+    owner: root
+    group: wheel
+    mode: 0755
+  when: ft_custom_stopword_file is defined
+
+- name: Percona | fulltext | check stopword file
+  stat:
+    path: "{{ percona_service_dir }}/ft_stopword_file"
+  register: ft_stopword_file_stat
+
+- name: Percona | fulltext get stopwords
+  shell: "cat {{ percona_service_dir}}/ft_stopword_file"
+  register: ft_stopwords
+  when: ft_stopword_file_stat.stat.exists == True
+
+#- name: Percona | fulltext | create InnoDB fulltext stopword table
+#  shell: mysql -S {{ percona_instance_path }}/mysql.sock --silent --silent -e "create table if not exists innodb_stopwords(value varchar(200) primary key) engine=innodb;" percona 
+
+#- name: Percona | fulltext | insert the stopword file in the stopword table
+#  shell: mysql -S {{ percona_instance_path }}/mysql.sock --silent --silent -e "replace into percona.innodb_stopwords values ('{{ item }}');"
+#  when: ft_stopword_file_stat.stat.exists == True
+#  with_items: ft_stopwords.stdout_lines

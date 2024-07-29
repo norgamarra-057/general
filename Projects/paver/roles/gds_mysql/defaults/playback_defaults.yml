@@ -1,0 +1,12 @@
+---
+playback_defaults:
+  playback_enabled: false
+  playback:
+    manage_mysql_slowlogd: 1
+    mysql_user_to_check: sbtest
+    user: playback_user
+    password: mee5pieK
+    schema: sbtest
+    thread_pool_size: 100
+    user_connection_threshold: 6
+    playback_connection_timeout: 20

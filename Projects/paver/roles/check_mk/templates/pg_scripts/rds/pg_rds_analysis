@@ -1,0 +1,505 @@
+#!/usr/bin/env bash
+
+function find_database {
+    Vip="$1"
+    result=$(psql -p 5432 -h $Vip -t -U gds_admin -d postgres -c "select datname from pg_stat_database where datname not in 
+('template0','template1','postgres','rdsadmin') order by 1")
+    echo "***************************************************Available databases:"
+    echo "-------------------------------------------------------------------------------------------"
+    echo "${result}"
+    echo "-------------------------------------------------------------------------------------------"
+}
+
+
+function find_pg_size {
+    Vip="$1"
+    Dbname="$2" 
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select pg_size_pretty(pg_database_size(datname)) as size from pg_stat_database where 
+current_database()=datname")
+    echo "*************************************************** The db size is:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+}
+
+function find_db_stats {
+    Vip="$1"
+    Dbname="$2"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select 
+(xact_commit*100)/(xact_commit+xact_rollback+1) as commit_ratio, deadlocks, conflicts,
+temp_files, pg_size_pretty(temp_bytes) as temp_size
+from pg_stat_database where datname=current_database()")
+    echo "*************************************************** DB statistics:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_checkpoints {
+    Vip="$1"
+    Dbname="$2"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select checkpoints_timed,checkpoints_req,checkpoints_req/checkpoints_timed::float as ratio_req_vs_timed from 
+pg_stat_bgwriter;")
+    echo "*************************************************** Check Checkpoints:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_biggest_tables {
+    Vip="$1"
+    Dbname="$2"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c " select schemaname,relname,
+pg_size_pretty(pg_total_relation_size(relid)) as full_size,
+pg_size_pretty(pg_relation_size(relid)) as table_size,
+pg_size_pretty(pg_total_relation_size(relid) - pg_relation_size(relid)) as index_size
+from pg_stat_user_tables 
+order by pg_total_relation_size(relid) desc limit 10;")
+    echo "*************************************************** Biggest Tables:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_tables_no_pk {
+    Vip="$1"
+    Dbname="$2"
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "SELECT table_schema as schema, table_name as table,pg_size_pretty(pg_relation_size(table_schema 
+|| '.' || 
+table_name)) as size
+    FROM information_schema.tables
+    WHERE (table_catalog, table_schema, table_name) NOT IN
+          (SELECT table_catalog, table_schema, table_name
+               FROM information_schema.table_constraints
+               WHERE constraint_type = 'PRIMARY KEY')
+      AND table_schema NOT IN ('information_schema', 'pg_catalog','dba','repack','gds','pglogical')
+      ORDER BY pg_relation_size(table_schema || '.' || table_name) desc")
+    echo "*************************************************** Tables without PK:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+function find_busiest_tables {
+    Vip="$1"
+    Dbname="$2"
+    recovery=$(psql -p 5432 -h $Vip -d $Dbname -At -x -U gds_admin -c "select pg_is_in_recovery()")
+    if [[ $recovery == t ]]; then
+        return
+    fi
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select s.relname,
+pg_size_pretty(pg_relation_size(relid)) as size,
+coalesce(n_tup_ins,0) + 2 * coalesce(n_tup_upd,0) - coalesce(n_tup_hot_upd,0) + coalesce(n_tup_del,0) AS total_writes,
+(coalesce(n_tup_hot_upd,0)::float * 100 / (case when n_tup_upd > 0 then n_tup_upd else 1 end)::float)::numeric(10,2) AS hot_rate
+from pg_stat_all_tables s
+join pg_class c ON c.oid=relid 
+where pg_relation_size(relid) > 10000000
+order by total_writes desc limit 20;")
+    echo "*************************************************** Busiest Tables:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+function find_fillfactor_candidates {
+    recovery=$(psql -p 5432 -h $Vip -d $Dbname -At -x -U gds_admin -c "select pg_is_in_recovery()")
+    if [[ $recovery == t ]]; then
+        return
+    fi
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select s.relname,
+pg_size_pretty(pg_relation_size(relid)) as size,
+coalesce(n_tup_ins,0) + 2 * coalesce(n_tup_upd,0) - coalesce(n_tup_hot_upd,0) + coalesce(n_tup_del,0) AS total_writes,
+n_tup_upd as updates,n_tup_upd/(n_tup_ins+1)::float as upd_to_ins_ratio
+from pg_stat_all_tables s
+join pg_class c ON c.oid=relid
+where pg_relation_size(relid) > 10000000
+and n_tup_upd+n_tup_ins > 10000 and n_tup_upd > n_tup_ins ORDER BY n_tup_upd/(n_tup_ins+1)::float 
+desc limit 10;")
+    echo "*************************************************** Table candidates for fillfactor:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+
+function find_tables_with_seqscans {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select relname,
+pg_size_pretty(pg_relation_size(relid)) as size, seq_scan, seq_tup_read,
+seq_tup_read / seq_scan as seq_tup_avg
+from pg_stat_user_tables 
+where seq_tup_read > 0 
+and pg_table_size(relid)>10000000
+order by 3 desc limit 10;")
+    echo "*************************************************** Tables with sequential scans:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_tables_close_to_vacuum {
+    recovery=$(psql -p 5432 -h $Vip -d $Dbname -At -x -U gds_admin -c "select pg_is_in_recovery()")
+    if [[ $recovery == t ]]; then
+        return
+    fi
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "
+with myQ1 as (
+select relname,unnest(reloptions::text[]) as my_option from  pg_class where reloptions is not null
+)
+select c.relname,pg_size_pretty(pg_relation_size(relid)) as size,
+current_setting('autovacuum_vacuum_threshold') as av_base, current_setting('autovacuum_vacuum_scale_factor') as av_scale_factor_def,
+(current_setting('autovacuum_vacuum_threshold')::int + (current_setting('autovacuum_vacuum_scale_factor')::float * c.reltuples))
+as av_thresh_def, SUBSTRING (my_option FROM 32)::float as av_scale_factor_over,
+(current_setting('autovacuum_vacuum_threshold')::int + ((SUBSTRING (my_option FROM 32)::float)* c.reltuples)) as av_thresh_over,
+s.n_dead_tup,last_vacuum,last_autovacuum,last_analyze,last_autoanalyze
+from pg_stat_user_tables s join pg_class c ON s.relname = c.relname left outer join myQ1 on c.relname = myQ1.relname
+where (my_option like 'autovacuum_vacuum_scale_factor%' or my_option is NULL)
+and  s.n_dead_tup > (current_setting('autovacuum_vacuum_threshold')::int + (current_setting('autovacuum_vacuum_scale_factor')::float *
+c.reltuples)) / 5  and (current_setting('autovacuum_vacuum_threshold')::int + (current_setting('autovacuum_vacuum_scale_factor')::float * c.reltuples)) > 10000 and 
+pg_relation_size(relid) > 10000000 order by n_dead_tup/(current_setting('autovacuum_vacuum_threshold')::int + (current_setting('autovacuum_vacuum_scale_factor')::float * 
+c.reltuples)) desc limit 20;
+")
+    echo "*************************************************** Vacuum Advice:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+
+function find_hit_ratio {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select
+sum(blks_hit)*100/sum(blks_hit+blks_read+1) as total_hit_ratio
+from pg_stat_database;")
+    echo "*************************************************** Hit Ratio:"
+    echo "${result}"
+
+}
+
+function find_hit_ratio_index {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "          SELECT
+            sum(idx_blks_hit)*100 / sum(idx_blks_hit + idx_blks_read+1) AS index_hit_ratio
+          FROM
+            pg_statio_user_indexes; ")
+    echo "${result}"
+
+}
+
+function find_hit_ratio_tables {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "          SELECT
+            sum(heap_blks_hit)*100 / sum(heap_blks_hit + heap_blks_read+1) AS table_hit_ratio
+          FROM
+            pg_statio_user_tables;")
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_idx_scan_ratio {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "SELECT u.schemaname,u.relname,idx_scan,seq_scan,idx_scan::float/(idx_scan+seq_scan) as 
+idx_scan_ratio,pg_size_pretty(pg_table_size(oid)) as table_size
+FROM pg_stat_user_tables u,pg_class c where u.relid=c.oid and pg_table_size(oid)>10000000
+and (idx_scan > 0 or seq_scan > 0 ) ORDER BY idx_scan_ratio ASC limit 10;")
+    echo "*************************************************** Index scan ratio:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_idx_not_used {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "SELECT indexrelid::regclass as index, relid::regclass as 
+table,pg_size_pretty(pg_relation_size(relid)) as table_size, pg_size_pretty(pg_relation_size(indexrelid)) as idx_size FROM 
+pg_stat_user_indexes JOIN pg_index USING (indexrelid) WHERE idx_scan = 0 AND indisunique is false order by pg_relation_size(indexrelid) 
+desc;")
+    echo "*************************************************** Indexes not used:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_idx_invalid {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "           SELECT
+            n.nspname AS schema,
+            c.relname AS index,
+            pg_get_indexdef(i.indexrelid) AS definition
+          FROM
+            pg_catalog.pg_class c,
+            pg_catalog.pg_namespace n,
+            pg_catalog.pg_index i
+          WHERE
+            i.indisvalid = false
+            AND i.indexrelid = c.oid
+            AND c.relnamespace = n.oid
+            AND n.nspname != 'pg_catalog'
+            AND n.nspname != 'information_schema'
+            AND n.nspname != 'pg_toast'
+          ORDER BY
+            c.relname")
+    echo "*************************************************** Invalid Indexes:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_idx_dup {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c " SELECT pg_size_pretty(SUM(pg_relation_size(idx))::BIGINT) AS SIZE,
+       (array_agg(idx))[1] AS idx1, (array_agg(idx))[2] AS idx2,
+       (array_agg(idx))[3] AS idx3, (array_agg(idx))[4] AS idx4
+FROM (
+    SELECT indexrelid::regclass AS idx, (indrelid::text ||E'\n'|| indclass::text ||E'\n'|| indkey::text ||E'\n'||
+                                         COALESCE(indexprs::text,'')||E'\n' || COALESCE(indpred::text,'')) AS KEY
+    FROM pg_index) sub
+GROUP BY KEY HAVING COUNT(*)>1
+ORDER BY SUM(pg_relation_size(idx)) DESC;")
+    echo "*************************************************** Duplicated Indexes:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_idx_missing {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "          SELECT
+            schemaname AS schema,
+            relname AS table,
+            pg_size_pretty(pg_relation_size(relid)) as size,
+            CASE idx_scan
+              WHEN 0 THEN 'Insufficient data'
+              ELSE (100 * idx_scan / (seq_scan + idx_scan))::text
+            END percent_of_times_index_used,
+            n_live_tup AS estimated_rows
+          FROM
+            pg_stat_user_tables
+          WHERE
+            idx_scan > 0
+            AND (100 * idx_scan / (seq_scan + idx_scan)) < 95
+            AND n_live_tup >= 10000
+          ORDER BY
+            n_live_tup DESC,
+            relname ASC")
+    echo "*************************************************** Missing Indexes:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+function find_idx_missing_from_fk {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "with my_Q1 as (
+select conrelid::regclass as
+mytable,pg_size_pretty(pg_relation_size(conrelid)) as size,conname as constraint, conkey[0],conkey[1] from
+pg_constraint where contype = 'f' and not exists (select 1 from pg_index where indrelid=conrelid and conkey[1] = indkey[0])
+) select * from my_Q1 where mytable::text  not like 'pglogical.%';")
+    echo "*************************************************** Foreign Keys with no index:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+function find_idx_not_selective {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "select 
+indexrelname,relname,idx_scan,idx_tup_read,idx_tup_fetch,idx_tup_fetch/idx_tup_read::float as fetch_per_read,indexdef from 
+pg_stat_user_indexes,pg_indexes where indexname=indexrelname and idx_scan>1000 and idx_tup_fetch/(idx_tup_read+1)::float > 0.2
+and idx_tup_read/(idx_scan+1)::float > 500 order by 6 desc;")
+    echo "*************************************************** Indexes not selective enough:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+function find_idx_hash {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "    WITH indexes AS ( 
+    SELECT schemaname, relname, indexrelname, pg_get_indexdef(pg_stat_user_indexes.indexrelid) 
+    FROM pg_stat_user_indexes
+    INNER JOIN pg_index ON pg_index.indexrelid = pg_stat_user_indexes.indexrelid
+    ORDER BY schemaname, relname, indexrelname)  
+    SELECT * from indexes where pg_get_indexdef like '%%USING hash (%' ")
+    echo "*************************************************** Hash Indexes:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+function find_idx_contained {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "        SELECT  
+    pg_get_indexdef(indexrelid) AS contained, 
+    pg_get_indexdef(index_backward) AS container  
+    FROM 
+    ( 
+      SELECT indexrelid, 
+        indrelid, 
+        array_to_string(indkey,'+') AS colindex, 
+        indisunique AS is_unique, 
+        lag(array_to_string(indkey,'+')) OVER search_window AS colindexbackward,  
+        lag(indexrelid) OVER search_window AS index_backward, 
+        lag(indisunique) OVER search_window AS is_unique_backward 
+      FROM pg_index 
+        WINDOW search_window AS (PARTITION BY indrelid 
+        ORDER BY array_to_string(indkey,'+') DESC) 
+    ) AS tmp 
+    WHERE (colindexbackward LIKE (colindex || '+%') OR colindexbackward = colindex) 
+      AND (is_unique_backward <> is_unique OR (not is_unique_backward AND NOT is_unique)) 
+      AND NOT is_unique  ")
+    echo "*************************************************** Indexes contained in other indexes:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+
+function find_bloat {
+    recovery=$(psql -p 5432 -h $Vip -d $Dbname -At -x -U gds_admin -c "select pg_is_in_recovery()")
+    if [[ $recovery == t ]]; then
+        return
+    fi
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "     select
+tablename,tbloat,wastedbytes,iname,ibloat,wastedibytes from (SELECT
+  current_database(), schemaname, tablename, /*reltuples::bigint, relpages::bigint, otta,*/
+  ROUND((CASE WHEN otta=0 THEN 0.0 ELSE sml.relpages::FLOAT/otta END)::NUMERIC,1) AS tbloat,
+  CASE WHEN relpages < otta THEN 0 ELSE bs*(sml.relpages-otta)::BIGINT END AS wastedbytes,
+  iname, /*ituples::bigint, ipages::bigint, iotta,*/
+  ROUND((CASE WHEN iotta=0 OR ipages=0 THEN 0.0 ELSE ipages::FLOAT/iotta END)::NUMERIC,1) AS ibloat,
+  CASE WHEN ipages < iotta THEN 0 ELSE bs*(ipages-iotta) END AS wastedibytes
+FROM (
+  SELECT
+    schemaname, tablename, cc.reltuples, cc.relpages, bs,
+    CEIL((cc.reltuples*((datahdr+ma-
+      (CASE WHEN datahdr%ma=0 THEN ma ELSE datahdr%ma END))+nullhdr2+4))/(bs-20::FLOAT)) AS otta,
+    COALESCE(c2.relname,'?') AS iname, COALESCE(c2.reltuples,0) AS ituples, COALESCE(c2.relpages,0) AS ipages,
+    COALESCE(CEIL((c2.reltuples*(datahdr-12))/(bs-20::FLOAT)),0) AS iotta -- very rough approximation, assumes all cols
+  FROM (
+    SELECT
+      ma,bs,schemaname,tablename,
+      (datawidth+(hdr+ma-(CASE WHEN hdr%ma=0 THEN ma ELSE hdr%ma END)))::NUMERIC AS datahdr,
+      (maxfracsum*(nullhdr+ma-(CASE WHEN nullhdr%ma=0 THEN ma ELSE nullhdr%ma END))) AS nullhdr2
+    FROM (
+      SELECT
+        schemaname, tablename, hdr, ma, bs,
+        SUM((1-null_frac)*avg_width) AS datawidth,
+        MAX(null_frac) AS maxfracsum,
+        hdr+(
+          SELECT 1+COUNT(*)/8
+          FROM pg_stats s2
+          WHERE null_frac<>0 AND s2.schemaname = s.schemaname AND s2.tablename = s.tablename
+        ) AS nullhdr
+      FROM pg_stats s, (
+        SELECT
+          (SELECT current_setting('block_size')::NUMERIC) AS bs,
+          CASE WHEN SUBSTRING(v,12,3) IN ('8.0','8.1','8.2') THEN 27 ELSE 23 END AS hdr,
+          CASE WHEN v ~ 'mingw32' THEN 8 ELSE 4 END AS ma
+        FROM (SELECT version() AS v) AS foo
+      ) AS constants
+      GROUP BY 1,2,3,4,5
+    ) AS foo
+  ) AS rs
+  JOIN pg_class cc ON cc.relname = rs.tablename
+  JOIN pg_namespace nn ON cc.relnamespace = nn.oid AND nn.nspname = rs.schemaname AND nn.nspname <> 'information_schema'
+  LEFT JOIN pg_index i ON indrelid = cc.oid
+  LEFT JOIN pg_class c2 ON c2.oid = i.indexrelid
+) AS sml
+) as foo
+where (tbloat > 10 and wastedbytes > 200000000) or (ibloat > 10 and wastedibytes > 200000000) or (tbloat > 5 and wastedbytes > 500000000) or
+(ibloat > 5 and wastedibytes > 500000000);")
+    echo "*************************************************** Bloat:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function install_extension_pg_buffercache {
+    recovery=$(psql -p 5432 -h $Vip -d $Dbname -At -x -U gds_admin -c "select pg_is_in_recovery()")
+    if [[ $recovery == t ]]; then
+        return
+    fi
+    psql -q -p $port -t -x -U postgres -d $dbname -c "SET client_min_messages = 'ERROR'; create extension if not exists pg_buffercache with schema ext;"
+}
+
+function find_total_buffers {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "set search_path=public,gds,ext,dba; select count(*) from pg_buffercache ;")
+    echo "*************************************************** Total buffers:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_relations_in_memory {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "set search_path=public,gds,ext,dba; SELECT c.relname,count(*) AS buffers
+FROM pg_class c INNER JOIN pg_buffercache b
+ON b.relfilenode=c.relfilenode INNER JOIN pg_database d
+ON (b.reldatabase=d.oid AND d.datname=current_database())
+GROUP BY c.relname
+ORDER BY 2 DESC LIMIT 10;")
+    echo "*************************************************** Relations in pg_buffercache:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+function find_usagecount_pg_buffercache {
+    result=$(psql -p 5432 -h $Vip -d $Dbname -t -x -U gds_admin -c "set search_path=public,gds,ext,dba; select pg_size_pretty(count(*) * 8192), 
+usagecount from pg_buffercache group by 2 order by 2 asc")
+    echo "*************************************************** Usagecount in pg_buffercache:"
+    echo "${result}"
+    echo "--------------------------------------------------------------------------------------------------------------------------------"
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if [ $# -lt 1 ]; then
+    echo 'no argument given'
+    exit 1
+elif [ $# -gt 2 ]; then
+    echo 'too many arguments'
+    exit 1
+fi
+
+    vip="$1"
+    dbname="$2"
+
+    if [ -z "${dbname}" ]; then find_database ${vip}; else echo "dbname is set to '$dbname'"; fi
+    if [ -z "${dbname}" ]; then read -p "Enter database name: " dbname; fi
+
+    find_pg_size ${vip} ${dbname}
+    find_db_stats ${vip} ${dbname}
+    find_checkpoints ${vip} ${dbname}
+    find_biggest_tables ${vip} ${dbname}
+    find_tables_no_pk ${vip} ${dbname}
+    find_fillfactor_candidates ${vip} ${dbname}
+    find_busiest_tables ${vip} ${dbname}
+    find_tables_with_seqscans ${vip} ${dbname}
+    find_tables_close_to_vacuum ${vip} ${dbname}
+    find_hit_ratio ${vip} ${dbname}
+    find_hit_ratio_index ${vip} ${dbname}
+    find_hit_ratio_tables ${vip} ${dbname}
+    find_idx_scan_ratio ${vip} ${dbname}
+    find_idx_not_used ${vip} ${dbname}
+    find_idx_invalid ${vip} ${dbname}
+    find_idx_dup ${vip} ${dbname}
+    find_idx_missing ${vip} ${dbname}
+    find_idx_missing_from_fk ${vip} ${dbname}
+    find_idx_not_selective ${vip} ${dbname}
+    find_idx_contained ${vip} ${dbname}
+    find_idx_hash ${vip} ${dbname}
+    find_bloat ${vip} ${dbname}
+#    install_extension_pg_buffercache ${vip} ${dbname}
+#    find_usagecount_pg_buffercache ${vip} ${dbname}

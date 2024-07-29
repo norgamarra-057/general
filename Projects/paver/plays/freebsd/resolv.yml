@@ -1,0 +1,6 @@
+---
+- name: Setup resolv.conf on hosts
+  hosts: gds_all
+  become: yes
+  roles:
+    - resolv_conf

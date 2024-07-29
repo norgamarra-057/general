@@ -1,0 +1,8 @@
+---
+- hosts: gds_snc1_prod_db101
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: killbill_prod }
+  - { role: gds-mysql-ha, instance: dealservice_prod }
+  - { role: gds-mysql-ha, instance: client_id_prod }

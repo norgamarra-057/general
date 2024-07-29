@@ -1,0 +1,162 @@
+---
+###################################################
+# destroy-instance.yml
+#
+# Description:  This playbook is intended to destroy/decommission a Postgresql DaaS instance from a GDS server
+#               WARNING!!!! This playbook will remove the instance from the node provided on the command line WITHOUT WARNING!
+#               Make ABSOLUTELY SURE this is the proper instance on the proper server before you begin!
+#
+# Parameters:  node=gds-server 
+#              instance=instance_name_on_server
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              node: gds-snc1-test-db002s1.snc1
+#              instance: duke_nukem
+#
+# Notes:  1. Playbook will connect to the instance to check for existing connections.  If any other than 'postgres',
+#            it will abort.  
+#         2. It will remove the following for the instance:  check_MK configuration, firewall configuration, cronjob,
+#            pgbouncer (configuration and data) and postgresql (configuration and data)
+#         3. THERE IS NO 'UNDESTROY!'  MAKE SURE YOU HAVE A GOOD BACKUP FIRST! 
+#
+###################################################
+
+- name: Destroy Postgresql Instance
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+- import_playbook: "{{ playbook_dir }}/../common/check-params.yml"
+- import_playbook: "{{ playbook_dir }}/tasks/facts.yml"
+- import_playbook: "{{ playbook_dir }}/tasks/status.yml"
+- import_playbook: "{{ playbook_dir }}/tasks/connections.yml"
+
+- name: Destroy | Postgres | check_MK
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Destroy | Postgres | Remove check_mk instance configuration
+      ini_file:
+        dest: /etc/check_mk/postgres.cfg
+        section: "{{ instance }}"
+        no_extra_spaces: yes
+        state: absent
+        backup: yes
+      ignore_errors: true
+
+- name: Destroy | Postgres | firewall instance configuration
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  roles: 
+    - { role: gds_firewall_decomm } # Are we using instance or instance_name?
+        
+- name: Destroy | Postgres | pgbouncer(s) and Postgres database
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Destroy | Postgres | Remove pre-destroyed file, if exists
+      file:
+        path: "/var/groupon/pre-destroyed/{{ instance }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Destroy | Postgres | Stop pgbouncer(s)
+      runit:
+        name: "{{pgbouncer_runit_service_dir }}-{{ item }}"
+        service_dir: "{{ service_root }}"
+        service_src: "{{ groupon_service_root }}"
+        state: killed
+      with_items: "{{ postgresql_modes }}"
+
+    - name: Destroy | Postgres | Remove pgbouncer cron entries
+      cron:
+        name: "pgbouncer {{ item }} for {{ instance }}"
+        state: absent
+      with_items: "{{ cron_modes }}"
+    
+    - name: Destroy | Postgres | Remove pgbouncer service symlink(s)
+      file:
+        name: "{{pgbouncer_service_symlink }}-{{ item }}"
+        state: absent
+      with_items: "{{ postgresql_modes }}"
+
+    - name: Destroy | Postgres | Remove pgbouncer service directories
+      file:
+        name: "{{pgbouncer_service_dir }}-{{ item }}"
+        state: absent
+      with_items: "{{ postgresql_modes }}"
+
+    - name: Destroy | Postgres | Stop Postgresql server
+      runit:
+        name: "{{ postgresql_runit_service_dir }}"
+        service_dir: "{{ service_root }}"
+        service_src: "{{ groupon_service_root }}"
+        state: killed
+ 
+    - name: Destroy | Postgres | Verify that Postgresql server has stopped
+      shell: sv status {{ postgresql_service_dir }} | cut -d':' -f1
+      register: postgresql_service_status
+      when: postgresql_service.stat is defined and postgresql_service.stat.isdir
+      changed_when: false
+
+    - name: Destroy | Postgres | Unlink Postgresql instance service data
+      file:
+        path: "{{ postgresql_service_dir }}/data"
+        state: absent
+      when: postgresql_service_status is defined and postgresql_service_status.stdout != "run"
+
+    - name: Destroy | Postgres | Unlink Postgresql instance service
+      file:
+        path: "{{ postgresql_service_symlink }}"
+        state: absent
+      when: postgresql_service_status is defined and postgresql_service_status.stdout != "run"
+
+    - name: Destroy | Postgres | Remove Postgresql instance data
+      file: 
+        path: "{{ postgresql_pgdata_dir }}"
+        state: absent
+      when: postgresql_service_status is defined and postgresql_service_status.stdout != "run"
+
+    - name: Destroy | Postgres | Find instance ZFS
+      shell: "zfs list -o name -H {{ postgresql_cluster_dir }}"
+      register: instance_zfs
+      always_run: true
+      changed_when: false
+      when: postgresql_service_status is defined and postgresql_service_status.stdout != "run"
+
+    - name: Destroy | Postgres | Remove instance ZFS
+      shell: "zfs destroy -r {{ instance_zfs.stdout }}"
+      when: instance_zfs.stdout.find(postgresql_cluster_dir) > 0 and postgresql_service_status is defined and postgresql_service_status.stdout != "run"
+
+    - name: Destroy | Postgres | Remove Postgresql instance path
+      file: 
+        path: "{{ postgresql_cluster_dir }}"
+        state: absent
+      when: postgresql_service_status is defined and postgresql_service_status.stdout != "run"
+
+    - name: Destroy | Postgres | Remove Postgresql service dir
+      file:
+        path: "{{ postgresql_service_dir }}"
+        state: absent
+      when: postgresql_service_status is defined and postgresql_service_status.stdout != "run"
+
+    - name: Destroy | Postgres | Create destroy directory, if needed
+      file:
+        path: /var/groupon/destroyed
+        state: directory
+
+    - name: Destroy | Postgres | Log destroy
+      lineinfile:
+        path: "/var/groupon/destroyed/{{ instance }}"
+        create: yes
+        state: present
+        line: "{{ instance }} was destroyed at {{ '%Y/%m/%d %H-%M-%S' | strftime }}"
+

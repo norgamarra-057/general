@@ -1,0 +1,4 @@
+Notes on firmware versions:
+
+mr2108fw.rom = Supermicro SMC2108
+mr2208fw.rom = LSI 2208 MegaRAID (fka ROMB)

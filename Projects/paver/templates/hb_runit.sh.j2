@@ -1,0 +1,8 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst -v\
+    -e /var/groupon/service/{{ instance }}-pg_heartbeat \
+        -u  {{ gds_instances[instance].unix_user }}:ops_gds_app  \
+  /usr/local/bin/bash /var/groupon/service/{{ instance }}-pg_heartbeat/bin/pg_heartbeat.sh

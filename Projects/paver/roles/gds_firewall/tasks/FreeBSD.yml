@@ -1,0 +1,293 @@
+---
+- set_fact:
+    gds_instances: {}
+  when: gds_instances is not defined
+
+- set_fact:
+    groupon_bastion_hosts:
+      - 50.115.209.4
+      - 50.115.209.5
+      - 10.20.40.177
+      - 10.20.200.20
+      - 10.20.200.21
+  when: groupon_bastion_hosts is not defined
+
+- set_fact:
+    groupon_vulnscan_hosts:
+      - 10.20.98.12 # vulnscan1.snc1
+  when: groupon_vulnscan_hosts is not defined
+
+- name: Ensure instance name length is OK
+  fail: msg='instance name must not be longer than 22 chars'
+  when: item|length > 22
+  with_items:
+    - "{{ gds_instances.keys() }}"
+
+- name: pf.conf | table fragments | directory
+  file:
+    dest: "{{ item }}"
+    owner: root
+    group:  wheel
+    mode: 0750
+    state: directory
+  with_items:
+    - /etc/pf.conf.d/fragments/redirects
+    - /etc/pf.conf.d/fragments/instance_specific
+    - /etc/pf.conf.d/fragments/tables
+    - /etc/pf.conf.d/tables
+
+- name: pf.conf | GDS Constants
+  copy:
+    src: gds-constants.conf
+    dest: /etc/pf.conf.d/gds-constants.conf
+    owner: root
+    group: wheel
+    mode: 0640
+
+- name: pf.conf | redirect fragments | instances
+  template:
+    src: pf.conf-redirects.j2
+    dest: "/etc/pf.conf.d/fragments/redirects/{{ '%03u' | format(item.value.firewall_priority) }}_{{ item.key }}.conf"
+    owner: root
+    group: wheel
+    mode: 0640
+  with_dict: "{{ gds_instances }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: pf.conf | instance_specific fragments | instances
+  template:
+    src: pf.conf-instance_specific.j2
+    dest: "/etc/pf.conf.d/fragments/instance_specific/100_{{ item.key }}_instance_specific.conf"
+    owner: root
+    group: wheel
+    mode: 0640
+  with_dict: "{{ gds_instances }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: pf.conf | table fragments | redirect fragments
+  template:
+    src: pf.conf-frag-table.j2
+    dest: "/etc/pf.conf.d/fragments/tables/{{ '%03u' | format(item.value.firewall_priority) }}_{{ item.key }}.table.conf"
+    owner: root
+    group: wheel
+    mode: 0640
+  with_dict: "{{ gds_instances }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: pf.conf | table fragments | replication peers
+  copy:
+    src: groupon-bastion-hosts.table
+    dest: /etc/pf.conf.d/fragments/tables/499_groupon_bastion_hosts.table.conf
+    owner: root
+    group: wheel
+    mode: 0640
+  when: gds_carp_peers is defined
+
+- name: pf.conf | table fragments | replication peers (empty)
+  file:
+    name: /etc/pf.conf.d/fragments/tables/499_groupon_bastion_hosts.table.conf
+    owner: root
+    group: wheel
+    mode: 0640
+    state: touch
+  when: gds_carp_peers is not defined
+
+- name: pf.conf | table | replication peers
+  template:
+    src: pf-groupon-bastion-hosts.j2
+    dest: /etc/pf.conf.d/tables/groupon-bastion-hosts.table
+    owner: root
+    group: wheel
+    mode: 0640
+  when: gds_carp_peers is defined
+
+- name: pf.conf | table | replication peers (empty)
+  file:
+    name: /etc/pf.conf.d/tables/groupon-bastion-hosts.table
+    owner: root
+    group: wheel
+    mode: 0640
+    state: touch
+  when: gds_carp_peers is not defined
+
+- name: pf.conf | table fragments | replication peers
+  copy:
+    src: gds-replication-peers.table
+    dest: /etc/pf.conf.d/fragments/tables/500_gds_replication_peers.table.conf
+    owner: root
+    group: wheel
+    mode: 0640
+  when: gds_carp_peers is defined
+
+- name: pf.conf | table fragments | replication peers (empty)
+  file:
+    name: /etc/pf.conf.d/fragments/tables/500_gds_replication_peers.table.conf
+    owner: root
+    group: wheel
+    mode: 0640
+    state: touch
+  when: gds_carp_peers is not defined
+
+# FIXME:  Need to fix 'replication peers' to only add to this file
+# if entries do not exist.  Use lineinfile instead of template. See GDS-10055
+- name: pf.conf | table | replication peers
+  template:
+    src: pf-gds-replication-peers.j2
+    dest: /etc/pf.conf.d/tables/gds-replication-peers.table
+    owner: root
+    group: wheel
+    mode: 0640
+  when: gds_carp_peers is defined
+
+- name: pf.conf | table | replication peers (empty)
+  file:
+    name: /etc/pf.conf.d/tables/gds-replication-peers.table
+    owner: root
+    group: wheel
+    mode: 0640
+    state: touch
+  when: gds_carp_peers is not defined
+
+- name: pf.conf | table fragments | srcs
+  template:
+    src: pf.conf-frag-srcs-table.j2
+    dest: "/etc/pf.conf.d/tables/{{ item.key }}-srcs.table"
+    owner: root
+    group: wheel
+    mode: 0640
+  with_dict: "{{ gds_instances }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: pf.conf | table fragments | vips (master)
+  template:
+    src: pf.conf-frag-vips-table.j2
+    dest: "/etc/pf.conf.d/tables/{{ item.key }}-vips.table"
+    owner: root
+    group: wheel
+    mode: 0640
+  with_dict: "{{ gds_instances }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: pf.conf | table fragments | vulnscan hosts
+  copy:
+    src: groupon-vulnscan-hosts.table
+    dest: /etc/pf.conf.d/fragments/tables/001_groupon-vulnscan-hosts.table.conf
+    owner: root
+    group: wheel
+    mode: 0640
+
+- name: pf.conf | table fragments | vulnscan hosts
+  copy:
+    src: groupon-vulnscan-hosts.table
+    dest: /etc/pf.conf.d/fragments/tables/001_groupon-vulnscan-hosts.table.conf
+    owner: root
+    group: wheel
+    mode: 0640
+
+- name: pf.conf | table | vulnscan hosts
+  template:
+    src: pf-groupon-vulnscan-hosts.j2
+    dest: /etc/pf.conf.d/tables/groupon-vulnscan-hosts.table
+    owner: root
+    group: wheel
+    mode: 0640
+
+- name: pf.conf | assemble tables.conf
+  assemble:
+    src: /etc/pf.conf.d/fragments/tables
+    dest: /etc/pf.conf.d/tables.conf
+    owner: root
+    group: wheel
+    regexp: '\.table.conf$'
+    mode: 0640
+
+- name: pf.conf | assemble redirects | pf.conf
+  assemble:
+    src: /etc/pf.conf.d/fragments/redirects
+    dest: /etc/pf.conf.d/redirects.conf
+    owner: root
+    group: wheel
+    regexp: '\.conf$'
+    mode: 0640
+
+- name: pf.conf | assemble instance_specific | pf.conf
+  assemble:
+    src: /etc/pf.conf.d/fragments/instance_specific
+    dest: /etc/pf.conf.d/instance_specific.conf
+    owner: root
+    group: wheel
+    regexp: '\.conf$'
+    mode: 0640
+
+- name: Add default RDS replication peers to gds-replication-peers.table
+  lineinfile:
+    path: /etc/pf.conf.d/tables/gds-replication-peers.table
+    state: present
+    line: "{{ item }}"
+  with_items:
+    - 10.213.128.0/23
+    - 10.213.130.0/23
+    - 10.221.130.0/23
+    - 10.221.132.0/23
+    - 10.221.128.0/23
+    - 10.230.130.0/23
+    - 10.230.128.0/23
+    - 10.230.132.0/23
+    - 10.211.128.0/22
+    - 10.211.132.0/22
+    - 10.219.128.0/23
+    - 10.219.132.0/23
+    - 10.219.130.0/23
+    - 10.228.0.0/16
+    - 10.228.130.0/23
+    - 10.228.128.0/23
+    - 10.228.132.0/23
+    - 10.228.48.0/20
+    - 10.228.64.0/20
+    - 10.228.80.0/20
+
+- name: pf.conf | Main configuration
+  template:
+    src: pf.conf.j2
+    dest: /etc/pf.conf
+    owner: root
+    group: wheel
+    mode: 0640
+    validate: '/sbin/pfctl -n -f "%s"'
+  ignore_errors: true
+
+- name: Ensure pf is enabled in rc.conf
+  lineinfile:
+    dest: /etc/rc.conf
+    regexp: '^pf_enable=.*'
+    line: 'pf_enable="YES"'
+
+- name: See if pf is loaded
+  shell: "kldstat | grep pf.ko"
+  register: pf_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Load pf module if not loaded
+  shell: "kldload pf"
+  when: pf_check|failed
+  notify:
+    - pf.conf | reload
+
+- name: See if pf syntax is correct
+  command: "/etc/rc.d/pf check"
+  register: check
+
+- name: reload pf rules
+  command: "/etc/rc.d/pf reload"
+  when: "check.rc == 0"
+  notify:
+    - pf.conf | reload
+
+- meta: flush_handlers
+

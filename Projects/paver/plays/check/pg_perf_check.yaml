@@ -1,0 +1,85 @@
+---
+###################################################
+# Querie Instance.
+#
+# Description:  This playbook is for run performance check in all postgres instance.
+#
+# Parameters:  node=gds-server
+#
+# ansible-playbook -i inventory/gds-staging plays/check/pg_perf_check.yaml  -l gds-snc1-stg-db004m1.snc1
+#
+#
+###################################################
+- name: FreeBSD | Check instance
+  hosts: gds_all
+  gather_facts: False 
+  become: yes
+  tasks:
+
+    - name: Copy pg_bloat
+      copy:
+        src: "../../roles/check_mk/files/checks/postgresql/pg_bloat.sql"
+        dest: "/usr/lib/check_mk_agent/pg_bloat.sql"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy pg_index
+      copy:
+        src: "../../roles/check_mk/files/checks/postgresql/pg_index.sql"
+        dest: "/usr/lib/check_mk_agent/pg_index.sql"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy pg_index_dup
+      copy:
+        src: "../../roles/check_mk/files/checks/postgresql/pg_index_dup.sql"
+        dest: "/usr/lib/check_mk_agent/pg_index_dup.sql"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy pg_stat install
+      copy:
+        src: "../../roles/check_mk/files/checks/postgresql/pg_stat.sql"
+        dest: "/usr/lib/check_mk_agent/pg_stat.sql"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy pg_stat query 1
+      copy:
+        src: "../../roles/check_mk/files/checks/postgresql/pg_stat_1.sql"
+        dest: "/usr/lib/check_mk_agent/pg_stat_1.sql"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy pg_stat query 2
+      copy:
+        src: "../../roles/check_mk/files/checks/postgresql/pg_stat_2.sql"
+        dest: "/usr/lib/check_mk_agent/pg_stat_2.sql"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Check Instance | templates | render pg_check.sh
+      template: 
+        src=../../templates/perf_check/perf_check.sh.j2
+        dest=/tmp/pg_check.sh
+        owner=root
+        group=wheel
+        mode=0755
+      changed_when: False
+
+    - name: Check Instance | Check instance
+      command: sh /tmp/pg_check.sh
+      register: aux
+      changed_when: False
+
+    - name: Check Instance | Delete tmp pg_check.sh
+      file: path=/tmp/pg_check.sh state=absent
+      changed_when: False
+
+    - debug: var=aux.stdout_lines

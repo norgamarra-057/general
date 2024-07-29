@@ -1,0 +1,320 @@
+---
+gds_carp_peers:
+  - 10.23.36.250  # gds-snc1-stg-db007m1
+  - 10.23.36.251  # gds-snc1-stg-db007s1
+  - 10.23.37.250  # gds-snc1-stg-db007m1
+  - 10.23.37.251  # gds-snc1-stg-db007s1
+
+gds_carp_interfaces:
+  - vlan336
+  - vlan337
+
+gds_instance_group: gds_snc1_stg_db007
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  crm_msg_svc_stg: # GDS-927 : Deommissioned # GDS-33861 
+  lupa_stg: # GDS-927 : Deommissioned # GDS-33861#
+  booking_tool_stg: # GDS-928 : Deommissioned # GDS-33861
+  cons_data_svc_stg: # GDS-928 : Deommissioned # GDS-338615
+  killbill_emea_stg: # GDS-9286 : Deommissioned # GDS-33861 
+  orders_emea_stg: # GDS-928 : Deommissioned # GDS-33861
+  users_emea_stg: # GDS-928 : Deommissioned # GDS-33861
+  coupon_emea_stg: # GDS-928 : Deommissioned # GDS-33861
+  itemmaster_emea_stg: # GDS-9290
+  goods_shipment_stg: # GDS-9291
+  ssu_stg: # GDS-9271
+  getaways_content_stg: # GDS-9377
+  getaways_invent_stg: # GDS-9379
+  gpn_emea_stg: # GDS-9380
+# destroyed GDS-27034 po_manager_emea_stg: # GDS-9383
+# destroyed GDS-28471 goods_recei_emea_stg: # GDS-9385
+  social_raf_emea_stg: # GDS-9386
+  rocketman_emea_stg: # GDS-9412
+  fraud_emea_stg: # GDS-9502
+  goods_o_cont_emea_stg: # GDS-9490
+  geekon_pw_uat: # GDS-12188
+  pwa_stg: # GDS-12228
+ 
+  voucherinventory_stg: # GDS-12229
+  orders_msg_stg: # GDS-12705
+  giftcard_srv_emea_stg: # GDS-13577
+  afl_recon_emea_stg: # GDS-14158
+  cart_emea_stg: # GDS-15100
+  gim_emea_stg: # GDS-15390
+  cart_stg: # GDS-15979
+  gateway_emea_stg: # GDS-18113
+  opdata_ingest_stg: # GDS-18310
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60036
+    nodes:
+      - gds-snc1-stg-db007m1.snc1
+      - gds-snc1-stg-db007s1.snc1
+    master_carp_interface: vlan336
+    slave_carp_interface: vlan337
+    vhid: 136
+    slave_vhid: 136
+    master_vip: 10.23.36.136
+    slave_vips:
+      - 10.23.37.136
+    replication_ips:
+      - 10.23.88.41 # gds-snc1-stg-db007m1.snc1
+      - 10.23.90.74  # gds-snc1-stg-db007s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.41.169/32   # gso-app-ingestionservice2-staging.snc1
+      - 10.23.42.59/32   # gso-app-ingestionservice3-staging.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: opdata_ingest
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20036
+  airflow_emea_stg: # GDS-18874
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60037
+    nodes:
+      - gds-snc1-stg-db007m1.snc1
+      - gds-snc1-stg-db007s1.snc1
+    master_carp_interface: vlan336
+    slave_carp_interface: vlan337
+    vhid: 137
+    slave_vhid: 137
+    master_vip: 10.23.36.137
+    slave_vips:
+      - 10.23.37.137
+    replication_ips:
+      - 10.23.88.41  # gds-snc1-stg-db007m1.snc1
+      - 10.23.90.74  # gds-snc1-stg-db007s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.56.234      # darwin-airflow1-emea.snc1
+      - 10.23.82.78       # darwin-airflow2-emea.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: airflow_emea_stg_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20037
+
+# destroyed GDS-26712  v_smrt_srch_emea_stg: # GDS-20878
+
+  freebsd12_test_stg: # GDS-20878
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60039
+    nodes:
+      - gds-snc1-stg-db007m1.snc1
+      - gds-snc1-stg-db007s1.snc1
+    master_carp_interface: vlan336
+    slave_carp_interface: vlan337
+    vhid: 139
+    slave_vhid: 139
+    master_vip: 10.23.36.139
+    slave_vips:
+      - 10.23.37.139
+    replication_ips:
+      - 10.23.88.41  # gds-snc1-stg-db007m1.snc1
+      - 10.23.90.74  # gds-snc1-stg-db007s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: freebsd_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20039
+
+  mjtest_mysql: # GDS-27792
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60040
+    nodes:
+      - gds-snc1-stg-db007m1.snc1
+      - gds-snc1-stg-db007s1.snc1
+    master_carp_interface: vlan336
+    slave_carp_interface: vlan337
+    vhid: 140
+    slave_vhid: 140
+    master_vip: 10.23.36.140
+    slave_vips:
+      - 10.23.37.140
+    replication_ips:
+      - 10.23.88.41  # gds-snc1-stg-db007m1.snc1
+      - 10.23.90.74  # gds-snc1-stg-db007s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: mjtest_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20040
+
+  prov_test_stg: # GDS-27824
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+    relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60041
+    nodes:
+      - gds-snc1-stg-db007m1.snc1
+      - gds-snc1-stg-db007s1.snc1
+    master_carp_interface: vlan336
+    slave_carp_interface: vlan337
+    vhid: 141
+    slave_vhid: 141
+    master_vip: 10.23.36.141
+    slave_vips:
+      - 10.23.37.141
+    replication_ips:
+      - 10.23.88.41  # gds-snc1-stg-db007m1.snc1
+      - 10.23.90.74  # gds-snc1-stg-db007s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: prov_test_stg
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20041
+
+  sandbox2_stg: # GDS-28301
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+    relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60042
+    nodes:
+      - gds-snc1-stg-db007m1.snc1
+      - gds-snc1-stg-db007s1.snc1
+    master_carp_interface: vlan336
+    slave_carp_interface: vlan337
+    vhid: 142
+    slave_vhid: 142
+    master_vip: 10.23.36.142
+    slave_vips:
+      - 10.23.37.142
+    replication_ips:
+      - 10.23.88.41  # gds-snc1-stg-db007m1.snc1
+      - 10.23.90.74  # gds-snc1-stg-db007s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32  # dbclustermon1.snc1
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: sandbox2_stg
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20042

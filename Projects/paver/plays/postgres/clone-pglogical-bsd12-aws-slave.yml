@@ -1,0 +1,568 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - daas_slave is defined
+          - instance is defined
+          - aws_host is defined
+          - admin_password is defined
+
+    - set_fact: 
+        pglogical_status={{ gds_instances[instance].extra_variables.pglogical }}
+        my_dba_user={{ gds_instances[instance].dba_account_name }}
+        my_db_schema={{ gds_instances[instance].schemas }}
+        my_master_vip={{ gds_instances[instance].master_vip }}
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+
+    - name: check if pglogical is on
+      fail: msg="Exiting ---------pglogical variable is not set to on"
+      when:  pglogical_status is not defined or pglogical_status != 'on' 
+
+    - name: check if database is defined
+      fail: msg="Exiting ---------database is not defined"
+      when:  my_db_name is not defined
+
+    - name: check if dba user is defined
+      fail: msg="Exiting --------- dba user is not defined"
+      when:  my_dba_user is not defined
+
+    - name: check if db schema is defined
+      fail: msg="Exiting --------- dba user is not defined"
+      when:  my_db_schema is not defined
+
+    - name: check if master vip is defined
+      fail: msg="Exiting --------- master vip is not defined"
+      when:  my_master_vip is not defined
+
+
+- name: Daas part (slave)
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_slave }}'
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+
+
+    - name: check if package is installed
+      shell: pkg info pglogical | grep Installed | wc -l
+      register: is_pglogical_installed
+
+    - name: install package
+      shell: pkg install -y pglogical-2.2.1_3
+      when:  is_pglogical_installed.stdout|int  ==  0
+
+    - name: set parameters in the postgresql.conf
+      lineinfile:
+        dest: "/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/postgresql.conf"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: "^wal_level*", line: "wal_level = logical" }
+        - { regexp: "^max_replication_slots*", line: "max_replication_slots = 15" }
+        - { regexp: "^max_wal_senders*", line: "max_wal_senders = 15" }
+        - { regexp: "^max_worker_processes*", line: "max_worker_processes = 10" }
+        - { regexp: "^shared_preload_libraries*", line: "shared_preload_libraries = 'auto_explain,btree_gin,btree_gist,citext,dblink,dict_int,dict_xsyn,fuzzystrmatch,hstore,lo,ltree,pageinspect,passwordcheck,pg_buffercache,pgcrypto,pg_freespacemap,pgrowlocks,pg_stat_statements,pgstattuple,pg_trgm,postgres_fdw,tablefunc,tcn,unaccent,uuid-ossp,pglogical' #(change requires restart)" }
+
+    - name: Check if restart is actually needed 1/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='wal_level' and setting='logical'"
+      register: current_wal_level_count
+
+    - name: Check if restart is actually needed 2/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='shared_preload_libraries' and setting like '%pglogical'"
+      register: current_preload_libraries_count
+
+    - name: Check if restart is actually needed 3/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='max_wal_senders' and setting::int > 9"
+      register: max_wal_senders_count
+
+    - name: Check if restart is actually needed 4/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='max_replication_slots' and setting::int > 9"
+      register: max_replication_slots_count
+
+    - name: Check if restart is actually needed 5/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='max_worker_processes' and setting::int > 7"
+      register: max_worker_processes_count
+
+    - name: Update sources file
+      lineinfile:
+       dest: /etc/pf.conf.d/tables/{{ instance }}-srcs.table
+       regexp: "{{ item.regexp }}"
+       line: "{{ item.line }}"
+      with_items:
+       - { regexp: "^10.213.128.0/23*", line: "10.213.128.0/23" }
+       - { regexp: "^10.213.129.0/23*", line: "10.213.129.0/23" }
+       - { regexp: "^10.213.130.0/23*", line: "10.213.130.0/23" }
+       - { regexp: "^10.211.128.0/22*", line: "10.211.128.0/22" }
+       - { regexp: "^10.211.132.0/22*", line: "10.211.132.0/22" }
+       - { regexp: "^10.230.128.0/23*", line: "10.230.128.0/23" }
+       - { regexp: "^10.230.130.0/23*", line: "10.230.130.0/23" }
+       - { regexp: "^10.230.132.0/23*", line: "10.230.132.0/23" }
+       - { regexp: "^10.228.128.0/23*", line: "10.228.128.0/23" }
+       - { regexp: "^10.228.130.0/23*", line: "10.228.130.0/23" }
+       - { regexp: "^10.228.132.0/23*", line: "10.228.132.0/23" }
+       - { regexp: "^10.221.128.0/23*", line: "10.221.128.0/23" }
+       - { regexp: "^10.221.130.0/23*", line: "10.221.130.0/23" }
+       - { regexp: "^10.221.132.0/23*", line: "10.221.132.0/23" }
+       - { regexp: "^10.219.128.0/23*", line: "10.219.128.0/23" }
+       - { regexp: "^10.219.130.0/23*", line: "10.219.130.0/23" }
+       - { regexp: "^10.219.132.0/23*", line: "10.219.132.0/23" }
+
+
+
+    - name: Reload pf
+      shell: /etc/rc.d/pf reload
+
+#    - name: Data directory
+#      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c 'show data_directory'
+#      register: data_dir
+
+
+    - name: Update pg_hba.conf 1
+      lineinfile:
+        dest: "/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/pg_hba.conf"
+        line: "host    {{ my_db_name }}    gds_admin        {{ item }}              md5"
+      with_items:
+       - "10.213.128.0/23"
+       - "10.213.129.0/23"
+       - "10.213.130.0/23"
+       - "10.211.128.0/22"
+       - "10.211.132.0/22"
+       - "10.219.128.0/23"
+       - "10.219.130.0/23"
+       - "10.219.132.0/23"
+       - "10.230.128.0/23"
+       - "10.230.130.0/23"
+       - "10.230.132.0/23"
+       - "10.228.128.0/23"
+       - "10.228.130.0/23"
+       - "10.228.132.0/23"
+       - "10.221.128.0/23"
+       - "10.221.130.0/23"
+       - "10.221.132.0/23"
+
+    - name: Update pg_hba.conf 2
+      lineinfile:
+        dest: "/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/pg_hba.conf"
+        line: "host    replication    gds_admin        {{ item }}              md5"
+      with_items:
+       - "10.213.128.0/23"
+       - "10.213.129.0/23"
+       - "10.213.130.0/23"
+       - "10.211.128.0/22"
+       - "10.211.132.0/22"
+       - "10.219.128.0/23"
+       - "10.219.130.0/23"
+       - "10.219.132.0/23"
+       - "10.230.128.0/23"
+       - "10.230.130.0/23"
+       - "10.230.132.0/23"
+       - "10.228.128.0/23"
+       - "10.228.130.0/23"
+       - "10.228.132.0/23"
+       - "10.221.128.0/23"
+       - "10.221.130.0/23"
+       - "10.221.132.0/23"
+
+    - name: Update pg_hba.conf 3
+      lineinfile:
+        dest: "/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/pg_hba.conf"
+        line: "host    replication    gds_admin    127.0.0.1/32    trust"
+
+    - name: Reload Database
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select pg_reload_conf()"
+
+    - name: Checkpoint
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "checkpoint"
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Restart database
+      shell: sv int /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Find if pid exists
+      stat: path=/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/postmaster.pid
+      register: is_postmaster_online
+      until: is_postmaster_online.stat.exists == True
+      retries: 1000
+      delay: 1
+
+
+- name: Daas part (master)
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_first_db: "{{ hostvars[daas_host]['my_first_db'] }}"
+        my_dba_user: "{{ hostvars[daas_host]['my_dba_user'] }}"
+        my_master_vip: "{{ hostvars[daas_host]['my_master_vip'] }}"
+        my_db_schema: "{{ hostvars[daas_host]['my_db_schema'] }}"
+
+
+    - name: check if package is installed
+      shell: pkg info pglogical | grep Installed | wc -l
+      register: is_pglogical_installed
+
+    - name: install package
+      shell: pkg install -y pglogical-2.2.1_3
+      when:  is_pglogical_installed.stdout|int  ==  0
+
+
+    - name: set parameters in the postgresql.conf
+      lineinfile:
+        dest: "/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/postgresql.conf"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: "^wal_level*", line: "wal_level = logical" }
+        - { regexp: "^max_replication_slots*", line: "max_replication_slots = 15" }
+        - { regexp: "^max_wal_senders*", line: "max_wal_senders = 15" }
+        - { regexp: "^max_worker_processes*", line: "max_worker_processes = 10" }
+        - { regexp: "^shared_preload_libraries*", line: "shared_preload_libraries = 'auto_explain,btree_gin,btree_gist,citext,dblink,dict_int,dict_xsyn,fuzzystrmatch,hstore,lo,ltree,pageinspect,passwordcheck,pg_buffercache,pgcrypto,pg_freespacemap,pgrowlocks,pg_stat_statements,pgstattuple,pg_trgm,postgres_fdw,tablefunc,tcn,unaccent,uuid-ossp,pglogical' #(change requires restart)" }
+
+    - name: Check if restart is actually needed 1/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='wal_level' and setting='logical'"
+      register: current_wal_level_count
+
+    - name: Check if restart is actually needed 2/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='shared_preload_libraries' and setting like '%pglogical'"
+      register: current_preload_libraries_count
+
+    - name: Check if restart is actually needed 3/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='max_wal_senders' and setting::int > 9"
+      register: max_wal_senders_count
+
+    - name: Check if restart is actually needed 4/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='max_replication_slots' and setting::int > 9"
+      register: max_replication_slots_count
+
+    - name: Check if restart is actually needed 5/5
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_settings where name='max_worker_processes' and setting::int > 7"
+      register: max_worker_processes_count
+
+    - name: Update sources file
+      lineinfile:
+       dest: /etc/pf.conf.d/tables/{{ instance }}-srcs.table
+       regexp: "{{ item.regexp }}"
+       line: "{{ item.line }}"
+      with_items:
+       - { regexp: "^10.213.128.0/23*", line: "10.213.128.0/23" }
+       - { regexp: "^10.213.129.0/23*", line: "10.213.129.0/23" }
+       - { regexp: "^10.213.130.0/23*", line: "10.213.130.0/23" }
+       - { regexp: "^10.211.128.0/22*", line: "10.211.128.0/22" }
+       - { regexp: "^10.211.132.0/22*", line: "10.211.132.0/22" }
+       - { regexp: "^10.230.128.0/23*", line: "10.230.128.0/23" }
+       - { regexp: "^10.230.130.0/23*", line: "10.230.130.0/23" }
+       - { regexp: "^10.230.132.0/23*", line: "10.230.132.0/23" }
+       - { regexp: "^10.228.128.0/23*", line: "10.228.128.0/23" }
+       - { regexp: "^10.228.130.0/23*", line: "10.228.130.0/23" }
+       - { regexp: "^10.228.132.0/23*", line: "10.228.132.0/23" }
+       - { regexp: "^10.221.128.0/23*", line: "10.221.128.0/23" }
+       - { regexp: "^10.221.130.0/23*", line: "10.221.130.0/23" }
+       - { regexp: "^10.221.132.0/23*", line: "10.221.132.0/23" }
+       - { regexp: "^10.219.128.0/23*", line: "10.219.128.0/23" }
+       - { regexp: "^10.219.130.0/23*", line: "10.219.130.0/23" }
+       - { regexp: "^10.219.132.0/23*", line: "10.219.132.0/23" }
+
+    - name: Reload pf
+      shell: /etc/rc.d/pf reload
+
+#    - name: Data directory
+#      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c 'show data_directory'
+#      register: data_dir
+
+    - name: Update pg_hba.conf 1
+      lineinfile:
+        dest: "/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/pg_hba.conf"
+        line: "host    {{ my_db_name }}    gds_admin        {{ item }}              md5"
+      with_items: 
+       - "10.213.128.0/23"
+       - "10.213.129.0/23"
+       - "10.213.130.0/23"
+       - "10.211.128.0/22"
+       - "10.211.132.0/22"
+       - "10.219.128.0/23"
+       - "10.219.130.0/23"
+       - "10.219.132.0/23"
+       - "10.230.128.0/23"
+       - "10.230.130.0/23"
+       - "10.230.132.0/23"
+       - "10.228.128.0/23"
+       - "10.228.130.0/23"
+       - "10.228.132.0/23"
+       - "10.221.128.0/23"
+       - "10.221.130.0/23"
+       - "10.221.132.0/23"
+
+    - name: Update pg_hba.conf 2
+      lineinfile:
+        dest: "/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/pg_hba.conf"
+        line: "host    replication    gds_admin        {{ item }}              md5"
+      with_items:
+       - "10.213.128.0/23"
+       - "10.213.129.0/23"
+       - "10.213.130.0/23"
+       - "10.211.128.0/22"
+       - "10.211.132.0/22"
+       - "10.219.128.0/23"
+       - "10.219.130.0/23"
+       - "10.219.132.0/23"
+       - "10.230.128.0/23"
+       - "10.230.130.0/23"
+       - "10.230.132.0/23"
+       - "10.228.128.0/23"
+       - "10.228.130.0/23"
+       - "10.228.132.0/23"
+       - "10.221.128.0/23"
+       - "10.221.130.0/23"
+       - "10.221.132.0/23"
+
+    - name: Update pg_hba.conf 3
+      lineinfile:
+        dest: "/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/pg_hba.conf"
+        line: "host    replication    gds_admin    127.0.0.1/32    trust"
+
+    - name: Check if user exists
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pg_roles where rolname='gds_admin'"
+      register: count_gds_admin
+    - name: Create user if it does not exists
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "create user gds_admin encrypted password 'md55d281d3a044217393d4667c49929dd86' SUPERUSER LOGIN"
+      when:  count_gds_admin.stdout|int  == 0
+
+    - name: Reload Database
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select pg_reload_conf()"
+
+    - name: Checkpoint
+      shell: psql -U postgres -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "checkpoint"
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Restart database
+      shell: sv int /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/
+      when: current_preload_libraries_count.stdout|int == 0  or current_wal_level_count.stdout|int == 0 or max_wal_senders_count.stdout|int == 0 or max_replication_slots_count.stdout|int == 0 or max_worker_processes_count.stdout|int == 0
+
+    - name: Find if pid exists
+      stat: path=/var/groupon/postgresql/data11/{{ gds_cluster }}-{{ instance }}/data/postmaster.pid
+      register: is_postmaster_online
+      until: is_postmaster_online.stat.exists == True
+      retries: 1000
+      delay: 1
+
+    - name: Create extensions 1/2
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "create extension if not exists pglogical_origin"
+
+    - name: Create extensions 2/2
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "create extension if not exists pglogical"
+
+    - name: Check for missing primary keys
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "with my_Q1 as (SELECT n.nspname as schema,c.relname as table FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ) select count(*) from my_Q1"
+      register: table_no_pks
+
+    - name: Check for missing unique constraints and indexes
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "with my_Q1 as (SELECT n.nspname as schema,c.relname as mytable FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND NOT EXISTS (SELECT 1 FROM pg_constraint con WHERE con.conrelid = c.oid AND con.contype = 'p') AND n.nspname <> ALL ( ARRAY ['pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext'] ) ), my_Q2 as (SELECT rel.relname FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace WHERE nsp.nspname not in ('pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext') AND contype = 'u'), my_Q3 as(select tbl.relname as table_name from pg_index pgi join pg_class idx on idx.oid = pgi.indexrelid join pg_namespace insp on insp.oid = idx.relnamespace join pg_class tbl on tbl.oid = pgi.indrelid join pg_namespace tnsp on tnsp.oid = tbl.relnamespace where pgi.indisunique and tnsp.nspname not in ('pg_catalog','sys','dba','information_schema','pglogical','pglogical_origin','ext','pg_toast')) select count(*) from my_Q1 where mytable NOT in (select relname from my_Q2) and mytable NOT in (select table_name from my_Q3)" 
+      register: table_no_uniqs
+      when: table_no_pks.stdout|int > 0
+
+    - name: verify no uniqs are missing
+      fail: msg="Exiting ----------There are unique constraints missing"
+      when:  'table_no_pks.stdout|int > 0  and table_no_uniqs.stdout|int > 0'
+
+    - pause: prompt="There are primany keys missing but unique constraints/indexes exist. Please fix the replica identity or create the PK and then press ENTER to continue..."
+      when:  'table_no_pks.stdout|int > 0 and table_no_uniqs.stdout|int == 0'
+
+#    - name: Check for superusers
+#      shell: psql -U postgres -d postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_catalog.pg_roles where rolsuper is TRUE"
+#      register: superuser_no
+#    - name: verify no more than 2 superusers
+#      fail: msg="Exiting ----------There are more than 2(postgres,gds_admin) superusers. There will be issues on importing them to aws"
+#      when:  superuser_no.stdout|int  > 2
+
+    - name: export globals
+      shell: pg_dumpall -U postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -g | grep -Ev 'gds_admin|postgres|gdsmon|checkmk_mon' > /tmp/{{ instance }}_globals.sql 
+
+    - name: remove aws conflicting words 1/2
+      shell: sed -e 's/\<NOSUPERUSER\>//g' /tmp/{{ instance }}_globals.sql > /tmp/{{ instance }}_globals_temp.sql
+
+    - name: remove aws conflicting words 2/2
+      shell: sed -e 's/\<NOREPLICATION\>//g' /tmp/{{ instance }}_globals_temp.sql > /tmp/{{ instance }}_globals.sql
+
+    - name: export schema
+      shell: pg_dump -U postgres -N heartbeat -N pglogical -N pglogical_origin -N dba -F p -s -f /tmp/{{ my_db_name }}_schema.sql -p {{ gds_instances[instance].ports.postgresql_raw }} {{ my_db_name }}
+
+    - fetch:
+        src: /tmp/{{ instance }}_globals.sql
+        dest: files/temp/
+        flat: yes
+
+    - fetch: 
+        src: /tmp/{{ my_db_name }}_schema.sql
+        dest: files/temp/
+        flat: yes
+
+    - name: Remove globals file
+      file: path=/tmp/{{ instance }}_globals.sql state=absent
+
+    - name: Remove dump file
+      file: path=/tmp/{{ my_db_name }}_schema.sql state=absent
+
+    - name: Check if provider exists
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pglogical.node_interface where if_name='{{ my_db_name }}_provider'"
+      register: count_provider
+
+    - name: Create provider
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "SELECT pglogical.create_node(node_name := '{{ my_db_name }}_provider', dsn := 'host=127.0.0.1 port={{ gds_instances[instance].ports.postgresql_raw }}  dbname={{ my_db_name }} user=gds_admin')"
+      when:  count_provider.stdout|int  == 0
+
+    - name: Add tables
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "SELECT pglogical.replication_set_add_all_tables('default', '{ {{ item }} }'::text[])"
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Add sequences
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "SELECT pglogical.replication_set_add_all_sequences('default', '{ {{ item }} }'::text[],true )"
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Check if heartbeat exists
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select count(*) from pglogical.replication_set_table where set_reloid='heartbeat.repl_status'::regclass"
+      register: count_heartbeat
+      when: 'my_db_name == my_first_db'
+
+    - name: Add heartbeat
+      shell: psql -U postgres -d {{ my_db_name }} -qAt -p {{ gds_instances[instance].ports.postgresql_raw }} -c "\timing off" -c "select pglogical.replication_set_add_table('default','heartbeat.repl_status'::regclass)"
+      when: 'my_db_name == my_first_db and count_heartbeat.stdout|int == 0'
+
+
+- name: Aws part 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_first_db: "{{ hostvars[daas_host]['my_first_db'] }}"
+        my_dba_user: "{{ hostvars[daas_host]['my_dba_user'] }}"
+        my_master_vip: "{{ hostvars[daas_host]['my_master_vip'] }}"
+        my_db_schema: "{{ hostvars[daas_host]['my_db_schema'] }}"
+
+
+    - name: Create .pgpass file
+      command: touch ~/.pgpass
+
+    - name: set proper mode for the .pgpass file
+      command: chmod 0600 ~/.pgpass
+
+    - name: Create config for the .pgpass file
+      lineinfile: dest=~/.pgpass line="{{ aws_host }}:5432:*:gds_admin:{{ admin_password }}"
+
+    - name: Import users
+      shell: psql -U gds_admin -d postgres -At -p 5432 -h {{ aws_host }} < files/temp/{{ instance }}_globals.sql
+      register: users_import
+
+    - name: Grant Role
+      shell: psql -U gds_admin -d postgres -At -p 5432 -h {{ aws_host }} -c "grant {{ my_dba_user }} to gds_admin"
+
+    - name: Check if database exists
+      shell: psql -U gds_admin -d postgres -At -p 5432 -h {{ aws_host }} -c "select count(*) from pg_database where datname = '{{ my_db_name }}'"
+      register: count_database
+
+    - name: Create database
+      shell: psql -U gds_admin -d postgres -At -p 5432 -h {{ aws_host }} -c "create database {{ my_db_name }}"
+      when: 'count_database.stdout|int == 0'
+
+    - name: Import schema
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} < files/temp/{{ my_db_name }}_schema.sql
+      register: db_import
+
+    - name: Check if heartbeat exists
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select count(*) from pg_namespace where nspname = 'heartbeat'"
+      register: count_heartbeat
+
+    - name: Create heartbeat schema
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "create schema heartbeat" 
+      when: 'my_db_name == my_first_db and count_heartbeat.stdout|int == 0'
+
+    - name: Check if heartbeat.repl_status exists
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select count(*) from pg_stat_user_tables where schemaname = 'heartbeat' and relname='repl_status'"
+      register: count_heartbeat_table
+
+    - name: Create heartbeat table
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "CREATE  TABLE heartbeat.repl_status (    pid integer,    usesysid oid,    usename name, application_name text,    client_addr inet,    client_hostname text,    client_port integer,  backend_start timestamp with time zone,    backend_xmin xid,    state text,    sent_lsn  pg_lsn,    write_lsn pg_lsn,    flush_lsn pg_lsn,    replay_lsn pg_lsn, write_lag interval, flush_lag interval, replay_lag interval, sync_priority integer, sync_state text,last_updated timestamp without time zone,     current_position_master pg_lsn NOT NULL,    master_host inet)"
+      when: 'my_db_name == my_first_db and count_heartbeat_table.stdout|int == 0'
+
+    - name: Alter heartbeat table
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "ALTER TABLE ONLY heartbeat.repl_status    ADD CONSTRAINT repl_status_pkey PRIMARY KEY (current_position_master,client_port)"
+      when: 'my_db_name == my_first_db and count_heartbeat_table.stdout|int == 0'
+
+    - name: Privileges 1/2
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "grant usage on schema heartbeat to checkmk_mon"
+      when: 'my_db_name == my_first_db'
+
+    - name: Privileges 2/2
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "grant select on heartbeat.repl_status to checkmk_mon"
+      when: 'my_db_name == my_first_db'
+
+    - name: Create extension
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -c "create extension if not exists pglogical"
+
+    - name: Check if subscriber exists
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select count(*) from pglogical.node_interface where if_name='{{ my_db_name }}_rds_pg10_subscriber'"
+      register: count_subscriber
+
+    - name: Create subscriber
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "SELECT pglogical.create_node(node_name := '{{ my_db_name }}_rds_pg10_subscriber', dsn := 'host=127.0.0.1 port=5432 dbname={{ my_db_name }} user=gds_admin password= {{ admin_password }}')" 
+      when:  count_subscriber.stdout|int  == 0
+
+    - name: Check if subscription exists
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select count(*) from pglogical.subscription where sub_name='{{ my_db_name }}_rds_pg10_subscription'"
+      register: count_subscription
+
+    - name: Create subscription
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c " SELECT pglogical.create_subscription(subscription_name := '{{ my_db_name }}_rds_pg10_subscription', provider_dsn := 'host={{ my_master_vip }} port=15432 dbname={{ my_db_name }} user=gds_admin password={{ admin_password }}', replication_sets := '{default}'::text[] );"
+      when:  count_subscription.stdout|int  == 0
+
+    - name: Show one-time replication status 
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -c "SELECT subscription_name, status FROM pglogical.show_subscription_status();"
+      register: pglogical_repl_status
+    - debug: var=pglogical_repl_status.stdout
+
+
+- name: a play that runs entirely on the ansible host
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+
+    - name: Delete the temp globals file
+      file: path=files/temp/{{ instance }}_globals.sql state=absent
+
+    - name: Delete the temp schema file
+      file: path=files/temp/{{ my_db_name }}_schema.sql state=absent
+
+

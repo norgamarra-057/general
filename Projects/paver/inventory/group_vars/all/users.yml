@@ -1,0 +1,1187 @@
+---
+# Alphabetically sort by username. UID/GIDs taken from
+# ops-config/etc/users.txt.
+users:
+  abedra:
+    group: ops
+    groups:
+      - grpn_c
+      - ops_dba
+    name: Aaron Bedra
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/abedra.pub') }}"
+    uid: 1429
+  alock:
+    group: ops
+    groups:
+      - grpn
+      - ops_sa
+      - pci
+    name: Alex Lock
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/alock.pub') }}"
+    uid: 1753
+  akaminski:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Andreas Kaminski
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/akaminski.pub') }}"
+    uid: 2650
+  c_mboehm:
+    group: ops
+    groups:
+      - grpn_c
+      - ops_dba
+    name: Matthew Boehm
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/c_mboehm.pub') }}"
+    uid: 2210
+  c_pboros:
+    group: ops
+    groups:
+      - grpn_c
+      - ops_dba
+    name: Peter Boros
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/c_pboros.pub') }}"
+    uid: 3014
+  rbarabas:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+    name: Robert Barabas
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/rbarabas.pub') }}"
+    uid: 3321
+  c_dguzmanburgos:
+    group: ops
+    groups:
+      - grpn_c
+      - ops_dba
+    name: Daniel Guzman Burgos
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/c_dguzmanburgos.pub') }}"
+    uid: 3514
+  c_dducos:
+    group: ops
+    groups:
+      - grpn_c
+      - ops_dba
+    name: David Ducos
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/c_dducos.pub') }}"
+    uid: 3515
+  c_ytrudeau:
+    group: ops
+    groups:
+      - grpn_c
+      - ops_dba
+    name: Yves Trudeau
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/c_ytrudeau.pub') }}"
+    uid: 3791
+  cbirkholz:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Christian Birkholz
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/cbirkholz.pub') }}"
+    uid: 2826
+  chaynie:
+    group: ops
+    groups:
+      - grpn
+      - ops_sre
+    name: Chris Haynie
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/chaynie.pub') }}"
+    uid: 2844
+  chinh:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Chinh Ly
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/chinh.pub') }}"
+    uid: 1604
+  chschneider:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+      - pci
+    name: Chris Schneider
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/chschneider.pub') }}"
+    uid: 2701
+  ckochan:
+    group: ops
+    groups:
+      - grpn
+      - ops_eng
+    name: Christopher Kochan
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/ckochan.pub') }}"
+    uid: 2976
+  claver:
+    group: ops
+    groups:
+      - grpn
+      - ops_tdo
+    name: Claver Medina
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/claver.pub') }}"
+    uid: 1747
+  cllanca:
+    group: ops
+    groups:
+      - grpn
+      - ops_ses
+    name: Claudio Llanca
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/cllanca.pub') }}"
+    uid: 2763
+  cwinter:
+    group: ops
+    groups:
+      - grpn
+      - ops_imoc
+    name: Christopher Winter
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/cwinter.pub') }}"
+    uid: 2531
+  fkalamidas:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+    name: Flippos Kalamidas
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/fkalamidas.pub') }}"
+    uid: 2959
+  gds_mha:
+    group: ops_gds_app
+    groups:
+      - _system
+    name: GDS MHA UID
+    shell: /bin/tcsh
+    uid: 996
+  gds_pkg:
+    group: ops_gds_app
+    gropus:
+      - _system
+    homedir: False
+    name: GDS Poudriere User
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/gds_pkg.pub') }}"
+    uid: 995
+  glopezfernandez:
+    group: ops
+    groups:
+      - grpn
+    name: Gerardo Lopezfernandez
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/glopezfernandez.pub') }}"
+    uid: 3103
+  jcraig:
+    group: ops
+    groups:
+      - grpn
+      - ops_eng
+    name: John Craig
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/jcraig.pub') }}"
+    uid: 2832
+  jdetke:
+    group: ops
+    groups:
+      - grpn
+      - ops_sre
+    name: John Detke
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/jdetke.pub') }}"
+    uid: 1804
+  jhalter:
+    group: ops
+    groups:
+      - grpn
+      - ops_eng
+    name: Jeff Halter
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/jhalter.pub') }}"
+    uid: 1812
+  jocampbell:
+    group: ops
+    groups:
+      - grpn
+      - ops_sre
+    name: Josh Campbell
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/jocampbell.pub') }}"
+    uid: 2771
+  jonathon:
+    group: ops
+    groups:
+      - grpn
+    name: Jonathon Jenkins
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/jonathon.pub') }}"
+    uid: 1778
+  jdoenhardt:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+    name: Juergen Doenhardt
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/jdoenhardt.pub') }}"
+    uid: 1908
+  jose.finotto:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+    name: Jose Finotto
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/jose.finotto.pub') }}"
+    uid: 2098
+  jsotelo:
+    group: ops
+    groups:
+      - grpn
+      - ops_imoc
+    name: Javier Moro Sotelo
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/jsotelo.pub') }}"
+    uid: 2663
+  juan:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+    name: Juan Rodriquez
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/juan.pub') }}"
+    uid: 1518
+  mhang:
+    group: ops
+    groups:
+      - grpn_c
+    name: Michael Hang
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/mhang.pub') }}"
+    uid: 3096
+  monitord:
+    group: '_monitoring'
+    groups:
+      - _system
+    name: Monitoring Daemon
+    homedir: False
+    uid: 622
+  nico.kramer:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Nico Kramer
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/nico.kramer.pub') }}"
+    uid: 2087
+  nleskiw:
+    group: ops
+    groups:
+      - grpn
+      - ops_sre
+    name: Nicholas (Nick) Leskiw
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/nleskiw.pub') }}"
+    uid: 2108
+  nolofsson:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Nils Olofsson
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/nolofsson.pub') }}"
+    uid: 3258
+  gonad:
+    group: _monitoring
+    groups:
+      - _system
+    name: Monitoring Daemon
+    homedir: False
+    uid: 997
+  mreussner:
+    group: ops
+    groups:
+      - grpn
+      - ops_sa
+    name: Matthieu Ruessner
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/mreussner.pub') }}"
+    uid: 3235
+  msubramanian:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+    name: Mani Subramanian
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/msubramanian.pub') }}"
+    uid: 2980
+  pablo:
+    group: ops
+    groups:
+      - grpn
+    name: Pablo Bustos
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/pablo.pub') }}"
+    uid: 1215
+  peter.staikow:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Peter Staikow
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/peter.staikow.pub') }}"
+    uid: 3242
+  phofmeister:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Patrick Hofmeister
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/phofmeister.pub') }}"
+    uid: 2825
+  psoncek:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Peter Soncek
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/psoncek.pub') }}"
+    uid: 3031
+  pwebb:
+    group: ops
+    groups:
+      - grpn
+      - ops_imoc
+    name: Pete Webb
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/pwebb.pub') }}"
+    uid: 2563
+  rbenoit:
+    group: ops
+    groups:
+      - grpn
+      - ops_tdo
+    name: Ron Benoit
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/rbenoit.pub') }}"
+    uid: 3081
+  rlewon:
+    group: ops
+    groups:
+      - grpn
+      - ops_eng
+    name: Ryan Lewon
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/rlewon.pub') }}"
+    uid: 3732
+  rolando:
+    group: ops
+    groups:
+      - grpn
+    name: Rolando Ruiz
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/rolando.pub') }}"
+    uid: 1755
+  rpenugonda:
+    group: ops
+    groups:
+      - grpn
+      - ops_sa
+    name: Ramesh Penugonda
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/rpenugonda.pub') }}"
+    uid: 3245
+  rprillinger:
+    group: ops
+    groups:
+      - grpn
+      - ops_imoc
+    name: Rich Prillinger
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/rprillinger.pub') }}"
+    uid: 2714
+  rvalin:
+    group: ops
+    groups:
+      - grpn
+      - ops_sre
+    name: Rodrigo Valin
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/rvalin.pub') }}"
+    uid: 1346
+  rvenkatesh:
+    group: ops
+    groups:
+      - grpn
+      - ops_sre
+    name: Raghu Venkatesh
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/rvenkatesh.pub') }}"
+    uid: 2634
+  saurabh:
+    group: ops
+    groups:
+      - grpn
+      - ops_sa
+    name: Saurabh Bhalerao
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/saurabh.pub') }}"
+    uid: 1614
+  sblaurock:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Stefan Blaurock
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/sblaurock.pub') }}"
+    uid: 2649
+  sdoumbouya:
+    group: ops
+    groups:
+      - grpn
+      - ops_sa
+    name: Sekou Doumbouya
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/sdoumbouya.pub') }}"
+    uid: 3275
+  sdurant:
+    group: ops
+    groups:
+      - grpn
+      - ops_sa
+    name: Sharon Durant
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/sdurant.pub') }}"
+    uid: 1788
+  schittenden:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+    email_primary: seanc
+    name: Sean Chittenden
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/schittenden.pub') }}"
+    uid: 2851
+  sfox:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Sam Fox
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/sfox.pub') }}"
+    uid: 2968
+  smei:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Steve Mei
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/smei.pub') }}"
+    uid: 3074
+  smurillo:
+    group: ops
+    groups:
+      - grpn
+      - ops_dba
+    name: Sergio Murillo
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/smurillo.pub') }}"
+    uid: 3643
+  pgbadger:
+    group: _monitoring
+    groups:
+      - grpn
+    name: PGbadger
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/pgbadger.pub') }}"
+    uid: 4699
+  splunk:
+    group: _monitoring
+    groups:
+      - _system
+      - splunk
+    name: Splunk System Account
+    homedir: /var/groupon/splunk
+    homedir_mode: 0755
+    uid: 545
+  vchalco:
+    group: ops
+    groups:
+      - grpn
+      - ops_soc
+    name: Victor Chalco
+    ssh_key: "{{ lookup('file', inventory_dir + '/../roles/foreman/files/vchalco.pub') }}"
+    uid: 2109
+  gds_uid60001:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 1 UID
+    uid: 60001
+  gds_uid60002:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 2 UID
+    uid: 60002
+  gds_uid60003:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 3 UID
+    uid: 60003
+  gds_uid60004:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 4 UID
+    uid: 60004
+  gds_uid60005:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 5 UID
+    uid: 60005
+  gds_uid60006:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 6 UID
+    uid: 60006
+  gds_uid60007:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 7 UID
+    uid: 60007
+  gds_uid60008:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 8 UID
+    uid: 60008
+  gds_uid60009:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 9 UID
+    uid: 60009
+  gds_uid60010:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 10 UID
+    uid: 60010
+  gds_uid60011:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 11 UID
+    uid: 60011
+  gds_uid60012:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 12 UID
+    uid: 60012
+  gds_uid60013:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 13 UID
+    uid: 60013
+  gds_uid60014:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 14 UID
+    uid: 60014
+  gds_uid60015:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 15 UID
+    uid: 60015
+  gds_uid60016:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 16 UID
+    uid: 60016
+  gds_uid60017:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 17 UID
+    uid: 60017
+  gds_uid60018:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 18 UID
+    uid: 60018
+  gds_uid60019:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 19 UID
+    uid: 60019
+  gds_uid60020:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 20 UID
+    uid: 60020
+  gds_uid60021:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 21 UID
+    uid: 60021
+  gds_uid60022:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 22 UID
+    uid: 60022
+  gds_uid60023:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 23 UID
+    uid: 60023
+  gds_uid60024:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 24 UID
+    uid: 60024
+  gds_uid60025:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 25 UID
+    uid: 60025
+  gds_uid60026:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 26 UID
+    uid: 60026
+  gds_uid60027:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 27 UID
+    uid: 60027
+  gds_uid60028:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 28 UID
+    uid: 60028
+  gds_uid60029:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 29 UID
+    uid: 60029
+  gds_uid60030:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 30 UID
+    uid: 60030
+  gds_uid60031:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 31 UID
+    uid: 60031
+  gds_uid60032:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 32 UID
+    uid: 60032
+  gds_uid60033:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 33 UID
+    uid: 60033
+  gds_uid60034:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 34 UID
+    uid: 60034
+  gds_uid60035:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 35 UID
+    uid: 60035
+  gds_uid60036:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 36 UID
+    uid: 60036
+  gds_uid60037:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 37 UID
+    uid: 60037
+  gds_uid60038:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 38 UID
+    uid: 60038
+  gds_uid60039:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 39 UID
+    uid: 60039
+  gds_uid60040:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 40 UID
+    uid: 60040
+  gds_uid60041:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 41 UID
+    uid: 60041
+  gds_uid60042:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 42 UID
+    uid: 60042
+  gds_uid60043:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 43 UID
+    uid: 60043
+  gds_uid60044:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 44 UID
+    uid: 60044
+  gds_uid60045:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 45 UID
+    uid: 60045
+  gds_uid60046:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 46 UID
+    uid: 60046
+  gds_uid60047:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 47 UID
+    uid: 60047
+  gds_uid60048:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 48 UID
+    uid: 60048
+  gds_uid60049:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 49 UID
+    uid: 60049
+  gds_uid60050:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 50 UID
+    uid: 60050
+  gds_uid60051:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 51 UID
+    uid: 60051
+  gds_uid60052:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 52 UID
+    uid: 60052
+  gds_uid60053:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 53 UID
+    uid: 60053
+  gds_uid60054:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 54 UID
+    uid: 60054
+  gds_uid60055:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 55 UID
+    uid: 60055
+  gds_uid60056:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 56 UID
+    uid: 60056
+  gds_uid60057:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 57 UID
+    uid: 60057
+  gds_uid60058:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 58 UID
+    uid: 60058
+  gds_uid60059:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 59 UID
+    uid: 60059
+  gds_uid60060:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 60 UID
+    uid: 60060
+  gds_uid60061:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 61 UID
+    uid: 60061
+  gds_uid60062:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 62 UID
+    uid: 60062
+  gds_uid60063:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 63 UID
+    uid: 60063
+  gds_uid60064:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 64 UID
+    uid: 60064
+  gds_uid60065:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 65 UID
+    uid: 60065
+  gds_uid60066:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 66 UID
+    uid: 60066
+  gds_uid60067:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 67 UID
+    uid: 60067
+  gds_uid60068:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 68 UID
+    uid: 60068
+  gds_uid60069:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 69 UID
+    uid: 60069
+  gds_uid60070:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 70 UID
+    uid: 60070
+  gds_uid60071:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 71 UID
+    uid: 60071
+  gds_uid60072:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 72 UID
+    uid: 60072
+  gds_uid60073:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 73 UID
+    uid: 60073
+  gds_uid60074:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 74 UID
+    uid: 60074
+  gds_uid60075:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 75 UID
+    uid: 60075
+  gds_uid60076:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 76 UID
+    uid: 60076
+  gds_uid60077:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 77 UID
+    uid: 60077
+  gds_uid60078:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 78 UID
+    uid: 60078
+  gds_uid60079:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 79 UID
+    uid: 60079
+  gds_uid60080:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 80 UID
+    uid: 60080
+  gds_uid60081:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 81 UID
+    uid: 60081
+  gds_uid60082:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 82 UID
+    uid: 60082
+  gds_uid60083:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 83 UID
+    uid: 60083
+  gds_uid60084:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 84 UID
+    uid: 60084
+  gds_uid60085:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 85 UID
+    uid: 60085
+  gds_uid60086:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 86 UID
+    uid: 60086
+  gds_uid60087:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 87 UID
+    uid: 60087
+  gds_uid60088:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 88 UID
+    uid: 60088
+  gds_uid60089:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 89 UID
+    uid: 60089
+  gds_uid60090:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 90 UID
+    uid: 60090
+  gds_uid60091:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 91 UID
+    uid: 60091
+  gds_uid60092:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 92 UID
+    uid: 60092
+  gds_uid60093:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 93 UID
+    uid: 60093
+  gds_uid60094:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 94 UID
+    uid: 60094
+  gds_uid60095:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 95 UID
+    uid: 60095
+  gds_uid60096:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 96 UID
+    uid: 60096
+  gds_uid60097:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 97 UID
+    uid: 60097
+  gds_uid60098:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 98 UID
+    uid: 60098
+  gds_uid60099:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 99 UID
+    uid: 60099
+  gds_uid60100:
+    group: ops_gds_app
+    groups:
+      - _system
+    homedir: False
+    name: GDS Instance 100 UID
+    uid: 60100

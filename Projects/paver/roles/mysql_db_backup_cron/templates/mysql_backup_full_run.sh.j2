@@ -1,0 +1,12 @@
+#!/bin/sh --
+
+# Execute all backup jobs listed in {{ delorean_jobs_dir }} in parallel
+
+set -e
+PARALLELISM=12
+
+/usr/bin/find \
+    {{ delorean_jobs_dir }} \
+    -type f -name '*.sh' -print0 \
+  | /usr/bin/xargs -0 -n1 -P ${PARALLELISM} -I {} \
+    /bin/sh -c 'exec {}'

@@ -1,0 +1,38 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Create .pgpass file
+      command: touch ~/.pgpass
+
+    - name: set proper mode for the .pgpass file
+      command: chmod 0600 ~/.pgpass
+
+    - name: Create config for the .pgpass file
+      lineinfile: dest=~/.pgpass line="localhost:*:pgbouncer:gdsmon:gds123123"
+
+    - name: Copy local1
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_pgb_ses_maxwait.sh
+        dest: "/usr/lib/check_mk_agent/local/360/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy local2
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_pgb_ses_generic.sh
+        dest: "/usr/lib/check_mk_agent/local/360/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy local3
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_pgb_ses_backends.sh
+        dest: "/usr/lib/check_mk_agent/local/360/"
+        owner: root
+        group: wheel
+        mode: 0655

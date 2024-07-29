@@ -1,0 +1,12 @@
+---
+- set_fact: is_ro_master=false
+  when: is_ro_master is undefined
+
+- name: Deploy postgresql check_mk configuration
+  template:
+    src: postgres.cfg.j2
+    dest: /etc/check_mk/postgres.cfg
+    mode: 0644
+    owner: root
+    group: wheel
+

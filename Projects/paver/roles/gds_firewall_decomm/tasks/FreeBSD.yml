@@ -1,0 +1,88 @@
+---
+- name: Set variables needed for decomm
+  set_fact:
+    firewall_priority: "{{ '%03u' | format(gds_instances[instance]['firewall_priority']) }}"
+    
+- name: pf.conf | redirect fragment | remove instance file(s)
+  file:
+    path: "/etc/pf.conf.d/fragments/redirects/{{ firewall_priority }}_{{ instance }}.conf"
+    state: absent
+
+- name: pf.conf | instance_specific fragment | remove instance file(s)
+  file:
+    path: "/etc/pf.conf.d/fragments/instance_specific/100_{{ instance }}_instance_specific.conf"
+    state: absent
+
+- name: pf.conf | table fragments | remove redirect fragment files(s)
+  file:
+    path: "/etc/pf.conf.d/fragments/tables/{{ firewall_priority }}_{{ instance }}.table.conf"
+    state: absent
+
+- name: pf.conf | table fragments | remove srcs file(s)
+  file:
+    path: "/etc/pf.conf.d/tables/{{ instance }}-srcs.table"
+    state: absent
+
+- name: pf.conf | table fragments | remove vips file(s)
+  file:
+    path: "/etc/pf.conf.d/tables/{{ instance }}-vips.table"
+    state: absent
+
+###
+# Not processing /etc/pf.conf.d/tables/gds-replication-peers.table as it has duplicate values for each instance.
+# It is at the host level and should not be removed.  FIXME:  Need to fix gds_firewall to only add to this file
+# if entries do not exist.  Use lineinfile instead of template
+###
+
+- name: pf.conf | remove existing redirects.conf
+  file:
+    path: /etc/pf.conf.d/redirects.conf
+    state: absent
+  changed_when: false
+
+- name: pf.conf | re-assemble new redirects | redirects.conf
+  assemble:
+    src: /etc/pf.conf.d/fragments/redirects
+    dest: /etc/pf.conf.d/redirects.conf
+    owner: root
+    group: wheel
+    regexp: '\.conf$'
+    mode: 0640
+  changed_when: false
+
+- name: pf.conf | remove existing instance_specific.conf
+  file:
+    path: /etc/pf.conf.d/instance_specific.conf
+    state: absent
+  changed_when: false
+
+- name: pf.conf | re-assemble new instance_specific | instance_specific.conf
+  assemble:
+    src: /etc/pf.conf.d/fragments/instance_specific
+    dest: /etc/pf.conf.d/instance_specific.conf
+    owner: root
+    group: wheel
+    regexp: '\.conf$'
+    mode: 0640
+  changed_when: false
+
+- name: pf.conf | remove existing tables.conf
+  file:
+    dest: /etc/pf.conf.d/tables.conf
+    state: absent
+  changed_when: false
+
+- name: pf.conf | re-assemble new tables.conf
+  assemble:
+    src: /etc/pf.conf.d/fragments/tables
+    dest: /etc/pf.conf.d/tables.conf
+    owner: root
+    group: wheel
+    regexp: '\.table.conf$'
+    mode: 0640
+  changed_when: false
+
+- name: pf.conf | reload pf
+  command: /etc/rc.d/pf reload
+  changed_when: false
+  ignore_errors: true

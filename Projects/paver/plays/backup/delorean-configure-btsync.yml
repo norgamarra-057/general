@@ -1,0 +1,19 @@
+---
+- name: configure btsync with sync keys
+  hosts: delorean_all
+  become: true
+  vars:
+    btsync_role_dir: "roles/delorean"
+    btsync_key_vault_path: "{{ btsync_role_dir }}/vars/btsync_keys_vault.yml"
+  vars_files:
+    - "{{ lookup('env','PWD') }}/{{ btsync_key_vault_path }}"
+  handlers:
+    - name: btsync_restart
+      command: /usr/local/etc/rc.d/btsync restart
+  tasks:
+    - name: configure btsync
+      template: src="{{ lookup('env','PWD') }}/{{ btsync_role_dir }}/templates/btsync.conf.j2" dest=/usr/local/etc/btsync.conf owner=root group=wheel mode=0600
+      notify:
+        - btsync_restart
+    - name: make sure btsync is running
+      service: name=btsync state=started

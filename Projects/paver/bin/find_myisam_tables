@@ -1,0 +1,142 @@
+#! /usr/bin/env python
+###################################################
+# find_myisam_tables
+#
+# Version:      1.0.1
+#
+# Descripton:   Parses group_vars files, connects to the instance(s) and produces a list of database(s), tables(s) that are MyISAM to STDOUT.
+#
+# Usage:        find_myisam_tables [-i inventory-path] [ [-d snc1|sac1|dub1] [-t prod|stg|uat] | [-f "filename"] ] [-V]
+#
+# Optional arguments:
+#   -h --help             Show this help message and exit
+#   -i path_to_inventory_group_vars, --inventory path_to_inventory_group_vars
+#                         Override default inventory path to group_vars files
+#   -d {snc1,sac1,dub1}, --datacenter {snc1,sac1,dub1}
+#                         snc1|sac1|dub1
+#   -t {prod,stg,uat}, --type {prod,stg,uat}
+#                         prod|stg|uat
+#   -f FILENAME, --filename FILENAME
+#                         Group_vars "filename". Can include a wildcard, but
+#                         must be quoted. Note: overrides -d and -t
+#   -v --verbose          Display skipped files/instances. Default is do not display
+#   -V --version          Displays version and exits
+#
+# Requirements: python 2.7
+#
+# Notes:        If no options provided, will default to every .yml file in the inventory/group_vars relative to the current path.
+#               Output format example: 
+#               gds-sac1-prod-db043m1.sac1 analytics_prod groupon_analytics_production	play_evolutions	MyISAM
+###################################################
+
+# Import needed modules
+
+import yaml
+import sys
+import string
+import socket
+import argparse
+import glob
+import os
+import paramiko
+import re
+
+# Default values
+Version = "1.0.1"
+inventory = "inventory/group_vars"
+datacenter = "*"
+type = "*"
+filename = "*"
+
+# Parse and load command line options
+parser = argparse.ArgumentParser(description="find_myisam_tables parses group_vars files, connects to the instance(s) and produces a list of database(s), tables(s) that are MyISAM to STDOUT.  find_myisam_tables: [-i inventory-path] [ [-d snc1|sac1|dub1] [-t prod|stg|uat] | [-f \"filename\"] ] [-v] [-V]")
+
+parser.add_argument("-i", "--inventory", help="Override default inventory path to group_vars files", metavar='path_to_inventory_group_vars')
+parser.add_argument("-d", "--datacenter", help="snc1|sac1|dub1", choices=['snc1','sac1','dub1'])
+parser.add_argument("-t", "--type", help="prod|stg|uat", choices=['prod','stg','uat'])
+parser.add_argument("-f", "--filename", help="group_vars \"filename\".  Can include a wildcard, but must be quoted.  Note: overrides -d and -t")
+parser.add_argument("-v", "--verbose", help="Display skipped files/instances. Default is do not display", action='store_true')
+parser.add_argument("-V", "--version", help="Displays version and exits.", action='store_true')
+args = parser.parse_args()
+
+if args.inventory:
+   inventory = args.inventory
+   inventory = inventory.rstrip('/')
+if args.datacenter:
+   datacenter = args.datacenter
+if args.type:
+   type = args.type
+if args.filename:
+   filename = args.filename 
+if args.version:
+   print "Version: " + Version
+   quit()
+
+# Build filename search path and name
+
+if re.match('\*', filename):
+   filename = inventory + "/gds_" + datacenter + "_" + type + "_db*.yml"
+else:
+   filename = inventory + "/" + filename
+   
+# Load all found files
+files = sorted(glob.glob(filename))
+
+# Loop through files or a single file if specified
+for file in files:
+   stream = open(file,'r')
+   data = yaml.safe_load(stream)
+   server = os.path.splitext(os.path.basename(file))[0]
+
+   # Get the type of prod, stg or uat. 'test' is ignored because the names are not standard
+   server_array = server.split("_")
+
+   # if type is not defined, get it from the file name
+   if re.match('\*', type):
+      instance_type = server_array[2]
+   else:
+      instance_type = type
+
+   if instance_type == "test":
+      continue
+
+   # if datacenter is not defined, get it from the file name
+   if re.match('\*', datacenter):
+      instance_datacenter = server_array[1]
+   else:
+      instance_datacenter = datacenter
+
+   # Get the actual server name from the file name
+   node = string.replace(server,'_','-') + "m1." + instance_datacenter
+   
+   try:
+      # Process each instance on each file found
+      for instance in data['gds_instances'].keys():
+         
+         if data['gds_instances'][instance]['type'] != "mysql":
+            continue
+
+         remote = paramiko.SSHClient()
+         remote.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+         remote.connect(node)
+
+         remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BAN -e\"SELECT table_schema, table_name, engine FROM information_schema.tables WHERE engine != 'InnoDB' and table_schema NOT IN ('information_schema', 'mysql','percona','performance_schema','sys','gds_pm','gds_validate') group by table_schema,table_name\""
+         stdin, stdout, stderr = remote.exec_command(remote_command)
+
+         lines = stdout.readlines()
+
+         if not lines:
+            if args.verbose:
+               print(node + " " + instance)
+         else:
+            for line in lines:
+               print(node + " " + instance + " " + line.rstrip())
+
+         remote.close()
+   except:
+     print (node + " " + instance + " - no instance or improperly configured instance(s)")
+
+     continue
+   stream.close()
+   
+   

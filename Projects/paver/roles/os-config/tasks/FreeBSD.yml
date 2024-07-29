@@ -1,0 +1,132 @@
+---
+- name: FreeBSD | cloned_interfaces
+  lineinfile:
+     dest: /etc/rc.conf.local
+     regexp: '^[#]*cloned_interfaces=*'
+     line: '{{ item.name }}="{{ item.value }}"'
+  when: "hostvars[inventory_hostname].freebsd_cloned_interfaces is defined"
+  with_items:
+    - name: cloned_interfaces
+      value: '{{ hostvars[inventory_hostname].freebsd_cloned_interfaces }}'
+
+#- name: /var/empty | readonly
+#  zfs: name=zroot/var/empty state=present readonly=on
+
+- name: FreeBSD | sysctl.conf defaults
+  tags:
+    - sysctl
+  lineinfile:
+    dest: /etc/sysctl.conf
+    regexp: '^[#]*{{ item.name }}=.*'
+    line: '{{ item.name }}="{{ item.value }}"'
+  with_items:
+    - { name: debug.minidump, value: 1 }
+    - { name: dev.igb.0.fc, value: 0 }
+    - { name: dev.igb.1.fc, value: 0 }
+    - { name: dev.ix.0.fc, value: 0 }
+    - { name: dev.ix.1.fc, value: 0 }
+#    - { name: kern.ipc.maxsockbuf, value: 2097152 } # For 1GE. (2^7) * TCP Window Size (65535)
+    - { name: kern.ipc.maxsockbuf, value: 33477120 } # For 10GE. (2^9) * TCP Window Size (65535)
+    - { name: kern.ipc.soacceptqueue, value: 1024 }
+    - { name: kern.ipc.maxsockets, value: 25600 } # Must be greater than: `sysctl -n kern.ipc.numopensockets` + `sysctl -n net.inet.tcp.maxtcptw`
+    - { name: kern.ipc.shm_use_phys, value: 1 }
+    - { name: kern.ipc.shmmax, value: 103065333760 }
+    - { name: kern.ipc.shmall, value: 25162435 }
+    - { name: kern.maxvnodes, value: 250000 }
+    - { name: kern.sched.interact, value: 5 } # Set via: `sysctl kern.clockrate`'s stathz/10
+    - { name: kern.sched.slice, value: 3 } # Set via: `sysctl kern.clockrate`'s stathz/10
+    # Increase max threads per process to 8k
+    - { name: kern.threads.max_threads_per_proc, value: 8192 }
+    - { name: net.inet.carp.preempt, value: 0 } # Only manually failover
+    - { name: net.inet.icmp.bmcastecho, value: 1 }
+    - { name: net.inet.icmp.drop_redirect, value: 1 }
+    - { name: net.inet.icmp.icmplim, value: 10000 }
+    - { name: net.inet.ip.intr_queue_maxlen, value: 256 } # Increase by 2x until `sysctl net.inet.ip.intr_queue_drops` is always 0
+    - { name: net.inet.ip.process_options, value: 0 }
+    - { name: net.inet.ip.redirect, value: 0 }
+    - { name: net.inet.ip.rtexpire, value: 2 }
+    - { name: net.inet.ip.rtminexpire, value: 2 }
+    - { name: net.inet.tcp.always_keepalive, value: 1 }
+    - { name: net.inet.tcp.blackhole, value: 0 } # Internal hosts use 0, external hosts set to 2
+    - { name: net.inet.tcp.cc.algorithm, value: htcp }
+    - { name: net.inet.tcp.cc.htcp.adaptive_backoff, value: 1 }
+    - { name: net.inet.tcp.cc.htcp.rtt_scaling, value: 1 }
+    - { name: net.inet.tcp.delacktime, value: 30 }
+    - { name: net.inet.tcp.delayed_ack, value: 0 } # Possibly enable
+    - { name: net.inet.tcp.drop_synfin, value: 1 }
+    - { name: net.inet.tcp.experimental.initcwnd10, value: 1 } # http://www.igvita.com/2011/10/20/faster-web-vs-tcp-slow-start/
+    - { name: net.inet.tcp.fast_finwait2_recycle, value: 1 }
+    - { name: net.inet.tcp.finwait2_timeout, value: 15000 }
+    - { name: net.inet.tcp.hostcache.expire, value: 3900 }
+    - { name: net.inet.tcp.icmp_may_rst, value: 0 }
+    - { name: net.inet.tcp.keepidle, value: 10000 }
+    - { name: net.inet.tcp.keepintvl, value: 5000 }
+    - { name: net.inet.tcp.maxtcptw, value: 15000 }
+    - { name: net.inet.tcp.minmss, value: 1300 }
+    - { name: net.inet.tcp.msl, value: 5000 } # Monitor via: `netstat -s -p tcp` in syncache
+    - { name: net.inet.tcp.mssdflt, value: 1460 }
+#    - { name: net.inet.tcp.path_mtu_discovery, value: 0 } # Set to 0 for external facing hosts
+    - { name: net.inet.tcp.path_mtu_discovery, value: 1 } # Set to 1 for internal hosts
+    - { name: net.inet.tcp.nolocaltimewait, value: 1 }
+    - { name: net.inet.tcp.recvbuf_inc, value: 524288 }
+    - { name: net.inet.tcp.recvbuf_max, value: 16777216 }
+    - { name: net.inet.tcp.recvspace, value: 4194304 }
+    - { name: net.inet.tcp.rfc1323, value: 1 }
+    - { name: net.inet.tcp.rfc3390, value: 1 }
+    - { name: net.inet.tcp.rfc3042, value: 1 }
+    - { name: net.inet.tcp.sack.enable, value: 1 }
+    - { name: net.inet.tcp.sendbuf_inc, value: 16384 }
+    - { name: net.inet.tcp.sendbuf_max, value: 16777216 }
+    - { name: net.inet.tcp.sendspace, value: 4194304 }
+    - { name: net.inet.tcp.syncache.rexmtlimit, value: 0 }
+    # NOTE: enable syncookies for external facing services. Internal services
+    # are better served with syncookies disabled (initcwd is useful!).
+    - { name: net.inet.tcp.syncookies, value: 0 }
+    - { name: net.inet.tcp.tso, value: 1 } # May set to 0 and on the hardware. http://www.peerwisdom.org/2013/04/03/large-send-offload-and-network-performance/
+    - { name: net.inet.udp.blackhole, value: 0 } # Internal hosts set to 0, external hosts to 1
+    - { name: net.local.stream.recvspace, value: 164240 }
+    - { name: net.local.stream.sendspace, value: 164240 }
+    - { name: net.route.netisr_maxqlen, value: 2048 } # Monitor via `netstat -Q`, look for rtsock. See net.inet.ip.intr_queue_maxlen.
+    - { name: vfs.zfs.free_max_blocks, value: 100000 }
+    - { name: vfs.zfs.l2arc_noprefetch, value: 1 }
+    - { name: vfs.zfs.l2arc_write_boost, value: 268435456 }
+    - { name: vfs.zfs.l2arc_write_max, value: 268435456 }
+    - { name: vfs.zfs.min_auto_ashift, value: 12 }
+    - { name: vfs.zfs.vdev.min_pending, value: 1 }
+    - { name: vfs.zfs.vdev.max_pending, value: 16 }
+    - { name: vfs.zfs.write_limit_override, value: 1073741824 } # 1G for busy hosts, 256MB should be used for 4GB RAM hosts
+  notify:
+    - sysctl.conf reload
+
+# Sorted list of rc.conf tunables
+- name: FreeBSD | rc.conf defaults
+  lineinfile:
+    dest: /etc/rc.conf
+    regexp: '^[#]*{{ item.name }}=.*' 
+    line: '{{ item.name }}="{{ item.value }}"' 
+  with_items:
+    - { name: clear_tmp_enable,  value: 'YES' }
+    - { name: dumpdev, value: '/dev/ada0p2' }
+    - { name: keyrate, value: fast }
+    - { name: netwait_enabled, value: 'YES' }
+    - { name: netwait_ip, value: '${defaultrouter}' }
+    - { name: pf_enable, value: 'YES' }
+    - { name: pflog_enable, value: 'YES' }
+    - { name: pflog_logfile, value: '/var/log/pflog' }
+    - { name: sendmail_enable, value: 'NO' }
+    - { name: sendmail_msp_queue_enable, value: 'NO' }
+    - { name: sendmail_outbound_enable, value: 'NO' }
+    - { name: sendmail_submit_enable, value: 'NO' }
+    - { name: sshd_enable, value: 'YES' }
+    - { name: zfs_enable, value: 'YES' }
+
+- name: FreeBSD | loader.conf defaults
+  lineinfile:
+    dest: /boot/loader.conf
+    regexp: '^[#]*{{ item.name }}=.*' 
+    line: '{{ item.name }}="{{ item.value }}"' 
+  with_items:
+    - { name: vfs.zfs.cache_flush_disable, value: 0 } # WARNING: Only set to 1 for benchmarking, equiv of fsync=off for PG
+    - { name: vfs.zfs.deadman_synctime_ms, value: 100000000 }
+    - { name: vfs.zfs.deadman_checktime_ms, value: 500000 }
+    - { name: vfs.zfs.zio.use_uma, value: 1 }

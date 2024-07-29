@@ -1,0 +1,36 @@
+#!/usr/local/bin/bash
+#   __ _  __
+#  (_ / \/
+#  __)\_/\__
+#
+# nagios plugin wrapper for cached local checks.
+# MON-584 - sblaurock - 2014-02-14 - V1.0
+MK_CONFDIR=/etc/check_mk
+
+# fetch commandline options
+while test -n "$1"; do
+        case "$1" in
+        -q)
+                query=$2
+                shift
+        esac
+        shift
+done
+
+
+for postgresinstance in $(grep -e '\[.*\]' $MK_CONFDIR/postgres.cfg | sed -e 's/\[//g' -e 's/\]//g' | tr '\n' ' ');do
+currentinstance=$(grep -A3 "${postgresinstance}" $MK_CONFDIR/postgres.cfg | head -n 4)
+port=$(echo "$currentinstance" | grep "port=" | sed -e 's/port=//')
+vip=$(echo "$currentinstance" | grep "vip=" | sed -e 's/vip=//')
+dbname=$(echo "$currentinstance" | grep "dbname=" | sed -e 's/dbname=//')
+name=$(echo $postgresinstance)
+
+ServiceDescription="postgres_${port}_${dbname}"
+
+Output=$(/usr/local/bin/psql -tq -U postgres -p ${port} -c "${query}" ${dbname} )
+
+ExitCode=$?
+
+echo "$ServiceDescription $Output"
+sleep 0.5
+done

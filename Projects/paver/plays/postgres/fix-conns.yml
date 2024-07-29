@@ -1,0 +1,91 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - target_host is defined
+          - instance is defined
+
+    - set_fact: my_db_conns={{ gds_instances[instance].extra_variables.max_connections | default('60') }}
+    - set_fact: my_pgbouncer_conns={{ gds_instances[instance].extra_variables.default_pool_size | default('10') }}
+    - set_fact: my_app_limit={{ gds_instances[instance].extra_variables.app_connection_limit | default('10') }}
+    - set_fact: my_app_user={{ gds_instances[instance].app_account_name | default('foo_app')}}
+    - set_fact: f_do_db={{ do_db | default('f')}}
+    - set_fact: f_do_pgbouncer={{ do_pgbouncer | default('f')}}
+    - set_fact: f_do_user={{ do_user | default('f')}}
+
+    - name: Check if it is in recovery
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_is_in_recovery()"
+      register: it_is_in_recovery
+      when: f_do_user == "t"
+
+    - name: Alter user limit
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter user {{ my_app_user }} connection limit {{ my_app_limit }}"
+      register: change_user_limit
+      when: my_app_limit != "10" and my_app_user != "foo_app" and f_do_user == "t" and it_is_in_recovery.stdout  ==  "f"
+
+    - name: set default_pool_size for pgbouncer trx
+      lineinfile:
+        dest: "/var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}-transaction_mode/etc/pgbouncer.ini"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: "default_pool_size", line: "default_pool_size = {{ my_pgbouncer_conns }}" }
+      when: f_do_pgbouncer == "t" and my_pgbouncer_conns != "10"
+
+
+    - name: set default_pool_size for pgbouncer ses
+      lineinfile:
+        dest: "/var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}-session_mode/etc/pgbouncer.ini"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: "default_pool_size", line: "default_pool_size = {{ my_pgbouncer_conns }}" }
+      when: f_do_pgbouncer == "t" and my_pgbouncer_conns != "10"
+
+    - name: Restart pgbouncer trx
+      shell: sv down /var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}-transaction_mode/ && sv start /var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}-transaction_mode
+      when: f_do_pgbouncer == "t" and my_pgbouncer_conns != "10"
+
+    - name: start pgbouncer trx
+      shell: sv start /var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}-transaction_mode/
+      when: f_do_pgbouncer == "t" and my_pgbouncer_conns != "10"
+
+    - name: Restart pgbouncer ses
+      shell: sv down /var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}-session_mode/ && sv start /var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}-session_mode
+      when: f_do_pgbouncer == "t" and my_pgbouncer_conns != "10"
+
+    - name: start pgbouncer ses
+      shell: sv start /var/service/pgbouncer-{{ gds_cluster }}-{{ instance }}-session_mode/
+      when: f_do_pgbouncer == "t" and my_pgbouncer_conns != "10"
+
+    - name: Check current max_connections
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "show max_connections"
+      register: current_max_connections
+      when: f_do_db == "t"
+
+    - name: set parameters in the postgresql.conf
+      lineinfile:
+        dest: "/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/postgresql.conf"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: "^max_connections*", line: "max_connections = {{ my_db_conns }}" }
+      when: f_do_db == "t" and my_db_conns != current_max_connections.stdout
+
+    - name: Reset conns if elsewhere defined
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "alter system reset max_connections;"
+      register: change_user_limit
+      when: f_do_db == "t" and my_db_conns != current_max_connections.stdout
+
+    - name: Checkpoint to make restart faster
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "checkpoint;"
+      when: f_do_db == "t" and my_db_conns != current_max_connections.stdout
+
+    - name: Restart database
+      shell: sv int /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/
+      when: f_do_db == "t" and my_db_conns != current_max_connections.stdout

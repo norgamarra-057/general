@@ -1,0 +1,16 @@
+---
+- include_tasks: check_instance_name.yml
+
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "../defaults/{{ ansible_os_family }}.yml"
+    - "../defaults/default.yml"
+  tags:
+    - mysql-config
+
+- include_vars: derived_vars.yml
+  tags:
+    - mysql-config
+
+- include_tasks: FreeBSD.yml tags=percona,percona-server,mysql
+  when: ansible_os_family == 'FreeBSD'

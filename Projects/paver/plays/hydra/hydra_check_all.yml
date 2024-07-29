@@ -1,0 +1,175 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+    datacenter: "{{ inventory_hostname | regex_replace('^.*\\.([^\\.]+)$', '\\1') }}"
+  tasks:
+   - name: FreeBSD | run | check hydra 
+     shell: |
+       exec 2>&1
+       if [ "{{ default_primary|default(item.value.hydra.default_primary) is defined }}" == "False" ]; then
+         echo "error: initial master not defined"
+         exit 1
+       fi
+       dc="$(echo "{{ inventory_hostname }}"|cut -d . -f 2)"
+       id="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d - -f 4)"
+       master_dc="$(echo "{{ default_primary|default(item.value.hydra.default_primary) }}"|cut -d . -f 2)"
+       cluster="$(echo $id|head -c 5)"
+       type="$(echo $id|tail -c 3)"
+       fail=false
+       isMaster=false
+       isLocalSecondary=false
+       isRemoteSecondary=false
+       isTertiary=false
+       {% if inventory_hostname.endswith('m1.' + datacenter) %}
+       instance_id="{{ item.value.hydra.ids[0] }}"
+       {% else %}
+       instance_id="{{ item.value.hydra.ids[1] }}"
+       {% endif %}
+       msg=""
+       logfile=/var/groupon/service/hydra-agent/log/main/current
+
+       if [ "{{ default_primary|default(item.value.hydra.default_primary) == inventory_hostname }}" != "False" ]; then
+           isMaster=true
+       fi
+
+       if [ "{{ item.value.hydra.cascading is defined and item.value.hydra.cascading[inventory_hostname] is defined and not (item.value.hydra.cascading[inventory_hostname] is mapping) }}" != "False" ]; then
+           isTertiary=true
+       fi
+
+       if ! $isMaster && ! $isTertiary && [ "$dc" == "$master_dc" ]; then
+           isLocalSecondary=true
+       fi
+
+       if ! $isMaster && ! $isTertiary && [ "$dc" != "$master_dc" ]; then
+           isRemoteSecondary=true
+       fi
+
+       if [ "{{item.value.type}}" == "mysql" ] && [ "$dc" == "snc1" ] && [ "$type" == "m1" ]; then
+           lastMasterElectionReadable="$(cat /var/groupon/service/hydra-agent/log/main/current | grep Master |grep {{ item.key | replace("_","-") }} | grep 'agent state MasterElection' | tail -n1 | awk -F ' ' '{print $1}')"
+           lastMasterElection="$(echo $lastMasterElectionReadable| awk -F '.' '{print $1}' | sed 's/-//g' | sed 's/_//g' | sed 's/://g' | sed 's/./&./12')"
+           lastJoiningAsMasterReadable="$(cat /var/groupon/service/hydra-agent/log/main/current | grep Master |grep {{ item.key | replace("_","-") }} | grep 'agent state JoiningAsMaster' | tail -n1 | awk -F ' ' '{print $1}')"
+           lastJoiningAsMaster="$(echo $lastJoiningAsMasterReadable| awk -F '.' '{print $1}' | sed 's/-//g' | sed 's/_//g' | sed 's/://g' | sed 's/./&./12')"
+           
+           lastMasterElectionSeconds="$(date -j $lastMasterElection +%s )"
+           lastJoiningAsMasterSeconds="$(date -j $lastJoiningAsMaster +%s )"
+
+           dateDiffInSeconds="$((lastJoiningAsMasterSeconds-lastMasterElectionSeconds))"
+
+           if [ "$dateDiffInSeconds" -gt "10" ]; then
+               msg="${msg} {{ item.key }} joined as master ${dateDiffInSeconds} seconds after entering the election, dates are ${lastMasterElectionReadable} and ${lastJoiningAsMasterReadable}"
+               fail=true
+           fi
+       fi
+
+       service="{{item.value.type}}-{{ item.key | replace("_","-") }}"
+
+       serviceTags="$(curl -s http://localhost:8500/v1/catalog/service/$service \
+         | sed 's/},{/}|{/g' | tr '|' '\n' \
+         | grep -F "{{ inventory_hostname }}" | grep -F "$instance_id" \
+         | sed 's/.*"ServiceTags":\[\([^]]*\)].*/\1/')"
+       internalState="$(curl -s "http://localhost:8500/v1/kv/hydra/services/{{item.value.type}}/{{ item.key | replace("_","-") }}/nodes/$instance_id/internalState?raw=true")"
+
+       if $isMaster; then
+           if [[ "$serviceTags" != *"hydra"* ]] \
+             || [[ "$serviceTags" != *"primary"* ]] \
+             || [[ "$serviceTags" == *"secondaries"* ]] \
+             || [[ "$serviceTags" == *"local"* ]] \
+             || [[ "$serviceTags" == *"remote"* ]] \
+             || [[ "$serviceTags" == *"cascading"* ]]; then
+               msg="${msg} Tags $serviceTags are not the expected tags for a master instance"
+               fail=true
+           fi
+           if [ "$internalState" != "Master" ]
+           then
+               msg="${msg} State is not Master (but $internalState)"
+               fail=true
+           fi
+       fi
+
+       if $isLocalSecondary; then
+           if [[ "$serviceTags" != *"hydra"* ]] \
+             || [[ "$serviceTags" != *"secondaries"* ]] \
+             || [[ "$serviceTags" != *"local"* ]] \
+             || [[ "$serviceTags" == *"primary"* ]] \
+             || [[ "$serviceTags" == *"remote"* ]] \
+             || [[ "$serviceTags" == *"cascading"* ]]; then
+               msg="${msg} Tags $serviceTags are not the expected tags for a local secondary instance"
+               fail=true
+           fi
+           if [ "$internalState" != "Standby" ]
+           then
+               msg="${msg} State is not Standby (but $internalState)"
+               fail=true
+           fi
+       fi
+
+       if $isRemoteSecondary; then
+           if [[ "$serviceTags" != *"hydra"* ]] \
+             || [[ "$serviceTags" != *"secondaries"* ]] \
+             || [[ "$serviceTags" != *"remote"* ]] \
+             || [[ "$serviceTags" == *"primary"* ]] \
+             || [[ "$serviceTags" == *"local"* ]] \
+             || [[ "$serviceTags" == *"cascading"* ]]; then
+               msg="${msg} Tags $serviceTags are not the expected tags for a remote secondary instance"
+               fail=true
+           fi
+           if [ "$internalState" != "Standby" ]
+           then
+               msg="${msg} State is not Standby (but $internalState)"
+               fail=true
+           fi
+       fi
+
+       if $isTertiary; then
+           if [[ "$serviceTags" != *"hydra"* ]] \
+             || [[ "$serviceTags" != *"secondaries"* ]] \
+             || [[ "$serviceTags" != *"cascading"* ]] \
+             || [[ "$serviceTags" == *"primary"* ]] \
+             || [[ "$serviceTags" == *"remote"* ]] \
+             || [[ "$serviceTags" == *"local"* ]]; then
+               msg="${msg} Tags $serviceTags are not the expected tags for a tertiary instance"
+               fail=true
+           fi
+           if [ "$internalState" != "CascadingStandby" ]
+           then
+               msg="${msg} State is not CascadingStandby (but $internalState)"
+               fail=true
+           fi
+       fi
+
+       {% if show_errors|default(false) %}
+       errorlog="$(cat $logfile | grep -F "{{ item.value.type }}/{{ item.key | replace("_","-") }}/" \
+         | grep 'ERROR\|Exception' | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tail -n 3)"
+       if [ -n "$errorlog" ]; then
+           msg="${msg} errors:
+           ${errorlog}"
+           fail=true
+       fi
+       {% endif %}
+
+       if $fail
+       then
+         echo "{{ inventory_hostname }}:{{ item.key }} [$dc $type $env] ${msg}" 
+       fi
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: item.value.hydra is defined and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"

@@ -1,0 +1,43 @@
+---
+- name: FreeBSD | monitord | directories
+  file: path="{{ item }}" state=directory owner=root group=wheel mode=0755
+  with_items:
+    - /var/groupon/encap
+    - /var/groupon/log
+
+- name: FreeBSD | monitord package name
+  shell: "/usr/bin/grep -- '  - monitord-' /usr/local/etc/hostclass.yml | /usr/bin/awk '{print $2}'"
+  register: monitord_name
+  changed_when: False
+  failed_when: monitord_name.stdout == ""
+
+- name: FreeBSD | package | exists
+  stat: path="/var/groupon/encap/{{ monitord_name.stdout }}"
+  register: monitord_stat
+  ignore_errors: True
+
+- name: FreeBSD | package | fetch
+  get_url: dest=/tmp url="http://config/package/{{ monitord_name.stdout }}.tar.gz"
+    sha256sum="f2a870db0b2f79bdb268acaf983dd38c6f8fa923bbcd8883dc3866940d8df704"
+  when: "monitord_stat.stat.isdir is not defined or not monitord_stat.stat.isdir"
+  notify:
+    - monitord_agent restart
+
+- name: FreeBSD | package | extract
+  command: "/usr/bin/tar xf /tmp/{{ monitord_name.stdout }}.tar.gz"
+  args:
+    chdir: /var/groupon/encap
+  when: "monitord_stat.stat.isdir is not defined or not monitord_stat.stat.isdir"
+  notify:
+    - monitord_agent restart
+
+- name: FreeBSD | gem | check gem gserver
+  shell: "gem list | grep '^gserver'"
+  register: gserver 
+  ignore_errors: yes
+
+- name: FreeBSD | gem | Install
+  command: gem install gserver
+  when:  gserver.stdout == ""
+  
+  

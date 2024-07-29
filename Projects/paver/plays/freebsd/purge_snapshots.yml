@@ -1,0 +1,83 @@
+---
+###################################################
+# purge_snapshots.yml
+#
+# Description:  By default, this playbook will purge ALL 'data' snapshots for ALL instances 
+#               on the specified server, leaving a default of 4 snapshots.
+#
+# Parameters:  node=gds-server - Required.  Server to purge.  Works per server, not per cluster. 
+#              keep_snaps=4 - Optional.  Number of snapshots to keep.  Defaults to 4.
+#              chunk_snaps_count=4 - Optional.  Number of snapshot to purge in one run of the play.  Defaults to 4
+#              ignore_instance=pwa_stg - Optional.  Name of one instance to ignore.  Defaults to None.
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              node: gds-snc1-test-db002s1.snc1
+#              keep_snaps=4
+#              chunk_snaps_count=4
+#              ignore_instance=pwa_stg
+#
+# Notes:  1. Playbook will not purge any snapshots other then 'data'.
+#
+###################################################
+
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+
+- name: Purge data ZFS snapshots on server per instance
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  
+  tasks:  
+    - name: Process command line options 
+      block:
+      - name: keep_snaps
+        set_fact:
+          keep_snaps: 4
+        when: keep_snaps is not defined
+
+      - name: chunk_snaps_count
+        set_fact:
+          chunk_snaps_count: 4
+        when: chunk_snaps_count is not defined
+
+      - name: ignore_instance
+        set_fact:
+          ignore_instance: NONE
+        when: ignore_instance is not defined
+
+    - name: Retrieve list of ZFS snapshots per instance
+      shell: "export zfs_limit=`zfs list -t snapshot | grep {{ item }} | grep data | grep -v 'tmp@' | grep -v 'log@' | awk '{print $1}' | wc -l` ; zfs list -t snapshot | grep {{ item }} | grep data | grep -v 'tmp@' | grep -v 'log@' | awk '{print $1}' | head -n `expr $zfs_limit - {{ keep_snaps }}` | head -n {{ chunk_snaps_count }}"
+      with_items:
+        - "{{ gds_instances.keys() }}"
+      when: item != ignore_instance 
+      ignore_errors: true
+      changed_when: false
+      register: full_list
+
+    - set_fact:
+        stdout_lines: []
+
+    - set_fact:
+        stdout_lines: "{{ stdout_lines + item.stdout_lines }}"
+      with_items: "{{ full_list.results }}"
+      when: item.stdout_lines is defined 
+      ignore_errors: true
+      no_log: yes
+
+    - name: Purge ZFS snapshots per instance
+      zfs: 
+        name: "{{ item }}"
+        state: absent
+      with_items: "{{ stdout_lines }}"
+      loop_control:
+        pause: 2.0

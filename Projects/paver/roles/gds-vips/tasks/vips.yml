@@ -1,0 +1,32 @@
+---
+- name: Use (m)aster type settings for CARP
+  set_fact:
+    rw_base=5
+    rw_skew=100
+    ro_base=5
+    ro_skew=50
+  when: ansible_fqdn|match('gds-[a-z0-9]+-[a-z]+-db[0-9]+m[0-9]+.*')
+
+- name: Use (s)lave type settings for CARP
+  set_fact:
+    rw_base=5
+    rw_skew=50
+    ro_base=5
+    ro_skew=100
+  when: ansible_fqdn|match('gds-[a-z0-9]+-[a-z]+-db[0-9]+s[0-9]+.*')
+
+- name: Build password dicts
+  set_fact:
+    rw_passes: "{{ gds_instances.keys() | mkhashdict('writer', gds_instance_group) }}"
+    ro_passes: "{{ gds_instances.keys() | mkhashdict('reader', gds_instance_group) }}"
+
+- debug: var=rw_passes
+- debug: var=ro_passes
+
+- name: Deploy VIP template
+  template:
+    dest: /etc/rc.conf.local.d/vips
+    src: gds-vips.j2
+    owner: root
+    group: wheel
+    mode: 0644

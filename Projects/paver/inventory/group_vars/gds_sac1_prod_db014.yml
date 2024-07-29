@@ -1,0 +1,722 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.32.86.234 # gds-sac1-prod-db014m1
+  - 10.32.86.235 # gds-sac1-prod-db014s1
+  - 10.32.80.234 # gds-sac1-prod-db014m1
+  - 10.32.80.235 # gds-sac1-prod-db014s1
+gds_instance_group: gds_prod_sac1_db014
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+# List of all GDS instances in this timeline
+gds_instances:
+  facebook_auto_prod: # GDS-1628
+    type: postgresql
+    dbnames:
+      - facebook_auto_prod
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60001
+    master_vip: 10.32.86.51
+    slave_vips:
+      - 10.32.80.51
+    replication_ips:
+      - 10.22.142.102 # gds-sac1-prod-db014m1.sac1
+      - 10.22.142.232 # gds-sac1-prod-db014s1.sac1
+      - 10.22.142.102 # gds-snc1-prod-db014m1.snc1
+      - 10.22.142.232 # gds-snc1-prod-db014s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.135.124/32  # da-fba1.snc1
+      - 10.20.76.101/32   # campaign-manager.snc1
+      - 10.22.71.60/32    # da-mon-app1.snc1
+      - 10.22.81.56/32 # optimus-agent1.snc1
+      - 10.22.81.206/32 # optimus-agent2.snc1
+      - 10.22.152.129/32 # optimus-agent3.snc1
+      - 10.20.81.101/32 # optimus-agent4.snc1
+      - 10.22.78.110/32
+      - 10.22.217.39/32   # da-fba3.snc1
+      - 10.20.87.99/32   # da-fba4.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: facebook_auto_prod_dba
+    app_account_name: facebook_auto_prod_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.135.124/32  # da-fba1.snc1
+      - 10.20.76.101/32   # campaign-manager.snc1
+      - 10.22.71.60/32    # da-mon-app1.snc1
+      - 10.22.81.56/32 # optimus-agent1.snc1
+      - 10.22.81.206/32 # optimus-agent2.snc1
+      - 10.22.152.129/32 # optimus-agent3.snc1
+      - 10.20.81.101/32 # optimus-agent4.snc1
+      - 10.22.78.110/32
+      - 10.22.217.39/32   # da-fba3.snc1
+      - 10.20.87.99/32   # da-fba4.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20000
+      pgbouncer_session: 20001
+      postgresql_raw: 20002
+    extra_variables:
+      max_connections: 60
+      default_pool_size: 25
+ # crowd_prod: # GDS-1713
+#  oxygen_prod: # GDS-15408 # decomm GDS-33131#
+#  snap_products_prod: # GDS-1978
+
+
+  content_assembly_prod: # GDS-1673
+    type: postgresql
+    dbnames:
+      - content_assembly_prod
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60005
+    master_vip: 10.32.86.55
+    slave_vips:
+      - 10.32.80.55
+    replication_ips:
+      - 10.22.142.102 # gds-sac1-prod-db014m1.sac1
+      - 10.22.142.232 # gds-sac1-prod-db014s1.sac1
+      - 10.22.142.102 # gds-snc1-prod-db014m1.snc1
+      - 10.22.142.232 # gds-snc1-prod-db014s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.119.49/32  # ai-content-assembly-app1.snc1
+      - 10.22.109.29/32  # ai-content-assembly-app2.snc1
+      - 10.20.131.64/32  # ai-content-assembly-app3.snc1
+      - 10.22.137.111/32 # ai-content-assembly-app4.snc1
+      - 10.20.91.178/32  # ai-content-assembly-app5.snc1
+      - 10.22.151.111/32 # ai-content-assembly-app6.snc1
+      - 10.22.109.7/32   # ai-content-assembly-app7.snc1
+      - 10.22.150.174/32 # ai-content-assembly-app8.snc1
+      - 10.22.137.194/32 # ai-content-assembly-app9.snc1
+      - 10.22.109.145/32 # ai-content-assembly-app10.snc1
+      - 10.22.149.183/32 # ai-sponsored-link-app1.snc1
+      - 10.22.151.67/32  # ai-sponsored-link-app2.snc1
+      - 10.20.112.59/32  # ai-sponsored-link-app3.snc1
+      - 10.20.77.250/32  # ai-sponsored-link-app4.snc1
+      - 10.22.138.50/32  # ai-sponsored-link-app5.snc1
+      - 10.20.132.127/32 # ai-sponsored-link-app6.snc1
+      - 10.22.109.36/32  # ai-sponsored-link-app7.snc1
+      - 10.22.140.27/32  # ai-sponsored-link-app8.snc1
+      - 10.22.81.65/32   # ai-sponsored-link-app9.snc1
+      - 10.22.137.230/32 # ai-sponsored-link-app10.snc1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: content_assembly_prod_dba
+    app_account_name: content_assembly_prod_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.119.49/32  # ai-content-assembly-app1.snc1
+      - 10.22.109.29/32  # ai-content-assembly-app2.snc1
+      - 10.20.131.64/32  # ai-content-assembly-app3.snc1
+      - 10.22.137.111/32 # ai-content-assembly-app4.snc1
+      - 10.20.91.178/32  # ai-content-assembly-app5.snc1
+      - 10.22.151.111/32 # ai-content-assembly-app6.snc1
+      - 10.22.109.7/32   # ai-content-assembly-app7.snc1
+      - 10.22.150.174/32 # ai-content-assembly-app8.snc1
+      - 10.22.137.194/32 # ai-content-assembly-app9.snc1
+      - 10.22.109.145/32 # ai-content-assembly-app10.snc1
+      - 10.22.149.183/32 # ai-sponsored-link-app1.snc1
+      - 10.22.151.67/32  # ai-sponsored-link-app2.snc1
+      - 10.20.112.59/32  # ai-sponsored-link-app3.snc1
+      - 10.20.77.250/32  # ai-sponsored-link-app4.snc1
+      - 10.22.138.50/32  # ai-sponsored-link-app5.snc1
+      - 10.20.132.127/32 # ai-sponsored-link-app6.snc1
+      - 10.22.109.36/32  # ai-sponsored-link-app7.snc1
+      - 10.22.140.27/32  # ai-sponsored-link-app8.snc1
+      - 10.22.81.65/32   # ai-sponsored-link-app9.snc1
+      - 10.22.137.230/32 # ai-sponsored-link-app10.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20012
+      pgbouncer_session: 20013
+      postgresql_raw: 20014
+    extra_variables:
+      max_connections: 30
+    hydra:
+      ids:
+        - b2351c69-9091-7901-f991-153d40e6ef18
+        - 515223a4-26a2-e22c-8fc7-ddc042487cf8
+      default_primary: gds-snc1-prod-db014m1.snc1
+      cascading:
+        gds-sac1-prod-db014m1.sac1:
+          gds-snc1-prod-db014s1.snc1: 10.22.142.102 # gds-snc1-prod-db014m1.snc1
+        gds-sac1-prod-db014s1.sac1:
+          gds-snc1-prod-db014m1.snc1: 10.22.142.232 # gds-snc1-prod-db014s1.snc1
+
+
+  #nozilla_prod: # GDS-1717
+#  dsp_airflow1_prod: #  GDS-17769 - Decommed GDS-33806
+
+  menu_service_prod: # GDS-2012
+    type: postgresql
+    dbnames:
+      - menu_service_prod
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60008
+    master_vip: 10.32.86.58
+    slave_vips:
+      - 10.32.80.58
+    replication_ips:
+      - 10.22.142.102 # gds-sac1-prod-db014m1.sac1
+      - 10.22.142.232 # gds-sac1-prod-db014s1.sac1
+      - 10.22.142.102 # gds-snc1-prod-db014m1.snc1
+      - 10.22.142.232 # gds-snc1-prod-db014s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.135.129/32  # menu-service-app1.snc1
+      - 10.22.109.212/32  # menu-service-app2.snc1
+      - 10.22.139.6/32    # menu-service-app3.snc1
+      - 10.22.71.214/32   # merchant-data-menu-service-app1.snc1
+      - 10.22.218.153/32   # merchant-data-menu-service-app2.snc1
+      - 10.20.98.208/32   # merchant-data-menu-service-app3.snc1
+      - 10.32.49.170/32   # menu-service-app1.sac1
+      - 10.32.94.150/32   # menu-service-app2.sac1
+      - 10.32.97.123/32   # menu-service-app3.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+    dba_account_name: menu_service_prod_dba
+    app_account_name: menu_service_prod_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.135.129/32  # menu-service-app1.snc1
+      - 10.22.109.212/32  # menu-service-app2.snc1
+      - 10.22.139.6/32    # menu-service-app3.snc1
+      - 10.22.71.214/32   # merchant-data-menu-service-app1.snc1
+      - 10.22.218.153/32   # merchant-data-menu-service-app2.snc1
+      - 10.20.98.208/32   # merchant-data-menu-service-app3.snc1
+      - 10.32.49.170/32   # menu-service-app1.sac1
+      - 10.32.94.150/32   # menu-service-app2.sac1
+      - 10.32.97.123/32   # menu-service-app3.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20021
+      pgbouncer_session: 20022
+      postgresql_raw: 20023
+    extra_variables:
+      default_pool_size: 50
+      max_connections: 150
+      app_connection_limit: 100
+#  local_3rd_party_prod: # GDS-2038 #decomm GDS-33546 #
+
+  pay_groupon_prod: # GDS-2056
+    type: postgresql
+    dbnames:
+      - pay_with_groupon_api_prod
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60012
+    master_vip: 10.32.86.62
+    slave_vips:
+      - 10.32.80.62
+    replication_ips:
+      - 10.22.142.102 # gds-sac1-prod-db014m1.sac1
+      - 10.22.142.232 # gds-sac1-prod-db014s1.sac1
+      - 10.22.142.102 # gds-snc1-prod-db014m1.snc1
+      - 10.22.142.232 # gds-snc1-prod-db014s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.115.32/32   #pit-prod-etldata10.snc1
+      - 10.20.70.33/32   #pit-prod-etldata11.snc1
+      - 10.20.70.28/32   #pit-prod-etldata12.snc1
+      - 10.20.70.12/32   #pit-prod-etldata13.snc1
+      - 10.20.83.133/32   #pit-prod-etldata14.snc1
+      - 10.20.83.93/32   #pit-prod-etldata15.snc1
+      - 10.20.83.165/32   #pit-prod-etldata16.snc1
+      - 10.20.83.111/32   #pit-prod-etldata17.snc1
+      - 10.20.83.201/32   #pit-prod-etldata18.snc1
+      - 10.20.83.250/32   #pit-prod-etldata19.snc1
+      - 10.20.115.242/32   #pit-prod-etldata1.snc1
+      - 10.20.83.187/32   #pit-prod-etldata20.snc1
+      - 10.20.83.221/32   #pit-prod-etldata21.snc1
+      - 10.20.83.61/32   #pit-prod-etldata22.snc1
+      - 10.20.83.220/32   #pit-prod-etldata23.snc1
+      - 10.20.83.231/32   #pit-prod-etldata24.snc1
+      - 10.20.83.138/32   #pit-prod-etldata25.snc1
+      - 10.20.83.163/32   #pit-prod-etldata26.snc1
+      - 10.20.83.73/32   #pit-prod-etldata27.snc1
+      - 10.20.83.207/32   #pit-prod-etldata28.snc1
+      - 10.20.115.126/32   #pit-prod-etldata29.snc1
+      - 10.20.83.180/32   #pit-prod-etldata2.snc1
+      - 10.20.115.71/32   #pit-prod-etldata30.snc1
+      - 10.20.115.238/32   #pit-prod-etldata31.snc1
+      - 10.20.115.166/32   #pit-prod-etldata32.snc1
+      - 10.20.115.237/32   #pit-prod-etldata33.snc1
+      - 10.20.115.75/32   #pit-prod-etldata34.snc1
+      - 10.20.73.91/32   #pit-prod-etldata35.snc1
+      - 10.20.73.92/32   #pit-prod-etldata36.snc1
+      - 10.20.73.116/32   #pit-prod-etldata37.snc1
+      - 10.20.73.94/32   #pit-prod-etldata38.snc1
+      - 10.20.78.118/32   #pit-prod-etldata39.snc1
+      - 10.20.115.160/32   #pit-prod-etldata3.snc1
+      - 10.20.78.108/32   #pit-prod-etldata40.snc1
+      - 10.20.78.103/32   #pit-prod-etldata41.snc1
+      - 10.20.78.101/32   #pit-prod-etldata42.snc1
+      - 10.20.78.80/32   #pit-prod-etldata43.snc1
+      - 10.20.73.76/32   #pit-prod-etldata44.snc1
+      - 10.20.73.77/32   #pit-prod-etldata45.snc1
+      - 10.20.73.78/32   #pit-prod-etldata46.snc1
+      - 10.20.115.217/32   #pit-prod-etldata47.snc1
+      - 10.20.115.227/32   #pit-prod-etldata48.snc1
+      - 10.20.115.61/32   #pit-prod-etldata49.snc1
+      - 10.20.115.156/32   #pit-prod-etldata4.snc1
+      - 10.20.115.74/32   #pit-prod-etldata50.snc1
+      - 10.20.115.96/32   #pit-prod-etldata51.snc1
+      - 10.20.78.99/32   #pit-prod-etldata52.snc1
+      - 10.20.74.134/32   #pit-prod-etldata53.snc1
+      - 10.20.74.139/32   #pit-prod-etldata54.snc1
+      - 10.20.74.142/32   #pit-prod-etldata55.snc1
+      - 10.20.74.143/32   #pit-prod-etldata56.snc1
+      - 10.20.74.167/32   #pit-prod-etldata57.snc1
+      - 10.20.74.172/32   #pit-prod-etldata58.snc1
+      - 10.20.74.175/32   #pit-prod-etldata59.snc1
+      - 10.20.115.184/32   #pit-prod-etldata5.snc1
+      - 10.20.74.177/32   #pit-prod-etldata60.snc1
+      - 10.20.74.180/32   #pit-prod-etldata61.snc1
+      - 10.20.74.185/32   #pit-prod-etldata62.snc1
+      - 10.20.70.191/32   #pit-prod-etldata63.snc1
+      - 10.20.70.142/32   #pit-prod-etldata64.snc1
+      - 10.20.70.251/32   #pit-prod-etldata65.snc1
+      - 10.20.70.164/32   #pit-prod-etldata66.snc1
+      - 10.20.70.181/32   #pit-prod-etldata67.snc1
+      - 10.20.115.247/32   #pit-prod-etldata6.snc1
+      - 10.20.115.232/32   #pit-prod-etldata7.snc1
+      - 10.20.115.229/32   #pit-prod-etldata8.snc1
+      - 10.20.115.252/32   #pit-prod-etldata9.snc1
+      - 10.20.75.74/32   #pit-prod-etlhive1.snc1
+      - 10.20.75.96/32   #pit-prod-etljob1.snc1
+      - 10.20.78.11/32   #pit-prod-etljob2.snc1
+      - 10.20.77.59/32   #pit-prod-etlname1.snc1
+      - 10.20.64.52/32   #pit-prod-etlname3.snc1
+      - 10.20.70.35/32   #pit-devbh-etldata10.snc1
+      - 10.20.70.36/32   #pit-devbh-etldata11.snc1
+      - 10.20.74.195/32   #pit-devbh-etldata12.snc1
+      - 10.20.74.66/32   #pit-devbh-etldata13.snc1
+      - 10.20.74.45/32   #pit-devbh-etldata1.snc1
+      - 10.20.70.44/32   #pit-devbh-etldata2.snc1
+      - 10.20.70.48/32   #pit-devbh-etldata3.snc1
+      - 10.20.70.52/32   #pit-devbh-etldata4.snc1
+      - 10.20.70.23/32   #pit-devbh-etldata5.snc1
+      - 10.20.70.56/32   #pit-devbh-etldata6.snc1
+      - 10.20.70.54/32   #pit-devbh-etldata7.snc1
+      - 10.20.70.53/32   #pit-devbh-etldata8.snc1
+      - 10.20.70.55/32   #pit-devbh-etldata9.snc1
+      - 10.20.70.75/32   #pit-devbh-etlname1.snc1
+      - 10.20.75.135/32   #pit-prod-owagent6.snc1
+      - 10.20.71.49/32   #pit-prod-owagent5.snc1
+      - 10.20.41.45/32   #pit-prod-owagent4.snc1
+      - 10.20.76.125/32   #pit-prod-owagent3.snc1
+      - 10.20.70.79/32   #pit-prod-owagent2.snc1
+      - 10.20.70.74/32   #pit-prod-owagent1.snc1
+      - 10.20.82.227/32   #pit-devvm-opswiseagent2.snc1
+      - 10.20.70.80/32   #pit-adhoc1.snc1
+      - 10.20.40.12/32   #pit-share-hdphive1.snc1
+      - 10.20.74.26/32   #pit-share-hdputil1.snc1
+      - 10.20.95.234/32   #pit-dev-owagent1.snc1
+      - 10.20.95.97/32   #pit-dev-owagent2.snc1
+      - 10.22.194.40/32   #pit-dev-owagent3.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: pay_with_groupon_api_prod_dba
+    app_account_name: pay_with_groupon_api_prod_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.115.32/32   #pit-prod-etldata10.snc1
+      - 10.20.70.33/32   #pit-prod-etldata11.snc1
+      - 10.20.70.28/32   #pit-prod-etldata12.snc1
+      - 10.20.70.12/32   #pit-prod-etldata13.snc1
+      - 10.20.83.133/32   #pit-prod-etldata14.snc1
+      - 10.20.83.93/32   #pit-prod-etldata15.snc1
+      - 10.20.83.165/32   #pit-prod-etldata16.snc1
+      - 10.20.83.111/32   #pit-prod-etldata17.snc1
+      - 10.20.83.201/32   #pit-prod-etldata18.snc1
+      - 10.20.83.250/32   #pit-prod-etldata19.snc1
+      - 10.20.115.242/32   #pit-prod-etldata1.snc1
+      - 10.20.83.187/32   #pit-prod-etldata20.snc1
+      - 10.20.83.221/32   #pit-prod-etldata21.snc1
+      - 10.20.83.61/32   #pit-prod-etldata22.snc1
+      - 10.20.83.220/32   #pit-prod-etldata23.snc1
+      - 10.20.83.231/32   #pit-prod-etldata24.snc1
+      - 10.20.83.138/32   #pit-prod-etldata25.snc1
+      - 10.20.83.163/32   #pit-prod-etldata26.snc1
+      - 10.20.83.73/32   #pit-prod-etldata27.snc1
+      - 10.20.83.207/32   #pit-prod-etldata28.snc1
+      - 10.20.115.126/32   #pit-prod-etldata29.snc1
+      - 10.20.83.180/32   #pit-prod-etldata2.snc1
+      - 10.20.115.71/32   #pit-prod-etldata30.snc1
+      - 10.20.115.238/32   #pit-prod-etldata31.snc1
+      - 10.20.115.166/32   #pit-prod-etldata32.snc1
+      - 10.20.115.237/32   #pit-prod-etldata33.snc1
+      - 10.20.115.75/32   #pit-prod-etldata34.snc1
+      - 10.20.73.91/32   #pit-prod-etldata35.snc1
+      - 10.20.73.92/32   #pit-prod-etldata36.snc1
+      - 10.20.73.116/32   #pit-prod-etldata37.snc1
+      - 10.20.73.94/32   #pit-prod-etldata38.snc1
+      - 10.20.78.118/32   #pit-prod-etldata39.snc1
+      - 10.20.115.160/32   #pit-prod-etldata3.snc1
+      - 10.20.78.108/32   #pit-prod-etldata40.snc1
+      - 10.20.78.103/32   #pit-prod-etldata41.snc1
+      - 10.20.78.101/32   #pit-prod-etldata42.snc1
+      - 10.20.78.80/32   #pit-prod-etldata43.snc1
+      - 10.20.73.76/32   #pit-prod-etldata44.snc1
+      - 10.20.73.77/32   #pit-prod-etldata45.snc1
+      - 10.20.73.78/32   #pit-prod-etldata46.snc1
+      - 10.20.115.217/32   #pit-prod-etldata47.snc1
+      - 10.20.115.227/32   #pit-prod-etldata48.snc1
+      - 10.20.115.61/32   #pit-prod-etldata49.snc1
+      - 10.20.115.156/32   #pit-prod-etldata4.snc1
+      - 10.20.115.74/32   #pit-prod-etldata50.snc1
+      - 10.20.115.96/32   #pit-prod-etldata51.snc1
+      - 10.20.78.99/32   #pit-prod-etldata52.snc1
+      - 10.20.74.134/32   #pit-prod-etldata53.snc1
+      - 10.20.74.139/32   #pit-prod-etldata54.snc1
+      - 10.20.74.142/32   #pit-prod-etldata55.snc1
+      - 10.20.74.143/32   #pit-prod-etldata56.snc1
+      - 10.20.74.167/32   #pit-prod-etldata57.snc1
+      - 10.20.74.172/32   #pit-prod-etldata58.snc1
+      - 10.20.74.175/32   #pit-prod-etldata59.snc1
+      - 10.20.115.184/32   #pit-prod-etldata5.snc1
+      - 10.20.74.177/32   #pit-prod-etldata60.snc1
+      - 10.20.74.180/32   #pit-prod-etldata61.snc1
+      - 10.20.74.185/32   #pit-prod-etldata62.snc1
+      - 10.20.70.191/32   #pit-prod-etldata63.snc1
+      - 10.20.70.142/32   #pit-prod-etldata64.snc1
+      - 10.20.70.251/32   #pit-prod-etldata65.snc1
+      - 10.20.70.164/32   #pit-prod-etldata66.snc1
+      - 10.20.70.181/32   #pit-prod-etldata67.snc1
+      - 10.20.115.247/32   #pit-prod-etldata6.snc1
+      - 10.20.115.232/32   #pit-prod-etldata7.snc1
+      - 10.20.115.229/32   #pit-prod-etldata8.snc1
+      - 10.20.115.252/32   #pit-prod-etldata9.snc1
+      - 10.20.75.74/32   #pit-prod-etlhive1.snc1
+      - 10.20.75.96/32   #pit-prod-etljob1.snc1
+      - 10.20.78.11/32   #pit-prod-etljob2.snc1
+      - 10.20.77.59/32   #pit-prod-etlname1.snc1
+      - 10.20.64.52/32   #pit-prod-etlname3.snc1
+      - 10.20.70.35/32   #pit-devbh-etldata10.snc1
+      - 10.20.70.36/32   #pit-devbh-etldata11.snc1
+      - 10.20.74.195/32   #pit-devbh-etldata12.snc1
+      - 10.20.74.66/32   #pit-devbh-etldata13.snc1
+      - 10.20.74.45/32   #pit-devbh-etldata1.snc1
+      - 10.20.70.44/32   #pit-devbh-etldata2.snc1
+      - 10.20.70.48/32   #pit-devbh-etldata3.snc1
+      - 10.20.70.52/32   #pit-devbh-etldata4.snc1
+      - 10.20.70.23/32   #pit-devbh-etldata5.snc1
+      - 10.20.70.56/32   #pit-devbh-etldata6.snc1
+      - 10.20.70.54/32   #pit-devbh-etldata7.snc1
+      - 10.20.70.53/32   #pit-devbh-etldata8.snc1
+      - 10.20.70.55/32   #pit-devbh-etldata9.snc1
+      - 10.20.70.75/32   #pit-devbh-etlname1.snc1
+      - 10.20.75.135/32   #pit-prod-owagent6.snc1
+      - 10.20.71.49/32   #pit-prod-owagent5.snc1
+      - 10.20.41.45/32   #pit-prod-owagent4.snc1
+      - 10.20.76.125/32   #pit-prod-owagent3.snc1
+      - 10.20.70.79/32   #pit-prod-owagent2.snc1
+      - 10.20.70.74/32   #pit-prod-owagent1.snc1
+      - 10.20.82.227/32   #pit-devvm-opswiseagent2.snc1
+      - 10.20.70.80/32   #pit-adhoc1.snc1
+      - 10.20.40.12/32   #pit-share-hdphive1.snc1
+      - 10.20.74.26/32   #pit-share-hdputil1.snc1
+      - 10.20.95.234/32   #pit-dev-owagent1.snc1
+      - 10.20.95.97/32   #pit-dev-owagent2.snc1
+      - 10.22.194.40/32   #pit-dev-owagent3.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20033
+      pgbouncer_session: 20034
+      postgresql_raw: 20035
+    extra_variables:
+      max_connections: 40
+    hydra:
+      ids:
+        - 008ab155-83c1-25d2-136f-7e63b1f97857
+        - 6723a58c-6169-be34-9775-4c1e248a72eb
+      default_primary: gds-snc1-prod-db014m1.snc1
+      cascading:
+        gds-sac1-prod-db014m1.sac1:
+          gds-snc1-prod-db014s1.snc1: 10.22.142.102 # gds-snc1-prod-db014m1.snc1
+        gds-sac1-prod-db014s1.sac1:
+          gds-snc1-prod-db014m1.snc1: 10.22.142.232 # gds-snc1-prod-db014s1.snc1
+
+
+ # brands_prod: # GDS-2081
+
+
+  #merchant_access_prod: # GDS-650  # __SOX__ #Decom #GPROD-223911 
+
+
+#  merchant_notif_prod: # GDS-1442 #Decomm GDS-33547 #
+
+  merchant_analyt_prod: # GDS-1567
+    type: postgresql
+    dbnames:
+      - merchant_analyt_prod
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60016
+    master_vip: 10.32.86.66
+    slave_vips:
+      - 10.32.80.66
+    replication_ips:
+      - 10.22.142.102 # gds-sac1-prod-db014m1.sac1
+      - 10.22.142.232 # gds-sac1-prod-db014s1.sac1
+      - 10.13.250.88  # gds-dub1-prod-db006m1.dub1
+      - 10.13.250.241   # gds-dub1-prod-db012m1.dub1
+      - 10.13.250.62   # gds-dub1-prod-db012s1.dub1
+      - 10.22.142.102 # gds-snc1-prod-db014m1.snc1
+      - 10.22.142.232 # gds-snc1-prod-db014s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.71.118/32 # merchant-experience-app1.snc1
+      - 10.22.67.205/32 # merchant-experience-app2.snc1
+      - 10.22.71.169/32 # merchant-experience-app3.snc1
+      - 10.22.119.237/32 # merchant-experience-app4.snc1
+      - 10.22.81.56/32   #optimus-agent1.snc1
+      - 10.22.81.206/32   #optimus-agent2.snc1
+      - 10.22.152.129/32   #optimus-agent3.snc1
+      - 10.20.81.101/32   #optimus-agent4.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.32.168.243/32   # merchant-experience-app1.sac1
+      - 10.32.49.222/32   # merchant-experience-app2.sac1
+      - 10.32.170.193/32   # merchant-experience-app3.sac1
+      - 10.32.174.70/32   # mls-rin-app1.sac1
+      - 10.32.97.247/32   # mls-rin-app2.sac1
+      - 10.32.164.51/32   # mls-rin-app3.sac1
+      - 10.32.254.228/32   # mls-rin-app4.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: merchant_analyt_prod_dba
+    app_account_name: merchant_analyt_prod_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.71.118/32 # merchant-experience-app1.snc1
+      - 10.22.67.205/32 # merchant-experience-app2.snc1
+      - 10.22.71.169/32 # merchant-experience-app3.snc1
+      - 10.22.119.237/32 # merchant-experience-app4.snc1
+      - 10.22.81.56/32   #optimus-agent1.snc1
+      - 10.22.81.206/32   #optimus-agent2.snc1
+      - 10.22.152.129/32   #optimus-agent3.snc1
+      - 10.20.81.101/32   #optimus-agent4.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.32.168.243/32   # merchant-experience-app1.sac1
+      - 10.32.49.222/32   # merchant-experience-app2.sac1
+      - 10.32.170.193/32   # merchant-experience-app3.sac1
+      - 10.32.174.70/32   # mls-rin-app1.sac1
+      - 10.32.97.247/32   # mls-rin-app2.sac1
+      - 10.32.164.51/32   # mls-rin-app3.sac1
+      - 10.32.254.228/32   # mls-rin-app4.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20045
+      pgbouncer_session: 20046
+      postgresql_raw: 20047
+    extra_variables:
+      wal_keep_segments: 5000
+      default_pool_size: 300
+      max_connections: 500
+      app_connection_limit: 300
+  # snap_api_prod: # GDS-2382 # Decom # GPROD-202701
+
+  #goods_invoicing_prod: # GDS-2355  # __SOX__ #Decom #GPROD-223912 
+
+ # goods_apac_ci_prod: # GDS-2395
+ # epds_prod: # GDS-20618 #Decomm GDS-34366#
+  goods_promo_mgr_prod: # GDS-20721
+    type: postgresql
+    dbnames:
+      - goods_promo_mgr_prod
+    schemas:
+      goods_promo_mgr_prod:
+        - goods_promo_mgr
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60021
+    master_vip: 10.32.86.70
+    slave_vips:
+      - 10.32.80.70
+    replication_ips:
+      - 10.22.142.102 # gds-sac1-prod-db014m1.sac1
+      - 10.22.142.232 # gds-sac1-prod-db014s1.sac1
+      - 10.22.142.102 # gds-snc1-prod-db014m1.snc1
+      - 10.22.142.232 # gds-snc1-prod-db014s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.218.119/32   # goods-promotion-manager-app1.snc1
+      - 10.22.134.211/32   # goods-promotion-manager-app2.snc1
+      - 10.22.109.50/32   # goods-promotion-manager-app3.snc1
+      - 10.32.152.179/32   # goods-promotion-manager-app1.sac1
+      - 10.32.120.243/32   # goods-promotion-manager-app2.sac1
+      - 10.32.223.17/32   # goods-promotion-manager-app3.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: goods_promo_mgr_prod_dba
+    app_account_name: goods_promo_mgr_prod_app
+    dba_src_cidrs:
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.218.119/32   # goods-promotion-manager-app1.snc1
+      - 10.22.134.211/32   # goods-promotion-manager-app2.snc1
+      - 10.22.109.50/32   # goods-promotion-manager-app3.snc1
+      - 10.32.152.179/32   # goods-promotion-manager-app1.sac1
+      - 10.32.120.243/32   # goods-promotion-manager-app2.sac1
+      - 10.32.223.17/32   # goods-promotion-manager-app3.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20060
+      pgbouncer_session: 20061
+      postgresql_raw: 20062
+    extra_variables:
+      default_pool_size: 40
+#  mls_deal_index_prod: # GDS-20985 #Decomm GDS-33132 #
+  

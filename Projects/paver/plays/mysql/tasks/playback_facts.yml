@@ -1,0 +1,22 @@
+---
+# Parameter checks
+
+- name: Decommission | Playback | Set Playback fact for instance
+  set_fact:
+    playback_fact: "{{ gds_instances[instance]['playback'] }}"
+
+- name: Decommission | Playback | Set Playback fact for peers
+  set_fact:
+    playback_peers: "{{ gds_instances[instance]['playback']['peers'] | default('playback_not_configured') }}"
+
+- name: Decommission | Playback | Set node and peer
+  set_fact:
+    playback_node: "{{ item.node }}"
+    playback_peer: "{{ item.peer }}"
+  when: playback_enabled 
+  with_items: playback_peers
+
+- name: Decommission | Playback | Set Playback static facts
+  set_fact:
+    playback_runit_service_path: "/var/groupon/service/playback_{{ instance }}_{{ playback_node }}_{{ playback_peer }}"
+    playback_runit_service_link_path: "/var/service/playback_{{ instance }}_{{ playback_node}}_{{ playback_peer }}"

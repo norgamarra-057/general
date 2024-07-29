@@ -1,0 +1,26 @@
+### -*- mode: conf; -*-
+[monitoring_prod_ganglia]
+ganglia99.snc1
+
+[monitoring_prod_splunk_indexers]
+splunk-indexer-120.snc1
+
+[monitoring_prod_all:children]
+monitoring_prod_ganglia
+monitoring_prod_splunk_indexers
+
+[monitoring_ganglia:children]
+monitoring_prod_ganglia
+
+[monitoring_all:children]
+monitoring_prod_all
+
+[FreeBSD:children]
+monitoring_prod_all
+
+[FreeBSD:vars]
+ansible_python_interpreter=/usr/local/bin/python2.7
+
+[dc_snc1_prod:children]
+monitoring_prod_ganglia
+monitoring_prod_splunk_indexers

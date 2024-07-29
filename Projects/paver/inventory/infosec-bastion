@@ -1,0 +1,15 @@
+### -*- mode: conf; -*-
+###
+### BEGIN: infosec_jump*
+###
+[infosec_jump]
+jump1.snc1
+
+[infosec_all:children]
+infosec_jump
+
+[FreeBSD:children]
+infosec_jump
+
+[FreeBSD:vars]
+ansible_python_interpreter=/usr/local/bin/python2.7

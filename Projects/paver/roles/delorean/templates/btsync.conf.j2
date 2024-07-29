@@ -1,0 +1,38 @@
+{
+  "device_name": "{{ inventory_hostname }}",
+  "listening_port" : 1337,
+  "storage_path" : "/var/groupon/btsync",
+  "check_for_updates" : true,
+  "use_upnp" : false,
+  "download_limit" : 0,
+  "upload_limit" : 0,
+  "shared_folders" :
+  [
+    {
+      {% if 'delorean_masters' in group_names %}
+      "secret" : "{{ btsync_keys[delorean_cluster]['readwrite'] }}",
+      {% else %}
+      "secret" : "{{ btsync_keys[delorean_cluster]['readonly'] }}",
+      {% endif %}
+      "dir" : "/var/groupon/delorean/",
+      "use_relay_server" : false,
+      "use_tracker" : false,
+      "use_dht" : false,
+      "search_lan" : false,
+      "use_sync_trash" : false,
+      {% if 'delorean_slaves' in group_names %}
+      "overwrite_changes" : true,
+      {% endif %}
+      "known_hosts" :
+      [
+	      {% for host in groups[delorean_cluster] %}
+        {% if not loop.last %}
+        "{{ host }}:1337",
+        {% else %}
+        "{{ host }}:1337"
+        {% endif %}
+        {% endfor %}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+echo '<<<postgres_timeline>>>'
+for Port in $Ports; do
+    dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+    echo "Port $Port - $dbname"
+
+    what_are_we="$(echo "select pg_is_in_recovery();" |\
+                  psql -X -p ${Port} -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' 2>/dev/null)"
+
+    # only run on slaves
+    if [[ "$what_are_we" == "t" ]]; then
+        datadir="$(echo "show data_directory;" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' 2>/dev/null )"
+
+        lasthistory=$(ls -t ${datadir}/pg_xlog/*.history 2>/dev/null | head -n1)
+
+        if [[ -z ${lasthistory} ]]; then
+             echo "-1"
+        else
+            lasttimeline=$(tail -n1 ${lasthistory} | awk '{print $1;}')
+            timelinecheck=$(pg_controldata ${datadir} | grep "TimeLineID" | head -n1 | grep $((lasttimeline+1)))
+            if [[ -z ${timelinecheck} ]]; then
+                echo "2"
+            else
+                echo "0"
+            fi
+        fi
+    elif [[ "$what_are_we" == "f" ]]; then
+        echo "3"
+    fi
+    sleep 0.5
+done

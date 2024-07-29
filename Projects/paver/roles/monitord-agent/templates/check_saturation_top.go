@@ -1,0 +1,94 @@
+package main
+
+import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/exec"
+	"strings"
+)
+
+type Saturation struct {
+	Avg1 string
+	Avg5 string
+	Avg15 string
+        Uptime string
+	}
+
+func main() {
+
+	cmd := exec.Command("top", "-b")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	saturation := make([]*Saturation, 0)
+
+		line, err := out.ReadString('\n')
+		if err != nil {
+		        log.Fatal(err)
+		}
+
+
+		sz := len(line)
+		line = line[:sz-1]
+
+		tokens := strings.Split(line, " ")
+		ft := make([]string, 0)
+
+		for _, t := range tokens {
+			if t != "" && t != "\t" {
+				ft = append(ft, t)
+			}
+		}
+
+		avg1 := ft[5]
+                avg5 := ft[6]
+                avg15 := ft[7]
+		uptime := ft[9]
+
+		saturation = append(saturation, &Saturation{avg1,avg5,avg15,uptime})
+
+	for _, p := range saturation {
+
+		m := &Saturation{
+			Avg1: p.Avg1,
+			Avg5: p.Avg5,
+			Avg15: p.Avg15,
+			Uptime: p.Uptime}
+
+		b, err := json.Marshal(m)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+
+		in := strings.NewReader(string(b))
+
+		os.Stdout.Write(b)
+
+		req, err := http.NewRequest("POST", "https://10.20.98.116:43191/module/httptrap/afd07443-c29d-46cf-8e53-405255945510/mys3cr3t", in)
+		req.Header.Set("Content-Type", "application/json")
+
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client := &http.Client{Transport: tr}
+		resp, err := client.Do(req)
+		if err != nil {
+			panic(err)
+		}
+		defer resp.Body.Close()
+
+		fmt.Println("response Status:", resp.Status)
+		fmt.Println("response Headers:", resp.Header)
+
+	}
+}

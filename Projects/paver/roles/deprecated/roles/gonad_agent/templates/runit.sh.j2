@@ -1,0 +1,7 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+    /usr/bin/env -i \
+    /usr/local/sbin/chpst -v \
+        -u gonad:gonad  \
+    /usr/local/bin/go run /var/service/gonad_agent/bin/gonad.go

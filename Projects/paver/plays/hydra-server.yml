@@ -1,0 +1,7 @@
+- hosts: gds_all
+  become: yes
+  roles:
+    - role: hydra
+      vars:
+        hydra_as: server
+      

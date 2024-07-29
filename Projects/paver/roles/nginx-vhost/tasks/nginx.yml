@@ -1,0 +1,38 @@
+---
+- name: nginx vhost conf directory
+  file:
+    name: "{{ nginx_vhost_confdir }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: render nginx vhost configuration
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_confdir }}/nginx.conf"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: render nginx vhost configuration
+  template:
+    src: "nginx-default-vhost-{{ ansible_os_family}}.conf.j2"
+    dest: "{{ nginx_vhost_confdir }}/default-empty-vhost.conf"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: ignore nginx temp files
+  lineinfile: dest=/etc/periodic.conf
+    line='daily_clean_tmps_ignore="$daily_clean_tmps_ignore {{ nginx_temp_path }}"'
+    insertafter=EOF
+    state=present
+
+- name: nginx temp directory
+  file:
+    name: "{{ nginx_temp_path }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755

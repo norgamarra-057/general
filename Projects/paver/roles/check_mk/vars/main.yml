@@ -1,0 +1,95 @@
+---
+frequency_high: 60
+frequency: 120
+frequency_rare: 500
+frequency_rare_hourly: 3600
+frequency_mysql_common_rare: 250
+frequency_pg_common_rare: 360 
+frequency_pg_slave_rare: 500
+frequence_mysql_slave_extra_rare: 36000
+
+plugins:
+  all:
+    common:
+      - dmi_sysinfo
+    common_120:
+      - smart_gds
+
+  mysql:
+    common_frequent:
+      - mk_mysql
+    common:
+      - mysql_connection_test
+    common_rare:
+      - mysql_long_running_q
+    common_rare_hourly:
+      - mysql_zfs_snapshots
+    master:
+      - mysql_read_only_master
+    slave:
+      - mysql_read_only_slave
+      - mysql_replication_delay
+    slave_rare:
+      - mysql_general_repl_state
+    slave_rare_hourly:
+      - mysql_max_sizes
+      - mysql_num_tables
+    slave_extra_rare:
+      - mysql_autoinc
+
+  postgresql:
+    common_frequent:
+      - postgres_pgb_multi
+      - mk_postgres_multi
+    common:
+      - postgres_connection_test_multi
+      - postgres_connections_multi
+      - postgres_slowdowns
+      - postgres_timeline
+    common_rare:
+      - postgres_blocking_extended
+      - postgres_datadir
+      - postgres_trx
+    common_rare_hourly:
+      - postgres_hitratio
+      - postgres_wraparound
+      - postgres_zfs_snapshots
+    master:
+      - postgres_repl_master
+    slave:
+      - postgres_is_slave
+      - postgres_repl_slave
+    slave_rare:
+      - postgres_wal_last_upd
+    slave_rare_hourly:
+      - postgres_bloat_multi
+      - postgres_max_sizes
+      - postgres_num_tables
+      - postgres_sequences
+
+locals:
+  all:
+    common:
+      - pf_status.sh
+      - hw_mca_count.sh
+      - memory_error_status.sh
+
+  mysql:
+    common: []
+    common_rare: []
+    master: []
+    slave: []
+
+  postgresql:
+    common: []
+    common_rare: []
+
+pg_scripts:
+  - check_pg_conn.sh
+  - check_pg_repl.sh
+  - checkpoint_pg_all.sh
+  - failover_vips.sh
+  - find_pg_stats
+  - list_pg_instances
+  - pg_analysis
+  - reload_pg_all.sh

@@ -1,0 +1,1076 @@
+### -*- mode: conf; -*-
+###
+### BEGIN: gds_prod_admin_*
+###
+
+[gds_prod_admin_dub1]
+gds-admin01.dub1
+gds-admin02.dub1
+
+[gds_prod_admin_sac1]
+gds-admin01.sac1 fw_hydra=true
+gds-admin02.sac1 fw_hydra=true
+
+[gds_prod_admin_snc1]
+gds-admin01.snc1 fw_hydra=true
+gds-admin02.snc1 fw_jenkins=true fw_hydra=true
+
+[gds_prod_web_snc1]
+gds-web01.snc1
+gds-web02.snc1
+gds-web03.snc1
+gds-web04.snc1
+gds-web-default-01.snc1
+gds-web-default-02.snc1
+gds-web-pg93-01.snc1
+gds-web-pg93-02.snc1
+gds-web-jailv1-01.snc1
+gds-web-jailv1-02.snc1
+
+[gds_prod_admin:children]
+gds_prod_admin_dub1
+gds_prod_admin_sac1
+gds_prod_admin_snc1
+
+[gds_admin:children]
+gds_prod_admin
+
+### BEGIN: gds_prod_web_*
+###
+[gds_prod_web_dub1]
+# Empty
+
+[gds_prod_web_snc1]
+gds-web01.snc1
+gds-web02.snc1
+gds-web03.snc1
+gds-web04.snc1
+
+[gds_prod_web_dub1]
+# Empty
+
+[gds_prod_web:children]
+gds_prod_web_dub1
+gds_prod_web_snc1
+
+[gds_web:children]
+gds_prod_web
+
+###
+### BEGIN: gds_prod_mysql_*
+###
+
+[gds_prod_mysql_masters_snc1]
+gds-snc1-prod-db001m1.snc1
+gds-snc1-prod-db009m1.snc1
+gds-snc1-prod-db013m1.snc1
+gds-snc1-prod-db014m1.snc1
+gds-snc1-prod-db015m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db016m1.snc1
+gds-snc1-prod-db017m1.snc1
+gds-snc1-prod-db019m1.snc1
+gds-snc1-prod-db021m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db023m1.snc1
+gds-snc1-prod-db031m1.snc1
+gds-snc1-prod-db033m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db035m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db037m1.snc1
+gds-snc1-prod-db039m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db041m1.snc1 gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+gds-snc1-prod-db043m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db047m1.snc1 
+gds-snc1-prod-db051m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db052m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db053m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db055m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db057m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db059m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db061m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db063m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db065m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db071m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db101m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db161m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db162m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db163m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db164m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db172m1.snc1
+gds-snc1-prod-db173m1.snc1
+gds-snc1-prod-db174m1.snc1
+gds-snc1-prod-db175m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db181m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db182m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-dbl003m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db201m1.snc1  gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+gds-snc1-prod-db202m1.snc1  gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+gds-snc1-prod-db401m1.snc1  gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+gds-snc1-prod-db402m1.snc1  gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+
+[gds_prod_mysql_masters_sac1]
+gds-sac1-prod-db001m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db002m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db009m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db013m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db015m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db019m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db021m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db023m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db031m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db033m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db035m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db037m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db039m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db043m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db051m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db052m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db055m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db057m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db061m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db063m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db065m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db071m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db101m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db017m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db172m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db173m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db174m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db175m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db101m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db161m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db162m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db163m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db164m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db181m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db182m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-dbl003m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_mysql_slaves_sac1]
+gds-sac1-prod-db001s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db002s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db009s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db013s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db015s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db019s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db021s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db023s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db031s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db033s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db035s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db037s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db039s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db043s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db051s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db052s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db053s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db055s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db057s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db061s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db063s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db065s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db071s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db101s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db017s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db172s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db173s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db174s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db175s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db101s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db161s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db162s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db163s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db164s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db181s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db182s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-dbl003s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_mysql_masters_dub1]
+gds-dub1-prod-db001m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db003m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db005m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db007m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db009m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db011m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db013m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db015m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db019m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db151m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db152m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db153m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db171m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db172m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db173m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db191m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db192m1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_mysql_slaves_dub1]
+gds-dub1-prod-db001s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db003s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db005s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db007s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db009s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db011s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db013s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db015s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db019s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db151s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db152s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db153s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db171s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db172s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db173s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db191s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db192s1.dub1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_mysql_slaves_dub1]
+# empty
+
+[gds_prod_mysql_slaves_snc1]
+gds-snc1-prod-db001s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db009s1.snc1
+gds-snc1-prod-db008s1.snc1
+gds-snc1-prod-db010s1.snc1
+gds-snc1-prod-db013s1.snc1
+gds-snc1-prod-db014s1.snc1
+gds-snc1-prod-db015s1.snc1
+gds-snc1-prod-db016s1.snc1
+gds-snc1-prod-db017s1.snc1
+gds-snc1-prod-db019s1.snc1
+gds-snc1-prod-db021s1.snc1
+gds-snc1-prod-db023s1.snc1
+gds-snc1-prod-db031s1.snc1
+gds-snc1-prod-db033s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db035s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db037s1.snc1
+gds-snc1-prod-db039s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db041s1.snc1 gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+gds-snc1-prod-db043s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db047s1.snc1 
+gds-snc1-prod-db051s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db052s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db053s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db055s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db057s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db059s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db061s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db063s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db065s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db071s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db101s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db161s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db162s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db163s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db164s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db172s1.snc1
+gds-snc1-prod-db173s1.snc1
+gds-snc1-prod-db174s1.snc1
+gds-snc1-prod-db175s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db181s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db182s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-dbl003s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db201s1.snc1  gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+gds-snc1-prod-db202s1.snc1  gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+gds-snc1-prod-db401s1.snc1  gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+gds-snc1-prod-db402s1.snc1  gds_repo="http://gds-repo2.snc1/FreeBSD:12:amd64"
+
+
+[gds_prod_mysql_masters:children]
+gds_prod_mysql_masters_dub1
+gds_prod_mysql_masters_sac1
+gds_prod_mysql_masters_snc1
+
+[gds_prod_mysql_slaves:children]
+gds_prod_mysql_slaves_dub1
+gds_prod_mysql_slaves_sac1
+gds_prod_mysql_slaves_snc1
+
+[gds_prod_mysql:children]
+gds_prod_mysql_masters
+gds_prod_mysql_slaves
+
+[gds_mysql:children]
+gds_prod_mysql
+
+
+###
+### BEGIN: gds_prod_postgresql_*
+###
+[gds_prod_postgresql_masters_dub1]
+gds-dub1-prod-db002m1.dub1 
+gds-dub1-prod-db004m1.dub1 
+gds-dub1-prod-db006m1.dub1 
+gds-dub1-prod-db008m1.dub1 
+gds-dub1-prod-db010m1.dub1 
+gds-dub1-prod-db012m1.dub1 
+gds-dub1-prod-db014m1.dub1 
+gds-dub1-prod-db016m1.dub1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db018m1.dub1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_postgresql_masters_snc1]
+gds-snc1-prod-dbl001m1.snc1
+gds-snc1-prod-dbl002m1.snc1   gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db008m1.snc1
+gds-snc1-prod-db010m1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db014m1.snc1
+gds-snc1-prod-db016m1.snc1
+gds-snc1-prod-db018m1.snc1
+gds-snc1-prod-db019m1.snc1
+gds-snc1-prod-db020m1.snc1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db024m1.snc1
+gds-snc1-prod-db030m1.snc1
+gds-snc1-prod-db038m1.snc1
+gds-snc1-prod-db040m1.snc1
+gds-snc1-prod-db044m1.snc1
+gds-snc1-prod-db050m1.snc1
+gds-snc1-prod-db054m1.snc1
+gds-snc1-prod-db056m1.snc1
+gds-snc1-prod-db058m1.snc1
+gds-snc1-prod-db060m1.snc1
+gds-snc1-prod-db062m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db066m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db102m1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_postgresql_masters_sac1]
+gds-sac1-prod-db010m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db014m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db016m1.sac1
+gds-sac1-prod-db018m1.sac1
+gds-sac1-prod-db020m1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db024m1.sac1
+gds-sac1-prod-db030m1.sac1
+gds-sac1-prod-db038m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db040m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db044m1.sac1
+gds-sac1-prod-db050m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db054m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db056m1.sac1
+gds-sac1-prod-db058m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db059m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db060m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db062m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db066m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-dbl005m1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_postgresql_slaves_dub1]
+gds-dub1-prod-db002s1.dub1
+gds-dub1-prod-db004s1.dub1
+gds-dub1-prod-db006s1.dub1 
+gds-dub1-prod-db008s1.dub1 
+gds-dub1-prod-db010s1.dub1 
+gds-dub1-prod-db012s1.dub1 
+gds-dub1-prod-db014s1.dub1 
+gds-dub1-prod-db016s1.dub1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-dub1-prod-db018s1.dub1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_postgresql_slaves_snc1]
+gds-snc1-prod-dbl001s1.snc1
+gds-snc1-prod-dbl002s1.snc1   gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db008s1.snc1
+gds-snc1-prod-db010s1.snc1
+gds-snc1-prod-db014s1.snc1
+gds-snc1-prod-db016s1.snc1
+gds-snc1-prod-db018s1.snc1
+gds-snc1-prod-db019s1.snc1
+gds-snc1-prod-db020s1.snc1
+gds-snc1-prod-db024s1.snc1
+gds-snc1-prod-db030s1.snc1
+gds-snc1-prod-db038s1.snc1
+gds-snc1-prod-db040s1.snc1
+gds-snc1-prod-db044s1.snc1
+gds-snc1-prod-db050s1.snc1
+gds-snc1-prod-db054s1.snc1
+gds-snc1-prod-db056s1.snc1
+gds-snc1-prod-db058s1.snc1
+gds-snc1-prod-db060s1.snc1
+gds-snc1-prod-db062s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db066s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-snc1-prod-db102s1.snc1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_postgresql_slaves_sac1]
+gds-sac1-prod-db010s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db014s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db016s1.sac1
+gds-sac1-prod-db018s1.sac1
+gds-sac1-prod-db020s1.sac1  gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db024s1.sac1
+gds-sac1-prod-db030s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db038s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db040s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db044s1.sac1
+gds-sac1-prod-db050s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db054s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db056s1.sac1
+gds-sac1-prod-db058s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db059s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db060s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db062s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-db066s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+gds-sac1-prod-dbl005s1.sac1 gds_repo="pkg+http://gds-web-jailv1-01.snc1/packages/gdspkgs"
+
+[gds_prod_postgresql_masters:children]
+gds_prod_postgresql_masters_dub1
+gds_prod_postgresql_masters_sac1
+gds_prod_postgresql_masters_snc1
+
+[gds_prod_postgresql_slaves:children]
+gds_prod_postgresql_slaves_dub1
+gds_prod_postgresql_slaves_sac1
+gds_prod_postgresql_slaves_snc1
+
+[gds_prod_postgresql:children]
+gds_prod_postgresql_masters
+gds_prod_postgresql_slaves
+
+[gds_postgresql:children]
+gds_prod_postgresql
+
+
+
+###
+### BEGIN: GDS-wide aggregate groups
+###
+[gds_prod_masters:children]
+gds_prod_mysql_masters
+gds_prod_postgresql_masters
+
+[gds_prod_slaves:children]
+gds_prod_mysql_slaves
+gds_prod_postgresql_slaves
+
+[gds_prod_dbs:children]
+gds_prod_masters
+gds_prod_slaves
+
+[gds_prod_all:children]
+gds_prod_dbs
+gds_prod_admin
+gds_prod_web
+
+[gds_all:children]
+gds_prod_all
+
+[FreeBSD:children]
+gds_prod_all
+
+[FreeBSD:vars]
+env=prod
+ansible_python_interpreter=/usr/local/bin/python2.7
+
+
+###
+### BEGIN: GDS-replication domain groups
+###
+[gds_snc1_prod_dbl001]
+gds-snc1-prod-dbl001m1.snc1
+gds-snc1-prod-dbl001s1.snc1
+
+[gds_snc1_prod_dbl002]
+gds-snc1-prod-dbl002m1.snc1
+gds-snc1-prod-dbl002s1.snc1
+
+[gds_snc1_prod_db001]
+gds-snc1-prod-db001m1.snc1
+gds-snc1-prod-db001s1.snc1
+
+[gds_snc1_prod_db008]
+gds-snc1-prod-db008m1.snc1
+gds-snc1-prod-db008s1.snc1
+
+[gds_snc1_prod_db009]
+gds-snc1-prod-db009m1.snc1
+gds-snc1-prod-db009s1.snc1
+
+[gds_snc1_prod_db010]
+gds-snc1-prod-db010m1.snc1
+gds-snc1-prod-db010s1.snc1
+
+[gds_snc1_prod_db012]
+
+[gds_snc1_prod_db013]
+gds-snc1-prod-db013m1.snc1
+gds-snc1-prod-db013s1.snc1
+
+[gds_snc1_prod_db014]
+gds-snc1-prod-db014m1.snc1
+gds-snc1-prod-db014s1.snc1
+
+[gds_snc1_prod_db015]
+gds-snc1-prod-db015m1.snc1
+gds-snc1-prod-db015s1.snc1
+
+[gds_snc1_prod_db016]
+gds-snc1-prod-db016m1.snc1
+gds-snc1-prod-db016s1.snc1
+
+[gds_snc1_prod_db017]
+gds-snc1-prod-db017m1.snc1
+gds-snc1-prod-db017s1.snc1
+
+[gds_snc1_prod_db018]
+gds-snc1-prod-db018m1.snc1
+gds-snc1-prod-db018s1.snc1
+
+[gds_snc1_prod_db019]
+gds-snc1-prod-db019m1.snc1
+gds-snc1-prod-db019s1.snc1
+
+[gds_snc1_prod_db020]
+gds-snc1-prod-db020m1.snc1
+gds-snc1-prod-db020s1.snc1
+
+[gds_snc1_prod_db024]
+gds-snc1-prod-db024m1.snc1
+gds-snc1-prod-db024s1.snc1
+
+[gds_snc1_prod_db030]
+gds-snc1-prod-db030m1.snc1
+gds-snc1-prod-db030s1.snc1
+
+[gds_snc1_prod_db038]
+gds-snc1-prod-db038m1.snc1
+gds-snc1-prod-db038s1.snc1
+
+[gds_snc1_prod_db040]
+gds-snc1-prod-db040m1.snc1
+gds-snc1-prod-db040s1.snc1
+
+[gds_snc1_prod_db041]
+gds-snc1-prod-db041m1.snc1
+gds-snc1-prod-db041s1.snc1
+
+[gds_snc1_prod_db044]
+gds-snc1-prod-db044m1.snc1
+gds-snc1-prod-db044s1.snc1
+
+[gds_snc1_prod_db021]
+gds-snc1-prod-db021m1.snc1
+gds-snc1-prod-db021s1.snc1
+
+[gds_snc1_prod_db023]
+gds-snc1-prod-db023m1.snc1
+gds-snc1-prod-db023s1.snc1
+
+[gds_snc1_prod_db031]
+gds-snc1-prod-db031m1.snc1
+gds-snc1-prod-db031s1.snc1
+
+[gds_snc1_prod_db033]
+gds-snc1-prod-db033m1.snc1
+gds-snc1-prod-db033s1.snc1
+
+[gds_snc1_prod_db043]
+gds-snc1-prod-db043m1.snc1
+gds-snc1-prod-db043s1.snc1
+
+[gds_snc1_prod_db047]
+gds-snc1-prod-db047m1.snc1
+gds-snc1-prod-db047s1.snc1
+
+[gds_snc1_prod_db101]
+gds-snc1-prod-db101m1.snc1
+gds-snc1-prod-db101s1.snc1
+
+[gds_snc1_prod_db201]
+gds-snc1-prod-db201m1.snc1
+gds-snc1-prod-db201s1.snc1
+
+[gds_snc1_prod_db202]
+gds-snc1-prod-db202m1.snc1
+gds-snc1-prod-db202s1.snc1
+
+[gds_snc1_prod_db401]
+gds-snc1-prod-db401m1.snc1
+gds-snc1-prod-db401s1.snc1
+
+[gds_snc1_prod_db402]
+gds-snc1-prod-db402m1.snc1
+gds-snc1-prod-db402s1.snc1
+
+[gds_snc1_prod_db161]
+gds-snc1-prod-db161m1.snc1
+gds-snc1-prod-db161s1.snc1
+
+[gds_snc1_prod_db033]
+gds-snc1-prod-db033m1.snc1
+gds-snc1-prod-db033s1.snc1
+
+[gds_snc1_prod_db035]
+gds-snc1-prod-db035m1.snc1
+gds-snc1-prod-db035s1.snc1
+
+[gds_snc1_prod_db037]
+gds-snc1-prod-db037m1.snc1
+gds-snc1-prod-db037s1.snc1
+
+[gds_snc1_prod_db039]
+gds-snc1-prod-db039m1.snc1
+gds-snc1-prod-db039s1.snc1
+
+[gds_snc1_prod_db050]
+gds-snc1-prod-db050m1.snc1
+gds-snc1-prod-db050s1.snc1
+
+[gds_snc1_prod_db051]
+gds-snc1-prod-db051m1.snc1
+gds-snc1-prod-db051s1.snc1
+
+[gds_snc1_prod_db052]
+gds-snc1-prod-db052m1.snc1
+gds-snc1-prod-db052s1.snc1
+
+[gds_snc1_prod_db053]
+gds-snc1-prod-db053m1.snc1
+gds-snc1-prod-db053s1.snc1
+
+[gds_snc1_prod_db054]
+gds-snc1-prod-db054m1.snc1
+gds-snc1-prod-db054s1.snc1
+
+[gds_snc1_prod_db055]
+gds-snc1-prod-db055m1.snc1
+gds-snc1-prod-db055s1.snc1
+
+[gds_snc1_prod_db056]
+gds-snc1-prod-db056m1.snc1
+gds-snc1-prod-db056s1.snc1
+
+[gds_snc1_prod_db057]
+gds-snc1-prod-db057m1.snc1
+gds-snc1-prod-db057s1.snc1
+
+[gds_snc1_prod_db058]
+gds-snc1-prod-db058m1.snc1
+gds-snc1-prod-db058s1.snc1
+
+[gds_snc1_prod_db059]
+gds-snc1-prod-db059m1.snc1
+gds-snc1-prod-db059s1.snc1
+
+[gds_snc1_prod_db060]
+gds-snc1-prod-db060m1.snc1
+gds-snc1-prod-db060s1.snc1
+
+[gds_snc1_prod_db061]
+gds-snc1-prod-db061m1.snc1
+gds-snc1-prod-db061s1.snc1
+
+[gds_snc1_prod_db062]
+gds-snc1-prod-db062m1.snc1
+gds-snc1-prod-db062s1.snc1
+
+[gds_snc1_prod_db063]
+gds-snc1-prod-db063m1.snc1
+gds-snc1-prod-db063s1.snc1
+
+[gds_snc1_prod_db066]
+gds-snc1-prod-db066m1.snc1
+gds-snc1-prod-db066s1.snc1
+
+[gds_snc1_prod_db065]
+gds-snc1-prod-db065m1.snc1
+gds-snc1-prod-db065s1.snc1
+
+[gds_snc1_prod_db071]
+gds-snc1-prod-db071m1.snc1
+gds-snc1-prod-db071s1.snc1
+
+[gds_snc1_prod_db102]
+gds-snc1-prod-db102m1.snc1
+gds-snc1-prod-db102s1.snc1
+
+[gds_snc1_prod_db162]
+gds-snc1-prod-db162m1.snc1
+gds-snc1-prod-db162s1.snc1
+
+[gds_snc1_prod_db163]
+gds-snc1-prod-db163m1.snc1
+gds-snc1-prod-db163s1.snc1
+
+[gds_snc1_prod_db164]
+gds-snc1-prod-db164m1.snc1
+gds-snc1-prod-db164s1.snc1
+
+[gds_snc1_prod_db172]
+gds-snc1-prod-db172m1.snc1
+gds-snc1-prod-db172s1.snc1
+
+[gds_snc1_prod_db173]
+gds-snc1-prod-db173m1.snc1
+gds-snc1-prod-db173s1.snc1
+
+[gds_snc1_prod_db174]
+gds-snc1-prod-db174m1.snc1
+gds-snc1-prod-db174s1.snc1
+
+[gds_snc1_prod_db175]
+gds-snc1-prod-db175m1.snc1
+gds-snc1-prod-db175s1.snc1
+
+[gds_snc1_prod_db181]
+gds-snc1-prod-db181m1.snc1
+gds-snc1-prod-db181s1.snc1
+
+[gds_snc1_prod_db182]
+gds-snc1-prod-db182m1.snc1
+gds-snc1-prod-db182s1.snc1
+
+[gds_snc1_prod_dbl003]
+gds-snc1-prod-dbl003m1.snc1
+gds-snc1-prod-dbl003s1.snc1
+
+[gds_sac1_prod_db001]
+gds-sac1-prod-db001m1.sac1
+gds-sac1-prod-db001s1.sac1
+
+[gds_sac1_prod_db002]
+gds-sac1-prod-db002m1.sac1
+gds-sac1-prod-db002s1.sac1
+
+[gds_sac1_prod_db009]
+gds-sac1-prod-db009m1.sac1
+gds-sac1-prod-db009s1.sac1
+
+[gds_sac1_prod_db013]
+gds-sac1-prod-db013m1.sac1
+gds-sac1-prod-db013s1.sac1
+
+[gds_sac1_prod_db015]
+gds-sac1-prod-db015m1.sac1
+gds-sac1-prod-db015s1.sac1
+
+[gds_sac1_prod_db017]
+gds-sac1-prod-db017m1.sac1
+gds-sac1-prod-db017s1.sac1
+
+[gds_sac1_prod_db019]
+gds-sac1-prod-db019m1.sac1
+gds-sac1-prod-db019s1.sac1
+
+[gds_sac1_prod_db021]
+gds-sac1-prod-db021m1.sac1
+gds-sac1-prod-db021s1.sac1
+
+[gds_sac1_prod_db023]
+gds-sac1-prod-db023m1.sac1
+gds-sac1-prod-db023s1.sac1
+
+[gds_sac1_prod_db031]
+gds-sac1-prod-db031m1.sac1
+gds-sac1-prod-db031s1.sac1
+
+[gds_sac1_prod_db033]
+gds-sac1-prod-db033m1.sac1
+gds-sac1-prod-db033s1.sac1
+
+[gds_sac1_prod_db035]
+gds-sac1-prod-db035m1.sac1
+gds-sac1-prod-db035s1.sac1
+
+[gds_sac1_prod_db039]
+gds-sac1-prod-db039m1.sac1
+gds-sac1-prod-db039s1.sac1
+
+[gds_sac1_prod_db043]
+gds-sac1-prod-db043m1.sac1
+gds-sac1-prod-db043s1.sac1
+
+[gds_sac1_prod_db044]
+gds-sac1-prod-db044m1.sac1
+gds-sac1-prod-db044s1.sac1
+
+[gds_sac1_prod_db050]
+gds-sac1-prod-db050m1.sac1
+gds-sac1-prod-db050s1.sac1
+
+[gds_sac1_prod_db051]
+gds-sac1-prod-db051m1.sac1
+gds-sac1-prod-db051s1.sac1
+
+[gds_sac1_prod_db052]
+gds-sac1-prod-db052m1.sac1
+gds-sac1-prod-db052s1.sac1
+
+[gds_sac1_prod_db053]
+gds-sac1-prod-db053m1.sac1
+gds-sac1-prod-db053s1.sac1
+
+[gds_sac1_prod_db054]
+gds-sac1-prod-db054m1.sac1
+gds-sac1-prod-db054s1.sac1
+
+[gds_sac1_prod_db055]
+gds-sac1-prod-db055m1.sac1
+gds-sac1-prod-db055s1.sac1
+
+[gds_sac1_prod_db056]
+gds-sac1-prod-db056m1.sac1
+gds-sac1-prod-db056s1.sac1
+
+[gds_sac1_prod_db057]
+gds-sac1-prod-db057m1.sac1
+gds-sac1-prod-db057s1.sac1
+
+[gds_sac1_prod_db058]
+gds-sac1-prod-db058m1.sac1
+gds-sac1-prod-db058s1.sac1
+
+[gds_sac1_prod_db059]
+gds-sac1-prod-db059m1.sac1
+gds-sac1-prod-db059s1.sac1
+
+[gds_sac1_prod_db060]
+gds-sac1-prod-db060m1.sac1
+gds-sac1-prod-db060s1.sac1
+
+[gds_sac1_prod_db061]
+gds-sac1-prod-db061m1.sac1
+gds-sac1-prod-db061s1.sac1
+
+[gds_sac1_prod_db063]
+gds-sac1-prod-db063m1.sac1
+gds-sac1-prod-db063s1.sac1
+
+[gds_sac1_prod_db065]
+gds-sac1-prod-db065m1.sac1
+gds-sac1-prod-db065s1.sac1
+
+[gds_sac1_prod_db071]
+gds-sac1-prod-db071m1.sac1
+gds-sac1-prod-db071s1.sac1
+
+[gds_sac1_prod_db101]
+gds-sac1-prod-db101m1.sac1
+gds-sac1-prod-db101s1.sac1
+
+[gds_sac1_prod_db172]
+gds-sac1-prod-db172m1.sac1
+gds-sac1-prod-db172s1.sac1
+
+[gds_sac1_prod_db173]
+gds-sac1-prod-db173m1.sac1
+gds-sac1-prod-db173s1.sac1
+
+[gds_sac1_prod_db174]
+gds-sac1-prod-db174m1.sac1
+gds-sac1-prod-db174s1.sac1
+
+[gds_sac1_prod_db175]
+gds-sac1-prod-db175m1.sac1
+gds-sac1-prod-db175s1.sac1
+
+[gds_sac1_prod_db010]
+gds-sac1-prod-db010m1.sac1
+gds-sac1-prod-db010s1.sac1
+
+[gds_sac1_prod_db014]
+gds-sac1-prod-db014m1.sac1
+gds-sac1-prod-db014s1.sac1
+
+[gds_sac1_prod_db016]
+gds-sac1-prod-db016m1.sac1
+gds-sac1-prod-db016s1.sac1
+
+[gds_sac1_prod_db018]
+gds-sac1-prod-db018m1.sac1
+gds-sac1-prod-db018s1.sac1
+
+[gds_sac1_prod_db020]
+gds-sac1-prod-db020m1.sac1
+gds-sac1-prod-db020s1.sac1
+
+[gds_sac1_prod_db024]
+gds-sac1-prod-db024m1.sac1
+gds-sac1-prod-db024s1.sac1
+
+[gds_sac1_prod_db030]
+gds-sac1-prod-db030m1.sac1
+gds-sac1-prod-db030s1.sac1
+
+[gds_sac1_prod_db037]
+gds-sac1-prod-db037m1.sac1
+gds-sac1-prod-db037s1.sac1
+
+[gds_sac1_prod_db038]
+gds-sac1-prod-db038m1.sac1
+gds-sac1-prod-db038s1.sac1
+
+[gds_sac1_prod_db040]
+gds-sac1-prod-db040m1.sac1
+gds-sac1-prod-db040s1.sac1
+
+[gds_sac1_prod_db062]
+gds-sac1-prod-db062m1.sac1
+gds-sac1-prod-db062s1.sac1
+
+[gds_sac1_prod_db066]
+gds-sac1-prod-db066m1.sac1
+gds-sac1-prod-db066s1.sac1
+
+[gds_sac1_prod_dbl005]
+gds-sac1-prod-dbl005m1.sac1
+gds-sac1-prod-dbl005s1.sac1
+
+[gds_sac1_prod_db101]
+gds-sac1-prod-db101m1.sac1
+gds-sac1-prod-db101s1.sac1
+
+[gds_sac1_prod_db161]
+gds-sac1-prod-db161m1.sac1
+gds-sac1-prod-db161s1.sac1
+
+[gds_sac1_prod_db162]
+gds-sac1-prod-db162m1.sac1
+gds-sac1-prod-db162s1.sac1
+
+[gds_sac1_prod_db163]
+gds-sac1-prod-db163m1.sac1
+gds-sac1-prod-db163s1.sac1
+
+[gds_sac1_prod_db164]
+gds-sac1-prod-db164m1.sac1
+gds-sac1-prod-db164s1.sac1
+
+[gds_sac1_prod_db181]
+gds-sac1-prod-db181m1.sac1
+gds-sac1-prod-db181s1.sac1
+
+[gds_sac1_prod_db182]
+gds-sac1-prod-db182m1.sac1
+gds-sac1-prod-db182s1.sac1
+
+[gds_sac1_prod_dbl003]
+gds-sac1-prod-dbl003m1.sac1
+gds-sac1-prod-dbl003s1.sac1
+
+[gds_dub1_prod_db001]
+gds-dub1-prod-db001m1.dub1
+gds-dub1-prod-db001s1.dub1
+
+[gds_dub1_prod_db002]
+gds-dub1-prod-db002m1.dub1
+gds-dub1-prod-db002s1.dub1
+
+[gds_dub1_prod_db003]
+gds-dub1-prod-db003m1.dub1
+gds-dub1-prod-db003s1.dub1
+
+[gds_dub1_prod_db005]
+gds-dub1-prod-db005m1.dub1
+gds-dub1-prod-db005s1.dub1
+
+[gds_dub1_prod_db004]
+gds-dub1-prod-db004m1.dub1
+gds-dub1-prod-db004s1.dub1
+
+[gds_dub1_prod_db006]
+gds-dub1-prod-db006m1.dub1
+gds-dub1-prod-db006s1.dub1
+
+[gds_dub1_prod_db007]
+gds-dub1-prod-db007m1.dub1
+gds-dub1-prod-db007s1.dub1
+
+[gds_dub1_prod_db008]
+gds-dub1-prod-db008m1.dub1
+gds-dub1-prod-db008s1.dub1
+
+[gds_dub1_prod_db009]
+gds-dub1-prod-db009m1.dub1
+gds-dub1-prod-db009s1.dub1
+
+[gds_dub1_prod_db010]
+gds-dub1-prod-db010m1.dub1
+gds-dub1-prod-db010s1.dub1
+
+[gds_dub1_prod_db011]
+gds-dub1-prod-db011m1.dub1
+gds-dub1-prod-db011s1.dub1
+
+[gds_dub1_prod_db012]
+gds-dub1-prod-db012m1.dub1
+gds-dub1-prod-db012s1.dub1
+
+[gds_dub1_prod_db013]
+gds-dub1-prod-db013m1.dub1
+gds-dub1-prod-db013s1.dub1
+
+[gds_dub1_prod_db014]
+gds-dub1-prod-db014m1.dub1
+gds-dub1-prod-db014s1.dub1
+
+[gds_dub1_prod_db015]
+gds-dub1-prod-db015m1.dub1
+gds-dub1-prod-db015s1.dub1
+
+[gds_dub1_prod_db016]
+gds-dub1-prod-db016m1.dub1
+gds-dub1-prod-db016s1.dub1
+
+[gds_dub1_prod_db018]
+gds-dub1-prod-db018m1.dub1
+gds-dub1-prod-db018s1.dub1
+
+[gds_dub1_prod_db019]
+gds-dub1-prod-db019m1.dub1
+gds-dub1-prod-db019s1.dub1
+
+[gds_dub1_prod_db151]
+gds-dub1-prod-db151m1.dub1
+gds-dub1-prod-db151s1.dub1
+
+[gds_dub1_prod_db152]
+gds-dub1-prod-db152m1.dub1
+gds-dub1-prod-db152s1.dub1
+
+[gds_dub1_prod_db153]
+gds-dub1-prod-db153m1.dub1
+gds-dub1-prod-db153s1.dub1
+
+[gds_dub1_prod_db171]
+gds-dub1-prod-db171m1.dub1
+gds-dub1-prod-db171s1.dub1
+
+[gds_dub1_prod_db172]
+gds-dub1-prod-db172m1.dub1
+gds-dub1-prod-db172s1.dub1
+
+[gds_dub1_prod_db173]
+gds-dub1-prod-db173m1.dub1
+gds-dub1-prod-db173s1.dub1
+
+[gds_dub1_prod_db191]
+gds-dub1-prod-db191m1.dub1
+gds-dub1-prod-db191s1.dub1
+
+[gds_dub1_prod_db192]
+gds-dub1-prod-db192m1.dub1
+gds-dub1-prod-db192s1.dub1
+
+[dc_dub1_prod:children]
+gds_prod_admin_dub1
+gds_prod_mysql_masters_dub1
+gds_prod_mysql_slaves_dub1
+gds_prod_postgresql_masters_dub1
+gds_prod_postgresql_slaves_dub1
+
+[dc_dub1_prod:vars]
+splunk_server=splunk-indexers.dub1:9997
+
+[dc_snc1_prod:children]
+gds_prod_admin_snc1
+gds_prod_mysql_masters_snc1
+gds_prod_mysql_slaves_snc1
+gds_prod_postgresql_masters_snc1
+gds_prod_postgresql_slaves_snc1
+
+[dc_snc1_prod:vars]
+splunk_server=splunk-indexers.snc1:9997
+
+[dc_sac1_prod:children]
+gds_prod_admin_sac1
+gds_prod_mysql_masters_sac1
+gds_prod_mysql_slaves_sac1
+gds_prod_postgresql_masters_sac1
+gds_prod_postgresql_slaves_sac1
+
+[dc_sac1_prod:vars]
+splunk_server=splunk-indexers.sac1:9997

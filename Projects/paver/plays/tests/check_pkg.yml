@@ -1,0 +1,10 @@
+---
+- name: Check if pkg is operational
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Update pkg repo
+      shell: pkg update -f
+
+    - name: See if pkg package is avilable
+      shell: pkg info pkg

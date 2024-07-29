@@ -1,0 +1,14 @@
+---
+- name: nginx-vhost start tags=nginx
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "../defaults/{{ ansible_os_family }}.yml"
+    - "../defaults/main.yml"
+
+- include_vars: derived_vars.yml
+
+- include_tasks: FreeBSD.yml tags=nginx
+  when: ansible_os_family == 'FreeBSD'
+
+- include_tasks: nginx.yml
+- include_tasks: runit.yml

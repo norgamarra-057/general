@@ -1,0 +1,95 @@
+---
+###################################################
+# add_legacy_users.yml
+#
+# Description:   This playbook re-adds the mmm_agent and mysql_admin users to all instances on the node.
+#
+# Usage:        ansible-playbook plays/fix/add_legacy_users.yml -e "node-gds-snc1-test-db001m1.snc1"
+# become:       false
+# gather_facts: false
+# 
+# Parameters:   node=server
+#
+# Requirements: None
+#
+# Notes:        None
+###################################################
+
+- name: Check params
+  gather_facts: false
+  hosts: localhost
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+
+- name: Add Legacy MySQL Users
+  gather_facts: false
+  become: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Add user mmm_agent@10.20.32.30
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT CREATE TABLESPACE, PROCESS, REPLICATION CLIENT, SUPER ON *.* TO 'mmm_agent'@'10.20.32.30' IDENTIFIED BY PASSWORD '*F3874B8EE6BB1B48F80071912E4C388CF5A3CA46'"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+
+    - name: Add user mmm_agent10.20.32.32
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT CREATE TABLESPACE, PROCESS, REPLICATION CLIENT, SUPER ON *.* TO 'mmm_agent'@'10.20.32.32' IDENTIFIED BY PASSWORD '*F3874B8EE6BB1B48F80071912E4C388CF5A3CA46'"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+
+    - name: Add user mmm_agent@10.8.111.16
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT CREATE TABLESPACE, PROCESS, REPLICATION CLIENT, SUPER ON *.* TO 'mmm_agent'@'10.8.111.16' IDENTIFIED BY PASSWORD '*F3874B8EE6BB1B48F80071912E4C388CF5A3CA46'"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+
+    - name: Add user mysql_admin@10.20.32.30
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT ALL PRIVILEGES ON *.* TO 'mysql_admin'@'10.20.32.30' IDENTIFIED BY PASSWORD '*1EEF71BF3826B9A1ECD755D30889B8BD7EC9A618' WITH GRANT OPTION"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+
+    - name: Add user mysql_admin@10.20.32.32
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT ALL PRIVILEGES ON *.* TO 'mysql_admin'@'10.20.32.32' IDENTIFIED BY PASSWORD '*1EEF71BF3826B9A1ECD755D30889B8BD7EC9A618' WITH GRANT OPTION"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+
+    - name: Add user mysql_admin@10.22.74.119
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT ALL PRIVILEGES ON *.* TO 'mysql_admin'@'10.22.74.119' IDENTIFIED BY PASSWORD '*1EEF71BF3826B9A1ECD755D30889B8BD7EC9A618' WITH GRANT OPTION"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+
+    - name: Add user mysql_admin@10.22.74.10
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT ALL PRIVILEGES ON *.* TO 'mysql_admin'@'10.22.74.10' IDENTIFIED BY PASSWORD '*1EEF71BF3826B9A1ECD755D30889B8BD7EC9A618' WITH GRANT OPTION"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+
+    - name: Add user ptosc@localhost
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT ALL PRIVILEGES ON *.* TO 'ptosc'@'localhost' IDENTIFIED BY PASSWORD '*E6852E7D56F72CACD26523963AED41C164C46CF2'"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+
+    - name: Add user ptosc@%
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"GRANT ALL PRIVILEGES ON *.* TO 'ptosc'@'%' IDENTIFIED BY PASSWORD '*E6852E7D56F72CACD26523963AED41C164C46CF2'"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      ignore_errors: true
+      no_log: true
+

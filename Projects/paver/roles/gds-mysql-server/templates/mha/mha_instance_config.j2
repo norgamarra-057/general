@@ -1,0 +1,22 @@
+[server default]
+user = gds_mha
+password = mhamysqlpassword
+ssh_user = gds_mha
+
+repl_user = replication
+repl_password = GaSxrz1twblgEyl
+
+ignore_fail = 1
+log_level = error
+
+manager_workdir = /tmp
+remote_workdir = /tmp
+
+{% for item in gds_instances[instance_name]['nodes'] %}
+[server{{ item }}]
+hostname = {{ item }}
+ssh_host = {{ item }}
+master_binlog_dir = {{ percona_logdir }}
+port = {{ gds_instances[instance_name]['ports']['mysqld'] }}
+
+{% endfor %}

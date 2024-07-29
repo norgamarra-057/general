@@ -1,0 +1,376 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - current_master is defined
+          - instance is defined
+          - current_slave is defined
+
+- name: Get slave IP
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ current_slave}}'
+  tasks:
+    - name: get IP slave
+      shell: ifconfig lagg0 | grep 'inet' | awk -F ' ' '{ print $2 }'
+      register: current_slave_ip
+#    - debug: var=current_slave_ip.stdout
+
+- name: Master checks
+  gather_facts: False
+  become: true
+  hosts: 
+    - '{{ current_master }}'
+  tasks:
+    - set_fact: my_slave_ip={{ hostvars[current_slave]['current_slave_ip']['stdout'] }}
+#    - debug: var=my_slave_ip
+
+    - name: get IP master
+      shell: ifconfig lagg0 | grep 'inet' | awk -F ' ' '{ print $2 }'
+      register: current_master_ip
+#    - debug: var=current_master_ip.stdout
+
+    - name: Confirm master vlan exists
+      shell: ifconfig -l | grep {{ gds_carp_interfaces.0 }}
+      register: master_vlan_exists
+#    - debug: var=master_vlan_exists.stdout
+    - name: verify master vlan exists
+      fail: msg="Exiting ----------Master vlan does not exist"
+      when:  master_vlan_exists.stdout  ==  ""
+
+
+    - name: Confirm slave vlan exists
+      shell: ifconfig -l | grep {{ gds_carp_interfaces.1 }}
+      register: slave_vlan_exists
+#    - debug: var=slave_vlan_exists.stdout
+    - name: verify slave vlan exists
+      fail: msg="Exiting ----------Slave vlan does not exist"
+      when:  slave_vlan_exists.stdout  ==  ""
+
+    - name: Copy check
+      copy:
+        src: ../../roles/check_mk/files/checks/postgresql/check_db_postgres_vip_generic
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Confirm rw_vip is on the master
+      shell: /var/groupon/check_mk/checks/check_db_postgres_vip_generic -v {{ gds_instances[instance].master_vip }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'OK - VIP is OK'
+      register: rw_vip_on_master
+#    - debug: var=rw_vip_on_master.stdout
+    - name: verify the rw vip is on the master
+      fail: msg="Exiting ----------rw VIP is not on the master"
+      when:  rw_vip_on_master.stdout  ==  ""
+
+    - name: Confirm ro_vip is not on the master
+      shell: /var/groupon/check_mk/checks/check_db_postgres_vip_generic -v {{ gds_instances[instance].slave_vips.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'CRIT - Possible Failover on the VIP'
+      register: ro_vip_on_master
+#    - debug: var=ro_vip_on_master.stdout
+    - name: verify the ro vip is not on the master
+      fail: msg="Exiting ----------ro VIP is on the master"
+      when:  ro_vip_on_master.stdout  ==  ""
+
+    - name: Confirm master is not in recovery
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_is_in_recovery()"
+      register: it_is_in_recovery
+#    - debug: var=it_is_in_recovery.stdout
+    - name: verify it's the master
+      fail: msg="Exiting ----------It is not a master database"
+      when:  it_is_in_recovery.stdout  ==  "t"
+
+
+    - name: Find if slave exists
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select client_addr from pg_stat_replication where client_addr='{{ my_slave_ip }}'"
+      register: slave_ip
+#    - debug: var=slave_ip.stdout
+    - name: verify slave exists
+      fail: msg="Exiting ----------Slave does not exist"
+      when:  slave_ip.stdout == ""
+
+    - name: Replication lag
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_xlog_location_diff(pg_current_xlog_location(),write_location)  from pg_stat_replication where client_addr='{{ my_slave_ip }}'"
+      register: replication_lag
+#    - debug: var=replication_lag.stdout
+    - name: verify replication lag is low
+      fail: msg="Exiting ----------Replication lag is high"
+      when:  replication_lag.stdout|int  >  100000000
+
+    - name: Copy check
+      copy:
+        src: ../../roles/check_mk/files/checks/postgresql/check_db_data_dir
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Find if instance name is correct
+      shell: /var/groupon/check_mk/checks/check_db_data_dir -i {{ instance }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'OK - Data Directory is OK'
+      register: instance_is_correct
+#    - debug: var=instance_is_correct.stdout
+    - name: verify it is the correct instance name
+      fail: msg="Exiting ----------Instance name is not the correct one"
+      when:  instance_is_correct.stdout  ==  ""
+
+
+- name: Slave checks
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ current_slave }}'
+  tasks:
+    - name: Confirm it's in recovery
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_is_in_recovery()"
+      register: it_is_in_recovery_slave
+#    - debug: var=it_is_in_recovery_slave.stdout
+    - name: verify if it's the slave
+      fail: msg="Exiting ----------It is not a slave database"
+      when:  it_is_in_recovery_slave.stdout  ==  "f"
+
+    - name: Confirm master vlan exists
+      shell: ifconfig -l | grep {{ gds_carp_interfaces.0 }}
+      register: master_vlan_exists
+#    - debug: var=master_vlan_exists.stdout
+    - name: verify master vlan exists
+      fail: msg="Exiting ----------Master vlan does not exist"
+      when:  master_vlan_exists.stdout  ==  ""
+
+    - name: Confirm slave vlan exists
+      shell: ifconfig -l | grep {{ gds_carp_interfaces.1 }}
+      register: slave_vlan_exists
+#    - debug: var=slave_vlan_exists.stdout
+    - name: verify slave vlan exists
+      fail: msg="Exiting ----------Slave vlan does not exist"
+      when:  slave_vlan_exists.stdout  ==  ""
+
+    - name: Copy check
+      copy:
+        src: ../../roles/check_mk/files/checks/postgresql/check_db_postgres_vip_generic
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Confirm rw_vip is not on the slave
+      shell: /var/groupon/check_mk/checks/check_db_postgres_vip_generic -v {{ gds_instances[instance].master_vip }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'CRIT - Possible Failover on the VIP'
+      register: rw_vip_on_slave
+#    - debug: var=rw_vip_on_slave.stdout
+    - name: verify the rw vip is not on the slave
+      fail: msg="Exiting ----------rw VIP is on the slave"
+      when:  rw_vip_on_slave.stdout  ==  ""
+
+    - name: Confirm ro_vip is on the slave
+      shell: /var/groupon/check_mk/checks/check_db_postgres_vip_generic -v {{ gds_instances[instance].slave_vips.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'OK - VIP is OK'
+      register: ro_vip_on_slave
+#    - debug: var=ro_vip_on_slave.stdout
+    - name: verify the ro vip is on the slave
+      fail: msg="Exiting ----------ro VIP is not on the slave"
+      when:  ro_vip_on_slave.stdout  ==  ""
+
+    - name: Copy check
+      copy:
+        src: ../../roles/check_mk/files/checks/postgresql/check_db_data_dir
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Find if instance name is correct
+      shell: /var/groupon/check_mk/checks/check_db_data_dir -i {{ instance }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'OK - Data Directory is OK'
+      register: instance_is_correct
+#    - debug: var=instance_is_correct.stdout
+    - name: verify it is the correct instance name
+      fail: msg="Exiting ----------Instance name is not the correct one"
+      when:  instance_is_correct.stdout  ==  ""
+
+- name: Master changes
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ current_master }}'
+  tasks:
+    - pause: prompt="Are you sure you want to proceed with the failover? Press ENTER to continue..."
+
+    - set_fact: my_slave_ip={{ hostvars[current_slave]['current_slave_ip']['stdout'] }}
+#    - debug: var=my_slave_ip
+
+    - name: Checkpoint on master to make the shutdown faster
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "checkpoint"
+
+    - name: Do not allow connections to this database anymore
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "update pg_database set datallowconn='f' where datname='{{ gds_instances[instance].dbnames.0 }}'"
+
+    - name: Kill all sessions
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid()"
+
+    - name: Everything has reached the slave
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_xlog_location_diff(pg_current_xlog_location(),write_location) from pg_stat_replication where client_addr='{{ my_slave_ip }}'"
+      register: replication_lag_final
+      until: replication_lag_final.stdout == "0"
+      retries: 1000
+      delay: 1
+#    - debug: var=replication_lag_final.stdout
+
+    - name: Shutdown the instance
+      shell: sv down /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/ && sv int /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/
+
+    - name: Find if pid still exists
+      stat: path=/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/postmaster.pid
+      register: is_postmaster_online
+      until: is_postmaster_online.stat.exists == False
+      retries: 300
+      delay: 1
+#    - debug: var=is_postmaster_online.stat.exists
+
+    - name: Extract latest checkpoint location for the master
+      shell: pg_controldata /var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data | grep 'Latest checkpoint location:' | awk '{print $4}'
+      register: latest_chkpt_loc_master
+#    - debug: var=latest_chkpt_loc_master.stdout
+
+    - name: Move rw vip to the new master 1/2
+      shell: cat /etc/rc.conf.local | grep {{ gds_instances[instance].master_vip }} | grep -o 'vhid.*' | awk '{print $2}'
+      register: my_vhid
+#    - debug: var=my_vhid.stdout
+
+    - name: Move rw vip to the new master 2/2
+      shell: ifconfig {{ gds_carp_interfaces.0 }} vhid {{ my_vhid.stdout }} state backup
+
+    - name: Confirm rw_vip is no longer on the former master
+      shell: /var/groupon/check_mk/checks/check_db_postgres_vip_generic -v {{ gds_instances[instance].master_vip }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'CRIT - Possible Failover on the VIP'
+      register: rw_vip_on_master_final
+      until: rw_vip_on_master_final.stdout  !=  ""
+      retries: 300
+      delay: 1
+#    - debug: var=rw_vip_on_master_final.stdout	
+
+
+- name: Slave changes
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ current_slave }}'
+  tasks:
+    - name: Kill all sessions
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_terminate_backend(pid) from pg_stat_activity where pid != pg_backend_pid()"
+
+    - name: Checkpoint on slave to make the startup faster
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "checkpoint"
+
+    - name: Everything has been applied on the slave
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_xlog_location_diff(pg_last_xlog_receive_location(),pg_last_xlog_replay_location())"
+      register: replication_lag_final2
+      until: replication_lag_final2.stdout == "0"
+      retries: 1000
+      delay: 1
+#    - debug: var=replication_lag_final2.stdout
+
+    - name: Checkpoint on slave to make the startup faster2
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "checkpoint"
+
+    - name: Extract latest checkpoint location for the slave
+      shell: pg_controldata /var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data | grep 'Latest checkpoint location:' | awk '{print $4}'
+      register: latest_chkpt_loc_slave
+      until: latest_chkpt_loc_slave.stdout == "{{ hostvars[current_master]['latest_chkpt_loc_master']['stdout'] }}"
+      retries: 300
+      delay: 1
+#    - debug: var=latest_chkpt_loc_slave.stdout
+
+    - name: Confirm rw_vip is on the new master
+      shell: /var/groupon/check_mk/checks/check_db_postgres_vip_generic -v {{ gds_instances[instance].master_vip }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'OK - VIP is OK'
+      register: rw_vip_on_new_master_final
+      until: rw_vip_on_new_master_final.stdout  !=  ""
+      retries: 300
+      delay: 1
+#    - debug: var=rw_vip_on_new_master_final.stdout
+
+
+    - name: Promote the slave
+      shell: su -m {{ gds_instances[instance].unix_user }} -c "pg_ctl promote -D /var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data"
+
+    - name: Confirm it's not in recovery
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_is_in_recovery()"
+      register: it_is_in_recovery_final
+      until: it_is_in_recovery_final.stdout == "f"
+      retries: 300
+      delay: 1
+#    - debug: var=it_is_in_recovery_final.stdout
+
+    - name: Allow connections to this database
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "update pg_database set datallowconn='t' where datname='{{ gds_instances[instance].dbnames.0 }}'"
+
+
+- name: Final master changes
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ current_master }}'
+  tasks:
+    - name: check if recovery.conf exists on the former master
+      stat: path=/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/recovery.conf
+      register: recov_conf
+#    - debug: var=recov_conf.stat.exists
+
+    - name: create recovery.conf if it's not there already
+      shell: touch /var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/recovery.conf
+      when: recov_conf.stat.exists == False
+
+    - name: set parameters in the recovery.conf
+      lineinfile:
+        dest: "/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/recovery.conf"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: "^standby_mode", line: "standby_mode = 'on'" }
+        - { regexp: "^primary_conninfo", line: "primary_conninfo = 'user=postgres host={{ hostvars[current_master]['slave_ip']['stdout'] }} port={{ gds_instances[instance].ports.postgresql_raw }} sslmode=prefer sslcompression=1'" }
+        - { regexp: "^recovery_target_timeline", line: "recovery_target_timeline = 'latest'" }
+
+    - name: set chown on recovery.conf
+      shell: chown {{ gds_instances[instance].unix_user }}:ops_gds_app /var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/recovery.conf
+
+    - name: set chmod on recovery.conf
+      shell: chmod 0600 /var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/recovery.conf
+
+    - name: Startup the instance
+      shell: sv start /var/service/postgresql-{{ gds_cluster }}-{{ instance }}/
+
+    - name: Find if pid was created
+      stat: path=/var/groupon/postgresql/data94/{{ gds_cluster }}-{{ instance }}/data/postmaster.pid
+      register: is_postmaster_back_online
+      until: is_postmaster_back_online.stat.exists == True
+      retries: 300
+      delay: 1
+#    - debug: var=is_postmaster_back_online.stat.exists
+
+
+- name: Final Slave changes
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ current_slave }}'
+  tasks:
+    - set_fact: my_master_ip={{ hostvars[current_master]['current_master_ip']['stdout'] }}
+#    - debug: var=my_master_ip
+
+    - name: Find new slave
+      command: psql -U postgres -A -t -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_stat_replication where backend_start > now() - interval '5 minutes' and client_addr='{{ my_master_ip }}'"
+      register: new_slave_exists
+      until: new_slave_exists.stdout == "1"
+      retries: 300
+      delay: 1
+#    - debug: var=new_slave_ip.stdout
+
+    - name: Move ro vip to the new slave 
+      shell: ifconfig {{ gds_carp_interfaces.1 }} vhid {{ hostvars[current_master]['my_vhid']['stdout'] }} state backup
+
+    - name: Confirm ro_vip is no longer on the former slave (it is now the master)
+      shell: /var/groupon/check_mk/checks/check_db_postgres_vip_generic -v {{ gds_instances[instance].slave_vips.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -w 50 -c 100 | grep 'CRIT - Possible Failover on the VIP'
+      register: ro_vip_on_slave_final
+      until: ro_vip_on_slave_final.stdout  !=  ""
+      retries: 300
+      delay: 1
+#    - debug: var=ro_vip_on_slave_final.stdout

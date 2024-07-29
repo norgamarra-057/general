@@ -1,0 +1,6 @@
+---
+- name: Setup linux compatibility on hosts
+  hosts: gds_all
+  become: yes
+  roles:
+    - linux-compat

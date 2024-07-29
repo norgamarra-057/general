@@ -1,0 +1,6 @@
+---
+- name: Memcached | FreeBSD | packages | install Memcached 
+  shell: cd /usr/ports/databases/{{ item }} ; make install
+  with_items:
+  - memcached
+  ignore_errors: true

@@ -1,0 +1,24 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+   - name: FreeBSD | run | exists
+     shell: |
+       if [ -d /var/groupon/service/hydra-agent \
+         -o -d /var/groupon/service/hydra-server ]
+       then
+         echo exists
+       fi
+     executable: /usr/local/bin/bash
+     register: log_output
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ log_output.stdout_lines }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       var: outputs
+

@@ -1,0 +1,81 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_sequences>>>'
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        max_incr=0
+        my_sequence_name=''
+        sequence_name=''
+
+        temp_result=$(echo "select sequence_name
+                            from information_schema.sequences" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -d ${dbname} -A -t -F' ' 2>/dev/null)
+
+        for Record in $temp_result; do
+              read mysch myseq  <<< $(echo "select sequence_schema,sequence_name
+                                            from information_schema.sequences
+                                            where sequence_name like '${Record[0]}'
+                                            limit 1" |\
+              psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -d ${dbname} -A -t -F' ' 2>/dev/null)
+
+              mysch=\"$mysch\"
+              myseq=\"$myseq\"
+              my_sequence_name=${mysch}.${myseq}
+
+              final_result=$(echo "select round(((my_last_value/max_possible_value)::double precision)*100)
+                                   as incr from ( with myQ_col
+                                   as( select table_catalog,table_name,column_name,regexp_replace(replace(replace(TRIM(REPLACE(column_default,'nextval','')),'''', ''),'::regclass',''), '[()]', '', 'g')
+                                   as my_seq,data_type,udt_name,numeric_precision
+                                   FROM information_schema.columns
+                                   WHERE column_default LIKE 'nextval%'),
+                                   myQ_seq as (select * from information_schema.sequences)
+                                   select *,
+                                   CASE when (udt_name='int4')
+                                   then 2147483647
+                                   when (udt_name='int8')
+                                   then 9223372036854775807
+                                   when (udt_name='int2')
+                                   then 32767
+                                   when (udt_name='numeric')
+                                   then (10^aa.numeric_precision)/2
+                                   else 1 end
+                                   as max_possible_value,
+                                   cc.last_value as my_last_value
+                                   from myQ_col aa,
+                                   myQ_seq bb, ${my_sequence_name} cc
+                                   where aa.my_seq like '%' || bb.sequence_name || '%'
+                                   and cc.sequence_name=bb.sequence_name)
+                                   as foo order by 1 desc
+                                   limit 1" |\
+              psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -d ${dbname} -A -t -F' ' 2>/dev/null)
+
+              if [[ -z "$final_result" ]]; then
+                    final_result=0
+              fi
+              if (( $final_result > $max_incr )); then
+                    max_incr=$final_result
+                    sequence_name=${my_sequence_name}
+              fi
+        done
+        echo "$max_incr
+sequence_name $sequence_name"
+        sleep 0.5
+done

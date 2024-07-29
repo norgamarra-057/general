@@ -1,0 +1,49 @@
+---
+- name: Play to stop consul
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Check if runit is configured
+      stat:
+        path: /var/service
+      register: var_service
+      changed_when: false
+      always_run: true
+
+    - name: See if symlink for consul exist
+      stat:
+        path: /var/service/consul
+      register: var_service_consul
+      always_run: true
+
+    - name: Check status of consul service
+      shell: cd /var/service/consul && sv status . | awk '{ print $1 }' | tr -d ':'
+      register: consul_service_state
+      when: var_service_consul.stat.exists
+      changed_when: false
+
+    - debug: var=consul_service_state
+
+    - name: Stop consul if it is running
+      shell: cd /var/service/consul && sv stop .
+      when: consul_service_state is defined and consul_service_state.stdout == 'run'
+      register: consul_service_stop
+      failed_when: false
+
+    - name: Kill consul if graceful stop did not work
+      shell: pgrep consul | xargs kill -9
+      when: consul_service_stop is defined and consul_service_stop|failed
+
+    - name: Re-check status of consul service
+      shell: cd /var/service/consul && sv status . | awk '{ print $1 }' | tr -d ':'
+      register: consul_service_state
+      when: var_service_consul.stat.exists
+      changed_when: false
+
+    - debug: var=consul_service_state
+
+    - name: Remove symlink to consul from services
+      file:
+        dest: /var/service/consul
+        state: absent
+      when: var_service_consul.stat.islnk is defined and var_service_consul.stat.islnk == True and consul_service_state is defined and consul_service_state.stdout == 'down'

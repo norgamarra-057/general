@@ -1,0 +1,21 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Copy local1
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_txn_time.sh
+        dest: "/usr/lib/check_mk_agent/local/120"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy local2
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_txn_idle.sh
+        dest: "/usr/lib/check_mk_agent/local/120"
+        owner: root
+        group: wheel
+        mode: 0655

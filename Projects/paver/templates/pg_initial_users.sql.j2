@@ -1,0 +1,65 @@
+create user {{ dba_account_name }} password '{{ dba_password }}' connection limit 2;
+create user {{ app_account_name }} password '{{ app_password }}' connection limit {{ app_connection_limit }};
+create user gdsmon encrypted password 'md59e9cff4de7faeca4aca2a83876c4efb5' NOSUPERUSER NOINHERIT NOCREATEDB NOCREATEROLE connection limit 0;
+
+{% set schema_list = schema_list|replace("[","") %}
+{% set schema_list = schema_list|replace("]",",") %}
+{% set schema_list = schema_list|replace(" ","") %}
+{% set schema_list = schema_list|replace("u'","") %}
+{% set schema_list = schema_list|replace("'","") %}
+alter user {{ dba_account_name }} set search_path={{ schema_list }}ext;
+alter user {{ app_account_name }} set search_path={{ schema_list }}ext;
+
+{% for db in dbnames %}
+\c postgres postgres
+
+create database {{ db }} owner {{ dba_account_name }};
+ \c {{ db }}
+
+{% for key,schema in schemas|dictsort %}
+{% if key == db %}
+{% for schema2 in schema %}
+create schema {{ schema2 }};
+{% endfor %}
+{% endif %}
+{% endfor %}
+ 
+create schema ext;
+grant usage on schema ext to {{ dba_account_name }};
+grant usage on schema ext to {{ app_account_name }};
+create extension "uuid-ossp" with schema ext;
+create extension pg_trgm with schema ext;
+create extension hstore with schema ext;
+grant all privileges on all functions in schema ext to {{ dba_account_name }};
+grant all privileges on all functions in schema ext to {{ app_account_name }};
+grant execute on all functions in schema ext to {{ dba_account_name }};
+grant execute on all functions in schema ext to {{ app_account_name }};
+ 
+{% for key,schema in schemas.iteritems() %}
+{% if key == db %}
+{% for schema2 in schema %}
+alter schema {{ schema2 }} OWNER TO {{ dba_account_name }};
+{% endfor %}
+{% endif %}
+{% endfor %}
+ 
+\c {{ db }} {{ dba_account_name }}
+
+{% for key,schema in schemas.iteritems() %}
+{% if key == db %}
+{% for schema2 in schema %}
+grant usage on schema {{ schema2 }} to {{ app_account_name }};
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% for key,schema in schemas.iteritems() %}
+{% if key == db %}
+{% for schema2 in schema %}
+alter default privileges in schema {{ schema2 }} grant select,insert,update,delete on tables to {{ app_account_name }};
+alter default privileges in schema {{ schema2 }} grant select,update on sequences to {{ app_account_name }};
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% endfor %}

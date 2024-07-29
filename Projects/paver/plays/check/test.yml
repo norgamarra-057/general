@@ -1,0 +1,11 @@
+---
+- name: Health check PG 
+  hosts: gds_all
+  become: yes
+  tasks:
+
+    - name: Ifconfig status
+      shell: " ifconfig"
+      register: ifconfig_status
+
+    - debug: var=ifconfig_status.stdout_lines

@@ -1,0 +1,17 @@
+\pset null (null)
+\pset format wrapped
+--\pset pager off
+-- \set AUTOCOMMIT 'off'
+-- \set ON_ERROR_ROLLBACK on
+\set COMP_KEYWORD_CASE upper
+\set HISTCONTROL ignoreboth
+\set HISTSIZE 9999
+\set HISTFILE ~/.psql_history- :DBNAME
+\set IGNOREEOF 3
+\set PROMPT1 '%/@%`hostname -s`%R%#%x '
+\set PROMPT2 '%/@%`hostname -s`%R%#%x '
+\set VERBOSITY verbose
+\timing
+\x auto
+\setenv LESS -imx4F
+\setenv PAGER less

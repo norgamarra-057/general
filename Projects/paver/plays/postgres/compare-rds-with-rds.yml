@@ -1,0 +1,336 @@
+---
+- name: Ensure command line variables are set 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - aws_host_primary is defined
+          - db is defined
+          - aws_host_replica is defined
+
+    - name: find schemas
+      shell: psql -U gds_admin -d {{ db }} -Atq -p 5432 -h {{ aws_host_primary }} -c "select schema_name from information_schema.schemata where schema_name not in ('repack','heartbeat','dba','ext','information_schema') AND schema_name not like 'pg_%'"
+      register: pgschemas
+
+    - name: Find tables aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select schemaname,relname from pg_stat_user_tables where schemaname in ('{{ item }}') order by 1,2" | sort >> /tmp/tables_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find indexes aws
+      shell: psql -U gds_admin -d {{ db }}  -At -p 5432 -h {{ aws_host_primary }} -c "select schemaname,relname,indexrelname from pg_stat_user_indexes where schemaname in ('{{ item }}') order by 1" | sort >> /tmp/indexes_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find indexes def aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select indexdef from pg_indexes where schemaname in ('{{ item }}') order by 1" | sort >> /tmp/indexesdef_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find columns aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select table_catalog,table_schema,table_name,column_name,data_type from information_schema.columns where table_schema in ('{{ item }}') order by 1,2,3,4,5" | sort >> /tmp/columns_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find nullable columns aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select table_schema,table_name,column_name,is_nullable from information_schema.columns where table_schema in ('{{ item }}') order by 1,2,3" >> /tmp/nullables_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Find constraints aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "SELECT tc.constraint_name, tc.table_name,kcu.column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name where tc.table_schema IN ('{{ item }}') ORDER BY 1,2,3" | sort >> /tmp/constraints_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find sequences aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select sequence_schema,sequence_name,data_type from information_schema.sequences order by 1,2,3" | sort >> /tmp/sequences_aws_primary_{{ db }}.txt
+
+    - name: Find extensions aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select extname FROM pg_extension where extname not in ('pglogical_origin')" | sort >> /tmp/extensions_aws_primary_{{ db }}.txt
+
+    - name: Find functions aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select routines.routine_name, parameters.data_type, parameters.ordinal_position from information_schema.routines left join information_schema.parameters on routines.specific_name=parameters.specific_name where routines.specific_schema in ('{{ item }}') order by 1,2,3" | sort >> /tmp/functions_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find views aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select table_schema as schema_name,table_name as view_name from information_schema.views where table_schema not in ('repack','heartbeat','information_schema', 'pg_catalog','dba','pglogical') order by 1,2 " | sort >> /tmp/views_aws_primary_{{ db }}.txt
+
+    - name: Find types aws
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "SELECT typname FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace WHERE nspname in ('{{ item }}') order by 1" | sort >> /tmp/types_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+#    - name: Find lob aws
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select count(*) from pg_largeobject " >> /tmp/lob_aws_primary_{{ db }}.txt
+
+    - name: Find missing pglogical tables
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_primary }} -c "select relname,set_reloid from pg_stat_user_tables left JOIN pglogical.replication_set_table on schemaname || '.' || relname = set_reloid::text where set_reloid is null and schemaname in ('{{ item }}')" | sort >> /tmp/missingtables_aws_primary_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Find rowcount aws
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_primary }} -c " with myQ1 as (select a.schemaname as table_schema, a.relname as table_name, pg_size_pretty(pg_total_relation_size(a.relid)) as total_size, pg_size_pretty(pg_relation_size(a.relid)) as data_size, pg_size_pretty(pg_total_relation_size(a.relid) - pg_relation_size(a.relid)) as external_size, reltuples as rows_pglass, n_live_tup as rows_statusertables from pg_catalog.pg_statio_user_tables a, pg_class b, pg_stat_user_tables c where a.relname = b.relname and a.relname = c.relname order by pg_total_relation_size(a.relid) desc,pg_relation_size(a.relid) desc limit 15) select * from myQ1 order by 1,2 asc"  >> /tmp/rowcount_aws_primary_{{ db }}.txt
+
+
+
+
+
+    - name: Find tables aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select schemaname,relname from pg_stat_user_tables where schemaname in ('{{ item }}') order by 1,2" | sort >> /tmp/tables_aws_replica_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find indexes aws replica
+      shell: psql -U gds_admin -d {{ db }}  -At -p 5432 -h {{ aws_host_replica }} -c "select schemaname,relname,indexrelname from pg_stat_user_indexes where schemaname in ('{{ item }}') order by 1" | sort >> /tmp/indexes_aws_replica_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find indexes def aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select indexdef from pg_indexes where schemaname in ('{{ item }}') order by 1" | sort >> /tmp/indexesdef_aws_replica_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find columns aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select table_catalog,table_schema,table_name,column_name,data_type from information_schema.columns where table_schema in ('{{ item }}') order by 1,2,3,4,5" | sort >> /tmp/columns_aws_replica_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Find nullable columns aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select table_schema,table_name,column_name,is_nullable from information_schema.columns where table_schema in ('{{ item }}') order by 1,2,3" >> /tmp/nullables_aws_replica_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+    - name: Find constraints aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "SELECT tc.constraint_name, tc.table_name,kcu.column_name FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name where tc.table_schema IN ('{{ item }}') ORDER BY 1,2,3" | sort >> /tmp/constraints_aws_replica_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find sequences aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select sequence_schema,sequence_name,data_type from information_schema.sequences order by 1,2,3" | sort >> /tmp/sequences_aws_replica_{{ db }}.txt
+
+    - name: Find extensions aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select extname FROM pg_extension where extname not in ('pglogical_origin')" | sort >> /tmp/extensions_aws_replica_{{ db }}.txt
+
+    - name: Find functions aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select routines.routine_name, parameters.data_type, parameters.ordinal_position from information_schema.routines left join information_schema.parameters on routines.specific_name=parameters.specific_name where routines.specific_schema in ('{{ item }}') order by 1,2,3" | sort >> /tmp/functions_aws_replica_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+    - name: Find views aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select table_schema as schema_name,table_name as view_name from information_schema.views where table_schema not in ('repack','heartbeat','information_schema', 'pg_catalog','dba','pglogical') order by 1,2 " | sort >> /tmp/views_aws_replica_{{ db }}.txt
+
+    - name: Find types aws replica
+      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "SELECT typname FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace WHERE nspname in ('{{ item }}') order by 1" | sort >> /tmp/types_aws_replica_{{ db }}.txt
+      with_items: "{{ pgschemas.stdout_lines }}"
+
+
+#    - name: Find lob aws
+#      shell: psql -U gds_admin -d {{ db }} -At -p 5432 -h {{ aws_host_replica }} -c "select count(*) from pg_largeobject " >> /tmp/lob_aws_primary_{{ db }}.txt
+
+    - name: Find rowcount aws replica
+      shell: psql -U gds_admin -d {{ db }} -p 5432 -h {{ aws_host_replica }} -c " with myQ1 as (select a.schemaname as table_schema, a.relname as table_name, pg_size_pretty(pg_total_relation_size(a.relid)) as total_size, pg_size_pretty(pg_relation_size(a.relid)) as data_size, pg_size_pretty(pg_total_relation_size(a.relid) - pg_relation_size(a.relid)) as external_size, reltuples as rows_pglass, n_live_tup as rows_statusertables from pg_catalog.pg_statio_user_tables a, pg_class b, pg_stat_user_tables c where a.relname = b.relname and a.relname = c.relname order by pg_total_relation_size(a.relid) desc,pg_relation_size(a.relid) desc limit 15) select * from myQ1 order by 1,2 asc"  >> /tmp/rowcount_aws_replica_{{ db }}.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    - name: Get difference for tables
+      command: diff /tmp/tables_aws_replica_{{ db }}.txt /tmp/tables_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug tables
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for indexes
+      command: diff /tmp/indexes_aws_replica_{{ db }}.txt /tmp/indexes_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug indexes
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for indexes def
+      command: diff /tmp/indexesdef_aws_replica_{{ db }}.txt /tmp/indexesdef_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug indexes definitions
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for columns
+      command: diff /tmp/columns_aws_replica_{{ db }}.txt /tmp/columns_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug columns
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for constraints
+      command: diff /tmp/constraints_aws_replica_{{ db }}.txt /tmp/constraints_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug constraints
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for sequences
+      command: diff /tmp/sequences_aws_replica_{{ db }}.txt /tmp/sequences_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug sequences
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for extensions
+      command: diff /tmp/extensions_aws_replica_{{ db }}.txt /tmp/extensions_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug extensions
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for functions
+      command: diff /tmp/functions_aws_replica_{{ db }}.txt /tmp/functions_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug functions
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for views
+      command: diff /tmp/views_aws_replica_{{ db }}.txt /tmp/views_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug views
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for types
+      command: diff /tmp/types_aws_replica_{{ db }}.txt /tmp/types_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug types
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for nullable columns
+      command: diff /tmp/nullables_aws_replica_{{ db }}.txt /tmp/nullables_aws_primary_{{ db }}.txt
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug nullable columns
+      debug: msg="{{ diff.stdout }}"
+
+    - name: Get difference for pglogical tables
+      command: diff /tmp/missingtables_aws_primary_{{ db }}.txt /dev/null
+      failed_when: diff.rc > 1
+      register: diff
+    - name: debug missing tables from pglogical
+      debug: msg="{{ diff.stdout }}"
+
+
+#    - name: Get difference for lob
+#      command: diff /tmp/lob_aws_replica_{{ db }}.txt /tmp/lob_aws_primary_{{ db }}.txt
+#      failed_when: diff.rc > 1
+#      register: diff
+#    - name: debug lob
+#      debug: msg="{{ diff.stdout }}"
+
+    - name: File set to null
+      shell: cat /dev/null > /tmp/myrowcount.txt
+
+    - name: Get rowcount onprem
+      shell: cat /tmp/rowcount_aws_replica_{{ db }}.txt >> /tmp/myrowcount.txt
+#      register: onprem_rowcount
+#    - name: show onprem rowcount
+#      debug: msg="{{ onprem_rowcount.stdout }}"
+
+    - name: Get rowcount aws
+      shell: cat /tmp/rowcount_aws_primary_{{ db }}.txt >> /tmp/myrowcount.txt
+#      register: aws_rowcount
+#    - name: show aws rowcount
+#      debug: msg="{{ aws_rowcount.stdout }}"
+
+    - name: Delete the temp file 1
+      file: path=/tmp/tables_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 2
+      file: path=/tmp/indexes_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 3
+      file: path=/tmp/columns_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 4
+      file: path=/tmp/tables_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 5
+      file: path=/tmp/indexes_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 6
+      file: path=/tmp/columns_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 7
+      file: path=/tmp/heartbeat_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 8
+      file: path=/tmp/indexesdef_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 9
+      file: path=/tmp/indexesdef_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 10
+      file: path=/tmp/constraints_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 11
+      file: path=/tmp/constraints_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 12
+      file: path=/tmp/sequences_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 13
+      file: path=/tmp/sequences_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 14
+      file: path=/tmp/extensions_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 15
+      file: path=/tmp/extensions_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 16
+      file: path=/tmp/functions_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 17
+      file: path=/tmp/functions_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 18
+      file: path=/tmp/views_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 19
+      file: path=/tmp/views_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 20
+      file: path=/tmp/types_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 21
+      file: path=/tmp/types_aws_replica_{{ db }}.txt state=absent
+
+#    - name: Delete the temp file 22
+#      file: path=/tmp/lob_aws_primary_{{ db }}.txt state=absent
+
+#    - name: Delete the temp file 23
+#      file: path=/tmp/lob_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 24
+      file: path=/tmp/rowcount_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 25
+      file: path=/tmp/rowcount_aws_replica_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 26
+      file: path=/tmp/nullables_aws_primary_{{ db }}.txt state=absent
+
+    - name: Delete the temp file 27
+      file: path=/tmp/nullables_aws_replica_{{ db }}.txt state=absent

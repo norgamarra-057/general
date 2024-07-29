@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+{% for zone in dns.zones|sort %}
+forward-zone:
+        name: "{{ zone }}"
+{% for ns in dns.zones[zone].nameservers %}
+        forward-addr: {{ ns }}
+{% endfor %}
+{% endfor %}

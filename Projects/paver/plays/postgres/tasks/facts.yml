@@ -1,0 +1,73 @@
+---
+#- name:  Parameter checks
+#  hosts: 127.0.0.1
+#  connection: local
+- name: Set global variables
+  hosts:
+    - "{{ node }}"
+  become: yes
+  gather_facts: false
+  tasks:
+  - name: Set root level variables
+    set_fact:
+    # OS level path definitions
+    # Groupon root directory 
+    #  groupon_root: /var/groupon
+    
+    # Groupon service root directory
+      groupon_service_root: /var/groupon/service
+    
+    # System service root directory.  NOTE:  service_root contents are symlinked to groupon_service_root.
+      service_root: /var/service    
+
+    # Postgresql level path definitions    
+    # Postgreql root directory
+      postgresql_root: /var/groupon/postgresql
+    
+
+  - name: Set instance level dir variables 1 of 3
+    set_fact:
+    # Directory used by runit for each instance of PostgreSQL on this host.
+      postgresql_service_dir: "{{ groupon_service_root }}/postgresql-{{ gds_cluster }}-{{ instance }}"
+
+    # Base directory for all clusters running {{ postgresql_port_major }}
+      postgresql_datadir: "{{ postgresql_root }}/data{{ postgresql_port_major }}"
+
+  - name: Set instance level dir variables 2 of 3
+    set_fact:
+    # Absolute path of a given cluster
+      postgresql_cluster_dir: "{{ postgresql_datadir }}/{{ gds_cluster }}-{{ instance }}"
+
+  - name: Set instance level dir variables 3 of 3
+    set_fact:
+    # The actual path to a cluster's PGDATA. The "/data" suffix is to allow
+    # PostgreSQL to gracefully detect that ZFS (or NFS) has not mounted
+    # properly. "foo/data" should *NEVER* be a ZFS dataset, it should always be a
+    # directory or it is possible in some failure scenarios to loose data.
+      postgresql_pgdata_dir: "{{ postgresql_cluster_dir }}/data/"
+
+    # Directory used by runit for each instance of PostgreSQL on this host.
+      postgresql_service_dir: "{{ groupon_service_root }}/postgresql-{{ gds_cluster }}-{{ instance }}"
+    
+    # Directory used by runit MODULE for each instance of PostgreSQL on this host.
+      postgresql_runit_service_dir: "postgresql-{{ gds_cluster }}-{{ instance }}"
+    
+    # Symlink used by runit for each instance of PostgreSQL on this host.
+      postgresql_service_symlink: "{{ service_root }}/postgresql-{{ gds_cluster }}-{{ instance }}"
+
+    # pgbouncer service directory pre-fix
+      pgbouncer_service_dir: "{{ groupon_service_root }}/pgbouncer-{{ gds_cluster }}-{{ instance }}"
+    
+    # pgbouncer service directory pre-fix used by runit MODULE
+      pgbouncer_runit_service_dir: "pgbouncer-{{ gds_cluster }}-{{ instance }}"
+    
+    # pgbouncer service symlink pre-fix
+      pgbouncer_service_symlink: "{{ service_root }}/pgbouncer-{{ gds_cluster }}-{{ instance }}"
+    
+    # Postgresql misc variables    
+    # List of possible postgress modes
+      postgresql_modes: "[ 'session_mode', 'transaction_mode' ]"
+      cron_modes: "[ 'session', 'transaction' ]"
+    # Defined Postgres 'raw' port
+      postgresql_raw: "{{ gds_instances[instance].ports.postgresql_raw }}"
+        

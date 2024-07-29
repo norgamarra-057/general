@@ -1,0 +1,21 @@
+---
+- hosts: gds_sac1_prod_db001
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: cs_tools_prod }
+  - { role: gds-mysql-ha, instance: client_id_prod }
+  - { role: gds-mysql-ha, instance: glive_gia_prod }
+  - { role: gds-mysql-ha, instance: espresso_prod }
+  - { role: gds-mysql-ha, instance: scamtracker_prod }
+  - { role: gds-mysql-ha, instance: pricing_dim_prod }
+  - { role: gds-mysql-ha, instance: service_portal_prod }
+  - { role: gds-mysql-ha, instance: getaways_geo_prod }
+  - { role: gds-mysql-ha, instance: lb_service_prod }
+  - { role: gds-mysql-ha, instance: testrail_prod }
+  - { role: gds-mysql-ha, instance: phabricator_prod }
+  - { role: gds-mysql-ha, instance: reviewboard_prod }
+  - { role: gds-mysql-ha, instance: getaways_torch_prod }
+  - { role: gds-mysql-ha, instance: booking_appoint_prod }
+  - { role: gds-mysql-ha, instance: booking_avail_prod }
+  - { role: gds-mysql-ha, instance: host_harvester_prod }

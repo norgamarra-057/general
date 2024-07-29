@@ -1,0 +1,9 @@
+# Ansible managed
+{% for ip in gds_carp_peers %}
+{{ ip }}/32
+{% endfor %}
+{% for instance_name,instance in gds_instances.iteritems() %}
+{% for replication_ip in instance.replication_ips %}
+{{ replication_ip }}/32
+{% endfor %}
+{% endfor %}

@@ -1,0 +1,13 @@
+---
+- hosts: gds_sac1_prod_db057
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: gds_sandbox_prod }
+  - { role: gds-mysql-ha, instance: orr_tools_prod }
+  - { role: gds-mysql-ha, instance: ls_sf_backup_prod }
+  - { role: gds-mysql-ha, instance: kb_subscriptions_prod }
+  - { role: gds-mysql-ha, instance: cmi_travelclick_prod }
+  - { role: gds-mysql-ha, instance: affiliate_prod } 
+  - { role: gds-mysql-ha, instance: ccs_prod } 
+  - { role: gds-mysql-ha, instance: jla_prod }

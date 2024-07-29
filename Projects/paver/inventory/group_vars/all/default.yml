@@ -1,0 +1,51 @@
+---
+host_admins: []
+host_packages: []
+host_packages_legacy: []
+host_zfs: []
+host_zfsnap: []
+consul:
+  snc1:
+    join_servers:
+      - gds-admin01.snc1
+      - gds-admin02.snc1
+      - gds-web01.snc1
+ops_accounts_soc:
+  - akaminski
+  - cbirkholz
+  - chinh
+  - nico.kramer
+  - nolofsson
+  - phofmeister
+  - psoncek
+  - sblaurock
+  - sfox
+  - smei
+  - vchalco
+ops_accounts_sre:
+  - chaynie
+  - jdetke
+  - jocampbell
+  - nleskiw
+  - rvalin
+  - rvenkatesh
+ops_accounts_sa:
+  - sdurant
+ops_accounts_tdo:
+  - rbenoit
+  - claver
+ops_accounts_imoc:
+  - nico.kramer
+  - jsotelo
+  - rprillinger
+  - pwebb
+system_accounts: []
+# IMPORTANT: It is *required* to remove this user from all other groups that
+# would otherwise grant a user access to a host.
+terminated_accounts:
+  - mhang
+  - ckochan
+  - cwinter
+  - jhalter
+  - peter.staikow
+  - c_rbarabas

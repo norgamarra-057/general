@@ -1,0 +1,66 @@
+---
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - src_server is defined
+          - dest_server is defined
+          - instance is defined
+
+- name: Ensure host level settings look OK
+  hosts:
+    - "{{ src_server }}"
+  tasks:
+    - set_fact:
+        instance_port: "{{ gds_instances[instance]['ports']['mysqld'] | int }}"
+        instance_user: "{{ gds_instances[instance]['unix_user'] }}"
+    - set_fact:
+        backup_stream_port: 9999
+      when: backup_stream_port is not defined
+    - assert:
+        that:
+          - gds_instance_group is defined
+          - instance_port is defined
+          - instance_user is defined
+
+- name: Prepare Destination
+  become: true
+  hosts:
+    - "{{ dest_server }}"
+  tasks:
+    - name: Stop destination MySQL server
+      shell: sv down /var/service/{{ instance }}-{{ gds_instance_group }}-mysql/
+    - name: Wipe destination datadir
+      shell: rm -rf /var/groupon/percona/{{ instance }}/data/*
+    - name: Wipe destination logdir
+      shell: rm -rf /var/groupon/percona/{{ instance }}/log/*
+    - name: Wipe error.log
+      shell: rm -f /var/groupon/percona/{{ instance }}/error.log
+    - name: Start socat listener
+      shell: cd /var/groupon/percona/{{ instance }}/data && socat -u tcp4-listen:{{ backup_stream_port }} - | /usr/local/bin/xbstream -xv .
+      async: 86400
+      poll: 0
+
+- name: Stream from Source
+  become: true
+  hosts:
+    - "{{ src_server }}"
+  tasks:
+    - name: Stream backup
+      shell: /usr/local/bin/innobackupex --socket=/var/groupon/percona/{{ instance }}/mysql.sock --defaults-file=/var/service/{{ instance }}-{{ gds_instance_group }}-mysql/my.cnf --user=root --stream=xbstream /var/tmp | socat -u - tcp4:{{ src_server }}:{{ backup_stream_port }}
+
+- name: Start MySQL on destination
+  become: true
+  hosts:
+    - "{{ dest_server }}"
+  tasks:
+    - name: Run apply log
+      shell: cd /var/groupon/percona/{{ instance }}/data ; innobackupex --apply-log .
+    - name: Chown to user
+      shell: chown -R {{ instance_user }}:ops_gds_app /var/groupon/percona/{{ instance }}/data/*
+    - name: Start MySQL server
+      shell: sv up /var/service/{{ instance }}-{{ gds_instance_group }}-mysql/
+    - name: Wait for mysql to start
+      wait_for: port={{ instance_port }}

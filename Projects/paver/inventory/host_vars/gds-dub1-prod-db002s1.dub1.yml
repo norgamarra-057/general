@@ -1,0 +1,17 @@
+---
+freebsd_cloned_interfaces: lagg0 vlan201 vlan202
+gds_cluster: gds_prod_dub1_db002
+
+ops_carp:
+  vlan201:
+    anchor_address: 10.13.110.223/24
+    master_weight: 50
+    slave_base_weight: 100
+    failover_weight: 40
+  vlan202:
+    anchor_address: 10.13.184.223/24
+    master_weight: 50
+    slave_base_weight: 100
+    failover_weight: 40
+
+postgresql_port_major: '94'

@@ -1,0 +1,12 @@
+---
+- hosts: gds_dub1_prod_db001
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: po_manager_emea_prod }
+  - { role: gds-mysql-ha, instance: goods_wlm_emea_prod }
+  - { role: gds-mysql-ha, instance: killbill_emea_prod }
+  - { role: gds-mysql-ha, instance: arrowhead_prod }
+  - { role: gds-mysql-ha, instance: arrowhead_ui_prod }
+  - { role: gds-mysql-ha, instance: goods_shipment_prod }
+  - { role: gds-mysql-ha, instance: goods_logistics_prod }

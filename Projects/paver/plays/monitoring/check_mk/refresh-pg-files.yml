@@ -1,0 +1,27 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Copy checks
+      copy:
+        src: ../../../roles/check_mk/files/checks/postgresql/check_db_pgbouncer_session
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+    - name: Copy modified plugins common
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/
+        dest: "/usr/lib/check_mk_agent/local/120"
+        owner: root
+        group: wheel
+        mode: 0655
+    - name: Copy modified plugins master-slave
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/{{ inst_type }}/
+        dest: "/usr/lib/check_mk_agent/local/120"
+        owner: root
+        group: wheel
+        mode: 0655

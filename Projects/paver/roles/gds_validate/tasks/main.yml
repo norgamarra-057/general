@@ -1,0 +1,462 @@
+---
+###################################################
+# gds_validate role
+#
+# Description:  This play is intended to validate/compare an on-premise MySQL database to an AWS RDS Instance.
+#
+# Parameters:  node=source_server 
+#              instance=instance_name_on_source 
+#              db=source_database_to_validate
+#              endpoint=aws_endpoint
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              node: gds-snc1-prod-db001s1.snc1
+#              instance: client_id_prod
+#              db: client_id_production
+#              endpoint: dminorauroramysql56-0.cz37pbquwh5j.us-west-1.rds.amazonaws.com
+#
+# Version:     1.1.0
+# Date:        2020-09-28
+#
+# Notes:  1. .my.cnf is REQUIRED in the user's home directory, with the endpoint user name and password.  
+#         
+###################################################
+
+######
+# Set initial values needed
+######
+
+- name: Check existence of ~/.my.cnf
+  block:
+    - name: Does ~/.my.cnf exist?
+      stat: 
+        path: ~/.my.cnf
+      register: my_cnf
+
+    - name: Abort, if not
+      fail: 
+        msg: "Aborting validation.  ~/.my.cnf does not exist on the on-prem server" 
+      when: my_cnf.stat.exists != true
+
+- name: Set "run" value
+  set_fact:
+    run: "{{ instance }}-{{ '%Y%m%d-%H%M%S' | strftime }}"
+
+######
+# Check if db exists on src and end
+######
+
+- name: Does db exist on src?
+  block:
+    - name: Get db count on src
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT count(*) FROM information_schema.schemata WHERE schema_name = '{{ db }}'"
+      changed_when: false
+      register: src_count
+
+    - name: Set count variable
+      set_fact:
+          src_db_count: "{{ src_count.stdout|int }}"
+
+    - name: Does it exist?
+      fail:
+        msg: "'{{ db }}' does not exist on src"
+      when: src_db_count == "0"
+  become: true
+
+- name: Does db exist on end?
+  block:
+    - name: Get db count on end
+      shell: mysql -h {{ endpoint }} -BAN -e "SELECT count(*) FROM information_schema.schemata WHERE schema_name = '{{ db }}'"
+      changed_when: false
+      register: end_count
+
+    - name: Set count variable
+      set_fact:
+          end_db_count: "{{ end_count.stdout|int }}"
+
+    - name: Does it exist?
+      fail:
+        msg: "'{{ db }}' does not exist on end"
+      when: end_db_count == "0"
+
+######
+# Create and load gds_validate database
+######
+
+- name: Create validatation database, if not exists
+  shell: mysql -h {{ endpoint }} -A -e 'create database if not exists gds_validate'
+
+- name: Load validatation tables and triggers, if not exists
+  connection: local
+  shell: mysql -h {{ endpoint }} -A -e 'source {{ role_path }}/files/validate.sql' gds_validate
+
+######
+# Query data needed for summary table and populate
+######
+
+- name: Get count of source tables
+  block:
+    - name: Get count of src tables
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT count(*) FROM information_schema.tables WHERE table_type NOT LIKE \"%VIEW%\" and table_schema = '{{ db }}'"
+      changed_when: false
+      register: src_tbl_count
+              
+    - name: Set count variable
+      set_fact:
+          on_prem_table_count: "{{ src_tbl_count.stdout|int }}"
+  become: true
+
+- name: Get count of cloud tables
+  block:
+    - name: Get count of cloud tables
+      shell: mysql -BAN -h {{ endpoint }} -e "SELECT count(*) FROM information_schema.tables WHERE table_type NOT LIKE \"%VIEW%\" and table_schema = '{{ db }}'"
+      changed_when: false
+      register: end_tbl_count
+                
+    - name: Set count variable
+      set_fact:
+        cloud_table_count: "{{ end_tbl_count.stdout|int }}"
+
+- name: Get count of source views
+  block:
+    - name: Get count of src views
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT count(*) FROM information_schema.views WHERE table_schema = '{{ db }}'"
+      changed_when: false
+      register: src_view_count
+
+    - name: Set count variable
+      set_fact:
+          on_prem_view_count: "{{ src_view_count.stdout|int }}"
+  become: true
+
+- name: Get count of cloud views
+  block:
+    - name: Get count of cloud views
+      shell: mysql -BAN -h {{ endpoint }} -e "SELECT count(*) FROM information_schema.views WHERE table_schema = '{{ db }}'"
+      changed_when: false
+      register: end_view_count
+
+    - name: Set count variable
+      set_fact:
+        cloud_view_count: "{{ end_view_count.stdout|int }}"
+
+- name: Get count of source routines
+  block:
+    - name: Get count of src routines
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT count(*) FROM information_schema.routines WHERE routine_schema = '{{ db }}'"
+      changed_when: false
+      register: src_proc_count
+                      
+    - name: Set count variable
+      set_fact:
+        on_prem_routine_count: "{{ src_proc_count.stdout|int }}"
+  become: true
+
+- name: Get count of cloud routines
+  block:
+    - name: Get count of cloud routines
+      shell: mysql -BAN -h {{ endpoint }} -e "SELECT count(*) FROM information_schema.routines WHERE routine_schema = '{{ db }}'"
+      changed_when: false
+      register: end_proc_count
+                        
+    - name: Set count variable
+      set_fact:
+        cloud_routine_count: "{{ end_proc_count.stdout|int }}"
+
+- name: Get count of source triggers
+  block:
+    - name: Get count of src triggers
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT count(*) FROM information_schema.triggers WHERE trigger_schema = '{{ db }}'"
+      changed_when: false
+      register: src_trig_count
+                              
+    - name: Set count variable
+      set_fact:
+        on_prem_trigger_count: "{{ src_trig_count.stdout|int }}"
+  become: true
+
+- name: Get count of cloud triggers
+  block:
+    - name: Get count of cloud triggers
+      shell: mysql -BAN -h {{ endpoint }} -e "SELECT count(*) FROM information_schema.triggers WHERE trigger_schema = '{{ db }}'"
+      changed_when: false
+      register: end_trig_count
+                                
+    - name: Set count variable
+      set_fact:
+        cloud_trigger_count: "{{ end_trig_count.stdout|int }}"
+
+- name: Get count of source events
+  block:
+    - name: Get count of src events
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "SELECT count(*) FROM information_schema.events WHERE event_schema = '{{ db }}'"
+      changed_when: false
+      register: src_event_count
+                                      
+    - name: Set count variable
+      set_fact:
+        on_prem_event_count: "{{ src_event_count.stdout|int }}"
+  become: true
+
+- name: Get count of cloud events
+  block:
+    - name: Get count of cloud events
+      shell: mysql -BAN -h {{ endpoint }} -e "SELECT count(*) FROM information_schema.events WHERE event_schema = '{{ db }}'"
+      changed_when: false
+      register: end_event_count
+                                        
+    - name: Set count variable
+      set_fact:
+        cloud_event_count: "{{ end_event_count.stdout|int }}"
+
+- name: Create summary record
+  shell: mysql -BAN -h {{ endpoint }} -e "INSERT INTO gds_validate.summary (run, db_name, on_prem_table_count, cloud_table_count, on_prem_view_count, cloud_view_count, on_prem_routine_count, cloud_routine_count, on_prem_trigger_count, cloud_trigger_count, on_prem_event_count, cloud_event_count) values ('{{run}}','{{db}}',{{on_prem_table_count}},{{cloud_table_count}},{{on_prem_view_count}},{{cloud_view_count}},{{on_prem_routine_count}},{{cloud_routine_count}},{{on_prem_trigger_count}},{{cloud_trigger_count}},{{on_prem_event_count}},{{cloud_event_count}})"
+  
+######
+#  Query data needed for tables table and populate
+######
+
+- name: Get src tables by database
+  block:
+    - name: Get tables, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select table_name from information_schema.tables where table_type NOT LIKE \"%VIEW%\" and table_schema = '{{ db }}' order by table_name" 
+      changed_when: false
+      register: src_tables_out
+
+    - name: Create list
+      set_fact:
+        src_tables_list: "{{ src_tables_out.stdout_lines }}"
+
+    - name: Get tables rows, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select table_rows from information_schema.tables where table_type NOT LIKE \"%VIEW%\" and table_schema = '{{ db }}' order by table_name"
+      changed_when: false
+      register: src_rows_out
+
+    - name: Create list
+      set_fact:
+        src_rows_list: "{{ src_rows_out.stdout_lines }}"
+  become: true
+                
+- name: Get end tables by database
+  block:
+    - name: Get tables, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select table_name from information_schema.tables where table_type NOT LIKE \"%VIEW%\" and table_schema = '{{ db }}' order by table_name"
+      changed_when: false
+      register: end_tables_out
+
+    - name: Create list
+      set_fact:
+        end_tables_list: "{{ end_tables_out.stdout_lines }}"
+
+    - name: Get tables rows, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select table_rows from information_schema.tables where table_type NOT LIKE \"%VIEW%\" and table_schema = '{{ db }}' order by table_name"
+      changed_when: false
+      register: end_rows_out
+
+    - name: Create list
+      set_fact:
+        end_rows_list: "{{ end_rows_out.stdout_lines }}"
+
+- name: Build query string
+  shell: mysql -BAN -h {{ endpoint }} -e "INSERT INTO gds_validate.tables (run, db_name, on_prem_name, on_prem_rows, cloud_name, cloud_rows) values ('{{run}}','{{ db }}','{{item[0]}}',{{item[1]}},'{{item[2]}}',{{item[3]}})"
+  with_together:
+    - "{{ src_tables_list }}"
+    - "{{ src_rows_list }}"
+    - "{{ end_tables_list }}"
+    - "{{ end_rows_list }}"
+
+######
+#  Query data needed for views table and populate
+######
+
+- name: Get src views by database
+  block:
+    - name: Get views, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select table_name from information_schema.views where table_schema = '{{ db }}' order by table_name"
+      changed_when: false
+      register: src_views_out
+
+    - name: Create list
+      set_fact:
+        src_views_list: "{{ src_views_out.stdout_lines }}"
+  become: true
+
+- name: Get end views by database
+  block:
+    - name: Get views, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select table_name from information_schema.views where table_schema = '{{ db }}' order by table_name"
+      changed_when: false
+      register: end_views_out
+
+    - name: Create list
+      set_fact:
+        end_views_list: "{{ end_views_out.stdout_lines }}"
+
+- name: Build query string
+  shell: mysql -BAN -h {{ endpoint }} -e "INSERT INTO gds_validate.views (run, db_name, on_prem_name, cloud_name) values ('{{run}}','{{ db }}','{{item[0]}}','{{item[1]}}')"
+  with_together:
+    - "{{ src_views_list }}"
+    - "{{ end_views_list }}"
+
+######
+#  Query data needed for routines table and populate
+######
+
+- name: Get src routines by database
+  block:
+    - name: Get routines, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select routine_name from information_schema.routines where routine_schema = '{{ db }}' order by routine_name" 
+      changed_when: false
+      register: src_routines_out
+
+    - name: Create list
+      set_fact:
+        src_routines_list: "{{ src_routines_out.stdout_lines }}"
+
+    - name: Get routine types, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select routine_type from information_schema.routines where routine_schema = '{{ db }}' order by routine_name"
+      changed_when: false
+      register: src_rtype_out
+
+    - name: Create list
+      set_fact:
+        src_rtype_list: "{{ src_rtype_out.stdout_lines }}"
+  become: true
+                    
+- name: Get end routines by database
+  block:
+    - name: Get routines, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select routine_name from information_schema.routines where routine_schema = '{{ db }}' order by routine_name"
+      changed_when: false
+      register: end_routines_out
+
+    - name: Create list
+      set_fact:
+        end_routines_list: "{{ end_routines_out.stdout_lines }}"
+
+    - name: Get routine types, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select routine_type from information_schema.routines where routine_schema = '{{ db }}' order by routine_name"
+      changed_when: false
+      register: end_rtype_out
+
+    - name: Create list
+      set_fact:
+        end_rtype_list: "{{ end_rtype_out.stdout_lines }}"
+
+- name: Build query string
+  shell: mysql -BAN -h {{ endpoint }} -e "INSERT INTO gds_validate.routines (run, db_name, on_prem_name, on_prem_type, cloud_name, cloud_type) values ('{{run}}','{{ db }}','{{item[0]}}','{{item[1]}}','{{item[2]}}','{{item[3]}}')"
+  with_together:
+    - "{{ src_routines_list }}"
+    - "{{ src_rtype_list }}"
+    - "{{ end_routines_list }}"
+    - "{{ end_rtype_list }}"
+
+######
+#  Query data needed for triggers table and populate
+######
+
+- name: Get src triggers by database
+  block:
+    - name: Get triggers, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select trigger_name from information_schema.triggers where trigger_schema = '{{ db }}' order by trigger_name" 
+      changed_when: false
+      register: src_triggers_out
+
+    - name: Create list
+      set_fact:
+        src_triggers_list: "{{ src_triggers_out.stdout_lines }}"
+
+    - name: Get triggers event_manipulation, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select event_manipulation from information_schema.triggers where trigger_schema = '{{ db }}' order by trigger_name"
+      changed_when: false
+      register: src_man_out
+
+    - name: Create list
+      set_fact:
+        src_man_list: "{{ src_man_out.stdout_lines }}"
+
+    - name: Get triggers event_object_table, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select event_object_table from information_schema.triggers where trigger_schema = '{{ db }}' order by trigger_name"
+      changed_when: false
+      register: src_object_out
+
+    - name: Create list
+      set_fact:
+        src_object_list: "{{ src_object_out.stdout_lines }}"
+  become: true
+                        
+- name: Get end triggers by database
+  block:
+    - name: Get triggers, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select trigger_name from information_schema.triggers where trigger_schema = '{{ db }}' order by trigger_name"
+      changed_when: false
+      register: end_triggers_out
+
+    - name: Create list
+      set_fact:
+        end_triggers_list: "{{ end_triggers_out.stdout_lines }}"
+
+    - name: Get triggers event_manipulation, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select event_manipulation from information_schema.triggers where trigger_schema = '{{ db }}' order by trigger_name"
+      changed_when: false
+      register: end_man_out
+
+    - name: Create list
+      set_fact:
+        end_man_list: "{{ end_man_out.stdout_lines }}"
+
+    - name: Get triggers event_object_table, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select event_object_table from information_schema.triggers where trigger_schema = '{{ db }}' order by trigger_name"
+      changed_when: false
+      register: end_object_out
+
+    - name: Create list
+      set_fact:
+        end_object_list: "{{ end_object_out.stdout_lines }}"
+        
+- name: Build query string
+  shell: mysql -BAN -h {{ endpoint }} -e "INSERT INTO gds_validate.triggers (run, db_name, on_prem_name, on_prem_type, on_prem_table_name, cloud_name, cloud_type, cloud_table_name) values ('{{run}}','{{ db }}','{{item[0]}}','{{item[1]}}','{{item[2]}}','{{item[3]}}','{{item[4]}}','{{item[5]}}')"
+  with_together:
+    - "{{ src_triggers_list }}"
+    - "{{ src_man_list }}"
+    - "{{ src_object_list }}"
+    - "{{ end_triggers_list }}"
+    - "{{ end_man_list }}"
+    - "{{ end_object_list }}"
+
+######
+#  Query data needed for events table and populate
+######
+
+- name: Get src events by database
+  block:
+    - name: Get events, by src database
+      shell: mysql -S/var/groupon/percona/{{ instance }}/mysql.sock -BAN -e "select event_name from information_schema.events where event_schema = '{{ db }}' order by event_name" 
+      changed_when: false
+      register: src_events_out
+
+    - name: Create list
+      set_fact:
+        src_events_list: "{{ src_events_out.stdout_lines }}"
+  become: true
+                        
+- name: Get end events by database
+  block:
+    - name: Get events, by end database
+      shell: mysql -BAN -h {{ endpoint }} -e "select event_name from information_schema.events where event_schema = '{{ db }}' order by event_name"
+      changed_when: false
+      register: end_events_out
+
+    - name: Create list
+      set_fact:
+        end_events_list: "{{ end_events_out.stdout_lines }}"
+
+- name: Build query string
+  shell: mysql -BAN -h {{ endpoint }} -e "INSERT INTO gds_validate.events (run, db_name, on_prem_name, cloud_name) values ('{{run}}','{{ db }}','{{item[0]}}','{{item[1]}}')"
+  with_together:
+    - "{{ src_events_list }}"
+    - "{{ end_events_list }}"
+
+

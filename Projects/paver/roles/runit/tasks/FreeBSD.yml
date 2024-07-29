@@ -1,0 +1,37 @@
+---
+- name: runit | FreeBSD | package
+  pkgng: name=runit state=present
+
+- name: group | _log
+  group: name="_log" gid="999"
+
+- name: user | _log
+  user: name="_log" comment="svlogd logging user" shell='/usr/sbin/nologin'
+        uid=999 state='present' group="_log"
+
+- name: runit | FreeBSD | service directory
+  file: path="/var/service" state=directory owner=root mode=0755
+
+- name: Configure runit in rc.conf
+  lineinfile:
+    dest: /etc/rc.conf
+    regexp: '^[#]*{{ item.key }}.*$'
+    line: '{{ item.key }}="{{ item.value }}"'
+  with_items:
+    - key: runsvdir_enable
+      value: 'YES'
+    - key: runsvdir_path
+      value: /var/service
+
+# - name: runit | FreeBSD | runsvdir
+#   service: name=runsvdir state=started
+- name: FreeBSD | check runsvdir
+  shell: /bin/pgrep runsvdir
+  register: runsvdir_running
+  ignore_errors: true
+  changed_when: false
+
+- name: FreeBSD | start runsvdir
+  shell: /usr/local/etc/rc.d/runsvdir start
+  when: runsvdir_running.rc != 0
+

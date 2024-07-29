@@ -1,0 +1,21 @@
+---
+###################################################
+# splunk.yml
+#
+# Description:  This playbook is for install and configure the package splunk forwarder allow the server to send 
+#               to send logs to splunk server.
+#
+# Parameters:  node=gds-server
+#
+# Example: ansible-playbook -i inventory/gds-staging plays/monitoring/splunk.yml -e "node=gds_snc1_stg_db011"
+#
+# Notes:  1. Playbook will install the package splunk
+#         2. It will fix a permision for logs for mysql instances.
+#         3. It will recreate the config files for splunk (inputs and outputs) 
+#
+###################################################
+- name: Install splunk forwarder
+  hosts: gds_all
+  gather_facts: False
+  roles:
+    - { role: splunk_forwarder }

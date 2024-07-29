@@ -1,0 +1,45 @@
+#!/usr/bin/env python2.7
+
+import os, sys, argparse
+
+
+parser = argparse.ArgumentParser(description='Check Disk space and biggest mysql table size')
+
+parser.add_argument('-w', '--warning', help='Warning threshold', metavar='85', default='85')
+parser.add_argument('-c', '--critical', help='Critical threshold', metavar='90', default='90')
+parser.add_argument('-d', '--directory', help='MySQL datadir path', metavar='/var/lib/mysql', default='/var/groupon')
+parser.add_argument('-u', '--user', help='MySQL User', metavar='root', default='root')
+parser.add_argument('-p', '--password', help='MySQL Password', metavar='XXXXX', default='')
+parser.add_argument('-P', '--port', help='MySQL Port', metavar='3306', default='3306')
+parser.add_argument('-H', '--host', help='MySQL Host', metavar='127.0.0.1', default='127.0.0.1')
+parser.add_argument('-s', '--socket', help='MySQL Socket', metavar='/var/groupon/percona/gds_mysql_test01/mysql.sock', required=True, default='')
+
+parameters = parser.parse_args()
+
+# removing this check since it rarely works and is horribly inaccurate and slow - asutherland
+#try:
+#	used_kbytes,available_kbytes,used_space=os.popen("df "+ parameters.directory +" | grep -v Filesystem | awk '{print $3\",\"$4\",\"$5}'").readline().strip().split(',')
+#except:
+#	print "check_mysql_disk CRITICAL: Could not get the size info from partitions using df"
+#	sys.exit(2)
+
+allgood = True
+used_mb = int(used_kbytes)/1024
+available_mb = int(available_kbytes)/1024
+calculo = used_mb * 3 / 2
+
+if calculo < available_mb:
+	allgood = True
+
+if used_space > parameters.critical + "%" or not allgood:
+	print "CRITICAL - %s of disk space used." % used_space
+        sys.exit(2)
+elif used_space == parameters.warning + "%":
+        print "WARNING - %s of disk space used." % used_space
+        sys.exit(1)
+elif used_space < parameters.warning + "%":
+	print "OK - %s of disk space used." % used_space        
+        sys.exit(0)
+else:
+        print "UKNOWN - %s of disk space used." % used_space
+        sys.exit(3)

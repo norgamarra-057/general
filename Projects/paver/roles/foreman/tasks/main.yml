@@ -1,0 +1,164 @@
+---
+# unresolved:
+#             + test this module with Debian7 and CentOS6 hosts
+#             + source user config hashes from a file (file for now, central directory later)
+#             + ensure that /usr/local/bin/bash exists by adding freebsd_commons as a dependency here
+#             + change the default shell based on what's installed (i.e. look at /etc/shells)
+
+# - name: Dump all vars
+#   template: src=dumpall.j2 dest=/tmp/ansible.all
+#   changed_when: False
+
+- include_tasks: terminated_users.yml
+- include_tasks: groups.yml
+
+- include_tasks: users_freebsd.yml
+  when: ansible_os_family == 'FreeBSD'
+
+- include_tasks: system_accounts_freebsd.yml
+  when: ansible_os_family == 'FreeBSD'
+
+- include_tasks: users_redhat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include_tasks: system_accounts_redhat.yml
+  when: ansible_os_family == 'RedHat'
+
+- debug: var=host_admins
+
+- name: users with valid home directory
+  user: name="{{ item }}" state='present' home="{{ users[item].homedir }}"
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+  when: item in users and users[item].homedir is defined and users[item].homedir != False
+
+- name: Ensure correct homedir permissions for system accounts
+  file:
+    owner="{{ users[item].uid }}"
+    group="{{ users[item].group }}"
+    mode="{{ users[item].homedir_mode | default('0700') }}"
+    path="{{ users[item].homedir }}"
+  with_items: system_accounts
+  when: item in users and users[item].homedir is defined and users[item].homedir != False
+
+- name: SOC users
+  user: name="{{ item }}" state=present append=yes groups=wheel
+  when: item in users
+  with_items: ops_accounts_soc
+
+- name: SRE users
+  user: name="{{ item }}" state=present append=yes groups=wheel
+  when: item in users
+  with_items: ops_accounts_sre
+
+- name: Host Admins
+  user: name="{{ item }}" state=present append=yes groups=wheel
+  when: item in users
+  with_items: host_admins
+
+# For now, force the replacement
+- name: Add .cshrc
+  copy:
+    src: dot.cshrc
+    dest: "~{{ item }}/.cshrc"
+    mode: 0644
+    owner: "{{ item }}"
+    group: "{{ users[item].group }}"
+    force: yes
+  when: item in users
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+
+- name: Add .gitconfig
+  template:
+    src: dot.gitconfig.j2
+    dest: "~{{ item }}/.gitconfig"
+    mode: 0644
+    owner: "{{ item }}"
+    group: "{{ users[item].group }}"
+    force: no
+  when: item in users
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+
+- name: Add authorized_keys for users
+  authorized_key:
+    user="{{ item }}"
+    key="{{ users[item].ssh_key | default(lookup('file', item + '.pub')) }}"
+    manage_dir=yes
+  when: item in users and users[item].ssh_key is defined
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+    - system_accounts
+
+- name: Ensure correct homedir for users
+  file:
+    owner="{{ users[item].uid }}"
+    group="{{ users[item].group }}"
+    mode="0755"
+    path="~{{ item }}"
+  when: item in users
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+
+- name: Ensure correct ownership of files in homedir for users
+  file: owner="{{ users[item].uid }}" recurse=yes path="~{{ item }}"
+  when: item in users
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+
+- name: Ensure correct group for .ssh for user
+  file: group="{{ users[item].group }}" state=directory recurse=yes path="~{{ item }}/.ssh"
+  when: item in users
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+    - system_accounts
+
+- name: make sure system accounts have their groups
+  group: name="{{ item }}" gid="{{ foreman_groups[users[item].group].gid }}" system=yes state=present
+  when: item in users and users[item].group in foreman_groups
+  with_items: system_accounts
+  ignore_errors: True
+
+- name: Ensure correct ownership of files in homedir for system accounts
+  file:
+    owner="{{ users[item].uid }}"
+    recurse=yes
+    path="{{ users[item].homedir }}"
+  with_items: system_accounts
+  when: item in users and users[item].homedir is defined and users[item].homedir != False

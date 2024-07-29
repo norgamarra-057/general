@@ -1,0 +1,20 @@
+---
+- name: Fix CARP advbase
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Remove any existing advbase
+      replace:
+        dest: /etc/rc.conf.local
+        regexp: '^(ifconfig.*=".*?)(advbase\s*\d\s*)advskew(.*")'
+        replace: '\1advskew\3'
+        backup: yes
+
+    - name: Adjust advbase 5 for VIPs
+      replace:
+        dest: /etc/rc.conf.local
+        regexp: '^(ifconfig.*=".*?)advskew(.*")'
+        replace: '\1advbase 5 advskew\2'
+        backup: yes
+
+

@@ -1,0 +1,52 @@
+<html>
+<head>
+<title>GDS Cloud</title>
+<meta charset="utf-8">
+<!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css"/> -->
+<link rel="stylesheet" href="https://unpkg.com/mvp.css">
+<script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+<py-env>
+- pandas
+- paths:
+  - ./rds_instances_usw1_prod.csv
+</py-env>
+</head>
+<body>
+<h1>RDS inventory us-west-1 prod</h1>
+<!-- <input type="text" id="my-sqlquery"/> -->
+<textarea id="my-sqlquery" name="my-sqlquery"
+          rows="7" cols="240">
+select DBInstanceIdentifier,DBInstanceClass,Engine,EngineVersion,"Endpoint.Address",
+"Endpoint.Port", TagList
+from rds_instances
+where TagList like '%fed@groupon.com%'
+order by DBInstanceIdentifier
+</textarea>
+<button id="submit-button" type="submit" pys-onClick="my_output">Submit</button>
+<p id="csv"></p>
+<py-script>
+
+import pandas as pd
+import sqlite3
+
+pd.set_option('display.max_colwidth', None)
+pd.set_option("display.max_columns", 500)
+pd.options.display.max_rows = 5000
+
+conn = sqlite3.connect(":memory:")
+
+df=pd.read_csv("./rds_instances_usw1_prod.csv")
+df.to_sql("rds_instances", conn, if_exists="replace")
+
+
+def my_output(*args, **kwargs):
+  sql_query = Element('my-sqlquery').element.value
+  output_df=pd.read_sql_query(sql_query,conn)
+  csv=Element('csv')
+  Element('csv').element.innerHTML=''
+  csv.write(output_df)
+
+</py-script>
+</body>
+</html>
+

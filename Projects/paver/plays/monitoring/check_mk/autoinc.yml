@@ -1,0 +1,13 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+     - name: Creates directory
+       file: path=/usr/lib/check_mk_agent/local/36000 state=directory
+
+
+     - name: Mv autoince there
+       command: mv /usr/lib/check_mk_agent/local/120/mysql_db_auto_inc.sh /usr/lib/check_mk_agent/local/36000
+

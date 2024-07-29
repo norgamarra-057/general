@@ -1,0 +1,99 @@
+---
+- name: Health check PG 
+  hosts: gds_all
+  become: yes
+  tasks:
+
+    - name: Ifconfig status
+      shell: " ifconfig"
+      register: ifconfig_status
+
+    - debug: var=ifconfig_status.stdout_lines
+
+    - name: PG instances status
+      shell: " sv stat /var/service/*-mysql "
+      register: instances_status
+
+    - debug: var=instances_status.stdout_lines
+
+    - name: Mysql instances on a host
+      shell: " /bin/ls -lha /var/service/*-mysql | /usr/bin/wc -l "
+      register: host_mysql_instances
+
+    - debug: var=host_mysql_instances.stdout_lines
+
+    - name: mysql instances on check_mk
+      shell: " /usr/bin/egrep 'port=|portexception' /etc/check_mk/mysql.cfg | /usr/bin/wc -l "
+      register: check_mysql_instances 
+
+    - debug: var=check_mysql_instances.stdout_lines
+
+    - name: Fail if all the instnaces are not in check mk 
+      fail:
+        msg: "ERROR Incompatible instances x config check_mk"
+      when: host_mysql_instances.stdout_lines != check_mysql_instances.stdout_lines
+
+    - name: PF status
+      shell: "bash /usr/lib/check_mk_agent/local/120/pf_status.sh"
+      changed_when: false
+      register: check_mysql_pf_status
+
+    - debug: var=check_mysql_pf_status.stdout_lines
+
+    - name: DB VIP status
+      shell: "bash /usr/lib/check_mk_agent/local/120/mysql_db_vip.sh"
+      changed_when: false
+      register: check_mysql_db_vip_status
+
+    - debug: var=check_mysql_db_vip_status.stdout_lines
+
+    - name: Mysql replication master status
+      shell: "bash /usr/lib/check_mk_agent/local/120/mysql_replication_health_check.sh"
+      changed_when: false
+      register: mysql_repl_master_status
+      ignore_errors: yes
+
+    - debug: var=mysql_repl_master_status.stdout_lines
+
+    - name: Mysql replication slave status
+      shell: "bash /usr/lib/check_mk_agent/local/120/mysql_db_replication.sh"
+      changed_when: false
+      register: mysql_repl_slave_status
+      ignore_errors: yes
+
+    - debug: var=mysql_repl_slave_status.stdout_lines
+
+
+    - name: Copy check zfs-snapshots
+      copy:
+        src: "../../roles/check_mk/files/locals/all/common/zfs_snapshots.sh"
+        dest: "/usr/lib/check_mk_agent/plugins/zfs_snapshots.sh"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: zfs zfs-snapshots
+      shell: "bash /usr/lib/check_mk_agent/plugins/zfs_snapshots.sh"
+      changed_when: false
+      register: mysql_zfs_status
+      ignore_errors: yes
+
+    - debug: var=mysql_zfs_status.stdout_lines
+
+    - name: Copy check mysql size and version
+      copy:
+        src: "../../roles/check_mk/files/locals/mysql/common/mysql_db_size_version.sh"
+        dest: "/usr/lib/check_mk_agent/plugins/mysql_db_size_version.sh"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: mysql size and version
+      shell: "bash /usr/lib/check_mk_agent/plugins/mysql_db_size_version.sh"
+      changed_when: false
+      register: mysql_size_version
+      ignore_errors: yes
+
+    - debug: var=mysql_size_version.stdout_lines
+
+

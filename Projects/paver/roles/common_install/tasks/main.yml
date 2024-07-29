@@ -1,0 +1,12 @@
+---
+- include_tasks: zfs.yml tags=zfs
+- include_tasks: pkg-cleanup.yml tags=pkg
+- include_tasks: os.yml tags=os
+- include_tasks: rc.conf.yml tags=rc.conf
+- include_tasks: periodic.yml tags=periodic
+- include_tasks: zfsnap.yml 
+  tags:
+    - zfsnap
+    - zfs
+
+

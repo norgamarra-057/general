@@ -1,0 +1,12 @@
+- name: splunk | binaries | install deployment client app
+  copy:
+    dest="/tmp/groupon_all_deploymentclient.tgz"
+    src="../ansible/groupon_all_deploymentclient.tgz"
+
+- name: splunk | binaries | uncompress deployment client app
+  shell: sudo -u splunk tar -zxvf /tmp/groupon_all_deploymentclient.tgz -C /var/groupon/splunk/etc/apps/
+    creates="/var/groupon/splunk/etc/apps/groupon_all_deploymentclient/local/deploymentclient.conf"
+
+- name: splunk | binaries | chmod +r to deployment client
+  shell: chmod -R -f +Xr /var/groupon/splunk/etc/apps/groupon_all_deploymentclient
+

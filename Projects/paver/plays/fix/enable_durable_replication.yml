@@ -1,0 +1,31 @@
+---
+- name: Make replication durable
+  hosts: gds_all
+  become: yes
+  vars:
+    zpool: tank
+    content: |
+      #!/usr/bin/env bash
+      ZPOOL=tank
+      INSTANCES=$(list_instances | awk '{print $NF}')
+      for INSTANCE in ${INSTANCES}; do
+        echo " [*] fixing ${INSTANCE}"
+        BINLOG=$(egrep '^log-bin ' /var/groupon/service/${INSTANCE}-mysql/my.cnf | cut -d= -f2 | tr -d ' ')
+        BINLOG_DIR=${BINLOG%/*}
+        echo '  |--> setting sync=standard on ZFS'
+        zfs set sync=standard "${ZPOOL}${BINLOG_DIR}"
+        echo '  `--> setting sync_binlog in MySQL'
+        mysql -S /var/groupon/percona/${INSTANCE}/mysql.sock -e 'set @@global.sync_binlog=1;'
+        mysql -S /var/groupon/percona/${INSTANCE}/mysql.sock -e 'set @@global.sync_relay_log=1;'
+      done
+  tasks:
+    - name: Create binlog fix script
+      copy:
+        dest: /tmp/fix_binlog.sh
+        content: "{{ content }}"
+        owner: root
+        group: wheel
+        mode: 0755
+
+    - name: Execute binlog fixer
+      shell: /tmp/fix_binlog.sh

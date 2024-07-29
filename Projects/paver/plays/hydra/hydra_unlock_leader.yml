@@ -1,0 +1,37 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+    datacenter: "{{ inventory_hostname | regex_replace('^.*\\.([^\\.]+)$', '\\1') }}"
+  tasks:
+   - name: FreeBSD | run | unlock leader
+     shell: |
+       exec 2>&1
+       service="{{item.value.type}}/{{ item.key | replace("_","-") }}"
+       if curl -s "http://localhost:8500/v1/kv/hydra/services/$service/leader"|grep -q '"Session"'
+       then
+         session_id="$(curl -s "http://localhost:8500/v1/kv/hydra/services/$service/leader"|sed 's/^.*"Session":"\([^\"]*\)".*$/\1/')"
+         echo -n "unlocking " && curl -s -X PUT "http://localhost:8500/v1/session/destroy/$session_id" && echo || echo " error"
+       else
+         echo already unlocked
+       fi
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: item.value.hydra is defined and default_primary|default(item.value.hydra.default_primary) == inventory_hostname and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"

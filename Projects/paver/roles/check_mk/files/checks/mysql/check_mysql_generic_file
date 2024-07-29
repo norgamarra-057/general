@@ -1,0 +1,45 @@
+#!/usr/local/bin/bash
+#
+#
+
+# help
+print_usage (){
+        echo ""
+        echo "$0 -q --> query to be executed"
+        echo ""
+        exit 3
+}
+# commandline options given?
+if [ $# -lt 1 ]; then
+        echo "- Not all arguments found!"
+        print_usage
+        exit 3
+fi
+# fetch commandline options
+while test -n "$1"; do
+        case "$1" in
+        -q)
+                query=$2
+                shift
+        esac
+        shift
+done
+
+
+
+MK_CONFDIR=/etc/check_mk
+
+for mysqlinstance in $(grep -e '\[.*\]' $MK_CONFDIR/mysql.cfg | sed -e 's/\[//g' -e 's/\]//g' | tr '\n' ' ');do
+currentinstance=$(grep -A2 "${mysqlinstance}" $MK_CONFDIR/mysql.cfg)
+port=$(echo "$currentinstance" | grep "port=" | sed -e 's/port=//')
+user=root
+socket=$(echo "$currentinstance" | grep "socket=")
+name=$(echo $mysqlinstance)
+
+ServiceDescription="MySQL_Read_Only_Master_${name}"
+Output=$(/usr/local/bin/mysql -u ${user} -P ${port} --${socket} -t < "${query}" )
+ExitCode=$?
+
+echo "$ExitCode $ServiceDescription $Output"
+sleep 0.5
+done

@@ -1,0 +1,5 @@
+---
+dependencies:
+  - { role: ops_vlan }
+  - { role: gds_carp }
+  - { role: gds_facts }

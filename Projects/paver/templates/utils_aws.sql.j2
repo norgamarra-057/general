@@ -1,0 +1,245 @@
+create schema if not exists dba;
+
+create or replace view dba.find_blocking_queries as
+SELECT blocked_locks.pid     AS blocked_pid,
+         blocked_activity.usename  AS blocked_user,
+         blocking_locks.pid     AS blocking_pid,
+         blocking_activity.usename AS blocking_user,
+         blocked_activity.query    AS blocked_statement,
+         blocking_activity.query   AS current_statement_in_blocking_process
+   FROM  pg_catalog.pg_locks         blocked_locks
+    JOIN pg_catalog.pg_stat_activity blocked_activity  ON blocked_activity.pid = blocked_locks.pid
+    JOIN pg_catalog.pg_locks         blocking_locks
+        ON blocking_locks.locktype = blocked_locks.locktype
+        AND blocking_locks.DATABASE IS NOT DISTINCT FROM blocked_locks.DATABASE
+        AND blocking_locks.relation IS NOT DISTINCT FROM blocked_locks.relation
+        AND blocking_locks.page IS NOT DISTINCT FROM blocked_locks.page
+        AND blocking_locks.tuple IS NOT DISTINCT FROM blocked_locks.tuple
+        AND blocking_locks.virtualxid IS NOT DISTINCT FROM blocked_locks.virtualxid
+        AND blocking_locks.transactionid IS NOT DISTINCT FROM blocked_locks.transactionid
+        AND blocking_locks.classid IS NOT DISTINCT FROM blocked_locks.classid
+        AND blocking_locks.objid IS NOT DISTINCT FROM blocked_locks.objid
+        AND blocking_locks.objsubid IS NOT DISTINCT FROM blocked_locks.objsubid
+        AND blocking_locks.pid != blocked_locks.pid
+    JOIN pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid
+   WHERE NOT blocked_locks.GRANTED and blocking_locks.granted is true and blocked_activity.datname=current_database();
+
+create or replace view dba.find_bloat as
+select schemaname,tablename,tbloat,wastedbytes,iname,ibloat,wastedibytes from (
+SELECT
+  current_database(), schemaname, tablename, /*reltuples::bigint, relpages::bigint, otta,*/
+  ROUND((CASE WHEN otta=0 THEN 0.0 ELSE sml.relpages::FLOAT/otta END)::NUMERIC,1) AS tbloat,
+  CASE WHEN relpages < otta THEN 0 ELSE bs*(sml.relpages-otta)::BIGINT END AS wastedbytes,
+  iname, /*ituples::bigint, ipages::bigint, iotta,*/
+  ROUND((CASE WHEN iotta=0 OR ipages=0 THEN 0.0 ELSE ipages::FLOAT/iotta END)::NUMERIC,1) AS ibloat,
+  CASE WHEN ipages < iotta THEN 0 ELSE bs*(ipages-iotta) END AS wastedibytes
+FROM (
+  SELECT
+    schemaname, tablename, cc.reltuples, cc.relpages, bs,
+    CEIL((cc.reltuples*((datahdr+ma-
+      (CASE WHEN datahdr%ma=0 THEN ma ELSE datahdr%ma END))+nullhdr2+4))/(bs-20::FLOAT)) AS otta,
+    COALESCE(c2.relname,'?') AS iname, COALESCE(c2.reltuples,0) AS ituples, COALESCE(c2.relpages,0) AS ipages,
+    COALESCE(CEIL((c2.reltuples*(datahdr-12))/(bs-20::FLOAT)),0) AS iotta -- very rough approximation, assumes all cols
+  FROM (
+    SELECT
+      ma,bs,schemaname,tablename,
+      (datawidth+(hdr+ma-(CASE WHEN hdr%ma=0 THEN ma ELSE hdr%ma END)))::NUMERIC AS datahdr,
+      (maxfracsum*(nullhdr+ma-(CASE WHEN nullhdr%ma=0 THEN ma ELSE nullhdr%ma END))) AS nullhdr2
+    FROM (
+      SELECT
+        schemaname, tablename, hdr, ma, bs,
+        SUM((1-null_frac)*avg_width) AS datawidth,
+        MAX(null_frac) AS maxfracsum,
+        hdr+(
+          SELECT 1+COUNT(*)/8
+          FROM pg_stats s2
+          WHERE null_frac<>0 AND s2.schemaname = s.schemaname AND s2.tablename = s.tablename
+        ) AS nullhdr
+      FROM pg_stats s, (
+        SELECT
+          (SELECT current_setting('block_size')::NUMERIC) AS bs,
+          CASE WHEN SUBSTRING(v,12,3) IN ('8.0','8.1','8.2') THEN 27 ELSE 23 END AS hdr,
+          CASE WHEN v ~ 'mingw32' THEN 8 ELSE 4 END AS ma
+        FROM (SELECT version() AS v) AS foo
+      ) AS constants
+      GROUP BY 1,2,3,4,5
+    ) AS foo
+  ) AS rs
+  JOIN pg_class cc ON cc.relname = rs.tablename
+  JOIN pg_namespace nn ON cc.relnamespace = nn.oid AND nn.nspname = rs.schemaname AND nn.nspname <> 'information_schema'
+  LEFT JOIN pg_index i ON indrelid = cc.oid
+  LEFT JOIN pg_class c2 ON c2.oid = i.indexrelid
+) AS sml
+) as foo
+where (tbloat > 30 and wastedbytes > 500000000) or (ibloat > 30 and wastedibytes > 500000000) or (tbloat > 15 and wastedbytes > 1000000000) or
+(ibloat > 15 and wastedibytes > 1000000000) and schemaname!='postgres';
+
+
+create or replace view dba.find_trx_wrap as
+SELECT relname,age(relfrozenxid) as xid_age,pg_size_pretty(pg_table_size(oid)) as table_size
+FROM pg_class
+WHERE relkind = 'r' and pg_table_size(oid) > 10
+ORDER BY age(relfrozenxid) DESC LIMIT 30;
+
+create or replace view dba.find_non_default_settings as
+select name,source,setting from pg_settings where source != 'default' and source != 'override'
+and name not in ('DateStyle','TimeZone','default_text_search_config','lc_messages','lc_monetary','lc_numeric',
+'lc_time','log_checkpoints','log_connections','log_destination','log_disconnections','log_duration','log_filename',
+'log_line_prefix','log_lock_waits','log_temp_files','log_timezone','track_activity_query_size','track_functions',
+'track_io_timing','update_process_title','max_stack_depth','application_name','archive_command','archive_mode','port','shared_preload_libraries')
+ORDER BY 2,1;
+
+create or replace view dba.find_oldest_trx_running as
+select extract(epoch from (now() - xact_start)) as duration, * from pg_stat_activity where state not in
+('idle','idle in transaction') and query not ilike  '%vacuum%' and pid != pg_backend_pid() and datname=current_database() order by xact_start asc limit 1;
+
+create or replace view dba.find_oldest_idle_in_trx as
+select extract(epoch from (now() - xact_start)) as duration, * from pg_stat_activity where state in
+('idle in transaction') and datname=current_database() order by xact_start asc limit 1;
+
+create or replace view dba.find_master_replication_lag as
+select client_addr as slave_ip,round(pg_wal_lsn_diff(pg_current_wal_lsn(),replay_lsn)/1048576)
+AS result from pg_catalog.pg_stat_replication WHERE application_name = 'walreceiver';
+
+create or replace view dba.find_slave_replication_lag_in_mb as
+select round(pg_wal_lsn_diff(pg_last_wal_receive_lsn(),pg_last_wal_replay_lsn())/1048576) as mb_lag;
+
+create or replace view dba.find_timestamp_of_last_trx as
+select pg_last_xact_replay_timestamp() as last_trx, now();
+
+create or replace view dba.find_top_Qs_running as
+select count(*),query from pg_stat_activity where state='active' and pid != pg_backend_pid() and datname=current_database() group by 2 order by 1 desc limit 5;
+
+create or replace view dba.find_slow_Qs_running as
+select query,now() - query_start from pg_stat_activity where state='active' and query_start <= now() - interval '1 second' and pid !=
+pg_backend_pid() and datname=current_database() order by 2 desc limit 5;
+
+grant usage on schema dba to checkmk_mon;
+
+CREATE OR REPLACE FUNCTION dba.myseqvals() RETURNS TABLE(name text, value bigint) AS $myseqvals$
+DECLARE
+   sch_name TEXT;
+   seq_name TEXT;
+BEGIN
+   FOR sch_name, seq_name IN
+       SELECT nspname::text, relname::text
+          FROM pg_class
+          JOIN pg_namespace
+          ON pg_class.relnamespace = pg_namespace.oid WHERE relkind='S' ORDER BY 1,2
+   LOOP
+       RETURN QUERY EXECUTE 'SELECT ''' || sch_name || '.' || seq_name || '''::text, last_value FROM "' || sch_name || '"."' || seq_name || '"';
+   END LOOP;
+END;
+$myseqvals$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE VIEW dba.find_seq_info as
+with myQ_col as(
+select table_catalog,table_name,column_name,regexp_replace(replace(replace(TRIM(REPLACE(column_default,'nextval','')),'''', ''),'::regclass',''),
+'[()]', '', 'g') as my_seq,data_type,udt_name,numeric_precision
+FROM information_schema.columns
+WHERE column_default LIKE 'nextval%'),
+myQ_seq as (select * from pg_catalog.pg_sequences)
+select
+schemaname,table_name,sequencename,column_name,aa.data_type,start_value,max_value,increment_by,cache_size,last_value,udt_name,(last_value*100/max_value)
+as used_pct from myQ_col aa,myQ_seq bb where my_seq like '%' || sequencename || '%' and last_value is not null order by used_pct desc;
+
+CREATE OR REPLACE FUNCTION dba.myseqmax() RETURNS INT AS $myseqmax$
+DECLARE
+   sch_name TEXT;
+   seq_name TEXT;
+   counter  INT;
+   has_nextval BOOL;
+   my_temp1 INT;
+BEGIN
+   counter = 0;
+   has_nextval = FALSE;
+
+   select count(*) into my_temp1
+   FROM information_schema.columns
+   WHERE column_default LIKE 'nextval%';
+
+   If not found then
+      RETURN counter;
+   end if;
+
+   my_temp1 = 0;
+
+   FOR sch_name, seq_name IN
+       SELECT nspname::text, relname::text
+          FROM pg_class
+          JOIN pg_namespace
+          ON pg_class.relnamespace = pg_namespace.oid WHERE relkind='S' ORDER BY 1,2
+   LOOP
+       set search_path = sch_name;
+select round(((my_last_value/max_possible_value)::double precision)*100) into my_temp1
+                                   as incr from ( with myQ_col
+                                   as( select
+table_catalog,table_name,column_name,regexp_replace(replace(replace(TRIM(REPLACE(column_default,'nextval','')),'''', ''),'::regclass',''), '[()]', '',
+'g')
+                                   as my_seq,data_type,udt_name,numeric_precision
+                                   FROM information_schema.columns
+                                   WHERE column_default LIKE 'nextval%'),
+                                   myQ_seq as (select * from information_schema.sequences)
+                                   select *,
+                                   CASE when (udt_name='int4')
+                                   then 2147483647
+                                   when (udt_name='int8')
+                                   then 9223372036854775807
+                                   when (udt_name='int2')
+                                   then 32767
+                                   when (udt_name='numeric')
+                                   then (10^aa.numeric_precision)/2
+                                   else 1 end
+                                   as max_possible_value,
+                                   cc.last_value as my_last_value
+                                   from myQ_col aa,
+                                   myQ_seq bb, pg_sequences cc
+                                   where aa.my_seq like '%' || bb.sequence_name || '%'
+                                   and cc.sequencename=bb.sequence_name and bb.sequence_name=seq_name)
+                                   as foo order by 1 desc
+                                   limit 1;
+        if not found then
+           continue;
+        end if;
+
+        if my_temp1 > 40 then
+        counter = counter + 1;
+        end if;
+
+   END LOOP;
+
+   RETURN counter;
+END;
+$myseqmax$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dba.myseqmax_privs() RETURNS INT AS $myseqmax_privs$
+DECLARE
+   sch_name TEXT;
+   counter  INT;
+BEGIN
+
+   counter = 0;
+
+   FOR sch_name IN
+       SELECT schema_name FROM information_schema.schemata where schema_name not in ('pg_catalog','pglogical','dba','ext','information_schema','pglogical_origin')
+       and schema_name not like 'pg_toast%' and schema_name not like 'pg_temp%'
+   LOOP
+       EXECUTE 'grant usage on all sequences in schema ' || sch_name || ' to checkmk_mon';
+       EXECUTE 'grant select on all tables in schema ' || sch_name || ' to checkmk_mon';
+       EXECUTE 'alter default privileges in schema '|| sch_name || ' grant usage on sequences to checkmk_mon';
+       EXECUTE 'alter default privileges in schema '|| sch_name || ' grant select on tables to checkmk_mon';
+       counter = counter + 1;
+   END LOOP;
+
+ grant execute on function dba.myseqmax() to checkmk_mon;
+ grant usage on schema dba to checkmk_mon;
+
+   RETURN counter;
+
+END;
+$myseqmax_privs$
+LANGUAGE plpgsql;
+
+select dba.myseqmax_privs();

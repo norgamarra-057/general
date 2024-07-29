@@ -1,0 +1,61 @@
+---
+- name: Ops Monitoring - gmetad | FreeBSD | runit | directories (read-only)
+  file:
+    path="{{ item }}"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - "{{ gmetad_service_path }}"
+    - "{{ gmetad_service_path }}/bin"
+    - "{{ gmetad_service_path }}/env"
+    - "{{ gmetad_service_path }}/log"
+
+- name: Ops Monitoring - gmetad | FreeBSD | runit | directories mode(writable)
+  file:
+    path="{{ gmetad_service_path }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+
+- name: Ops Monitoring - gmetad | FreeBSD | runit | environment mode
+  copy: dest="{{ gmetad_service_path }}/env/PATH"
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - gmetad restart
+
+- name: Ops Monitoring - gmetad | FreeBSD | runit | log script mode
+  template:
+    dest="{{ gmetad_service_path }}/log/run"
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - gmetad log restart
+
+- name: Ops Monitoring - gmetad | FreeBSD | config gmetad.conf
+  template:
+    dest="{{ gmetad_service_path }}/gmetad.conf"
+    mode=0644
+    owner=root
+    group=wheel
+    src=gmetad.conf.j2
+  notify:
+    - gmetad restart
+
+- name: Ops Monitoring - gmetad | FreeBSD | runit | run script mode
+  template:
+    dest="{{ gmetad_service_path }}/run"
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - gmetad restart

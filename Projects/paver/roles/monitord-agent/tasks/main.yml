@@ -1,0 +1,19 @@
+---
+- name: MONITORD | FreeBSD | Create group
+  group: name="_monitoring" gid="{{ foreman_groups[users['monitord'].group ].gid }}"
+
+- name: system account
+  user: name=monitord state=present
+        uid="{{ users['monitord'].uid }}" group="{{ users['monitord'].group }}"
+
+- include_tasks: FreeBSD.yml
+
+- name: tmp permissions
+  file:
+    owner=root
+    group=wheel
+    mode="1777"
+    path="{{ item }}"
+  with_items:
+    - /tmp
+    - /var/tmp

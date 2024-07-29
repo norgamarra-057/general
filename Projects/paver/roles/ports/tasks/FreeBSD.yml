@@ -1,0 +1,76 @@
+---
+- name: Ports | FreeBSD | Package Configuration
+  file: path="/etc/rc.conf.d" state=directory owner=root mode=0755
+
+- name: Ports | pkg | Local Repos
+  tags:
+    - repo
+  file: path=/usr/local/etc/pkg/repos state=directory owner=root group=wheel mode=0755
+
+- set_fact:
+    gds_repo: "pkg+http://gds-web-default-01.snc1/packages/gdspkgs"
+  tags:
+    - repo
+  when: gds_repo is not defined
+
+- name: Ports | pkg | Add GDS package repo
+  tags:
+    - repo
+  template:
+    src: gds-web.conf.j2
+    dest: /usr/local/etc/pkg/repos/gds-web.conf
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: Ports | pkg | Disable FreeBSD.org repos
+  tags:
+    - repo
+  copy:
+    content: "FreeBSD: { enabled: no }"
+    dest: /usr/local/etc/pkg/repos/FreeBSD.conf
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: Ports | FreeBSD | pkg update
+  command: /usr/sbin/pkg update
+  changed_when: false
+
+- name: Ports | FreeBSD | install packages
+  pkgng: name={{ item }} state=present
+  with_items:
+  - bash-static
+  - curl
+  - gnu-watch
+  - go
+  - mosh
+  - mtr-nox11
+  - nano
+  - pbzip2
+  - pftop
+  - pigz
+  - pstree
+  - python27
+  - ruby
+  - rubygem-rake
+  - runit
+  - screen
+  - sshpass
+  - tmux
+  - vim
+  - wget
+  - zfs-stats
+  - zfsnap
+
+- name: Ports | FreeBSD | install packages
+  pkgng: name={{ item }} state=present
+  with_items:
+    - emacs-nox11
+  when: '"10" in ansible_distribution_release'
+
+- name: Ports | FreeBSD | install 12packages
+  pkgng: name={{ item }} state=present
+  with_items:
+    - emacs-nox
+  when: '"12" in ansible_distribution_release'

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Dialog based instance selection
+
+# Settings
+HEIGHT=40
+WIDTH=60
+INSTANCE_FILE=/root/.current_instance
+
+# Get list of instances
+CURRENT=$(current_instance)
+INSTANCES=$(list_instances | awk '{ print $NF }')
+
+ARR=()
+i=0
+for INSTANCE in $INSTANCES; do
+  ARR[${i}]="${INSTANCE}"
+  ((i++))
+  ARR[${i}]="(mysql)"
+  ((i++))
+  [ "${INSTANCE}" == "${CURRENT}" ] && ARR[${i}]="ON" || ARR[${i}]="OFF"
+  ((i++))
+done
+((count=i/3))
+
+dialog --radiolist 'Select an instance!' ${WIDTH} ${HEIGHT} "${count}" ${ARR[*]} 2> ${INSTANCE_FILE}
+
+select_instance $(cat ${INSTANCE_FILE})

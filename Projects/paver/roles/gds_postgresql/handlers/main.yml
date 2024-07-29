@@ -1,0 +1,6 @@
+---
+- name: PostgreSQL reload
+  command: /usr/local/sbin/sv hup {{ postgresql_service_dir }}/
+
+- name: PostgreSQL log restart
+  command: /usr/local/sbin/sv hup "{{ postgresql_service_dir }}/log"

@@ -1,0 +1,2306 @@
+************************************
+
+LSI Corp. MegaRAID Firmware Release 
+
+************************************
+
+Release date: 06/18/14
+
+====================== 
+Supported Controllers:
+======================
+
+MegaRAID SAS 9265-8i
+MegaRAID SAS 9266-4i
+MegaRAID SAS 9266-8i
+MegaRAID SAS 9285-8e
+MegaRAID SAS 9285CV-8e
+MegaRAID SAS 9270-8i 
+MegaRAID SAS 9271-4i 
+MegaRAID SAS 9271-8i 
+MegaRAID SAS 9271-8iCC 
+MegaRAID SAS 9286-8e 
+MegaRAID SAS 9286CV-8e 
+MegaRAID SAS 9286CV-8eCC
+
+This package includes support for CacheCade Pro 2.0 and CacheVault(if enabled).  
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 06/18/14
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.28.0-0015 (MR 5.10 Patch release)
+WebBIOS 6.1-72-e_72-01-Rel
+Firmware 3.400.45-3507
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1403.03-0133
+BootBlockCommon 07.26.26.219
+UEFI_Driver 0x06060A03
+Hii 03.07.12.02
+FCODE 4.16.08.00
+BIOS 5.46.02.1
+
+Previous Package Details:
+Firmware Package: 23.28.0-0010 (MR 5.10)
+WebBIOS 6.1-71-e_71-Rel
+Firmware 3.400.05-3175
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 1403.03-0128
+BootBlockCommon 07.26.26.219
+UEFI_Driver 0x06060900
+Hii 03.07.11.00
+FCODE 4.16.08.00
+BIOS 5.46.02.0
+
+
+Bug Fixes and Enhancements:
+===========================
+Firmware:
+SCGCQ00698155 - (Closed) - Machine Check exception occurs during cache offload
+SCGCQ00680070 - (Closed) - Preventing controller reset after running several hours with ASPM(Active State Power Management) enabled
+SCGCQ00618569 - (Port_Complete) - HDD resume failed during dimmer switch test method.
+SCGCQ00646311 - (Port_Complete) - Consistency Check media error handling is incorrect and can cause data integrity issue
+SCGCQ00670882 - (Port_Complete) - Patrol read is in progress even after issuing stop patrol read command through App
+SCGCQ00664995 - (Port_Complete) - At boot up, if a learn is required or a learn is in progress, do not wait for the SuperCap to charge.
+SCGCQ00643769 - (Port_Complete) - Mechanism to override NVDATA Drive Activity LED setting
+SCGCQ00646299 - (Port_Complete) - Cannot recover data from a recoverable media error after Patrol Read encounters recovery failure for RAID-1
+SCGCQ00652191 - (Port_Complete) - CacheCade data loss after reboot
+SCGCQ00598400 - (Port_Complete) - For a particular OEM, size of some 4TB drives is reported as zero
+SCGCQ00692239 - (Port_Complete) - Improve the benchmark test performance.
+SCGCQ00664994 - (Port_Complete) - Increase the SuperCap learn time out value for 2GB TMM-B solution.
+SCGCQ00675291 - (Port_Complete) - Battery/ Memory Problems are detected and cache offload does not happen with a 2GB Memory module/ SuperCap design.
+
+WebBIOS:
+SCGCQ00666796 (CSET) - 9270 is not able to create RAID10 after CacheCade SSD VD created
+
+NVDATA:
+Various changes for different OEMs.
+
+UEFI Driver:
+SCGCQ00688791 - (Port_Complete) - Remove default value from numeric primitive that is present
+SCGCQ00698249 - (Port_Complete) - Don't let user boot to OS until user discards dirty cache
+SCGCQ00698254 - (Port_Complete) - Hii Image buffer clean-up
+SCGCQ00696371 - (Port_Complete) - For OEM, change memory type from EfiRuntimeServicesData to EfiMemoryMappedIO
+SCGCQ00696543 - (Port_Complete) - Implement mechanism to allow system BIOS to put entries for iMR mem allocation into proper table
+SCGCQ00698238 - (Port_Complete) - Do not go to WebBIOS due to a bad health status when WebBIOS is disabled in NVDATA.
+SCGCQ00644509 - (Port_Complete) - CPU EXCEPTION ERROR During CSIOR Stage- After Updating idrac X38 to X39 (Dont double free the memory)
+SCGCQ00644856 - (Port_Complete) - Install FMP on Controller Handle at Start() and the exception
+SCGCQ00661595 - (Port_Complete) - Timeout is not passed correctly to FW
+SCGCQ00644859 - (Port_Complete) - FMP GetImageInfo could result in stack corruption
+SCGCQ00698248 - (Port_Complete) - Initilize the buffer that we allocate to load HII and return EFI_OUT_OF_RESOURCES if allocation fails
+SCGCQ00698250 - (Port_Complete) - Return health status failed if platform calls GetHealthStatus w/ NULL handle after we return intermediate status
+SCGCQ00699147 - (Port_Complete) - For OEM, don't free the host memory during disconnect/unload process
+
+HII:
+SCGCQ00642232 - (Closed) - Ability to enable/disable JBOD mode in HII
+SCGCQ00644857 - (Port_Complete) - Remove FMP installed on the controller handle in HII
+SCGCQ00644858 - (Port_Complete) - RSOD during POST after enabling SecureBoot 
+SCGCQ00661685 - (Port_Complete) - HII reports wrong data under 'Eligible JBOD Drives for conversion' while converting JBOD to UG
+SCGCQ00698646 - (Port_Complete) - Unable to set spinup drive count in HII
+SCGCQ00698664 - (Port_Complete) - Not showing PD to assign as DHS to R50/ R60 VD if PD is of lesser size than largest PD 
+SCGCQ00698671 - (Port_Complete) - After Rebuilding, DHS and Expand VD operations failed to update as per VD properties
+SCGCQ00698309 - (Port_Complete) - In HII ,Full initialization is not grayed out for R6 DIF arrays.
+SCGCQ00698543 - (Port_Complete) - HII is gave a option to start reconstruction from any degraded RAID level to RAID 0.
+SCGCQ00698650 - (Port_Complete) - HII does not display power state of a PD
+SCGCQ00698667 - (Port_Complete) - In HII Create VD option is enabled when resconstruction is in progress (on partial VD)
+SCGCQ00644575 - (Port_Complete) - Consistency Check Start - remove mm/dd/yyyy from the string as the format is out of control of LSI
+SCGCQ00693695 - (Port_Complete) - When Controller is in Safe Mode don't remove UCM formset
+SCGCQ00698429 - (Port_Complete) - change the numeric primitive's maximum from MAX_PHYSICAL_DRIVES to 0xff
+SCGCQ00698644 - (Port_Complete) - Minor Typos and consistency issues in HEFU HII help text
+SCGCQ00698322 - (Port_Complete) - "Make Unconfigured good" option missing in HII even if JBOD's are present in the config
+SCGCQ00698320 - (Port_Complete) - HII is showing RAID6 and RAID5 levels while creating VD when we have 2 512n drives and 1 4k Drives
+SCGCQ00698447 - (Port_Complete) - Not able to create VD with 4k drives 
+SCGCQ00698627 - (Port_Complete) - not displaying the cachecade 512GB warning message
+SCGCQ00644786 - (Port_Complete) - Enhance help message for PD/VD Operation field
+SCGCQ00692302 - (Port_Complete) - creation in HII is showing GB
+SCGCQ00698547 - (Port_Complete) - HII is showing RAID levels, irrespective of drives to configure a new RAID level.
+SCGCQ00698661 - (Port_Complete) - Call UninstallStoreLib when we call StopControllerHiiImpl function
+
+BIOS:
+SCGCQ00697504 (CSET) - setting deviceExposure greater than or eaual to 128 will show wrong VD handled by bios
+SCGCQ00690943 (ENHREQ) - OEM wants the battery status text in BIOS to change from "missing" to "N/A" for iMR solutions.
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+====================================
+Previous Releases
+====================================
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 05/09/14
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.28.0-0010 (MR 5.10)
+WebBIOS 6.1-71-e_71-Rel
+Firmware 3.400.05-3175
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 1403.03-0128
+BootBlockCommon 07.26.26.219
+UEFI_Driver 0x06060900
+Hii 03.07.11.00
+FCODE 4.16.08.00
+BIOS 5.46.02.0
+
+Previous Package Details:
+Firmware Package: 23.22.0-0020 (MR 5.9 Point Release)
+WebBIOS 6.1-71-e_71-Rel
+Firmware 3.340.55-3173
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1312.03-0124
+BootBlockCommon 07.26.26.219
+UEFI_Driver 0x06030501
+Hii 03.05.11.03
+FCODE 4.16.08.00
+BIOS 5.45.07.0
+
+
+Bug Fixes and Enhancements:
+===========================
+FW:
+SCGCQ00482123 - (Closed) - External Key management security for iMR
+SCGCQ00499663 - (Closed) - Not seeing the correct Boot Message when the connection to the External Key Management server is down
+SCGCQ00518723 - (Closed) - Re-keying a controller with External Key Management(EKM) security enabled, results in a corrupted key ID.
+SCGCQ00523211 - (Closed) - Performing an online firmware update or Online Controller Reset(OCR) on a controller with External Key Management(EKM) enabled, results in all secured drives marked as foreign.
+SCGCQ00552222 - (Closed) - Raid configuration loss after reboot - PDs in POWERSAVE/PD failed after POR with erroneous "VP83 mis-match - DRIVE SWAP"
+SCGCQ00557797 - (Closed) - Re-keying in External Key Management mode followed by disabling security and enabling LKM results in a bail out while creating a Virtual Drive
+SCGCQ00563760 - (Closed) - FW debugger scrolls continuous message and eventually resets after deleting Source VD during a Cachecade disassocation
+SCGCQ00569173 - (Closed) - Switching to Local Key Management Mode(LKM) after a rekey in External Key Management(EKM) rekey without rebooting results in HII saying key incorrect but Firmware says key was created.
+SCGCQ00570040 - (Closed) - On a controller with Local Key Management(LKM) enabled, user is asked to enter the security key to unlock and import a foreign, locked and External Key Management(EKM) enabled drive.
+SCGCQ00571671 - (Closed) - After starting Patrol Read in the HII application, booting to OS and checking the status in MSM shows Patrol Read as suspended.
+SCGCQ00574396 - (Closed) - Getting Question Value mismatch when entering Controller management screen
+SCGCQ00602011 - (Closed) - MR to iMR downgrade error
+SCGCQ00605773 - (Closed) - Pinned cache gets flushed to incorrect VD for mirrored RAID levels
+SCGCQ00619188 - (Closed) - Cache policy of Virtual Drives(VD) does not change to Write Through(WT) mode even after detecting a bad supercap.
+SCGCQ00630411 - (Closed) - Cannot create pinned cache during an Online Controller Reset (OCR)
+SCGCQ00556744 - (Closed) - Switching the security mode from External Key Management(EKM) to Local Key Management(LKM) on iMR controller will result in a corrupted controller key.
+SCGCQ00571420 - (Closed) - Getting a non informative message when trying to import a Virtual Drive after a re-key without reboot
+SCGCQ00626852 - (Closed) - Internal Development team defect to check-in gemini image to resolve SSD drives missing issue.
+SCGCQ00530838 - (Closed) - Unable to suspend the Patrol Read operation in iMR mode from the HII application
+SCGCQ00530857 - (Closed) - Bad battery warning message that comes up during POST isn't aligned properly.
+SCGCQ00553023 - (Closed) - HDD status LED will be lit red after creating and deleting LD but the status is normal via MSM
+SCGCQ00579157 - (Closed) - Firmware break into montask, when there is a pinned cache( During bootup and OCR )
+SCGCQ00601452 - (Closed) - Controller breaks into montask if you have 10 enclosures connected to the controller.
+SCGCQ00600478 - (Closed) - VD erase does not resume and complete after reboot.
+SCGCQ00556740 - (Closed) - A data TLB error occurs when the External Key Management Server(EKMS) is down and drive security is changed from External Key Management(EKM) mode to Local Key Management(LKM) mode.
+SCGCQ00579672 - (Closed) - Remove redundant code within a particular function
+SCGCQ00604555 - (Closed) - Storecli reporting incorrect values for tfm and supercap date of manufacture
+SCGCQ00575142 - (Closed) - Static analysis tool defects
+SCGCQ00596556 - (Closed) - Unable to discard pinned cache in Headless Safe Mode.
+SCGCQ00496086 - (Closed) - Enhance code to catch Stack Overflow problem as soon as it occurs.
+SCGCQ00554056 - (Closed) - Write buffer flash programming support
+SCGCQ00552197 - (Closed) - Implement I2C Slave Address for Sideband Management
+SCGCQ00604565 - (Closed) - Add Fastpath Support by Default for a particular OEM.
+SCGCQ00496648 - (Port_Complete) - When pinned cache present VD property not changing from WB to WT.
+SCGCQ00496649 - (Port_Complete) - PDs go online without VD created & App doesn't allow any VD creation on passing a wrong parameter in Spanned VD.
+SCGCQ00504674 - (Port_Complete) - Booting a 12G server into a degraded Raid 5 array will result in limited functionality
+SCGCQ00504683 - (Port_Complete) - Improve Boot time that was lengthened due to previous change.
+SCGCQ00556161 - (Port_Complete) - (DDR3) CKE and Reset clamping circuit can cause DDR errors at initialization time
+SCGCQ00557763 - (Port_Complete) - Incorrect variable type in MR Read/Modify/Write path
+SCGCQ00570105 - (Port_Complete) - Gemini image updated
+SCGCQ00580318 - (Port_Complete) - Raid configuration loss after reboot - PDs in POWERSAVE
+SCGCQ00603255 - (Port_Complete) - RAID configured on PD been erased with Normal or Thorough will lost after system reboot/reset
+SCGCQ00603258 - (Port_Complete) - OEM MR TB controller reports foreign configuration on adapter during a 100 AC power cycles
+SCGCQ00626839 - (Port_Complete) - Cache policy of Virtual Drives(VD) does not change to Write Through(WT) mode even after detecting a bad supercap.
+SCGCQ00477016 - (Port_Complete) - FW sending wrong configuration data during boot msg pending state
+SCGCQ00498129 - (Port_Complete) - I/O's fail and VD becomes failed during planned failover of owner node w/ SMB I/O
+SCGCQ00501146 - (Port_Complete) - Configuration import of GHS (Global Host spare) fails.
+SCGCQ00502949 - (Port_Complete) - Firmware hits Montask when drive is pulled after changing the volume property from read ahead to no read ahead.
+SCGCQ00522634 - (Port_Complete) - VPD output of lspci –vvxxx showing [RV] Reserved: checksum bad, 86 byte(s) reserved
+SCGCQ00555284 - (Port_Complete) - Gemini image updated
+SCGCQ00556756 - (Port_Complete) - disableBatteryWarning should not be reset if changed by user
+SCGCQ00600687 - (Port_Complete) - An invalid frame sent during a PIO-mode SATA passthrough command results in resetting the drive
+SCGCQ00601379 - (Port_Complete) - Fix for Infinite retries of command for sense code 0B/47/03
+SCGCQ00613782 - (Port_Complete) - Liberator Card loses its boot VD after many reboots
+SCGCQ00479699 - (Port_Complete) - Upgrading from Software RAID to 9260-8i causes Alarm to sound
+SCGCQ00552759 - (Port_Complete) - Incorrect variable type in MR Read/Modify/Write path
+SCGCQ00557614 - (Port_Complete) - Bad or Missing TMM boot message is changed to Critical error
+SCGCQ00571404 - (Port_Complete) - In case of a certain OEM iMR shows R5 enabled.
+SCGCQ00575043 - (Port_Complete) - Running out of free entries in task list due to recursive addition of tasks
+SCGCQ00601892 - (Port_Complete) - Fix for Infinite retries of command for sense code 0B/47/03
+SCGCQ00606336 - (Port_Complete) - RAID configured on PD been erased with Normal or Thorough will lost after system reboot/reset
+SCGCQ00609531 - (Port_Complete) - Kill adapter is seen while performing CME recovery during Write operation.
+SCGCQ00609535 - (Port_Complete) - CME logic using overlaid fields in c->rec
+SCGCQ00573950 - (Port_Complete) - system black screen during S1 Sleep test
+SCGCQ00574335 - (Port_Complete) - Operating System event log reports a controller error during stress testing
+SCGCQ00579738 - (Port_Complete) - With Headless Continue On Error Mode(HCOE) enabled and the SafeStore BIOS password enabled, if the wrong password is entered you are stuck at the same screen .
+SCGCQ00600686 - (Port_Complete) - An invalid frame sent during a PIO-mode SATA passthrough command results in resetting the drive
+SCGCQ00613783 - (Port_Complete) - Liberator Card loses its boot VD after many reboots
+SCGCQ00502952 - (Port_Complete) - Code Review: Call DDF_discardInvalidPds only if DS3 is enabled
+SCGCQ00504687 - (Port_Complete) - FW take a long time to boot to OS
+SCGCQ00546684 - (Port_Complete) - Cluster validation failed in disk arbitration
+SCGCQ00558263 - (Port_Complete) - HDD status LED will be lit red after creating and deleting LD but the status is normal via MSM
+SCGCQ00570170 - (Port_Complete) - Deep learn will not start immediately when Relative State of Charge (RSOC) of battery is equal to 95%.
+SCGCQ00570251 - (Port_Complete) - Patrolread will not start on any VD after a PR is started, suspended and VD is deleted
+SCGCQ00575155 - (Port_Complete) - VD goes offline when we start reconstruction on 32 Drive R0 VD
+SCGCQ00579225 - (Port_Complete) - Clear up stale cache lines.
+SCGCQ00603257 - (Port_Complete) - OEM MR TB controller reports foreign configuration on adapter during a 100 AC power cycles
+SCGCQ00609530 - (Port_Complete) - MR 6.3: md5sum mismatch seen on a copied file from R5 VD with CME
+SCGCQ00570171 - (Port_Complete) - Deep learn will not start immediately when Relative State of Charge (RSOC) of battery is equal to 95%.
+SCGCQ00556757 - (Port_Complete) - search for one wire devices prints are masked after the boot
+
+BIOS:
+SCGCQ00579962 - (Closed) - Initialize deviceExposure with MAX_INT13DISKS instead of 0xFF
+SCGCQ00572939 - (Closed) - Make sure all the make file adheres to the latest binary names.
+SCGCQ00559095 - (Closed) - Provide an option to limit the max number of INT 13h devices presented to system BIOS
+
+UEFI_Driver
+SCGCQ00618669 - (Closed) - UEFI Driver: StartHiiBackEnd() has Print statement with %g
+SCGCQ00578194 - (Closed) - UEFI Driver should calculate checksum before setting bios data
+SCGCQ00601851 - (Closed) - System hang when we press F1 on second time when we are in HII form
+SCGCQ00628627 - (Closed) - UEFI Driver- has debug print statements during POST
+SCGCQ00589148 - (Closed) - Diskpart EFI utility can't create partition on a JBOD
+SCGCQ00526851 - (Closed) - Support EFI_FIRMWARE_MANAGEMENT_PROTOCOL for controller firmware
+SCGCQ00579837 - (Port_Complete) - UEFI Driver should calculate checksum before setting bios data 
+SCGCQ00606367 - (Port_Complete) - UEFI Driver returns EFI_NOT_FOUND when platform passes valid 
+SCGCQ00580313 - (Port_Complete) - User can't access RAID HII in UEFI mode after removing a HDD
+
+HII
+SCGCQ00579816 - (Closed) - HII\EKM-LKM without reboot should show proper message
+SCGCQ00594011 - (Closed) - With out selecting any drives I am seeing the previous config VD size.
+SCGCQ00609737 - (Closed) - Confiuration Restore is not working
+SCGCQ00618674 - (Closed) - StartHiiImpl() WriteToLogger uses %g and EFIHiiDriverEntryPoint() Print statement uses %g for displaying EFI status
+SCGCQ00521488 - (Closed) - Getting error message when we suspend Patrol read operation through HII browser
+SCGCQ00565876 - (Closed) - Remove duplicated strings from the UNI FIle
+SCGCQ00571353 - (Closed) - Allow user to select RAID level when controller has other VD + error handling
+SCGCQ00573871 - (Closed) - fixing code review defects (AIM version + UCM GUID + deallocation)
+SCGCQ00614027 - (Closed) - Firmware updation fails 
+SCGCQ00615221 - (Closed) - Form UF003 prints error messages (use WriteToLogger to log these debug messages)
+SCGCQ00617617 - (Closed) - FWMgmt Prtocol:<config ID="LSIMegaRAIDConfigurationTool"> has no "versionid" info.
+SCGCQ00565088 - (Closed) - Help content for Firmware Update in Controller Management is inappropriate
+SCGCQ00569098 - (Closed) - Enter security key for locked drives screen, press down to get to OK, OK will show up again on right
+SCGCQ00598822 - (Closed) - VD details display is improper in Expand Virtual Drive
+SCGCQ00613822 - (Closed) - Advanced Controller Properties- Power Saving Settings has broken form
+SCGCQ00556839 - (Closed) - Able to select EKM even when the EKM FOD key is removed from the system.
+SCGCQ00589301 - (Closed) - System/HII hang when clicks on Hardware Components menu option in HII.
+SCGCQ00595864 - (Closed) - On Success of creating Drive Security Form loads into Advanced controller properties
+SCGCQ00598431 - (Closed) - Drop Down option in VD properties for Cached is present
+SCGCQ00610889 - (Closed) - Customize help string for Select Interface Type
+SCGCQ00615190 - (Closed) - ill Controller Index in RouteConfig + for UF003 calculate checksume only for the actual config size
+SCGCQ00593558 - (Closed) - Auto Learn Mode is showing wrong data
+SCGCQ00612574 - (Closed) - Addressed review comments
+SCGCQ00613820 - (Closed) - Typo in HII form Controller Status
+SCGCQ00622464 - (Closed) - Toggling bewtween Legacy to Uefi mode vice versa junk values seen .
+SCGCQ00524969 - (Closed) - HII PKG 0006/Going from LKM to EKM asks for a Current Security key Identifier and Security key.
+SCGCQ00590465 - (Closed) - n selecting a wrong parameter for size while creating VDs, Options greyed, Create VD page exits to parent page.
+SCGCQ00595463 - (Closed) - Security feature is enabled but HII sees "Drive Security" as disabled
+SCGCQ00571359 - (Closed) - Typo "Clear Configuaration" -> "Clear Configuration"
+SCGCQ00573222 - (Closed) - Handling Code Collaborator Review Defects for SCGCQ00568814 and SCGCQ00569197
+SCGCQ00575062 - (Closed) - added a while loop and take care of the multiple PD Groups scenario.
+SCGCQ00578190 - (Closed) - HII should calculate checksum before setting bios data 
+SCGCQ00597641 - (Closed) - MR6.3 HII aesthetic change
+SCGCQ00503036 - (Closed) - Changing Percentage of Space to Expand Does not Update Final VD Size
+SCGCQ00574041 - (Closed) - AIM (Agentless Inventory Manager) Issues
+SCGCQ00574989 - (Closed) - Creation+ FW updation+ Scan foreign Configuration is disabled/grayed out in HII page
+SCGCQ00614466 - (Closed) - Under advanced controller properties and selecting Cache and Memory, it says's "scontroller cache"
+SCGCQ00614675 - (Closed) - To address FW Update help Strings
+SCGCQ00619028 - (Closed) - Not able to schedule CC in concurrent mode from HII(03.07.09.00).
+SCGCQ00526978 - (Closed) - HII. Provide controller FW update function
+SCGCQ00568814 - (Closed) - HEFU. Simplify controller propety page
+SCGCQ00568706 - (Closed) - Remove limitation for creating R6 in HII 
+SCGCQ00612466 - (Closed) - Provide pop-up to display current version and update fw version as part of HEFU HII Firmware Update functionality
+SCGCQ00571579 - (Implemented) - Create a formset with classGUID that customer has provided. 
+SCGCQ00569197 - (Closed) - Move Disable Protection option from Controller Management to VD management
+SCGCQ00601110 - (Port_Complete) - Able to select EKM even when the EKM FOD key is removed from the system.
+SCGCQ00557522 - (Port_Complete) - System hang observed when the "PdInfo.userDataBlockSize" is set to 0
+SCGCQ00601119 - (Port_Complete) - HII help for Boot error handling does not display "Stop On Error" option
+SCGCQ00601107 - (Port_Complete) - HII PKG 0006/Going from LKM to EKM asks for a Current Security key Identifier and Security key.
+SCGCQ00601103 - (Port_Complete) - Enter security key for locked drives screen, press down to get to OK, OK will show up again on right
+SCGCQ00601113 - (Port_Complete) - HII\EKM-LKM without reboot should show proper message
+SCGCQ00601117 - (Port_Complete) - UCM Phase 1: Allow user to select RAID level when controller has other VD + error handling
+SCGCQ00572986 - (Port_Complete) - System hang observed when the "PdInfo.userDataBlockSize" is set to 0
+SCGCQ00603235 - (Port_Complete) - HII help window shows unsupported stripe sizes
+SCGCQ00596920 - (Port_Complete) - Missing BBU caused disappearance of Enclosure Mgmt opt in BIOS setup
+SCGCQ00601120 - (Port_Complete) - In HII on a ready drive we are able to see Used space as 40Gb.
+SCGCQ00601118 - (Port_Complete) - Typo "Clear Configuaration" -> "Clear Configuration"
+SCGCQ00601116 - (Port_Complete) - added a while loop and take care of the multiple PD Groups scenario.
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 04/02/14
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.22.0-0020 (MR 5.9 Point release)
+WebBIOS 6.1-71-e_71-Rel
+Firmware 3.340.55-3173
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1312.03-0124
+BootBlockCommon 07.26.26.219
+UEFI_Driver 0x06030501
+Hii 03.05.11.03
+FCODE 4.16.08.00
+BIOS 5.45.07.0
+
+Previous Package Details:
+Firmware Package: 23.22.0-0012 (MR 5.9)
+WebBIOS 6.1-71-e_71-Rel
+Firmware 3.340.05-2939
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1312.03-0124
+BootBlockCommon 07.26.26.219
+UEFI_Driver 0x06030500
+Hii 03.05.11.00
+FCODE 4.16.07.00
+BIOS 5.45.07.0
+
+
+Bug Fixes and Enhancements:
+===========================
+Firmware:
+**NOTE: Full native 4K sector Firmware support is provided in firmware since MR 5.8 release
+SCGCQ00552222 - (Closed) - Raid configuration loss after reboot - PDs in POWERSAVE
+SCGCQ00619188 - (Closed) - Cache policy of Virtual Drives(VD) does not change to Write Through(WT) mode even after detecting a bad supercap.
+SCGCQ00531244 - (Closed) - Display the NCQ enabled/disabled status of every SATA disk drive in the output of StorCLI and MegaCLI
+SCGCQ00557763 - (Port_Complete) - Incorrect variable type in MR Read/Modify/Write path
+SCGCQ00570105 - (Port_Complete) - Gemini image updated
+SCGCQ00603258 - (Port_Complete) - OEM MR TB controller reports foreign configuration on adapter during a 100 AC power cycles
+SCGCQ00601379 - (Port_Complete) - Fix for Infinite retries of command for sense code 0B/47/03
+SCGCQ00613782 - (Port_Complete) - Liberator Card loses its boot VD after many reboots
+SCGCQ00606336 - (Port_Complete) - RAID configured on PD been erased with Normal or Thorough will lost after system reboot/reset
+SCGCQ00600686 - (Port_Complete) - An invalid frame sent during a PIO-mode SATA passthrough command results in resetting the drive
+SCGCQ00570170 - (Port_Complete) - Deep learn will not start immediately when Relative State of Charge (RSOC) of battery is equal to 95%.
+
+UEFI_Driver:
+SCGCQ00579837 (CSET) - UEFI Driver should calculate checksum before setting bios data
+
+HII:
+SCGCQ00579816 (DFCT) - HII\EKM-LKM without reboot should show proper message
+
+FCODE:
+SCGCQ00553069 (DFCT) - PCLI(1.07.05) Sparc: Command "cli set securitykey=Lsi@12345" fails with errcd "1001" and errmsg "invalid key".
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 01/07/14
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.22.0-0012 (MR 5.9)
+WebBIOS 6.1-71-e_71-Rel
+Firmware 3.340.05-2939
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1312.03-0124
+BootBlockCommon 07.26.26.219
+UEFI_Driver 0x06030500
+Hii 03.05.11.00
+FCODE 4.16.07.00
+BIOS 5.45.07.0
+
+Previous Package Details:
+Firmware Package: 23.18.0.0014 (MR 5.8 Point Release)
+WebBIOS 6.1-68-e_68-Rel 
+Firmware 3.290.15-2935
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1310.03-0122
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x06010300
+Hii 03.03.07.00
+FCODE 4.14.05.00
+BIOS 5.42.00
+
+
+Bug Fixes and Enhancements:
+===========================
+Firmware:
+**NOTE: Full native 4K sector Firmware support is provided in firmware since MR 5.8 release
+
+SCGCQ00358434 - (Closed) - StorCLI: Showing success for assigning a secured VD to cachepool whereas the operation is failure.
+SCGCQ00441316 - (Closed) - Supercap is not detected but cache offload and restore happens
+SCGCQ00476320 - (Closed) - Faulty protocol used for changing the Disk Write Cache Policy
+SCGCQ00504475 - (Closed) - Unable to create another Virtual Drive when pulling first drive (degrading) in partial Virtual Drive where all drives are configured
+SCGCQ00518693 - (Closed) - Active/suspended patrol reads not terminated during VD deletion
+SCGCQ00522321 - (Closed) - Error message displayed after suspending a Patrol Read Operation using the HII application
+SCGCQ00522381 - (Closed) - Incorrect information is returned for SATA drive when the drive is connected behind the interposer.
+SCGCQ00473201 - (Closed) - Firmware montask when solaris is installed on 4 drive Raid6 with 2 drive failure
+SCGCQ00552847 - (Closed) - Data Integrity issue found with CacheCade when CacheCade disassociation is initiated after running IO
+SCGCQ00487288 - (Closed) - The Firmware does not change the Virtual Drives's from Write Through to Write Back after a battery manual learn cycle is complete
+SCGCQ00501286 - (Closed) - Baseboard Management Controller (BMC): STP passthru command failure
+SCGCQ00500984 - (Closed) - HII - Last physical drive in 84 physical drive enclosure is displayed 4 times
+SCGCQ00501630 - (Closed) - Drive security mode switching in MSM
+SCGCQ00476528 - (Closed) - When I/Os are running on SATA Physical Drives with interposers, a drive removal and reinsertion within drive-removal-delay comes back as failed.
+SCGCQ00484803 - (Resolved) - The Firmware does not change the Virtual Drives's from Write Through to Write Back after a battery manual learn cycle is complete
+SCGCQ00552110 - (Closed) - Gemini image updated
+SCGCQ00333207 - (Closed) - Request to support 128 drives within single enclosure
+SCGCQ00466994 - (Closed) - Added support in FW to import CC1.x VDs.
+SCGCQ00467207 - (Closed) - Support Revision 17 and Revision 18 Supercaps
+SCGCQ00501863 - (Port_Complete) - Clustered Media Error handling does not work for read operations during RAID-5 writes
+SCGCQ00479734 - (Port_Complete) - When Cachecade LD is deletec invalid LD details is shown in the Cachecade size changed event.
+SCGCQ00487279 - (Port_Complete) - MR Controller does OCR due to Temp Buffer overflow
+SCGCQ00498098 - (Port_Complete) - 9240-4i on BCM RX67Q-6S motherboard is not getting required memory resources on boot
+SCGCQ00479736 - (Port_Complete) - D_SENSE bit in Mode Select Page=0a is set for < 2TB disk
+SCGCQ00479732 - (Port_Complete) - T-bolt MR (PL) FW : Invalid "mode select(Page=0a)" issued during disk initialization phase.
+SCGCQ00479499 - (Port_Complete) - iMR TB Data loss when reconstructing from 1 drive R0 to 2 drive R1 with reboot
+SCGCQ00480237 - (Port_Complete) - For iMR, Firmware is faulting when trying to flash firmware after Online Control Reset.
+SCGCQ00501862 - (Port_Complete) - Clustered Media Error handling does not work for read operations during RAID-5 writes
+SCGCQ00481029 - (Port_Complete) - Storcli: wrong error code displayed and wrong error message for copyback command
+SCGCQ00557108 - (Port_Complete) - Data Integrity issue found with CacheCade when CacheCade disassociation is initiated after running IO
+SCGCQ00470407 - (Port_Complete) - Remove support of a certain TMM-B from currently released firmware
+SCGCQ00504011 - (Port_Complete) - Cache offload is started when server's power down (DC Off) on WebBIOS or Post phase.
+SCGCQ00505203 - (Port_Complete) - Validate the requested blocks for SCSI VERIFY commands on RAID volumes
+SCGCQ00484048 - (Active) - Faulty protocol used for changing the Disk Write Cache Policy
+SCGCQ00471478 - (Port_Complete) - Firmware crash seen while doing continuous sas cable pull
+SCGCQ00467493 - (Port_Complete) - Foreign config import is getting failed when using multiple enclosures
+SCGCQ00505732 - (Port_Complete) - Firmware montask when solaris is installed on 4 drive Raid6 with 2 drive failure
+SCGCQ00490891 - (Port_Complete) - Firmware Crash during Controller StartUp when large number of drives are connected
+SCGCQ00480242 - (Port_Complete) - For iMR, Firmware is faulting when trying to flash firmware after Online Control Reset.
+SCGCQ00493102 - (Port_Complete) - Can't import foreign configuration on degraded arrays after system reboot
+SCGCQ00480234 - (Port_Complete) - A single supercap pack should not be supported on a 2GB memory module
+SCGCQ00501103 - (Port_Complete) - Validate the requested blocks for SCSI VERIFY commands on RAID volumes
+SCGCQ00485583 - (Port_Complete) - For a particular OEM fault LED does not come on when a bad HDD is inserted
+SCGCQ00479709 - (Port_Complete) - Firmware returns asc value as 0 when failing IOs with medium errors
+SCGCQ00471470 - (Port_Complete) - Firmware crash seen while doing continuous sas cable pull
+SCGCQ00493101 - (Port_Complete) - Can't import foreign configuration on degraded arrays after system reboot
+SCGCQ00479731 - (Port_Complete) - Foreign config import is getting failed when using multiple enclosures
+SCGCQ00472867 - (Port_Complete) - Defect Fix for Excessive unexpected sense events reported on PI enabled R5 VDs
+SCGCQ00479737 - (Port_Complete) - Installing and uninstalling iMR FOD key overwrites MR controller features
+SCGCQ00472864 - (Port_Complete) - Defect Fix for Excessive unexpected sense events reported on PI enabled R5 VDs
+SCGCQ00479502 - (Port_Complete) - iMR TB Data loss when reconstructing from 1 drive R0 to 2 drive R1 with reboot
+SCGCQ00479721 - (Port_Complete) - Intermittent SEP errors on iMR and MR controllers
+SCGCQ00487278 - (Port_Complete) - MR Controller does OCR due to Temp Buffer overflow
+
+WebBIOS:
+SCGCQ00333215 - (Implemented) - Request to support 128 drives wihin single enclosure
+SCGCQ00488500 - (Port_Complete) - Added support for OEM controller whose PCI subsystem Id is 2208
+SCGCQ00488501 - (Port_Complete) - Added support for OEM controller whose PCI subsystem Id is 2240
+SCGCQ00488502 - (Port_Complete) - Added support for OEM controller whose PCI subsystem Id is 0001
+
+NVDATA:
+SCGCQ00493673 - (Closed) - StorCli does not list all the available BBU modes.
+
+BootBlockCommon:
+SCGCQ00472311 (ENHREQ) - (CBB) Provide mechanism to disable PCIe backchannel training via SBR
+
+UEFI_Driver:
+SCGCQ00479003 - (Closed) - Disable Debug print in UEFI Driver
+SCGCQ00435384 - (Closed) - UEFI System hang if controller FW is in fault state
+SCGCQ00498925 - (Closed) - Not able to boot into BIOS boot menu
+SCGCQ00493654 - (Closed) - Memory Leak issue in UEFI driver when reconnect happens
+SCGCQ00518791 - (Closed) - DriverDiagnostics2.c: In IsValidHandle() - Free the buffer if status is not EFI success for LocateHandle
+SCGCQ00483847 - (Closed) - EKMS: Remove private GUID and use EFI_KMS_PROTOCOL_GUID defined in UEFI 2.3.1 spec
+SCGCQ00484086 - (Port_Complete) -  hang when SATA is connected
+SCGCQ00468948 - (Port_Complete) - Uninstall HII CAP and Driver Health formset if platform calls Start again without calling GetHealthStatus
+SCGCQ00477828 - (Port_Complete) - 9240/9260/9270 UEFI driver issue when user having 2TB or 4TB VD
+SCGCQ00478692 - (Port_Complete) - Block IO tests from SCT IHV test suite failed
+SCGCQ00484114 - (Port_Complete) - Follow UEFI Spec on interpreting In and Out Transfer Length that upper layer sends
+
+HII:
+SCGCQ00470101 - (Closed) - Allow user to edit VD size (that is free form input) as it is cumbersome to modify the size using +/-
+SCGCQ00471830 - (Closed) - Save and Restore Configuration
+SCGCQ00556209 - (Closed) - Transition a MR controller to run in iMR mode = Controller fail in HII After Memory removed
+SCGCQ00556811 - (Closed) - HII - When controller is in safe mode the PD menu displays inaccurate text and hangs when clicking a PD
+SCGCQ00529287 - (Closed) - Profile Based Raid1 Creation fails as invalid arguments
+SCGCQ00502940 - (Closed) - Naming inconsistency in option present in Create VD and Create VD - Advanced
+SCGCQ00482092 - (Closed) - HEFU_HII: condition checking is not right
+SCGCQ00474402 - (Closed) - HII: Allows user to select EKM mode when supportEKM is set to 0
+SCGCQ00485401 - (Closed) - 5.9 PKG 0002 HII/Using 84 PD encl when clicking on HW, Advanced then Enclosure Management, it completly freezes the system
+SCGCQ00473204 - (Closed) - MR UCM 2.0: unable to show UF003 as well the first two forms + XML special character handling
+SCGCQ00486457 - (Closed) - HEFU_HII_MR6.2: fixing memory leak of 128 drive enclosure implementation
+SCGCQ00505566 - (Closed) - MR 6.2-HII: Drop down option to set phy linkspeed tp 12 Gbps in HII browser is not available.
+SCGCQ00473186 - (Closed) - Save and Restore Configuration - MR w/ Premium Features (SED and Cachecade)
+SCGCQ00501111 - (Closed) - HII 3.05.07.00/Issues when trying to change EKM security key from change security key option.
+SCGCQ00523869 - (Closed) - EKMS\HII PKG 0006\EKMS is down but it is still possible to select drive security in MSM and HII during creation.
+SCGCQ00527700 - (Closed) - Update the latest API change in HEFU
+SCGCQ00500945 - (Closed) - MR: EXPAND operation fails in HII for prl11
+SCGCQ00494431 - (Closed) - Streamline the usage of max PD in limited configuration path (alias UCM)
+SCGCQ00494214 - (Closed) - Help content for Free space in Select Drive group is inappropriate
+SCGCQ00485932 - (Closed) - UCM Simple Configuration: Allow Clear Config always + Suppress Checkbox (Uf002.PDs) when VD count is >0
+SCGCQ00472196 - (Closed) - Profile based VD creation path incorrectly showing protect VD/secure VD checkbox when user clicks on drive selection criteria
+SCGCQ00481284 - (Closed) - Typos in help content for profile VD for Write Policy
+SCGCQ00471209 - (Closed) - UCM Phase2: config using 8PDs/16 partial VDs and all stripe sizes and HSPs does not restore
+SCGCQ00487936 - (Closed) - UCM-After creating a VD with UCM tool the manual configuration PD section still shows configured PDs as UG, and duplicates
+SCGCQ00495236 - (Closed) - Controller not seen in HII Browsercan after switiching from EFI WebBIOS
+SCGCQ00505591 - (Closed) - Checking the Enclosure Management settings in HII causes the system to reboot.
+SCGCQ00475217 - (Closed) - Request to support 128 drives wihin single enclosure
+SCGCQ00468930 - (Closed) - UCM Phase 2 support
+SCGCQ00481277 - (Closed) - Request to change the help content for write policy in create VD form
+SCGCQ00415456 - (Closed) - Obtain the Physical Slot number from the PCI Bridge to which the Controller is connected.
+SCGCQ00476607 - (Port_Complete) - HII cannot assign partial space less than 1 GB
+SCGCQ00498521 - (Port_Complete) - MR 6.01 : HII cannot create a VD using unconfigured good drives as long as PD locate is set on the drives
+
+FCODE:
+SCGCQ00471703 - (Closed) - Fcode CLI support for Invader (MR only)
+SCGCQ00486355 - (Closed) - Define and use capability bit to identify the StorCLI
+
+BIOS:
+SCGCQ00479507 - (Closed) - FW 3.340.05-2739/Getting memory conflict during boot
+SCGCQ00495471 - (Closed) - OOB function corrupts EBDA area used by other server function
+SCGCQ00493680 - (Closed) - Optimize reading IO port in INT15h path
+SCGCQ00552308 - (Closed) - OEM system is not allocating memory correctly when MR and iMR are in the same system
+SCGCQ00482283 - (Closed) - iMR: System reboots during IO because FW didnt receive permanent host memory from OpROM
+SCGCQ00503046 - (Closed) - OpROM is displaying incorrect value for the number of INT13h device it supports
+SCGCQ00466276 - (Closed) - Check the controller status bit in the function which hooks INT15
+SCGCQ00454086 - (Closed) - Add boundary checking when allocating EBDA and PMM memory for BIOS post.
+SCGCQ00460724 - (Port_Complete) - Memory access issue when loading Ctrl R
+SCGCQ00460725 - (Port_Complete) - Memory allocation: Allocate only two 64k
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 11/26/13
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.18.0.0014 (MR 5.8 Point Release)
+WebBIOS 6.1-68-e_68-Rel 
+Firmware 3.290.15-2935
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1310.03-0122
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x06010300
+Hii 03.03.07.00
+FCODE 4.14.05.00
+BIOS 5.42.00
+
+Previous Package Details:
+Firmware Package: 23.18.0.0013 (MR 5.8)
+WebBIOS 6.1-68-e_68-Rel 
+Firmware 3.290.05-2720
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1310.03-0122
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x06010300
+Hii 03.03.07.00
+FCODE 4.14.05.00
+BIOS 5.42.00
+
+
+Bug Fixes and Enhancements:
+===========================
+FIRMWARE:
+**NOTE: Full native 4K sector Firmware support is provided in this release
+
+SCGCQ00525647 (DFCT) - Cachecade 2.0 with MR 5.7 fw peformance is much lower than MR5.6
+SCGCQ00484803 (DFCT) - The Firmware does not change the Virtual Drives's from Write Through to Write Back after a battery manual learn cycle is complete
+SCGCQ00552847 (DFCT) - Data Integrity issue found with CacheCade when CacheCade disassociation is initiated after running IO
+SCGCQ00467493 (CSET) - Foreign config import is getting failed when using multiple enclosures
+SCGCQ00471470 (CSET) - Firmware crash seen while doing continous sas cable pull
+SCGCQ00472867 (CSET) - Defect Fix for Excessive unexpected sense events reported on PI enabled R5 VDs
+SCGCQ00479499 (CSET) - iMR TB Data loss when reconstructing from 1 drive R0 to 2 drive R1 with reboot
+SCGCQ00480237 (CSET) - For iMR, Firmware is faulting when trying to flash firmware after Online Control Reset.
+SCGCQ00487278 (CSET) - MR Controller does OCR due to Temp Buffer overflow
+SCGCQ00493101 (CSET) - Can't import foreign configuration on degraded arrays after system reboot
+SCGCQ00501862 (CSET) - Clustered Media Error handling does not work for read operations during RAID-5 writes
+SCGCQ00505732 (CSET) - Firmware montask when solaris is installed on 4 drive Raid6 with 2 drive failure
+SCGCQ00552110 (ENHREQ) - Gemini image updated
+SCGCQ00505203 (CSET) - Validate the requested blocks for SCSI VERIFY commands on RAID volumes
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 9/23/13
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.18.0.0013 (MR 5.8)
+WebBIOS 6.1-68-e_68-Rel 
+Firmware 3.290.05-2720
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1310.03-0122
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x06010300
+Hii 03.03.07.00
+FCODE 4.14.05.00
+BIOS 5.42.00
+
+Previous Package Details:
+Firmware Package: 23.16.0.0018 (MR 5.7 P1)
+WebBIOS 6.1-65-e_65-Rel 
+Firmware 3.270.65-2578
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1304.03-0117
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x06000500
+Hii 03.02.08.00
+FCODE 4.12.05.00
+BIOS 5.42.00
+
+
+Bug Fixes and Enhancements:
+===========================
+FIRMWARE:
+**NOTE: Full native 4K sector Firmware support is provided in this release
+SCGCQ00462339 - (Closed) - Virtual Drive creation failure in iMR during pre-boot
+SCGCQ00454816 - (Closed) - Recon VD made "degraded" when the recon pd is pulled out allowing for rebuild once the drive is plugged back in.
+SCGCQ00448786 - (Closed) - static variable used in PD Progress and LD Progress function which may affect multiple progresses running at the same time.
+SCGCQ00437008 - (Closed) - MegaRAID controller does not display a boot message when it has entered safe mode.
+SCGCQ00435944 - (Closed) - Allow adding a lba when table entries are exhausted, but addition is possible if consecutive to existing entry
+SCGCQ00434388 - (Closed) - When pulling and pushing SSD SATA PDs under 5 seconds, the SSDs come back as failed after a minute or so.
+SCGCQ00420777 - (Closed) - Fw defect in PdStateSet()
+SCGCQ00419399 - (Closed) - Hard coded values should be removed in TFM module
+SCGCQ00414056 - (Closed) - Potential IO integrity with R0/R1 CIO WT when overlapping R/W issued to LD.
+SCGCQ00413472 - (Closed) - Unable to perform Consistency Check and other background operations in a legacy WebBIOS
+SCGCQ00413254 - (Closed) - Multiple VDs undergoing full init show a calculated estimated time remaining even though they sit at 0%
+SCGCQ00406688 - (Closed) - ‘Static Code Analysis Tool’ warnings: IDs - 10007 , 10338 , 10340, 10356, 10364 , 10371, 10389, 10390, 10847, 10848
+SCGCQ00406301 - (Closed) - ‘Static Code Analysis Tool’ warnings 10071, 10100, 10162, 10174, 10288, 10332, 10361, 10363, 10503
+SCGCQ00406219 - (Closed) - FW reports "Progress init not proper" during 16 VD Rebuild
+SCGCQ00400809 - (Closed) - Data miscompare seen when errors injected to a RAID6 virtual drive
+SCGCQ00400807 - (Closed) - Potential data integrity issue During Check Consistency On 4DG R6 arrays with 16 VDs per array
+SCGCQ00400564 - (Closed) - Delete VD while PR still in progress cause debugger to loop. Reboot the system, debugger still loops
+SCGCQ00393749 - (Closed) - MonTask: line 281 in file ../../raid/mem.c if running megacli AdpDiag
+SCGCQ00349837 - (Closed) - Sequential Read performance is less on CacheCade associated LD's.
+SCGCQ00451137 - (Closed) - If a BOOT Passphrase is enabled with SafeStor "MegaCli adpbios dsply a0" will display "BIOS will Stop on error" even if any other mode is set.
+SCGCQ00447927 - (Closed) - Message release issue in immediate IO path
+SCGCQ00446623 - (Closed) - Firmware crash during foreign config import
+SCGCQ00441299 - (Closed) - Updated line of code recommended in code review.
+SCGCQ00439477 - (Closed) - Verify drive reinsertion within/before drive-removal-delay setting -verify discovery (Without IO)
+SCGCQ00425796 - (Closed) - HII - Profile based VD creation - [Partial RAID options blocked until system reboot]
+SCGCQ00424928 - (Closed) - Application could not make a JBOD bootable without a VD present
+SCGCQ00423182 - (Closed) - bootMsgPending.needsEKM bit is not set when FW needs a key
+SCGCQ00422760 - (Closed) - Indifference between MR.H and FW implementation for lockKeyLength
+SCGCQ00420918 - (Closed) - Potential data integrity issue with a 4K RAID5 virtual drive
+SCGCQ00412766 - (Closed) - HII /When user has a critical message and the conrtoller is in Safe Mode, going into CTRL mang will result an error msg
+SCGCQ00404263 - (Closed) - Staggered CMEs across R10 array are causing a read error
+SCGCQ00475140 - (Closed) - Learn cycle will not start on supercap
+SCGCQ00451213 - (Closed) - Assertion failure in raid 1078main.c at line 993 during hibernation when IOs or background operations are running
+SCGCQ00448750 - (Closed) - UEFI-4K drives: Unable to create any virtual drives of strip size 256k-1MB with the 4K sector drives.
+SCGCQ00439050 - (Closed) - Static Code Analysis defects - 5.8
+SCGCQ00436460 - (Closed) - Event is blocked during Full initialization
+SCGCQ00422757 - (Closed) - iMR firmware does not progress background operations with certain systems when using WebBIOS in legacy mode
+SCGCQ00420702 - (Cloned_EnhReq) - Fw defects related to Disk Write Cache Policy settings 	 	
+SCGCQ00406148 - (Closed) - Grammatical spacing error in bios message at POST
+SCGCQ00400555 - (Closed) - The elapsed time shown in the FW debugger for a reconstruction not starting at 0
+SCGCQ00399591 - (Closed) - 23.16.0.0005/Creating CacheCade with non supported OEM SSD using older FW and then flashing to 5.7 it's till available
+SCGCQ00398281 - (Closed) - "Question value mismatch with Option Value" message in HII's Controller Management when in Safe Mode with pin cache
+SCGCQ00393347 - (Closed) - ‘Static Code Analysis Tool’ code changes
+SCGCQ00448628 - (Closed) - Rebuild failed event is not seen when rebuild fails due to LDBBM and SBBM tables getting full (puncturing disabled)
+SCGCQ00439947 - (Closed) - Static analysis tool defects
+SCGCQ00437731 - (Closed) - Remove memory module on MR controller to downgrade to iMR does not work
+SCGCQ00415473 - (Closed) - Fix code review defect D16582 in 5.8 stream for Review #17785: NCQ support is disabled in FW
+SCGCQ00400149 - (Closed) - Firmware failed to import drives to start rebuild after remove then reinsert
+SCGCQ00462008 - (Closed) - LDBBM_EXT table does not get read during init
+SCGCQ00443920 - (Closed) - Static analysis tool defects
+SCGCQ00440224 - (Closed) - Corrected defects found by static analysis tool.
+SCGCQ00439068 - (Closed) - Static analysis tool defect fixes
+SCGCQ00404301 - (Closed) - Significant drop in Sequenial read performance with Read Ahead policy
+SCGCQ00449597 - (Closed) - Multi-stripe size in each raid level of R1,r5,r6 with SAS, DIF, 4K pinned cache offline vd import cause Montask
+SCGCQ00446657 - (Closed) - Static Code Analysis Tool - Defect Code Changes
+SCGCQ00443455 - (Closed) - Static Analysis Defects
+SCGCQ00424293 - (Closed) - Setting the ASO key with storcli 1.02.08 (MegaCli 8.07.06) fails with an error code 3 on Windows or Linux if the MB BIOS PCI
+SCGCQ00406233 - (Closed) - Data Miscompare found while running I/O overnight with degraded virtual drives
+SCGCQ00443883 - (Closed) - Static code analysis tool fixes
+SCGCQ00436287 - (Closed) - HII critical message form/Extra character "r" with configuration not supported critical message.
+SCGCQ00399227 - (Closed) - Prevent overtemp warnings while battery is charging
+SCGCQ00411672 - (Implemented) - CLI Reporting of TMM VPD
+SCGCQ00472756 - (Closed) - EKMS disabled in firmware by modifying support EKM property in a proper way.
+SCGCQ00399224 - (Closed) - Modify MR fw to eliminate four second window where drive swap is not recognized.
+SCGCQ00399233 - (Closed) - Rebuild automatically starts on drive with foreign configuration after reboot.
+SCGCQ00377263 - (Closed) - Modify sense data returned for an offline VD
+SCGCQ00399229 - (Closed) - Availability of information on PFK hardware keys presence/absence via termlog.
+SCGCQ00403115 - (Closed) - HA/Peer controller detection and handling logic
+SCGCQ00331562 - (Closed) - R5 rebuild fails source drive after LDBBM table is full
+SCGCQ00396289 - (Port_Complete) - Defect fix for crash when fde disk connected
+SCGCQ00396296 - (Port_Complete) - Ctrl+R BIOS hangs while hot plug of 2 enclosures with more than 32 drives on FURY controller
+SCGCQ00397338 - (Port_Complete) - CC2.1_RA_Support : Data Integrity issue may happen upon creating WB CCVD during Cache Flush
+SCGCQ00397347 - (Port_Complete) - Sequential Read performance is less on CacheCade associated LD's.
+SCGCQ00409501 - (Port_Complete) - The reliability and error recovery of the SuperCap firmware was improved.
+SCGCQ00414020 - (Port_Complete) - Adjusted the USB phy boost value for the OEM controllers
+SCGCQ00414463 - (Port_Complete) - IO integrity error seen after Source VD associated with CacheCade VD is forcibly unblocked
+SCGCQ00414466 - (Port_Complete) - During rebuild on PRL11 CacheCade VD and rebuild on RAID6 Source VD IO integrity error is seen.
+SCGCQ00417742 - (Port_Complete) - BBU Charging gets disabled when Transparent Relearn fails to start due to low capacity
+SCGCQ00421945 - (Port_Complete) - on iMR FW update caused card to FW fault state and card cannot boot to OS.
+SCGCQ00421967 - (Port_Complete) - SEAGATE hotspare drives remain spun up on LSI FW 12.12.0-0079
+SCGCQ00424028 - (Port_Complete) - After COR (OCR) controller not longer available to HOST
+SCGCQ00426998 - (Port_Complete) - Code Review defect to handle SA_INVALID_FIELD_IN_CDB
+SCGCQ00427028 - (Port_Complete) - Change SES Green/Amber LED behavior for OEM JBOD enclosure.
+SCGCQ00427030 - (Port_Complete) - Customer is hitting an ECC bug 
+SCGCQ00427031 - (Port_Complete) - Firmware returns invalid data in OOB packet
+SCGCQ00435303 - (Port_Complete) - OEM facing with incorrect SAS HDD's indication, MSM shows 2X drives connected
+SCGCQ00435305 - (Port_Complete) - Alarm continues to sound after copy-back is done, across reboot, from an unconfigured good drive that is used as an emergency spare.
+SCGCQ00436807 - (Port_Complete) - Change RAID controller FW bad battery warning message that comes up during POST.
+SCGCQ00439490 - (Port_Complete) - 9260 controller VD goes offline during Slow/Full/Foreground Initialize with 3TB Seagate SED SAS drives
+SCGCQ00442108 - (Port_Complete) - 2208 ROMB see 0 Capacitance
+SCGCQ00462321 - (Port_Complete) - Deep learn doesn't start when it is requested during relaxing.
+SCGCQ00340844 - (Port_Complete) - Don't interpret the cachecade BVD flags if the volume is created with old FW which does not support cachecade.
+SCGCQ00357678 - (Port_Complete) - immediate IO broken for R1 - (SCGCQ00357549)
+SCGCQ00384609 - (Port_Complete) - Assertion failure in ../../raid/raidpci.c at line 10011 , while running IO with medium errors on arrays.
+SCGCQ00405889 - (Port_Complete) - Auto Foreign import fails when controller is booted with pinned cache.
+SCGCQ00406635 - (Port_Complete) - Power loop cycle test on a non DIF drive connected to LSI controller caused fatal firmware error
+SCGCQ00414469 - (Port_Complete) - When a Cachecade PD marked as missing is reused to make Cachecade VD IO integrity error is observed.
+SCGCQ00418100 - (Port_Complete) - If a correctable ECC error occurred during a cache offload, the CPU would crash, resulting in a data loss
+SCGCQ00418526 - (Port_Complete) - montask hit at the line "Fatal firmware error: Line 1057 in ../../dm/src/dm.c while running copyback with 255 ME
+SCGCQ00424266 - (Port_Complete) - Disable Band Gap feature for select customers
+SCGCQ00424272 - (Port_Complete) - Disable Band Gap feature for select customers
+SCGCQ00426122 - (Port_Complete) - Megamon issue when disabling the drive security on a MR controller with spun down FDE drives.
+SCGCQ00426172 - (Port_Complete) - Copyback on a drive hits kill adapter
+SCGCQ00426433 - (Port_Complete) - Setting the ASO key with storcli 1.02.08 (MegaCli 8.07.06) fails with an error code 3 on Windows or Linux if the MB BIOS PCI
+SCGCQ00426961 - (Port_Complete) - immediate IO broken for R1
+SCGCQ00427002 - (Port_Complete) - disableHII: Needs to be updated from nvdata into MFCD
+SCGCQ00427591 - (Port_Complete) - Infinite retry happens on Test Unit command when HDD didn't respond to TU command during the initialization.
+SCGCQ00432566 - (Port_Complete) - Enable DS3 on TB code for OEM
+SCGCQ00450108 - (Port_Complete) - TFM error handling : Cache policy change for WB to WT if supercap is faulty
+SCGCQ00455801 - (Port_Complete) - OEM- StorCli should not allow turning on JBOD in MR mode
+SCGCQ00462305 - (Port_Complete) - Deep Learn is not invoked in new battery, when the system is reboot before the first learn completes
+SCGCQ00462319 - (Port_Complete) - Transparent Learn Cycle is rescheduled even though it is not completed
+SCGCQ00468434 - (Port_Complete) - Write policy changed from WT to WB when the battery/Supercap is declared as bad
+SCGCQ00355900 - (Port_Complete) - OCR observed after IO on reconstructed VD with ME's
+SCGCQ00381325 - (Port_Complete) - Wrong event generated "Reminder: Potential non-optimal configuration due to drive PD xx(e0xfc/sx) commissioned..
+SCGCQ00418110 - (Port_Complete) - If the hotspare was spun down, the copyback after a drive failure wouldn't always start.
+SCGCQ00421950 - (Port_Complete) - adapterOperations.alarmControl is being set to 1 even if controller doesnot have alarm on board
+SCGCQ00421964 - (Port_Complete) - 9240-4i on one motherboard is not getting required memory resources on boot
+SCGCQ00421966 - (Port_Complete) - Unable to open "Set Patrol Read Properties" in MSM with 2008-iMR
+SCGCQ00426092 - (Port_Complete) - Megamon during Injecting errors to VD with 512e PDs on iMR controller
+SCGCQ00426194 - (Port_Complete) - If VD is secured while reconstruction is going on does not stay secured once reconstruction is done.
+SCGCQ00427013 - (Port_Not_Required) - Allocate BBLog for iMR Initally during boot up
+SCGCQ00427018 - (Port_Complete) - When attempting to secure LD during RLM, receive option to secure LD, LD not secured (message incorrect/misleading.)
+SCGCQ00432842 - (Port_Complete) - Saved Release Note DataSLIB returning bad data as good data after host reboots
+SCGCQ00436873 - (Port_Complete) - Minimum Capacity needed for relearn is incorrect in 2208 MR FW
+SCGCQ00438483 - (Port_Complete) - Improve foreign config import for iMR with mixed JBOD/RAID settings
+SCGCQ00446741 - (Port_Complete) - Correct the error in copy back path smart errors path
+SCGCQ00456440 - (Port_Complete) - Defect fix for VD rebuild doesnot kickin and goes to foreign state after reboot
+SCGCQ00464629 - (Port_Complete) - Disconnect SCap during Shutdown/Hibernate only if pinned cache is not present
+SCGCQ00364724 - (Port_Complete) - Assertion failure in ../../raid/raidpci.c at line 8323 while running IO with cable pull/push.
+SCGCQ00426204 - (Port_Complete) - spare pointer is incorrectly used in MR_CONFIG_DATA
+SCGCQ00427032 - (Port_Complete) - Fix For code analysis Defects Reported
+SCGCQ00432754 - (Port_Complete) - Customer experiencing extremely long rebuild times under I/O with LSI 9288-8e Procyon-U) controller
+SCGCQ00436808 - (Port_Complete) - Change RAID controller FW bad battery warning message that comes up during POST.
+SCGCQ00441823 - (Port_Complete) - Patrol Read - no progress
+SCGCQ00450643 - (Port_Complete) - 9260-8i(SAS2108) hitting OOB SRAT timeout for a long time causing OOB commands to fail
+SCGCQ00397250 - (Port_Complete) - ECC/Medium/Unrecoverable read errors handling Enhancement
+SCGCQ00405886 - (Port_Complete) - FW halts when you have pinned cahce and remove VD form the configuration.
+SCGCQ00418112 - (Port_Complete) - If the hotspare was spun down, the copyback after a drive failure wouldn't always start.
+SCGCQ00421977 - (Port_Complete) - Invalid target ID after new logical drive creation
+SCGCQ00427021 - (Port_Complete) - sync error stat for MRS
+SCGCQ00427022 - (Port_Complete) - megacli reports battery pack is missing on hot insertion
+SCGCQ00448174 - (Port_Complete) - Card Running iMR Machine Checks when Requesting Host Memory
+SCGCQ00421953 - (Port_Complete) - 9260-16i's drive locate/fault LED header doesn't work
+SCGCQ00427592 - (Port_Complete) - Infinite retry happens on Test Unit command when HDD didn't respond to TU command during the initialization.
+SCGCQ00453504 - (Port_Complete) - Defect Fix for Exception in Core 0
+SCGCQ00456361 - (Port_Complete) - Virtual drive configurations go missing during firmware upgrade from 5.3 to 5.7, while running Consistency Check (CC), after tworeboots 
+SCGCQ00387315 - (Port_Complete) - fix for the defect - 4k drives display wrong value of Coerced size.
+
+WebBIOS
+SCGCQ00414398 - In WebBIOS, if BGI is suspended the vd progress info page shows it as CC progress until it is resumed.
+
+NVDATA
+SCGCQ00435818 - Modify the NVData to reduce the window in which a drive swap is not recognized from 4 seconds to 2 seconds
+Numerous updates for OEM specific controllers
+
+UEFI Driver
+SCGCQ00435384 - (Closed) - UEFI System hang if controller FW is in fault state
+SCGCQ00392836 - (Closed) - LSI to Support Remote Key Management
+
+HII
+SCGCQ00472196 (DFCT) - Profile based VD creation path incorrectly showing protect VD/secure VD checkbox when user clicks on drive selection criteria
+SCGCQ00452128 (DFCT) - HII cannot assign partial space less than 1 GB
+SCGCQ00441850 (DFCT) - HII 03.03.04.00/Profile based configuration help issues
+SCGCQ00443864 (DFCT) - HII 03.03.03.00/PKG 5/When creating an invalid argument in HII during VD creation and after correction, save is grayed out
+SCGCQ00437500 (CSET) - Hii failed to report error warning when config 2pds R10 with different drive capacity
+SCGCQ00423622 (DFCT) - Tool to generate VFR
+SCGCQ00423659 (DFCT) - UCM - Virtual Drive Configuration summary does not report the "Interface Type"
+SCGCQ00431622 (DFCT) - HII: Navigation issue from Enable Drive Security form
+SCGCQ00422725 (CSET) - HII doesn not allow user to use the remain free capacity to configure additional VD for R50/R10.
+SCGCQ00427518 (CSET) - HII failed to allow user to use the remains free capacity for R1 VD with 2 plus TB capacity.
+SCGCQ00431231 (CSET) - Hii enter black screen/timeout when user switching between fields/form sub_form to create R10 VD on PERC9 controller.
+SCGCQ00432915 (CSET) - Hii failed to report warning that inappropriate drives are picked to config R10 VD.
+SCGCQ00419159 (ENHREQ) - New Field "package version" in Controller Management
+SCGCQ00415826 (DFCT) - UCM Driver - unable to create an 8PD R5
+SCGCQ00420950 (DFCT) - MR 6.1 HII: empty warning prompt is given when creating a CacheCade VD with forced writeback option
+SCGCQ00421615 (CSET) - BBU information and propererties are not displayed in HII browser for Perc9-H730P controller.
+SCGCQ00421618 (CSET) - HII Manage Foreign Configuration menu is not available when a foreign locked drive is present in the configuration
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 6/28/13
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.16.0.0018 (MR 5.7 P1)
+WebBIOS 6.1-65-e_65-Rel 
+Firmware 3.270.65-2578
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1304.03-0117
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x06000500
+Hii 03.02.08.00
+FCODE 4.12.05.00
+BIOS 5.42.00
+
+Previous Package Details:
+Firmware Package: 23.16.0.0012 (MR 5.7)
+WebBIOS 6.1-65-e_65-Rel 
+Firmware 3.270.05-2430
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1304.03-0117
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x06000500
+Hii 03.02.08.00
+FCODE 4.12.05.00
+BIOS 5.42.00
+
+
+Bug Fixes and Enhancements:
+===========================
+FIRMWARE:
+**NOTE: Full native 4K sector Firmware support is deferred to MegaRAID Release 5.8 targeted for September 2013.
+SCGCQ00454557 - Virtual drive configurations go missing during firmware upgrade from 5.3 to 5.7, while running Consistency Check (CC), after two reboots
+SCGCQ00454559 - Card Running iMR Machine Checks when Requesting Host Memory
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 5/30/13
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.16.0.0012 (MR 5.7)
+WebBIOS 6.1-65-e_65-Rel 
+Firmware 3.270.05-2430
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1304.03-0117
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x06000500
+Hii 03.02.08.00
+FCODE 4.12.05.00
+BIOS 5.42.00
+
+Previous Package Details:
+Firmware Package: 23.12.0.0013 (MR 5.6 P1)
+WebBIOS 6.1-62-e_62-Rel 
+Firmware 3.240.25-2382
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1304.03-0118
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05270000
+Hii 03.02.02.00
+FCODE 4.12.05.00
+BIOS 5.42.00
+
+
+Bug Fixes and Enhancements:
+===========================
+FIRMWARE:
+**NOTE: Full native 4K sector Firmware support is deferred to MegaRAID Release 5.8 targeted for September 2013.
+SCGCQ00414056 - (Closed) - Potential IO integrity with R0/R1 CIO WT when overlapping R/W issued to LD.
+SCGCQ00413472 - (Closed) - Unable to perform Consistency Check and other background operations in a legacy WebBIOS
+SCGCQ00413254 - (Closed) - Multiple VDs undergoing full init show a calculated estimated time remaining even though they sit at 0%
+SCGCQ00406688 - (Closed) - 'Static Code Analysis Tool' warnings: IDs - 10007 , 10338 , 10340, 10356, 10364 , 10371, 10389, 10390, 10847, 10848
+SCGCQ00406301 - (Closed) - 'Static Code Analysis Tool' warnings 10071, 10100, 10162, 10174, 10288, 10332, 10361, 10363, 10503
+SCGCQ00406219 - (Closed) - FW reports "Progress init not proper" during 16 VD Rebuild
+SCGCQ00400564 - (Closed) - Delete VD while PR still in progress cause debugger to loop. Reboot the system, debugger still loops
+SCGCQ00393749 - (Closed) - MonTask: line 281 in file ../../raid/mem.c if running megacli AdpDiag
+SCGCQ00393117 - (Closed) - Firmware crash during CME recovery
+SCGCQ00392421 - (Closed) - 5.7‘Static Code Analysis Tool’ changes
+SCGCQ00385372 - (Closed) - 'Static Code Analysis Tool' Defect OVERRUN STATIC: CIDs Out-of-bounds access
+SCGCQ00369611 - (Closed) - Code Analysis Tool fix
+SCGCQ00349837 - (Closed) - Sequential Read performance is less on CacheCade associated LD's.
+SCGCQ00424928 - (Closed) - Application could not make a JBOD bootable without a VD present
+SCGCQ00412766 - (Closed) - In HII, when user has a critical message and the conrtoller is in Safe Mode, going into CTRL Management will result an error msg
+SCGCQ00404301 - (Closed) - Significant drop in Sequenial read performance with Read Ahead policy
+SCGCQ00404263 - (Closed) - Staggered CMEs across R10 array are causing a read error
+SCGCQ00384874 - (Closed) - MR5.6 Beta Firmware BST: Code Analysis Tool Fix
+SCGCQ00378971 - (Closed) - Continues PR 2nd time on Raid 1 and then delete VD and reboot system cause debugger to continues loop and want to run PR
+SCGCQ00378358 - (Closed) - 5.7 FW PKG 23.11.0-0013/Using CLI, can change a cachecade PD to WB even though enableSSCWB=0
+SCGCQ00422757 - (Closed) - Firmware does not progress background operations with certain systems when using WebBIOS in legacy mode
+SCGCQ00406148 - (Closed) - Grammatical spacing error in bios message at POST
+SCGCQ00400555 - (Closed) - The elapsed time shown in the FW debugger for a reconstruction not starting at 0
+SCGCQ00398281 - (Closed) - "Question value mismatch with Option Value" message in HII's Controller Management when in Safe Mode with pin cache
+SCGCQ00394067 - (Closed) - Removed unwanted prints. For copyBack, total Blocks for copyback was not getting intitailized for right drive. Initialized for copyBack destination PD. Added necessary fix.
+SCGCQ00383251 - (Closed) - Code Analysis Tool Defect OVERRUN STATIC: CIDs Out-of-bounds access
+SCGCQ00381562 - (Closed) - Assertion failure fixed for issuing "adpdiag" from megacli-dos
+SCGCQ00378408 - (Closed) - Correct formatting and compilation issues
+SCGCQ00400149 - (Closed) - Firmware failed to import drives to start rebuild after remove then reinsert
+SCGCQ00394259 - (Closed) - Fixes for defects found by Static Code Analysis Tool
+SCGCQ00393347 - (Closed) - 'Static Code Analysis Tool' code changes
+SCGCQ00383337 - (Closed) - Firmware is sending totalElapsedSecs value as 0 for LD and PD progresses
+SCGCQ00380450 - (Closed) - MegaCli pdFwDownload fails on a SATA drive with an interposer (parent defect is SCGCQ00352210)
+SCGCQ00378916 - (Closed) - Timed critical boot message under UEFI mode not showing
+SCGCQ00375763 - (Closed) - Fix for Firmware asserted when VDs are offline
+SCGCQ00375418 - (Closed) - Code Analysis Tool Fix
+SCGCQ00393765 - (Closed) - Code Analysis Tool Fix
+SCGCQ00391493 - (Closed) - Firmware blocked firmware download to interposer
+SCGCQ00372058 - (Closed) - NCQ support is disabled in FW
+SCGCQ00334864 - (Closed) - Double media error getting corrected during check consistency
+SCGCQ00406233 - (Closed) - Data Miscompare found while running I/O overnight with degraded virtual drives
+EnhancementRequests (12)
+**NOTE: Full native 4K sector Firmware support is deferred to MegaRAID Release 5.8 targeted for September 2013.
+SCGCQ00323433 - (Closed) - 4K sector support - Cache Mgmt, Snapshot, LD config, RAID **
+SCGCQ00369610 - (Closed) - CME handling improvements for handling multi-row I/Os
+SCGCQ00369835 - (Closed) - 4K sector support - Switch to enable/disable 4K feature, Restrict "Snapshot" to 512-sector drives **
+SCGCQ00392264 - (Closed) - Firmware returns invalid data in OOB packet
+SCGCQ00369206 - (Closed) - ECC memory error boot message and event log enhancement.
+SCGCQ00369208 - (Closed) - Rebuild time reset
+SCGCQ00392280 - (Closed) - Provide Fastpath as a standard offering for TB based controllers
+SCGCQ00364773 - (Closed) - Ability to power off and on individual HDD
+SCGCQ00369741 - (Closed) - Port latency outlier fixes to FW (from legacy PR137246)
+SCGCQ00323427 - (Closed) - 4K sector support - DDF, DM, Host Interface **
+SCGCQ00369832 - (Closed) - 4K sector support - iMR, analyze all remaining hard-coded instances of "512" **
+SCGCQ00369228 - (Rejected) - RRB 45 - CLI Reporting of TMM VPD
+CSETActivities (52)
+SCGCQ00354181 - (Port_Complete) - DDF rev is not updated properly when both 4K and 512 drives are present **
+SCGCQ00372172 - (Port_Complete) - MR2208 JBOD function can't handle the UNC error of SATA disk
+SCGCQ00381798 - (Port_Complete) - MR Controller Rejects Vendor Unique SCSI Command
+SCGCQ00395186 - (Port_Complete) - Double media error getting corrected during check consistency
+SCGCQ00396296 - (Port_Complete) - Ctrl+R- Ctrl+R BIOS hangs while hot plug of 2 enclosures with more than 32 drives
+SCGCQ00397246 - (Port_Complete) - [MR5.4] CacheCade: ECC/Medium/Unrecoverable read errors handling Enhancement
+SCGCQ00397338 - (Port_Complete) - CC2.1_RA_Support : Data Integrity issue may happen upon creating WB CCVD during Cache Flush
+SCGCQ00397347 - (Port_Complete) - Sequential Read performance is less on CacheCade associated LD's.
+SCGCQ00414020 - (Port_Complete) - Adjusted the USB phy boost value for the OEM controllers with SubDevice IDs between 3510 and 3515.
+SCGCQ00414463 - (Port_Complete) - IO integrity error seen after Source VD associated with CacheCade VD is forcibly unblocked
+SCGCQ00414466 - (Port_Complete) - During rebuild on PRL11 CacheCade VD and rebuild on RAID6 Source VD IO integrity error is seen.
+SCGCQ00417742 - (Port_Complete) - BBU Charging gets disabled when Transparent Relearn fails to start due to low capacity
+SCGCQ00373301 - (Port_Complete) - SCSI Pass-Through to SAS SSD returns data but disk reported medium error
+SCGCQ00374850 - (Port_Complete) - Foreign config import failed from MR to iMR on Solaris 11x86
+SCGCQ00384609 - (Port_Complete) - Assertion failure in ../../raid/raidpci.c at line 10011 , while running IO with medium errors on arrays.
+SCGCQ00385362 - (Port_Complete) - reading SATA IDENT information using STP_Passthru doesn't work with latest FW
+SCGCQ00389234 - (Port_Complete) - Continues PR 2nd time on Raid 1 and then delete VD and reboot system cause debugger to continues loop and want to run PR
+SCGCQ00395380 - (Port_Complete) - Disk missing sporadically during reboot of OEM
+SCGCQ00405889 - (Port_Complete) - Auto Foreign import fails when controller is booted with pinned cache.
+SCGCQ00406635 - (Port_Complete) - Power loop cycle test on a non DIF drive connected to LSI controller caused fatal firmware error
+SCGCQ00411291 - (Port_Complete) - Significant drop in Sequenial read performance with Read Ahead policy
+SCGCQ00414469 - (Port_Complete) - When a Cachecade PD marked as missing is reused to make Cachecade VD IO integrity error is observed.
+SCGCQ00418110 - (Active) - If the hotspare was spun down, the copyback after a drive failure wouldn't always start.
+SCGCQ00381325 - (Port_Complete) - Wrong event generated "Reminder: Potential non-optimal configuration due to drive PD xx(e0xfc/sx) commissioned..
+SCGCQ00383643 - (Port_Complete) - "Assertion failure in ../../raid/mem.c at line 281" on issuing "adpdiag" from megacli-dos
+SCGCQ00392859 - (Port_Complete) - TFM modules with dirty data can cause the controller to hang during boot when transported to another controller
+SCGCQ00409501 - (Port_Complete) - The reliability and error recovery of the SuperCap firmware was improved.
+SCGCQ00418100 - (Port_Complete) - If a correctable ECC error occurred during a cache offload, the CPU would crash, resulting in a data loss
+SCGCQ00360907 - (Port_Complete) - VD becomes WT with a good & new Super Cap on boot
+SCGCQ00381814 - (Port_Complete) - (multiple) Megacli64 error in deadlock state
+SCGCQ00386772 - (Port_Complete) - Timed critical boot message under UEFI mode not showing
+SCGCQ00392416 - (Port_Not_Required) - Firmware blocked firmware download to interposer
+SCGCQ00393320 - (Port_Complete) - NCQ support is disabled in FW
+SCGCQ00397337 - (Port_Complete) - Data Integrity issue may happen upon creating WB CCVD during Cache Flush
+SCGCQ00412657 - (Port_Complete) - Adjusted the USB phy boost value for the OEM controllers with SubDevice IDs between 3510 and 3515.
+SCGCQ00374855 - (Port_Complete) - GHS drives changed to unconfigured good after OCR / System reboot scenario's 
+SCGCQ00378050 - (Port_Complete) - BMC see clock stetching on I2C bus
+SCGCQ00380935 - (Port_Complete) - BMC see clock stetching on I2C bus
+SCGCQ00381794 - (Port_Complete) - MR Controller Rejects Vendor Unique SCSI Command
+SCGCQ00391703 - (Port_Complete) - Copyback was successful when the block sizes did not match
+SCGCQ00397250 - (Port_Complete) - [MR5.4] CacheCade: ECC/Medium/Unrecoverable read errors handling Enhancement
+SCGCQ00405886 - (Port_Complete) - FW halts when you have pinned cache and remove VD form the configuration.
+SCGCQ00374852 - (Port_Complete) - Defect fix for 4 K drives Foreign configuration import.
+SCGCQ00409495 - (Port_Complete) - The reliability and error recovery of the SuperCap firmware was improved.
+SCGCQ00412679 - (Port_Complete) - Timeout when creating a hotspare
+SCGCQ00385361 - (Port_Complete) - reading SATA IDENT information using STP_Passthru doesn't work with latest FW
+SCGCQ00395381 - (Port_Complete) - Disk missing sporadically during reboot of OEM
+SCGCQ00354097 - (Port_Complete) - MR: VD created in IR controller comes as UG when connected.
+SCGCQ00380285 - (Port_Complete) - Defect fix for 4K configuration record updation is not happening with 4k drives **
+SCGCQ00381728 - (Port_Complete) - Firmware asserted at raid/cache.c at line 3661 when VDs are offline
+SCGCQ00381812 - (Port_Complete) - (multiple) Megacli64 error in deadlock state
+**NOTE: Full native 4K sector Firmware support is deferred to MegaRAID Release 5.8 targeted for September 2013.
+
+WebBIOS:
+SCGCQ00380528 - (Closed) - In EFI WebBIOS with CC running on a R1 when 1 PD is removed EFI WebBIOS still shows that CC is in progress
+SCGCQ00400124 - (Closed) - Controller breaks into Megamon when clicking on the enclosure link in WebBIOS
+
+NVDATA:
+SCGCQ00333522 - (Closed) - Degraded performance comparison With the latest MR 5.3 -MR_3.190.25.1887
+
+Hii:
+SCGCQ00420373 - (Closed) - HII doesn not allow user to use the remain free capacity to configure additional VD for R50/R10.
+SCGCQ00422774 - (Port_Complete) - MR 6.1 HII: empty warning prompt is given when creating a CacheCade VD with forced writeback option
+
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 05/07/13
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.12.0.0013 (MR 5.6 P1)
+WebBIOS 6.1-62-e_62-Rel 
+Firmware 3.240.25-2382
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1304.03-0118
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05270000
+Hii 03.02.02.00
+FCODE 4.12.05.00
+BIOS 5.42.00
+
+Previous Package Details:
+Firmware Package: 23.12.0.0011 (MR 5.6)
+WebBIOS 6.1-62-e_62-Rel 
+Firmware 3.240.05-2282
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1304.03-0117
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05270000
+Hii 03.02.02.00
+FCODE 4.12.05.00
+BIOS 5.38.00
+
+
+Bug Fixes and Enhancements:
+===========================
+FIRMWARE:
+SCGCQ00369611 - (Closed) - FW issues discovered with test tool fixed
+SCGCQ00349837 - (Closed) - Sequential Read performance is less on CacheCade associated LD's.
+SCGCQ00392264 - (Closed) - Firmware returns invalid data in OOB packet
+SCGCQ00395186 - (Port_Complete) - Double media error getting corrected during check consistency
+SCGCQ00397246 - (Port_Complete) - ECC/Medium/Unrecoverable read errors handling Enhancement
+SCGCQ00411291 - (Port_Complete) - Significant drop in Sequenial read performance with Read Ahead policy
+SCGCQ00409495 - (Port_Complete) - The reliability and error recovery of the SuperCap firmware was improved.
+SCGCQ00395380 - (Port_Complete) - Disk missing sporadically during reboot
+SCGCQ00393320 - (Port_Complete) - NCQ support is disabled in FW
+SCGCQ00380935 - (Port_Complete) - BMC see clock stetching on I2C bus
+SCGCQ00412679 - (Port_Complete) - Timeout when creating a hotspare
+SCGCQ00397337 - (Port_Complete) - Potential data integrity issue when creating WB CCVD during Cache Flush
+SCGCQ00385361 - (Port_Complete) - reading SATA IDENT information using STP_Passthru doesn't work with latest FW
+SCGCQ00397345 - (Port_Complete) - Sequential Read performance is less on CacheCade associated LD's.
+
+BIOS:
+SCGCQ00383673 - (Closed) - Extremely long delay when the controller POST in Legacy mode
+SCGCQ00395750 - (Closed) - BIOS build date field is empty and build date is displayed as BIOS build time
+SCGCQ00408767 - (Closed) - OpROM not getting relocated to runtime segment if the segment address is 0xC0000
+SCGCQ00347490 - (Closed) - Handle error when B0 and D1 controller is present
+SCGCQ00375416 - (Closed) - BIOS to have a logic to filter CCVD and report Remote VD count at OpROM POST time
+SCGCQ00293087 - (Closed) - FW Version number Truncated by one digit in OpROM POST screen
+SCGCQ00397476 - (Implemented) - BIOS: Provide scratch segment and populate info to assist Ctrl R to load latest host
+SCGCQ00347481 - (Closed) - Retry read capacity if scsi status is not success
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 03/02/13
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.12.0.0011 (MR 5.6)
+WebBIOS 6.1-62-e_62-Rel 
+Firmware 3.240.05-2282
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1304.03-0117
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05270000
+Hii 03.02.02.00
+FCODE 4.12.05.00
+BIOS 5.38.00
+
+Previous Package Details:
+Firmware Package: 23.11.0-0021 (MR 5.5)
+WebBIOS 6.1-60-e_60-Rel 
+Firmware 3.230.05-2100
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1301.03-0115
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05240000
+Hii 03.00.06.00
+FCODE 4.12.05.00
+BIOS 5.38.00
+
+
+Bug Fixes and Enhancements:
+===========================
+FIRMWARE:
+SCGCQ00343193 - (Closed) - FW crashes during foreign configuration import.
+SCGCQ00353334 - (Closed) - Evaluation Order Violation
+SCGCQ00353358 - (Closed) - Operands don't affect result
+SCGCQ00353906 - (Closed) - Development tool fixes
+SCGCQ00358678 - (Closed) - Enclosure was not detected.
+SCGCQ00369216 - (Closed) - OVERRUN STATIC: CIDs 10281, 10283 Out-of-bounds access
+SCGCQ00369611 - (Closed) - Development tool fixes
+SCGCQ00369667 - (Closed) - Drives need to be marked foreign when its state changes to unconfigured good and it has a valid DDF.
+SCGCQ00372061 - (Closed) - Development tool fixes
+SCGCQ00363693 - (Closed) - Development tool fixes
+SCGCQ00364253 - (Closed) - UNUSED VALUE : CIDs 10376, 10377, 10398, 10399
+SCGCQ00378971 - (Closed) - Continues PR 2nd time on Raid 1 and then delete VD and reboot system cause debugger to continues loop and want to run PR
+SCGCQ00384874 - (Closed) - MR5.6 Beta Firmware BST: MonTask: line 5911 in file ../../raid/pd.c
+SCGCQ00356781 - (Closed) - System hanged after pulling out drives from a 8Raid-6 array during OCR in Debian OS
+SCGCQ00358060 - (Closed) - Logically dead code
+SCGCQ00358069 - (Closed) - In printMrLdConfig(), pointer is checked against null but then dereferenced anyway
+SCGCQ00359118 - (Closed) - Firmware does not allow CacheCade VDs to be created
+SCGCQ00364620 - (Closed) - Fix For development tool Defects Reported
+SCGCQ00381562 - (Closed) - "Assertion failure in ../../raid/mem.c at line 281" on issuing "adpdiag" from megacli-dos
+SCGCQ00353296 - (Closed) - Get_Time_Delta() has incorrect pointer increment
+SCGCQ00357185 - (Closed) - In configRaid, value returned from a function is not checked for errors before being used
+SCGCQ00375418 - (Closed) - Fix For development tool Defects Reported
+SCGCQ00375763 - (Closed) - Firmware asserted at raid/cache.c at line 3661 when VDs are offline
+SCGCQ00378916 - (Closed) - Timed critical boot message under UEFI mode not showing
+SCGCQ00380450 - (Closed) - MegaCli pdFwDownload fails on a SATA drive with an interposer (parent defect is SCGCQ00352210)
+SCGCQ00365342 - (Closed) - Wrong value returned for the field "CacheOffLoad" under the class "lsiesg_megaraidhbaadvancesoftware".
+SCGCQ00391493 - (Closed) - Firmware blocked firmware download to interposer
+SCGCQ00331565 - (Closed) - Punctured Block Logging Improvements
+SCGCQ00348163 - (Closed) - Fault LED behavior in OEM Blades
+SCGCQ00318098 - (Closed) - temporary patch.
+SCGCQ00331572 - (Closed) - Boot the system to iMR mode if NVRAM is not initialized.
+SCGCQ00357927 - (Port_Complete) - We should not be directly unregistering the device from the DISM code. As, we do have a proper device removal state machine scheduled in the task list to do that.
+SCGCQ00361327 - (Port_Complete) - A good SuperCap could be prematurely marked as failed.
+SCGCQ00367948 - (Port_Complete) - FW goes to montask at cache offload.
+SCGCQ00372173 - (Port_Complete) - MR2208 JBOD function can't handle the UNC error of SATA disk
+SCGCQ00374198 - (Port_Complete) - A SuperCap could be shown as prematurely failed if a reboot occurred immediately after a learn cycle completed.
+SCGCQ00374208 - (Port_Complete) - If a double bit error occurs during memory initialization on a OEM controller, GPIO 19 will now be asserted.
+SCGCQ00357590 - (Port_Not_Required) - CSET: MR_DS3: all PDS missing after few rounds of enclosure pull/push run. - (SCGCQ00354731)
+SCGCQ00360912 - (Port_Complete) - VD becomes WT with a good & new Super Cap on boot
+SCGCQ00364140 - (Port_Complete) - Error Message "incompatible secondary iButton present!" or "BIOS handshaking With The FW,Wait" shown
+SCGCQ00373302 - (Port_Complete) - SCSI Pass-Through to SAS SSD returns data but disk reported medium error
+SCGCQ00374201 - (Port_Complete) - The SuperCap will now remain in the failed state when its capacitance falls below the minimum or its resistance exceeds the maximum
+SCGCQ00357221 - (Port_Complete) - Cache offload would not work when a USB debugger was attached
+SCGCQ00374210 - (Port_Complete) - multi path with Consistency Check LED behavior problem
+SCGCQ00357937 - (Port_Complete) - We should not add a SEP device to the enclosure tracker.
+SCGCQ00360965 - (Port_Complete) - VD Degraded after reconstruction of R5
+SCGCQ00381794 - (Port_Complete) - T-Bolt MR Controller Rejects Vendor Unique SCSI Command
+SCGCQ00381812 - (Port_Complete) - (multiple) Megacli64 error in deadlock state
+
+WebBIOS
+SCGCQ00288524 - (Closed) - Remaining capacity is coming 0 from FW.
+SCGCQ00308400 - (Closed) - WebBIOS does not warn user before importing PI enabled VD on PI disabled controller.
+SCGCQ00309063 - (Closed) - WebBIOS does not show "Day" for Next learn cycle time in battery page. And issue with safe mode.
+SCGCQ00327325 - (Closed) - FW completely halted/hung when selecting drives in WebBIOS after reinserting drives with pinned cache present present
+SCGCQ00308556 - (Closed) - Preboot apps have to change load address change because of FW changes.
+SCGCQ00308401 - (Closed) - WebBIOS reports incorrect number of foreign configs during "Scan Devices"
+SCGCQ00309056 - (Closed) - WebBIOS should not allow RLM for protected VDs with non-PI drives.
+SCGCQ00318379 - (Closed) - "4K sector support" 
+SCGCQ00344103 - (Closed) - Not able to associate multiple VDs in a cache pool.
+SCGCQ00309218 - (Closed) - WebBIOS displays SSD association	 screen for Secured and Protected VDs (Virtual drive table is empty).
+SCGCQ00342568 - (Closed) - User is not able to see offline virtual drive property page.
+SCGCQ00322775 - (Closed) - "Boot error handling" options are not correct in WebBIOS.
+SCGCQ00289513 - (Closed) - Battery Firmware vesion(MR_BBU_DESIGN_INFO.moduleVersion) is coming as Null
+SCGCQ00322246 - (Closed) - Add 4k sector support in WebBIOS
+SCGCQ00324759 - (Closed) - bit in MR_PD_INFO for SSD Qualifier: SCGCQ00296487
+SCGCQ00322603 - (Closed) - Utilities to show logical block size [AF512e, 512n, 4Kn,..]
+
+NVDATA
+SCGCQ00333522 - (Closed) - Degraded performance comparison With the latest MR 5.3 -MR_3.190.25.1887 
+SCGCQ00351785 - (Closed) - Fault LED behavior in OEM Blades
+
+UEFI Driver
+SCGCQ00369636 - (Closed) - UEFI: Settime only when FW time is not set; DHP: Return appropriate health status when there is no critical boot message
+SCGCQ00340581 - (Implemented) - UEFI Driver should check pMRCtrlInfo ->maxHANodes with > 1 
+SCGCQ00310476 - (Implemented) - Load HII when user responds to critical boot message by pressing C
+
+HII
+SCGCQ00378089 Headline: HII hangs when trying to enter Configuration Management while in Safe Mode
+SCGCQ00378414 HII message for Safe Mode is not clear
+SCGCQ00378831 Headline: HEFU: Controller Status should reflect safe mode + dont log debug messages in serial port
+
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 12/28/12
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.11.0-0021 (MR 5.5)
+WebBIOS 6.1-60-e_60-Rel 
+Firmware 3.230.05-2100
+ROMENV 1.08
+PCLI 05.07.00
+BootBlock 2.05.00.00-0010
+NVDATA 2.1301.03-0115
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05240000
+Hii 03.00.06.00
+FCODE 4.12.05.00
+BIOS 5.38.00
+
+Previous Package Details:
+Firmware Package: 23.9.0-0018 (MR 5.4 P1)
+WebBIOS 6.1-49-e_49-Rel 
+Firmware 3.220.35-1998
+ROMENV 1.08
+PCLI 05.05.03
+BootBlock 2.05.00.00-0009
+NVDATA MR2.1209.03-0112
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05180000
+Hii 2.05.00
+FCODE 4.12.05.00
+BIOS 5.38.00
+
+
+Bug Fixes and Enhancements:
+===========================
+List of bug fixes and enhancements:
+SCGCQ00333941	CSETActivity	Firmware assertion failure during power-cycle test
+SCGCQ00335693	CSETActivity	PdIs512e() will not work for emulated drives
+SCGCQ00335703	CSETActivity	avoid setting physical block extend for 4096 drives
+SCGCQ00336938	CSETActivity	MR5.4 FW loses its time settings after OCR
+SCGCQ00336944	CSETActivity	Firmware assertion failure during power-cycle test
+SCGCQ00338623	CSETActivity	BGI does not correct ECC medium errors on 2nd arm of Raid 10 array
+SCGCQ00338895	CSETActivity	Controller is running into a Machine Check loop during copyback test
+SCGCQ00341862	CSETActivity	SAS2208 ROMB LD Rebuild suspend/resume issue
+SCGCQ00341863	CSETActivity	SAS2208 ROMB LD Rebuild suspend/resume issue
+SCGCQ00343746	CSETActivity	SES device is not found during cable pull testing
+SCGCQ00344089	CSETActivity	Flash of package with OFU request
+SCGCQ00344175	CSETActivity	SES device is not found during cable pull testing
+SCGCQ00347321	CSETActivity	Firmware fails to return proper value when flashed same firmware image with different stamping with OFU request.
+SCGCQ00347711	CSETActivity	RAID Member disks state changed to (foreign) online and still can access.
+SCGCQ00351212	CSETActivity	DDF: Wrong Controller Data CRC is written on the Disk
+SCGCQ00351225	CSETActivity	Defect Fix of foreign import failure
+SCGCQ00351889	CSETActivity	Drive removal could potentially hang FW.
+SCGCQ00353454	CSETActivity	RAID Member disks state changed to (foreign) online and still can access.
+SCGCQ00353461	CSETActivity	Foreign config after reboot with some drives.
+SCGCQ00354739	CSETActivity	Baseport Not Responding on SL1 during sytsem reboot
+SCGCQ00357220	CSETActivity	Cache offload would not work when a USB debugger was attached
+SCGCQ00357262	CSETActivity	Offline drive becomes automatically online during Raid Level Migration
+SCGCQ00357556	CSETActivity	Set Drive State to JBOD in MR9266/MR2208 will cause  Drive Fault LED light on
+SCGCQ00357673	CSETActivity	Drive fails after I/O timeout and subsequent target reset during continuous firmware flash.
+SCGCQ00357679	CSETActivity	immediate IO broken for R1
+SCGCQ00309752	Defect	BGI does not correct ECC medium errors on 2nd arm of Raid 10 array
+SCGCQ00310954	Defect	Irrelevant Popup message in HII due to FW filling MR_BIOS_DATA.bootTargetID with 1 when there is no VD or JBOD
+SCGCQ00319081	Defect	Drives dropped when flashing FW back from MR5.3 to 11M08 and FW crashes with TLB error
+SCGCQ00321912	Defect	When using 6GB drives with or without the interposer, the drives will not show.
+SCGCQ00323019	Defect	Change POST message for no" FoD key installed but config is on drives".
+SCGCQ00327330	Defect	Cannot import full foreign config after pulling and re-inserting SSD drives.
+SCGCQ00329658	Defect	Foreign config after reboot
+SCGCQ00329666	Defect	MR5.4 FW loses its time settings during the OCR.
+SCGCQ00329727	Defect	Voltage backdriving from serial port into adapter
+SCGCQ00334399	Defect	MegaRAID 5.5 firmware writes DDF revision 2.0 on the 512 sector drives
+SCGCQ00334799	Defect	True Random Number Generator BIST failed; Error code is 2
+SCGCQ00335316	Defect	FW breaks into Montask after running OCR during I/O
+SCGCQ00335603	Defect	when trying to import 64 VDs from a 1078 controller, the FW breaks into montask.
+SCGCQ00336270	Defect	Megacli64 Full init cause continuous error in ouput like this 156xxx end_request: I/O error, dev sdb, sector 0
+SCGCQ00336788	Defect	MegaRAID firmware does not detect devices after spin-up failure
+SCGCQ00336798	Defect	FW does not fail drive when excessive time is spent during recovery of CME's
+SCGCQ00336822	Defect	FW reports supercap device chemistry as "EDLC" but apps do not see any device chemistry
+SCGCQ00336827	Defect	FW reports Supercap FW version but apps do not see any supercap FW version
+SCGCQ00337177	Defect	MegaRAID firmware hangs when 4K sector drive is connected
+SCGCQ00338468	Defect	FW is flashed through Online Firmware Update method but no reset is performed after flashing
+SCGCQ00338544	Defect	MegaRAID firmware does not handle the Bad Block Log correctly
+SCGCQ00339125	Defect	When starting a reconstruction and rebooting the system to continue, debug message are constantly being scrolled
+SCGCQ00339383	Defect	iMR firmware continuously soft reset when running I/O using IOMETER on 16 RAID5 VDs
+SCGCQ00339807	Defect	512E hard drives show up as unsupported drives.
+SCGCQ00340107	Defect	Firmware failed to import all VDs after enclosure is removed and re-insert
+SCGCQ00340772	Defect	Address Action Item SCGCQ00340495 (Check coding standard for structure OfuRequestState)
+SCGCQ00342429	Defect	Performance drop at QD 8 and above running 4 KB Seq. Read
+SCGCQ00342925	Defect	Overnight I/O on VDs w/SSC and breaking Multi-path breaks into MegaMon (Interposers)
+SCGCQ00342940	Defect	Running PR on Multi-path enclosure, removing one cable and reinserting it deletes all VDs
+SCGCQ00346344	Defect	MSM allows OFU from MR 5.5 fw to MR 5.4 firmware then failed during upgrade
+SCGCQ00349622	Defect	When importing various VDs with different stipe sizes and rebuild, the PDs come back failed
+SCGCQ00350509	Defect	After flash controller with 5.5, VDs are no longer handled by BIOS
+SCGCQ00353078	Defect	HII, WebBIOS & CLI  reports supercap battery type as "SuperCapEDLC"
+SCGCQ00353322	Defect	Unable to enable ocr using application due to FW ocr setting taking precedence
+SCGCQ00354841	Defect	To Improve iMR Performance
+SCGCQ00356707	Defect	Multipath breaks into montask after VD creation
+SCGCQ00356708	Defect	maintainpdfailhistory = 0, but PDs come back as unconfigured bad anyway.
+SCGCQ00360807	Defect	Multi-Path is not re-enabling  when cable is removed and re-inserted
+SCGCQ00360925	Defect	When a configured drive is pulled and re-inserted it is left foreign
+SCGCQ00361288	Defect	When going from 5.3+GCA or PKG 6 to PKG 16, unable to import config.
+SCGCQ00361358	Defect	Interposer Multi-path failover is failing 2 Drives from R5
+SCGCQ00361661	Defect	OFU is disabled by default
+SCGCQ00362225	Defect	Repeated power cycling the enclosure with interposers results in drives not detecting
+SCGCQ00362456	Defect	CacheCade fails with interposers on fail over
+SCGCQ00362601	Defect	Drive not Foreign when pulling drive from VD, reinserting, and changing to UG
+SCGCQ00310880	EnhancementRequest	Add support for DDF2.0 specifications
+SCGCQ00314504	EnhancementRequest	Implement changes to mitigate performance degradation related to 512e I/O misalignment
+SCGCQ00320242	EnhancementRequest	Added support for a new MegaRAID I2C DCMD that returns the firmware package version and date stamp.
+SCGCQ00323007	EnhancementRequest	MR HWR CacheVault message : Change the word "USB" in any CacheVault related messages.
+SCGCQ00325942	EnhancementRequest	Use qualified SSD for super cache.
+
+WebBIOS
+SCGCQ00318379	Defect	"4K sector support" PR#SCGCQ00295805
+SCGCQ00322775	Defect	"Boot error handling" options are not correct in WebBIOS.
+SCGCQ00327325	Defect	FW completely halted/hung when selecting drives in WebBIOS after reinserting drives with pinned cache present present
+SCGCQ00342568	Defect	User is not able to see offline virtual drive  property page.
+SCGCQ00344103	Defect	Not able to associate multiple VDs in a cache pool.
+SCGCQ00322246	EnhancementRequest	Add 4k sector support in WebBIOS
+SCGCQ00322603	EnhancementRequest	Utilities to show logical block size [AF512e, 512n, 4Kn,..]
+SCGCQ00324759	EnhancementRequest	bit in MR_PD_INFO for  SSD Qualifier: SCGCQ00296487
+
+PCLI
+SCGCQ00356037 (DFCT) - CLI Crashes When Running ADP FW Flash Command
+SCGCQ00356190 (DFCT) - No controller properties for Online FW Update in MegaCLi
+
+BootBlock
+SCGCQ00343311 (DFCT) -FW MR 5.4 posting a "91" error code
+
+NVDATA
+SCGCQ00289330	EnhancementRequest	Added support for LSI MegaRAID 9271-4i controller
+SCGCQ00313968	EnhancementRequest	Change the "enablePI" default for all MR products to "1"
+
+UEFI Driver
+SCGCQ00262858	Defect	Debug message is shown from EFI app choice prompt
+SCGCQ00308870	Defect	EFI Driver 518\When disconnecting the driver in EFI, still able to exectue the EFI utility menu.
+SCGCQ00312683	Defect	UEFI Driver not timing out in 3 mins when FW is in undefined state
+SCGCQ00320619	Defect	UEFI: Build Device Path and Get Next Target function of SCSI Pass Thru is not returning correct EFI status for certain cases
+SCGCQ00335617	Defect	Drives are reporting timeout on Write Buffer cmd
+SCGCQ00339371	Defect	UEFI Driver fails SCT Test
+SCGCQ00343869	Defect	Enhance critical boot message handling
+SCGCQ00347171	Defect	MR: on having pinned cache, the option to invoke storage dosen't come.
+SCGCQ00318101	EnhancementRequest	Timed critical boot message under UEFI mode
+SCGCQ00338066	EnhancementRequest	Fire LD list query based on maxHANodes
+SCGCQ00338782	EnhancementRequest	If SetOptions is called dont show EFI WebBIOS and EFI CLI option
+SCGCQ00340581	EnhancementRequest	UEFI Driver should check pMRCtrlInfo ->maxHANodes with > 1 to determine HAMR
+SCGCQ00347492	EnhancementRequest	UEFI: Retry read capacity if scsi status is not success
+
+HII
+SCGCQ00355994 (DFCT) - HII Create Virtual Drive help file typo
+SCGCQ00356024 (DFCT) - HII displays Supercap capacity values in mAh instead of Joules like all other applications
+SCGCQ00356195 (CSET) - in HII the learn time shows as 8hours
+SCGCQ00348044 (DFCT) - 4KB drive's logiacal and physical sector size is shown as 4K.
+SCGCQ00348060 (DFCT) - 4k drive size is shown wrong in advanced window under drive management
+SCGCQ00349332 (DFCT) - No err msg when choosing 4k & 512b drv while creating VD; The VD size is shown incorrectly after choosing single 4k drive
+SCGCQ00349347 (DFCT) - The form title for "Create VD - Advanced " form is not correct
+SCGCQ00354279 (DFCT) - Not able to get into Controller Management when 64 VDs are created
+SCGCQ00354289 (DFCT) - Profile based configuration\SATA and SAS drives not in right order in the list of PDs
+SCGCQ00354644 (DFCT) - able to create R6 SAS using profile based configuration
+SCGCQ00344663 (DFCT) - HII: Change "Hole" to "Free Space" to conform with other apps
+SCGCQ00346930 (DFCT) - HII Screen updated reset fields in Configuration Management > Create Virtual Disk- Advanced screen
+SCGCQ00329645 (CSET) - Applying changes in Automatic Learn Cycle Properties ends up with "Requested Command is invalid"
+SCGCQ00283147 (DFCT) - Enclosure Management not showing attached drives even though there are 8 drives attached
+SCGCQ00338730 (DFCT) - When executing this version on certain systems, it is not entering HII at all
+SCGCQ00329659 (DFCT) - Unit for VD size is inconsistent
+SCGCQ00329992 (DFCT) - Title shows "Warning" for Success message
+SCGCQ00330080 (DFCT) - Error on creating partial Protected VD in Specific scenario
+SCGCQ00331426 (DFCT) - When going into Controller Management, select clear config then OK, it goes to Config screen
+SCGCQ00335528 (DFCT) - Help for Coercion Mode is not appropriate
+SCGCQ00337249 (DFCT) - Save Controller events: Anytime user saves events it gives the last 10 events by default
+SCGCQ00315701 (ENHREQ) - Update battery related pages in MR HII
+SCGCQ00328710 (ENHREQ) - Option to Initialize while creating VD
+SCGCQ00336427 (ENHREQ) - Remove a HII error message and change the landing zone to "configuration options" page
+SCGCQ00321339 (DFCT) - Help is missing for some of the fields.
+SCGCQ00322495 (DFCT) - Add missing help content and Modify existing Help content for few parameters
+SCGCQ00322499 (DFCT) - Question Value mismatch pops-up while clicking on Generic RAID 1, 5 or 6 option
+SCGCQ00322502 (DFCT) - VD cannot be created while choosing different option in drive selection criteria
+SCGCQ00321231 (CSET) - Attempt to create CacheCade VD by slecting R1 with with 3 SSD Drives ends up R0 VD Creation with 3 SSD Drives
+SCGCQ00321232 (CSET) - Doesn’t show the relevant title name for Setting Automatic Learn Cycle Properties Form
+SCGCQ00321233 (CSET) - Doesn't show the correct Title for Success Message
+SCGCQ00321234 (CSET) - Doesn't allow enabling/disabling PI support (controller property)
+SCGCQ00322930 (CSET) - VDs does not display Current Power Save Policy value for all power save policies.
+SCGCQ00324432 (CSET) - Enhanace MFI Stat error code strings
+SCGCQ00307025 (DFCT) - DHSP assignment form is not showing the array size correctly if user has partial VD
+SCGCQ00308002 (DFCT) - Patrol Read Rate is displayed 0 in Advanced Controller Properties
+SCGCQ00310951 (DFCT) - Allows to select Cachecade VD as Boot device
+SCGCQ00319518 (DFCT) - HII will not allow config to be cleared when no drives are attached
+SCGCQ00321339 (DFCT) - Help is missing for some of the fields.
+SCGCQ00321231 (CSET) - Attempt to create CacheCade VD by slecting R1 with with 3 SSD Drives ends up R0 VD Creation with 3 SSD Drives
+SCGCQ00321232 (CSET) - Doesn’t show the relevant title name for Setting Automatic Learn Cycle Properties Form
+SCGCQ00321233 (CSET) - Doesn't show the correct Title for Success Message
+SCGCQ00321234 (CSET) - Doesn't allow enabling/disabling PI support (controller property)
+SCGCQ00314266 (ENHREQ) - HII UI enhancements. Add application based VD creation wizard.
+SCGCQ00318037 (ENHREQ) - CacheCade SSD Qualifier
+SCGCQ00319424 (ENHREQ) - Enhance Informational message that HII displays when there is no more space to create additional VD
+SCGCQ00319514 (ENHREQ) - Remove 'Adaptive Read Ahead' option from every MegaRAID management utility (PR SCGCQ00317400)
+SCGCQ00319948 (ENHREQ) - MR TB: Add 4k sector support in HII
+SCGCQ00319949 (ENHREQ) - HII to show logical block size [AF512e, 512n, 4Kn,..]
+SCGCQ00322448 (CSET) - HII will not allow config to be cleared when no drives are attached
+SCGCQ00338394 (CSET) - Error on creating partial Protected VD in Specific scenario
+SCGCQ00343900 (CSET) - Enclosure Management not showing attached drives even though there are 8 drives attached
+SCGCQ00352424 (CSET) - Save Controller events: Anytime user saves events it gives the last 10 events by default
+SCGCQ00352427 (CSET) - HII: Change "Hole" to "Free Space" to conform with other apps
+SCGCQ00352430 (CSET) - HII 5.5 Version 3.00+/When executing this version on certain systems, it is not entering HII at all
+
+Installation:
+=============
+Use MegaCLI or StorCLI to flash the SAS controllers.  These tools can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  
+MegaCli -adpfwflash -f mr2208fw.rom -a0
+or
+StorCLI /c0 download file=mr2208fw.rom
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 11/12/12
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.9.0-0018 (MR 5.4 P1)
+WebBIOS 6.1-49-e_49-Rel 
+Firmware 3.220.35-1998
+ROMENV 1.08
+PCLI 05.05.03
+BootBlock 2.05.00.00-0009
+NVDATA MR2.1209.03-0112
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05180000
+Hii 2.05.00
+FCODE 4.12.05.00
+BIOS 5.38.00
+
+Previous Package Details:
+Firmware Package: 23.9.0-0015 (MR 5.4)
+Date Generated: 09/13/12 
+WebBIOS 6.1-49-e_49-Rel 
+Firmware 3.220.05.1881
+ROMENV 1.08
+PCLI 05.05.03
+BootBlock 2.05.00.00-0009
+NVDATA MR2.1209.03-0112
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05180000
+Hii 2.05.00
+FCODE 4.12.05.00
+BIOS 5.37.00
+
+
+Bug Fixes and Enhancements:
+===========================
+List of bug fixes and enhancements:
+Firmware:
+SCGCQ00319081 - (Closed) - Drives dropped when flashing FW back from MR5.3 to 11M08 and FW crashes with TLB error
+SCGCQ00309752 - (Closed) - BGI does not correct ECC medium errors on 2nd arm of Raid 10 array
+SCGCQ00329727 - (Closed) - Cache offload would not work when a USB debugger was attached
+SCGCQ00298871 - (Closed) - Controller is running into a Machine Check loop during copyback test.Controller time clock refer
+SCGCQ00329658 - (Closed) - Foreign config after reboot with some drives.
+SCGCQ00329666 - (Closed) - MR5.4 FW loses its time settings after OCR
+SCGCQ00344175 - (Port_Complete) - SES device is not found during cable pull testing
+SCGCQ00336944 - (Port_Complete) - Firmware assertion failure during power-cycle test
+SCGCQ00347711 - (Port_Complete) - RAID Member disks state changed to (foreign) online and
+
+BIOS
+SCGCQ00341354 (DFCT) - MR HWR OpROM BIOS : OOB (BMC) function corrupts EBDA area used by other server function.
+SCGCQ00340572 (ENHREQ) - BIOS should check pMRCtrlInfo ->maxHANodes with > 1 to determine HAMR
+
+
+Installation:
+=============
+Use MegaCLI to flash the SAS controllers.  MegaCLI can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  MegaCli -adpfwflash -f mr2208fw.rom -a0
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 10/08/12
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.9.0-0015 (MR 5.4)
+Date Generated: 09/13/12 
+WebBIOS 6.1-49-e_49-Rel 
+Firmware 3.220.05.1881
+ROMENV 1.08
+PCLI 05.05.03
+BootBlock 2.05.00.00-0009
+NVDATA MR2.1209.03-0112
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05180000
+Hii 2.05.00
+FCODE 4.12.05.00
+BIOS 5.37.00
+
+Previous Package Details:
+Firmware Package: 23.7.0-0035 (MR 5.3)
+Release Date: 2012-06-08 03:15:09 
+WebBIOS 6.1-45-e_45-Rel 
+Firmware 3.190.15-1776
+ROMENV 1.08
+PCLI 05.04.05
+BootBlock 2.05.00.00-0007 
+NVDATA MR2.1206.03-0105
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05160000
+Hii 1.30.00
+FCODE 4.12.05.00
+BIOS 5.33.00
+
+
+Bug Fixes and Enhancements:
+===========================
+
+This package includes support for CacheCade Pro 2.0 and CacheVault(if enabled).  
+
+List of bug fixes and enhancements:
+Firmware:
+SCGCQ00303893 - Firmware automatically convert to iMR mode after second reboot
+SCGCQ00317538 - Firmware montask when convert from iMR to MR.
+SCGCQ00294955 - USB Cache Device not responding message displayed at POST
+SCGCQ00296433 - Firmware failed to convert from MR back to iMR when memory module is removed.
+SCGCQ00296434 - 5.4 iMR FW breaks into MegaMon during boot after flashing.
+SCGCQ00297000 - Copyback is not automatically starting on 2208 MR board.
+SCGCQ00300226 - MR firmware received kill-adapter from host during drive pull.
+SCGCQ00302656 - BIOS does not display accurate message when multiple enclosures are attached to the controller
+SCGCQ00307641 - MFC variable enableSSCWB was not getting updated when updated via megaSCU
+SCGCQ00317920 - BBU still charged at a higher than required band gap for BBU mode 1
+SCGCQ00327403 - Serious performance issue found in the latest public official LSI 9285-8e MegaRAID firmware 1776(small sequential reads perf)
+SCGCQ00262489 - OOB STP returning wrong values
+SCGCQ00279167 - T-bolt firmware : CC schedule is changed to an unjust date by "Configuration Clear"
+SCGCQ00297092 - Controller does not come up while a PD Erase is in progress_Debug Firmware
+SCGCQ00299699 - Don't clear Recon LD PDs.
+SCGCQ00302625 - FW log shows too many times Host IOs were blocked.
+SCGCQ00303045 - biosContinueOnError does not work when enabled in mode 2, 3 or 1
+SCGCQ00307651 - Port LSIP200211420 from Invader - Upon OCR, Recon Ghost LD needs to be created before WJ processing
+SCGCQ00308502 - The SuperCap learn cycle error handling was improved.
+SCGCQ00292697 - Stressing test on degrade raid with drives or rebuilding on drives will cause firmware hang
+SCGCQ00307050 - Not able to flash both 9265-8i and 9285-8e card with 5.3 patch 1 firmware.However, it is ok on 9266-8i.
+SCGCQ00268424 - Add FUA support.
+SCGCQ00299975 - Controller does not detect SSD drives during boot up.
+SCGCQ00304347 - Firmware MonTask at line 482 in file gemini/pmuInterface.c when convert from MR to iMR.
+SCGCQ00305391 - Controller reports FW mismatch on the second enclosure when 3Gbps enclosure is connected to 6Gbps enclosure.
+SCGCQ00309064 - WebBIOS is giving an option to assosiate VDs with cahce pool even if feature(CC 1.0 and CC2.0) is not supported by FW.
+SCGCQ00314781 - Controller always enter HSM when it is set to HCOE
+SCGCQ00314822 - Dont log capacity change event post rebuild completion.
+SCGCQ00324568 - Firmware does not backup data during power fail with SuperCap.
+SCGCQ00292666 - SATA BBM list corruption
+SCGCQ00293603 - Cachecade configurations could not be created.
+SCGCQ00294044 - Pulling cable when maintainpdfailhistory=1 create wrong state in arrays.
+SCGCQ00301308 - MR5.4 Alpha: Unable to detect SATA CD-ROM: DM_DevVPD83Callback - VPD PAGE READ error Tid 110 Rdm 60422c00
+SCGCQ00303765 - RAID features are lost because of errors while accesing TSOC using an old firmware (11M08)
+SCGCQ00304283 - Memory test does not execute when performing FW diagnostics.
+SCGCQ00320097 - Firmware reports Pmu Msg Fault!!! faultcode 00000302.
+SCGCQ00324048 - iMR firmware cannot import VDs when drives are remove then re-inserted
+SCGCQ00289673 - Clean up bad block list during background init/check consistency failure
+SCGCQ00300187 - MR_DCMD_LD_LIST_QUERY response is not MFI_STAT_INVALID_PARAMETER when unsuported query is received
+SCGCQ00314824 - Log commission event only if Rebuild will start on the PD.
+SCGCQ00318660 - Corrupted rom id from ibutton can get used by other routines.
+SCGCQ00290533 - Learn Improvement - Do not take Command block if there is no LD for which cache policy will change
+SCGCQ00282990 - Online Firmware Update
+SCGCQ00285057 - Add STP passthru capability to BMC StorlIB
+SCGCQ00285058 - Need to add some mechanism to make Customer's Thunderbolt add-on card work only on Customer's systems
+SCGCQ00285351 - Spin up changes to accommodate multiple power domains simultaneously.
+SCGCQ00292266 - iBBU for OEM - need FW support
+SCGCQ00293529 - Increase iMR Queue Depth to remove JBOD performance bottleneck
+SCGCQ00290532 - Band Gap charging for iBBU00
+SCGCQ00314903 - Revert back OEM specific EEPROM updates
+
+BIOS
+SCGCQ00288503 BIOS doesnt display the RAID level and VD size correctly at OpROM POST 
+SCGCQ00278805 if the RAID volume or JBOD is created using 4k drive we will not expose them (we will not provide int13 support for it)
+SCGCQ00286064 Need to add some mechanism to make TB add-on card work on OEM system
+SCGCQ00292680 BIOS: LSIP200198414/LSIP200229508/LSIP200231613: Disables all requirement for human input at boot time 
+SCGCQ00298886 System hangs at splash screen when OEM ROC is installed 
+SCGCQ00321855 BIOS displays "BIOS Brining Up The F/W" message repeatedly 
+SCGCQ00324408 HAMR: Fire LD list query based on maxHANodes 
+SCGCQ00297361 System failed to boot with enableJBOD feature with B0 board. 
+SCGCQ00332262 Stack corruption if user has 4k and 512b JBOD drive connected to iMR 
+SCGCQ00333421 HAMR: BIOS is firing LD list query with query type exposed to boot instead of cluster access 
+
+UEFI Driver: 
+SCGCQ00262858 Debug message is shown from EFI app choice prompt on a OEM system 
+SCGCQ00308870 EFI Driver 518\When disconnecting the driver in EFI, I am still able to exectue the EFI utility menu.
+SCGCQ00312683 UEFI Driver not timing out in 3 mins when FW is in undefined state 
+SCGCQ00320619 UEFI: Build Device Path and Get Next Target function of SCSI Pass Thru is not returning correct EFI status for certain cases 
+SCGCQ00292963 LSIP200198414/LSIP200229508/LSIP200231613: Disables all requirement for human input at boot time 
+SCGCQ00267652 TB D1 Card caused customer system to fail on boot with PCI Express Error Interrupt at: C880:26CF - (SCGCQ00267652) 
+
+HII
+SCGCQ00327945 Applying changes in Automatic Learn Cycle Properties ends up with "“Requested Command is invalid”
+SCGCQ00321482 Help is missing for some of the fields. - (SCGCQ00321339)
+SCGCQ00322500 Remove subtitle text STR_FORM_HF002_ERROR_NO_PD
+SCGCQ00319518 HII will not allow config to be cleared no drives attached
+SCGCQ00319466 Attempt to create CacheCade VD by slecting R1 with with 3 SSD Drives ends up R0 VD Creation with 3 SSD Drives
+SCGCQ00319460 Doesn’t show the relevant title name for Setting Automatic Learn Cycle Properties Form
+SCGCQ00319456 Doesn't show the correct Title for Success Message
+SCGCQ00310951 Allows to select Cachecade VD as Boot device
+SCGCQ00308002 Patrol Read Rate is displayed 0 in Advanced Controller Properties
+SCGCQ00304249 HII allows to Make Unconfigured Bad to UCG Drive, MSM doesn't show this option
+SCGCQ00300211 Text string Missing in Expand VD Form
+SCGCQ00300186 HII - Eligible JBOD drives for conversion always shows 0.
+SCGCQ00324423 Enhanace MFI Stat error code strings
+SCGCQ00322928 VDs does not display Current Power Save Policy value for all power save policies. - (SCGCQ00302643)
+SCGCQ00321288 Doesn't allow enabling/disabling PI support (controller property) - (SCGCQ00305301)
+SCGCQ00321482 Help is missing for some of the fields. - (SCGCQ00321339)
+SCGCQ00303144 Progress field should be Read Only, it is selectable.
+SCGCQ00303141 In Adavnaced Controller Management Subtitles/Fields are not consistent
+SCGCQ00303138 "Manage DHSP Drives" is always grayed out in VD Advanced Properties
+SCGCQ00303137 On Success message title is showing "Warning"
+SCGCQ00303109 "Go" Button is missing for "Drive Erase" operation
+SCGCQ00302643 VDs does not display Current Power Save Policy value for all power save policies.
+SCGCQ00301202 Should not allow to check both boxed for Secure and Protected VD during Create VD
+SCGCQ00300486 Coonfiguration management form is blank if there is no drives connected.
+SCGCQ00300472 HII - Main menu does not update the forms after adding to an enclosure
+SCGCQ00300216 Help is missing in multiple places
+SCGCQ00300215 Text String needs to update for CacheCade VD "Write Cache Policy" options
+SCGCQ00300205 PD level Operation is not working properly
+SCGCQ00300197 HII - Save controller events did not save the events appropriately
+SCGCQ00299958 HII - Expand Virtual Drive gives success message but does not work, goes to wrong page after success message
+SCGCQ00299933 HOST Port Count value is inconsistent in RAID Management utilities
+SCGCQ00299861 "Advanced" form for CacheCade VD is not implemented properly
+SCGCQ00304342 Enable Drive Security EKMS mode on Success message title is showing "Error message"
+SCGCQ00294022 OnLine PD Info goes to irrelevant Pop Up message
+SCGCQ00304782 Doesn't show the progress for some of the operation in VD Management form
+SCGCQ00304785 "STOP" button should be grayed out or suppressed during Reconstruction
+SCGCQ00304820 VD Nmae is not interactive and Success message need to be different for Rebuild and Consistency Check
+SCGCQ00305300 Doesn't allow to create second Protected VD on the Disk group
+SCGCQ00305301 Doesn't allow enabling/disabling PI support (controller property)
+SCGCQ00304819 HII/Emergency Hotspare is reported for UG and HSP drives as "eligible/ineligible" - (SCGCQ00281514)
+SCGCQ00300216 Help is missing in multiple places
+SCGCQ00300192 Manage SSD Caching is showing all the VD's in the list in HII. - (SCGCQ00294957) 
+SCGCQ00299922 Add informational message for corner cases
+SCGCQ00296912 Form Title is not correct for Drive information when check view assiciated PD information for VD
+SCGCQ00296201 Doesn't show what opertaion is running but shows the progress
+SCGCQ00294080 On TB controller, making unconfigured bad drive to Good, goes to JBOD description
+SCGCQ00294960 Doesn't show all the options for Erase Mode
+SCGCQ00292023 HII - Not able to set Consistency Check start Date and Time
+SCGCQ00291970 HII - In Drive Management some of the field are empty
+SCGCQ00291822 Dedicated HSP option is not available in Select Drive Operation
+SCGCQ00294015 Doesn't show the Drive ID correctly
+SCGCQ00294035 Doesn't shows the Form Title correctly for Advanced Battery Management
+SCGCQ00293163 HII -Replace Drive, goes to wrong form after success message. Replace drive operation is not working.
+SCGCQ00292010 "Secure Erase" Primitive should not appear if drive is not secured
+SCGCQ00292005 Clicking on "Go" to start Check Consistency operation, goes to wrong form
+SCGCQ00291450 HII - "Reconfigure Virtual Drives" all fields are greyed out.
+SCGCQ00291992 VD Management form goes to wrong form after starting the operation
+SCGCQ00291394 Text string is missing for some of the fields in Advanced Drive Information, though it shows the value for that fields
+SCGCQ00291324 Grayout root menu options when no drive, encl or battery is connected
+SCGCQ00293373 HEFU: LSIP200198414/LSIP200229508/LSIP200231613: Disables all requirement for human input at boot time
+SCGCQ00293092 Redesign battery related pages in MR HII HEFU
+SCGCQ00293103 Hii- clean up / rearrange code 
+SCGCQ00291992 VD Management form goes to wrong form after starting the operation 
+SCGCQ00291893 "Associated Virtual Drive" is missing in Form 8 
+SCGCQ00291428 Assign GHSP ends up with irrelevant pop up messge. 
+SCGCQ00291394 Text string is missing for some of the fields in Advanced Drive Information, though it shows the value for that fields 
+SCGCQ00291390 Spelling Mistakes in some of the forms 
+SCGCQ00291382 As per Doc A.7, Create VD and Create CacheCadeVD should not be implemented under VD Management 
+SCGCQ00291350 HII-Clear foreign configuration warning message displays repeatedly 
+SCGCQ00291336 It should allow to check box only one PD for Assocoated Drives 
+SCGCQ00291324 Grayout root menu options when no drive, encl or battery is connected 
+SCGCQ00290602 In some of the Forms Title has missing strings 
+SCGCQ00290584 "View Drive Properties" is grayed out when select the PD under “Associated Drives” 
+SCGCQ00290567 Save TTYlog not following new logic
+SCGCQ00293474 Can not enable SSD caching in HII
+
+WebBIOS:
+SCGCQ00288524 - Remaining capacity is coming 0 from FW.
+SCGCQ00309056 - WebBIOS should not allow RLM for protected VDs with non-PI drives.
+SCGCQ00289513 - Battery Firmware vesion(MR_BBU_DESIGN_INFO.moduleVersion) is coming as Null
+SCGCQ00308400 - WebBIOS does not warn user before importing PI enabled VD on PI disabled controller.
+SCGCQ00309063 - WebBIOS does not show "Day" for Next learn cycle time in battery page. And issue with safe mode.
+SCGCQ00308401 - WebBIOS reports incorrect number of foreign configs during "Scan Devices"
+SCGCQ00308556 - Preboot apps have to change load address change because of FW changes.
+SCGCQ00309218 - WebBIOS displays SSD association screen for Secured and Protected VDs (Virtual drive table is empty).
+
+BootBlock:
+SCGCQ00313424 Bootblock is using NVRAM data even if NVRAM is uninitialized
+SCGCQ00309000 adapters card may training to PCIe Gen2 for certain slots
+
+NVDATA:
+Various changes
+
+
+Installation:
+=============
+Use MegaCLI to flash the SAS controllers.  MegaCLI can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  MegaCli -adpfwflash -f mr2208fw.rom -a0
+
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 08/03/12
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.7.0-0035 (MR 5.3)
+Release Date: 2012-06-08 03:15:09 
+WebBIOS 6.1-45-e_45-Rel 
+Firmware 3.190.15-1776
+ROMENV 1.08
+PCLI 05.04.05
+BootBlock 2.05.00.00-0007 
+NVDATA MR2.1206.03-0105
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05160000
+Hii 1.30.00
+FCODE 4.12.05.00
+BIOS 5.33.00
+
+Previous Package Details:
+Firmware Package: 23.7.0-0031 (MR 5.3)
+Release Date: 2012-06-08 03:15:09 
+WebBIOS 6.1-45-e_45-Rel 
+Firmware 3.190.15-1686 
+ROMENV 1.08
+PCLI 05.04.05
+BootBlock 2.05.00.00-0007 
+NVDATA MR2.1206.03-0102
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05160000
+Hii 1.30.00
+FCODE 4.12.05.00
+BIOS 5.33.00
+
+
+Bug Fixes and Enhancements:
+===========================
+
+This package includes support for CacheCade Pro 2.0 and CacheVault(if enabled).  
+
+Firmware:
+
+SCGCQ00287136 (DFCT) - Dont log capacity change event post rebuild completion.
+SCGCQ00287140 (DFCT) - Log commission event only if Rebuild will start on the PD.
+SCGCQ00289673 (DFCT) - Clean up bad block list during background init/check consistency failure
+SCGCQ00291161 (DFCT) - Reverted back the changes of the issues: SCGCQ00287136 & SCGCQ00287140.
+SCGCQ00292666 (DFCT) - SATA BBM list corruption
+SCGCQ00292697 (DFCT) - Stressing test on degrade raid with drives or rebuilding on drives will cause firmware hang
+SCGCQ00291473 (CSET) - T-bolt firmware : makes unconfigured bad (foreign) to unconfigured bad on reboot.
+SCGCQ00292663 (CSET) - cannot make the CacheCade configured PD as unconfigured bad even pulling it out during system online.
+SCGCQ00292699 (CSET) - Hot Spare lost after FW update
+SCGCQ00294044 (DFCT) - Pulling cable when maintainpdfailhistory=1 create wrong state in arrays.
+SCGCQ00304283 (DFCT) - Memory test does not execute when performing FW diagnostics.
+SCGCQ00307641 (DFCT) - MFC variable enableSSCWB was not getting updated when updated via megaSCU
+SCGCQ00299654 (CSET) - Code review: DC : Set RDM_FLAGS_FUA_REQ in immediate IO path in rebuilding drive case.
+SCGCQ00307690 (CSET) - Controller does not come up while a PD Erase is in progress_Debug Firmware
+
+
+Installation:
+=============
+Use MegaCLI to flash the SAS controllers.  MegaCLI can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  MegaCli -adpfwflash -f mr2208fw.rom -a0
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 06/18/12
+
+
+Version Numbers:	
+===============
+Current Package Details:
+Firmware Package: 23.7.0-0031 (MR 5.3)
+Release Date: 2012-06-08 03:15:09 
+WebBIOS 6.1-45-e_45-Rel 
+Firmware 3.190.15-1686 
+ROMENV 1.08
+PCLI 05.04.05
+BootBlock 2.05.00.00-0007 
+NVDATA MR2.1206.03-0102
+BootBlockCommon 07.26.13.219
+UEFI_Driver 0x05160000
+Hii 1.30.00
+FCODE 4.12.05.00
+BIOS 5.33.00
+
+Previous Firmware Package:     23.4.1-0028
+Previous Package Details:
+APPMR-3.160.15-1559_BB-2.05.00.00-0004_BIOS-5.29.00_4.12.05.00_0x05090000_WEBBIOS-6.1-31-e_31-Rel_PCLI-05.02-0100001_BOOT-07.26.05.219_NVDATAMR-2.1108.03-0078  
+
+
+Bug Fixes and Enhancements:
+===========================
+
+This is a major product refresh known as MegaRAID Release 5.3, with numerous bug fixes and enhancements.  This package includes support for CacheCade Pro 2.0 and CacheVault(if enabled).  Some of the bug fixes and enhancements are provided below.  
+
+Firmware:
+SCGCQ00289673 (DFCT) - Clean up bad block list during background init/check consistency failure
+SCGCQ00291161 (DFCT) - Reverted back the changes of the issues: SCGCQ00287136 & SCGCQ00287140
+SCGCQ00292666 (DFCT) - SATA BBM list corruption
+SCGCQ00292697 (DFCT) - Stressing test on degrade raid with drives or rebuilding on drives will cause firmware hang
+SCGCQ00291473 (CSET) - T-bolt firmware : makes unconfigured bad (foreign) to unconfigured bad on reboot.
+SCGCQ00292663 (CSET) - cannot make the CacheCade configured PD as unconfigured bad even pulling it out during system online.
+SCGCQ00292699 (CSET) - Hot Spare lost after FW update
+SCGCQ00263872 (DFCT) - Stressing test on degrade raid with UNC drives or rebuilding on UNC drives will cause firmware hang
+SCGCQ00269825 (DFCT) - Firmware reports device initialization completion status to be greater than 100% at startup
+SCGCQ00280612 (DFCT) - Split large bitmap reads into pieces
+SCGCQ00280820 (DFCT) - USB Cacheoffload restore fails after multiple power cycle.
+SCGCQ00282739 (DFCT) - When secure foreign drive is present, VD creation fails because FW become unresponsive
+SCGCQ00282930 (DFCT) - Check for the presence of PD before writing the data arms of a protected LD during BGI
+SCGCQ00285004 (DFCT) - FW asserts in CacheMemAllocForPrebootApps() when memory is allocated twice by BIOS.
+SCGCQ00285969 (DFCT) - USB Cacheoffload restore fails after multiple power cycle on an OEM controller
+SCGCQ00281982 (CSET) - Querying SMART / PFA Status Returns All Zeros in Sense Data
+SCGCQ00279897 (DFCT) - Save repository information in NVRAM
+SCGCQ00280123 (DFCT) - MegaRAID FW could result in a deadlock condition when offloading data to USB cache module after a system power failure and a power restore condition before offload operation could be completed.
+SCGCQ00280474 (DFCT) - When windows are freed, re-initialize those fields because freed windows can be allocated to other commands in case of window crunch scenario.
+SCGCQ00280792 (DFCT) - iMR-f/w hang at Waiting for Expansion ROM to load.
+SCGCQ00281742 (DFCT) - Skip spare check for R0 cachecade vd.
+SCGCQ00281994 (DFCT) - Change protected R6 secure erase behavior
+SCGCQ00282220 (DFCT) - Remove faulty check
+SCGCQ00282420 (DFCT) - If LD is in offline state then dont initate flush. Delete the VD.
+SCGCQ00282691 (DFCT) - DATA TLB error seen during cache offload while performing automated system power cycling test with cache present.
+SCGCQ00281982 (CSET) - Querying SMART / PFA Status Returns All Zeros in Sense Data
+SCGCQ00275826 (DFCT) - MonTask: line 1221 in file ../../raid/1078dma.c during I/O with CacheCade VD and degraded VD.
+SCGCQ00278827 (DFCT) - Separate error recovery functionality between modules
+SCGCQ00279508 (DFCT) - CC stops progressing on a R6 VD with media errors
+SCGCQ00280146 (DFCT) - Defect SCGCQ00280146
+SCGCQ00280846 (DFCT) - When a new XML file was added to the nvdata, the buffer to hold the uncompressed nvdata overflowed.
+SCGCQ00280793 (CSET) - (DDR3) Initialization fails with fault 0x91a1 - initial DFIRL selected too low
+SCGCQ00281617 (CSET) - Subsequent drives are dropped when all drives in the stagger spin up drives fails on boot sequence.
+SCGCQ00271108 (DFCT) - New stat indicating that memory is not available for SSC operation is returned.
+SCGCQ00278827 (DFCT) - Separate error recovery functionality between modules
+SCGCQ00279163 (DFCT) - Port Hot spare disk does not adhere the disk cache policy (LSIP200229786).
+SCGCQ00279488 (DFCT) - FW is generating powersave change event when DS3 is not enabled. Due to this applications are not parsing the event.
+SCGCQ00279753 (DFCT) - VD erase on R1 hit montask line 278 1078int.c
+SCGCQ00279877 (DFCT) - Churchill-LiberatorCacheOffload FW Unnecessary High Temp Event due to incorrect temp value.
+SCGCQ00278830 (CSET) - During IO test, a lot of ID129 OS events "Device reset to SCSI device" occur in Windows OS system log.
+SCGCQ00279843 (CSET) - 3TB Hitachi HDD failed in immunity test (Electrostatic Noise test)
+SCGCQ00279856 (CSET) - Performance Degradation in RAID 5 Sequential Writes due to command Out-of Ordering
+SCGCQ00279861 (CSET) - Patrol Read can cause data integrity issue if the LDBBM is full
+SCGCQ00279961 (CSET) - Controller features are lost if RAID Key is not detected
+SCGCQ00280115 (CSET) - Native configuration is no longer supported message in post
+SCGCQ00277831 (ENHREQ) - Add recognition of Tbolt new silicon to MegaRAID FW
+SCGCQ00279912 (CSET) - Port of Liberator 151207 to Thunderbolt FW - Read locate LED state
+SCGCQ00263878 (DFCT) - Use the original command to determine the ref tag
+SCGCQ00265319 (DFCT) - A defect in which a Patrol Read may not start under certain conditions was fixed.
+SCGCQ00268429 (DFCT) - SCGCQ00268429: FW hangs while running CC on a rebuilt R1 VD with SBBM
+SCGCQ00268574 (DFCT) - Fixed a defect, in which the bbuMode would revert to the factory default value of 5, when automatic learn cycle was enabled.
+SCGCQ00269266 (DFCT) - EFI WebBIOS showing rebuild progress on iMR ThunderBolt controller after using EFIHostCLI
+SCGCQ00269934 (DFCT) - Imported drive becomes unconfigured good when secure VD erase is running.
+SCGCQ00271108 (DFCT) - New stat indicating that memory is not available for SSC operation is returned.
+SCGCQ00271274 (DFCT) - Not enough BBM Info entries
+SCGCQ00271567 (DFCT) - FW hangs during pin cache destage as dirty lines in that map never become zero.
+SCGCQ00276222 (DFCT) - FW wrongly adding puncture entries.
+SCGCQ00277805 (DFCT) - Rebuild is run twice on a target drive with 100% full SBBM table.
+SCGCQ00264814 (DFCT) - Cacheline crunch issue when VD lines are getting pinned.
+SCGCQ00265375 (DFCT) - Recon from R0 to R1 using 3 TB drive causes FW to report excessive unexpected sense events
+SCGCQ00265670 (DFCT) - FW hit montask after after discarding the cache when a snapshot VD is involved
+SCGCQ00265990 (DFCT) - MR_EVT_PD_RBLD_FAILED_BAD_TARGET is not seen when rebuild to SATA drive fails due to full SBBM table
+SCGCQ00266481 (DFCT) - enable cachecade write for cachade read FOD key.
+SCGCQ00266493 (DFCT) - MR_EVT_LD_CACHE_PINNED is not coming when FW raises pin windows.
+SCGCQ00267733 (DFCT) - CC fails to correct media error at 2TB location on 2 3TB SATA drives that support WU.
+SCGCQ00269309 (DFCT) - The start ref for a shared cache line is not an indicator of the offset into the stripe
+SCGCQ00270254 (DFCT) - Clear PI properties on associated PDs
+SCGCQ00271645 (DFCT) - Fix skinny compilation issues
+
+BIOS:
+LSIP200223808 (sev-2): unable to enter  legacy web bios with 3 controllers present and one is missing memory on OEM system
+LSIP200212354 (sev-1): Overwrites invalid address and force system to fail the boot.
+LSIP200212039 (sev-3): Bios prints extra lines for press Ctrl_G to enter bios when you have some configuration errors
+LSIP200221386 (sev-3): BT750 workaround code is not disabled in all the path
+LSIP200149527 (PR): Need to display a message at POST if the TMM is defective or not installed
+
+WebBIOS:
+LSIP200230993 (DFCT) WebBIOS/Emergency hotspare status is being displayed for UG drives when UG for Emergency is disabled
+LSIP200231071 (DFCT) WebBIOS/Next button on the PD info screen is seen even on last page of info 
+LSIP200231286 (DFCT) WebBIOS is not displaying "Deactivate All Trial Software" button in Advanced Software Options page 
+LSIP200231273 (DFCT) Warning message overlapping with Offline VDs windows box 
+LSIP200231528 (DFCT) Discard_Cache button overlapping with "Virtual Drives with Preserved Cache" windows 
+LSIP200231334 (DFCT) Read Policy in VD settings in the WebBIOS need to change to match MSM 
+LSIP200232489 (DFCT) WebBIOS deletes the VD when select to discard cache from the access blocked VD 
+LSIP200232485 (DFCT) webBIOS /Copyback is being displayed in certain areas and should be replace drive 
+LSIP200232526 (DFCT) Raid bios console doesn't display secure foreign drives properly 
+LSIP200223371 (DFCT) HII/HII browser sluggishness is seen when exiting browser, going to EFI WebBIOS, and then going back to HII browser 
+LSIP200223762 (DFCT) WebBIOS should not display 65535 minutes estimated recharge time when not charging 
+LSIP200224228 (DFCT) WebBIOS should not allow user to set the BBU property, if battery type TMMC with transparentlearns support. 
+LSIP200224240 (DFCT) "Home and Back" toolbar is out of screen when an error message shown in BBU property screen. 
+LSIP200224393 (DFCT) WebBIOS is displaying Next learn time as "None" for Automatic Learn cycle equals to Warn. 
+LSIP200224825 (DFCT) WebBIOS does not provide option to schedule BBU Relearn time and day as indicated in PR 200122939 
+LSIP200224828 (DFCT) WebBIOS does not show an option to change BBU mode on TB with LSI ID 
+LSIP200224833 (DFCT) BBU Mode setting under WebBIOS disappear from OEM subvendorID after set to mode 4 
+LSIP200225019 (DFCT) WebBIOS is displaying Next Learn Cycle instead of "Next Learn Cycle Time:" in Bettary property page. 
+LSIP200229854 (DFCT) EFI WebBIOS BBU Mode pull down menu has garbage on the menu display line 
+LSIP200229855 (DFCT) WebBIOS BBU Mode pull down menu has garbage on the menu display line and some menu items 
+LSIP200230444 (DFCT) battery operational status is not proper 
+LSIP200224735 (DFCT) PD Listing bleeds over to the rest of the screen, when selecting reset under advanced operations in Web Bios 
+LSIP200225187 (DFCT) Improper Allignment of UnconfigGood spin Down in Controller Prperties page-UEFI mode 
+
+
+Installation:
+=============
+Use MegaCLI to flash the SAS controllers.  MegaCLI can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  MegaCli -adpfwflash -f mr2208fw.rom -a0
+
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 03/30/12
+
+
+Version Numbers:	
+===============
+Current Firmware Package:     23.4.1-0028 
+Current Package Details:
+APPMR-3.160.15-1559_BB-2.05.00.00-0004_BIOS-5.29.00_4.12.05.00_0x05090000_WEBBIOS-6.1-31-e_31-Rel_PCLI-05.02-0100001_BOOT-07.26.05.219_NVDATAMR-2.1108.03-0078
+
+Previous Firmware Package:    23.1.1-0004 (11M06)
+Previous Package Details: 
+APPMR-3.140.15-1320_BB-2.04.00.00-0001_BIOS-5.25.00_4.11.05.00_0x05040000_WEBBIOS-6.1-20-e_20-Rel_PCLI-05.01-0400001_BOOT-06.253.57.219_NVDATAMR-2.1106.03-0051     
+
+Bug Fixes and Enhancements:
+===========================
+
+This is a major product refresh with numerous bug fixes and enhancements, including adding CacheCade Pro 2.0 and CacheVault support (if enabled).  Some of the bug fixes and enhancements are provided below.  
+
+Firmware:
+LSIP200210748 (CO) USB channel discovery 
+LSIP200150527 (CO) Add support to pass SMART errors for JBOD drives to MSM 
+LSIP200186692 (CO) (Define NVDATA bit to allow the capability of enabling/disabling HII 
+LSIP200209759 (CO) (T-bolt FW and iBBU09 : New bbuMode to support Cell temp 50C or 55C along with 24h DRT and Transp 
+LSIP200149906 (CO) (LSIP200077381) USB offload implementation 
+LSIP200230079 (DFCT) FW hit MonTask: line 1221 in file ../../raid/1078dma.c when run I/O and create partition 
+LSIP200229810 (DFCT) MonTask: line 6613 in file ../../ssd/ssd_cache_fw.c during creation of SSCD. 
+LSIP200229797 (DFCT) while running IOs on VD using a cachecade WB VD FW goes to megamon 
+LSIP200229813 (DFCT) Port LSIP200224602 - Hot Spare alarm sounding after 11M08 Phase 4 firmware update 
+LSIP200229793 (DFCT) Potential data integrity issue while running I/O's on R0 VD with HSP kicking in for rebuild on R1 WB SSCVD 
+
+
+BIOS:
+LSIP200185756 (DFCT) It shows PD list during POST with specific OEM number which should not display PD list. 
+LSIP200018807 (DFCT) BIOS sees extra characters "0%" at end of particular product name 
+LSIP200187607 (DFCT) FW breaks to Megamon on trigerring an OCR while IO in progress (at line 1212 in file ../../raid/reglockhw.c) 
+LSIP200187538 (DFCT) OEM controller displays JBOD during controller initialization in BIOS 
+LSIP200196810 (DFCT) SWR-Macon: After installing the OS, unable to boot from SCU VD 
+LSIP200199602 (DFCT) FW hangs during POST after flashing new BIOS 
+LSIP200200358 (DFCT) Doesn't show the JBOD information on BIOS Posting 
+LSIP200199737 (DFCT) OEM Rack server System posts 'R00' as 'R0' during the reboot 
+LSIP200210684 (DFCT) Add support in OpROM to load new Ctrl H 
+LSIP200199163 (DFCT) Legacy BIOS BBS Boot Issues 
+
+WebBIOS:
+LSIP200199670 (CO)   End to End Data Protection (EEDP) 
+LSIP200210408 (DFCT) Forward porting of 11M08 cahnges 
+LSIP200196987 (DFCT) WebBios: Optimal VDs shown as offline in WebBios when pinned cache is present 
+LSIP200211567 (DFCT) 1TB support in WebBIOS for CacheCade 2.1 
+LSIP200211658 (DFCT) Porting 11M08 defects 
+LSIP200212864 (DFCT) WebBIOS should not display the option of "Always Write Back" for R0 CacheCade VD. 
+LSIP200221794 (DFCT) Firmware montask when trying to create a snapshot under WebBIOS 
+LSIP200222321 (DFCT) Porting defect "LSIP200212210:Under page four Global Hotspare for Emergency bleeds into the line under it" to CC2.1 
+LSIP200186580 (DFCT) Unable to change BBU autolearn policy with supercap present 
+LSIP200196711 (DFCT) Forword porting of 10M09 defect into 11M08. 
+LSIP200188240 (DFCT) Porting CC2.0 to 11M08 train 
+
+
+Installation:
+=============
+Use MegaCLI to flash the SAS controllers.  MegaCLI can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  MegaCli -adpfwflash -f mr2208fw.rom -a0
+
+
+
+
+
+
+
+Component:
+=========
+SAS MegaRAID Firmware Release for MegaRAID Controllers
+Release date: 08/11/2011
+
+
+Version Numbers:	
+===============
+Current Firmware Package:    23.1.1-0004
+Current Package Details: 
+APPMR-3.140.15-1320_BB-2.04.00.00-0001_BIOS-5.25.00_4.11.05.00_0x05040000_WEBBIOS-6.1-20-e_20-Rel_PCLI-05.01-0400001_BOOT-06.253.57.219_NVDATAMR-2.1106.03-0051
+
+Previous Firmware Package:   21.0.1-0111
+Previous Package Details: 
+APPMR-3.130.35-1206_BB-2.03.00.00-0003_BIOS-5.15.00_4.11.05.00_0x04360000_WEBBIOS-6.1-10-e_10-Rel_PCLI-05.00-0200008_BOOT-06.253.57.219_NVDATAMR-2.1012.03-0026      
+
+
+Bug Fixes and Enhancements:
+===========================
+
+This is a major product refresh with numerous bug fixes and enhancements.  The enhancements are listed below.  For a complete list of bug fixes, please refer to the following knowledgebase article:  http://kb.lsi.com/KnowledgebaseArticle16557.aspx
+
+Firmware Enhancements:
+LSIP200184337 (CO) (auto4comp FW_SAS_LSI) TB WebBIOS : Do not let WebBIOS to display "Chip Temperature (Celsius)". 
+LSIP200184339 (CO) (auto4comp FW_SAS_LSI) TB FW Re-activate the user option to enable Patrol Read on SSD. 
+LSIP200148755 (CO) (auto4comp FW_SAS_LSI) Port to TB - STANDBY IMMEDIATE command to SATA disks during shutdown from OS 
+LSIP200149074 (CO) (auto4comp FW_SAS_LSI) TB FW : Change SES Green/Amber LED behavior for particular OEM JBOD enclosure. 
+LSIP200148763 (CO) (auto4comp FW_SAS_LSI) TB FW: Do not let WebBIOS to display "BBU Retention Time" and "Estimated Time To Recharge". 
+LSIP200148997 (CO) (auto4comp FW_SAS_LSI) Need to correctly identify I2C errors with iBBU08 and beyond 
+LSIP200149017 (CO) (auto4comp FW_SAS_LSI) TB Firmware :Global HDD Fault LED doesn't light up/blink in PD Offline/Missing/Rebuildi 
+LSIP200148663 (CO) (auto4comp FW_SAS_LSI) MR fw should Enable puncturing for SATA drives 
+LSIP200085360 (CO) iMR TB changes 
+LSIP200146793 (CO) (LSIP200137246) tools to address latency 
+LSIP200122803 (CO) 2208 to support NVCache, update FPGA SPI Flash, and support small cell battery 
+LSIP200148499 (CO) FW to wait for 500us after DRAM_Available assertion 
+LSIP200148500 (CO) FW to take action based on temperature reading from the BMU 
+LSIP200149054 (CO) CR to include Megascu read of BMU version 
+LSIP200136551 (CO) (LSIP200096395) 2208 Firmware needs to release PCIe Retry 
+LSIP200144888 (CO) (auto4comp FW_SAS_LSI) Thunderbolt DSW-3 for initial release 
+LSIP200173689 (CO) (LSIP200165396) Tbolt C0/D0 chip recognition  
+LSIP200147510 (CO) (LSIP200165396) Tbolt C0/D0 chip recognition  
+LSIP200104569 (CO) (auto4comp FW_SAS_LSI) Mark VD consistent after CC with uncorrectable medium error 
+LSIP200170591 (CO) (LSIP200156073) Add support for Thunderbolt C0/D0 
+LSIP200173285 (CO) (LSIP200156073) Add support for Thunderbolt C0/D0 
+LSIP200148752 (CO) (auto4comp FW_SAS_LSI) add PCI-E information in fw log 
+LSIP200174086 (CO) (LSIP200156073) Add support for Thunderbolt C0/D0 
+LSIP200173293 (CO) (auto4comp FW_SAS_LSI) FW to take PCI IDs & SAS Address out of SBR or TSOC (OEM selectable per value) 
+LSIP200099802 (CO) (auto4comp FW_SAS_LSI) user accessible bad block table 
+LSIP200099806 (CO) (auto4comp FW_SAS_LSI) PD status commands under CLI 
+LSIP200099809 (CO) (auto4comp FW_SAS_LSI) additional MR diags 
+LSIP200099888 (CO) (auto4comp FW_SAS_LSI) Suspend function, resume function. 
+LSIP200099898 (CO) (auto4comp FW_SAS_LSI) Suspend / resume background tasks 
+LSIP200099907 (CO) (auto4comp FW_SAS_LSI) SSD Cache properties improvements 
+LSIP200099915 (CO) (auto4comp FW_SAS_LSI) Rebuild Write Cache 
+LSIP200051086 (CO) (LSIP200013286) MR to support Thunderbolt Dual Core 
+LSIP200075829 (CO) MR to support Thunderbolt Dual Core 
+LSIP200135222 (CO) (auto4comp FW_SAS_LSI) SW licensing. Support FoD for PF activations on MegaRAID 
+LSIP200144979 (CO) MR to support Thunderbolt Dual Core 11M02 
+LSIP200154733 (CO) (auto4comp FW_SAS_LSI) Add new Event to notify "Patrol Read Aborted" in MegaRAID FW. 
+LSIP200140142 (CO) (auto4comp FW_SAS_LSI) additional MR diags 
+LSIP200099825 (CO) (auto4comp FW_SAS_LSI) erase vd function 
+LSIP200099835 (CO) (auto4comp FW_SAS_LSI) PD secure erase 
+LSIP200099919 (CO) (auto4comp FW_SAS_LSI) Automatic rebuild on "cold" drive replacement 
+LSIP200099846 (CO) (auto4comp FW_SAS_LSI) Request to use Unconfigured Good Drives for a HotSpare if no spare defined. 
+LSIP200099857 (CO) (auto4comp FW_SAS_LSI) Emergency spare may ignore mixing policies 
+LSIP200099868 (CO) (auto4comp FW_SAS_LSI) EHSP - Emergency Hot Spare 
+LSIP200099921 (CO) (auto4comp FW_SAS_LSI) EHSP support for cold drive addition 
+LSIP200099878 (CO) (auto4comp FW_SAS_LSI) DGs revertible HSP attributes sticky on adoption. 
+LSIP200099764 (CO) (auto4comp FW_SAS_LSI) PD diag state - Shield State 
+LSIP200099770 (CO) (auto4comp FW_SAS_LSI) Shield state properties 
+LSIP200099773 (CO) (auto4comp FW_SAS_LSI) CLI battery commands 
+LSIP200099791 (CO) (auto4comp FW_SAS_LSI) Battery alerts 
+
+BIOS Enhancements:
+LSIP200154728 (CO) (auto4comp HWR_SAS_Bios) Enhance HWR oROM to allow system BIOS to retrieve RAID config info and pass over to BMC. 
+LSIP200060968 (CO) (auto4comp HWR_SAS_Bios) Add support for Thunderbolt C0/D0 
+LSIP200147835 (CO) (auto4comp HWR_SAS_Bios) Handle iMR / MR entering Pre-Boot applications when mixed are present in the system 
+
+WebBIOS Enhancements:
+LSIP200148758 (CO) (auto4comp HWR_SAS_WebBIOS) TB FW: Do not let WebBIOS to display "BBU Retention Time" and "Estimated Time To Recharge". 
+LSIP200149042 (CO) (auto4comp HWR_SAS_WebBIOS) TB WebBIOS : Change the color of "Link Speed" message in WebBIOS to NONE-Critical. 
+LSIP200148753 (CO) (auto4comp HWR_SAS_WebBIOS) Display FW Package Version in WebBIOS Selection Screen 
+LSIP200148996 (CO) (auto4comp HWR_SAS_WebBIOS) Need to correctly identify I2C errors with iBBU08 and beyond 
+LSIP200099738 (CO) (auto4comp HWR_SAS_WebBIOS) addtional VD properties for MSM 
+LSIP200099819 (CO) (auto4comp HWR_SAS_WebBIOS) erase vd function 
+LSIP200099829 (CO) (auto4comp HWR_SAS_WebBIOS) PD secure erase 
+LSIP200099839 (CO) (auto4comp HWR_SAS_WebBIOS) Request to use Unconfigured Good Drives for a HotSpare if no spare defined. 
+LSIP200099850 (CO) (auto4comp HWR_SAS_WebBIOS) Emergency spare may ignore mixing policies 
+LSIP200099861 (CO) (auto4comp HWR_SAS_WebBIOS) EHSP - Emergency Hot Spare 
+LSIP200099872 (CO) (auto4comp HWR_SAS_WebBIOS) DGs revertible HSP attributes sticky on adoption. 
+LSIP200099902 (CO) (auto4comp HWR_SAS_WebBIOS) SSD Cache properties improvements 
+LSIP200099794 (CO) (auto4comp HWR_SAS_WebBIOS) MSM improvement for battery display 
+LSIP200099757 (CO) (auto4comp HWR_SAS_WebBIOS) PD diag state - Shield State 
+LSIP200099749 (CO) (auto4comp HWR_SAS_WebBIOS) enclosure reporting improvements for GUI tools 
+LSIP200099882 (CO) (auto4comp HWR_SAS_WebBIOS) Suspend function, resume function. 
+LSIP200099892 (CO) (auto4comp HWR_SAS_WebBIOS) Suspend / resume background tasks 
+LSIP200135218 (CO) (auto4comp HWR_SAS_WebBIOS) SW licensing. Support FoD for PF activations on MegaRAID 
+LSIP200060967 (CO) (auto4comp HWR_SAS_WebBIOS) Add support for Thunderbolt C0/D0 
+LSIP200135225 (CO) (auto4comp HWR_SAS_WebBIOS) Array Size During Creation 
+LSIP200075366 (CO) (auto4comp HWR_SAS_WebBIOS) Porting MR Skinny to support Thunderbolt 
+LSIP200086058 (CO) (auto4comp HWR_SAS_WebBIOS) DIF support for Thunderbolt MR controllers 
+
+PCLI Enhancements:
+LSIP200148740 (CO) (auto4comp UNIV_VIVA_Cli) MegaSCU (DOS4GW) change request to support OEM iBBU calibration process 
+LSIP200148762 (CO) (auto4comp UNIV_VIVA_Cli) TB FW: Do not let WebBIOS to display "BBU Retention Time" and "Estimated Time To Recharge". 
+LSIP200099844 (CO) (auto4comp UNIV_VIVA_Cli) Request to use Unconfigured Good Drives for a HotSpare if no spare defined. 
+LSIP200099855 (CO) (auto4comp UNIV_VIVA_Cli) Emergency spare may ignore mixing policies 
+LSIP200099877 (CO) (auto4comp UNIV_VIVA_Cli) DGs revertible HSP attributes sticky on adoption. 
+LSIP200099896 (CO) (auto4comp UNIV_VIVA_Cli) Suspend / resume background tasks 
+LSIP200088557 (CO) (auto4comp UNIV_VIVA_Cli) Need ability to RESET expander from behind MegaSAS 
+LSIP200135217 (CO) (auto4comp UNIV_VIVA_Cli) SW licensing. Support FoD for PF activations on MegaRAID 
+LSIP200150237 (CO) (auto4comp UNIV_VIVA_Cli) Need MFC bit for CacheCade 2.0 
+LSIP200150509 (CO) (auto4comp UNIV_VIVA_Cli) Need MFC bit for CacheCade 2.0 
+LSIP200099823 (CO) (auto4comp UNIV_VIVA_Cli) erase vd function 
+LSIP200135617 (CO) (LSIP200106069) CLI. Add performance monitor related functions to MegaOEM 
+LSIP200099807 (CO) (auto4comp UNIV_VIVA_Cli) additional MR diags 
+LSIP200099771 (CO) (auto4comp UNIV_VIVA_Cli) CLI battery commands 
+LSIP200100159 (CO) (auto4comp UNIV_VIVA_Cli) CLI version command 
+LSIP200154735 (CO) (auto4comp UNIV_VIVA_Cli) FreeBSD x64 support for 6Gb/s (TBolt) MegaRAID line 
+LSIP200099745 (CO) (auto4comp UNIV_VIVA_Cli) Enclosure related CLI improvements 
+LSIP200099746 (CO) (auto4comp UNIV_VIVA_PCLI) Enclosure related CLI improvements 
+LSIP200099762 (CO) (auto4comp UNIV_VIVA_Cli) PD diag state - Shield State 
+LSIP200099768 (CO) (auto4comp UNIV_VIVA_Cli) Shield state properties 
+LSIP200099803 (CO) (auto4comp UNIV_VIVA_Cli) PD status commands under CLI 
+LSIP200099804 (CO) (auto4comp UNIV_VIVA_PCLI) PD status commands under CLI 
+LSIP200173292 (CO) (auto4comp UNIV_VIVA_Cli) FW to take PCI IDs & SAS Address out of SBR or TSOC (OEM selectable per value) 
+LSIP200153885 (CO) (auto4comp UNIV_VIVA_Cli) Update MR SAS LSI applications for VMWare ESXi MN Release 
+LSIP200101547 (CO) (auto4comp UNIV_VIVA_Cli) iMR unconfigured disks naming for JBOD disks 
+LSIP200101549 (CO) (auto4comp UNIV_VIVA_PCLI) iMR unconfigured disks naming for JBOD disks 
+
+
+Installation:
+=============
+Use MegaCLI to flash the SAS controllers.  MegaCLI can be downloaded from the support and download
+section of www.lsi.com.
+
+Command syntax:  MegaCli -adpfwflash -f mr2208fw.rom -a0
+
+

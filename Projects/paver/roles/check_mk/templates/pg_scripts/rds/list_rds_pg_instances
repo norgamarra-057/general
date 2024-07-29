@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+cat ~/.pgpass | awk -F: '{print $1}' | sort | uniq

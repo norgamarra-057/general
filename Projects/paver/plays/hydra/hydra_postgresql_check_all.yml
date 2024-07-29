@@ -1,0 +1,126 @@
+- hosts: gds_all
+  gather_facts: no
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+   - name: FreeBSD | run | check postgresql
+     shell: |
+       exec 2>&1
+       if [ "{{ default_primary|default(item.value.hydra.default_primary) is defined }}" == "False" ]; then
+         echo "error: default_primary not defined"
+         exit 1
+       fi
+
+       dc="$(echo "{{ inventory_hostname }}"|cut -d . -f 2)"
+       id="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d - -f 4)"
+       env="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d - -f 3)"
+       cluster="$(echo $id|head -c 5)"
+       type="$(echo $id|tail -c 3)"
+       master_dc="$(echo "{{ default_primary|default(item.value.hydra.default_primary) }}"|cut -d . -f 2)"
+       isMaster=false
+       followed=""
+       fail=false
+       msg=""
+
+       if [ "{{ default_primary|default(item.value.hydra.default_primary) == inventory_hostname }}" != "False" ]; then
+           isMaster=true
+       fi
+       {% if (item.value.hydra.cascading is defined)
+         and (item.value.hydra.cascading[inventory_hostname] is defined)
+         and not (item.value.hydra.cascading[inventory_hostname] is mapping) %}
+       followed="$(getent hosts "{{ item.value.hydra.cascading[inventory_hostname] }}"|cut -d ' ' -f 1)"
+       {% else %}
+         {% if (item.value.hydra.cascading is defined)
+           and (item.value.hydra.cascading[inventory_hostname] is defined)
+           and (item.value.hydra.cascading[inventory_hostname] is mapping)
+           and (item.value.hydra.cascading[inventory_hostname][default_primary|default(item.value.hydra.default_primary)] is defined) %}
+       followed="$(getent hosts "$(echo "{{ item.value.hydra.cascading[inventory_hostname][default_primary|default(item.value.hydra.default_primary)] }}"|cut -d ':' -f 1)"|cut -d ' ' -f 1)"
+         {% else %}
+           {% if (item.value.hydra.cascading is defined)
+             and (item.value.hydra.cascading[inventory_hostname] is defined)
+             and (item.value.hydra.cascading[inventory_hostname] is mapping)
+             and (item.value.hydra.cascading[inventory_hostname][default_primary|default(item.value.hydra.default_primary) + ':' + hostvars[default_primary|default(item.value.hydra.default_primary)].gds_instances[item.key].ports.postgresql_raw|string] is defined) %}
+       followed="$(getent hosts "$(echo "{{ item.value.hydra.cascading[inventory_hostname][default_primary|default(item.value.hydra.default_primary) + ':' + hostvars[default_primary|default(item.value.hydra.default_primary)].gds_instances[item.key].ports.postgresql_raw|string] }}"|cut -d ':' -f 1)"|cut -d ' ' -f 1)"
+           {% else %}
+       followed="$(getent hosts "{{ default_primary|default(item.value.hydra.default_primary) }}"|cut -d ' ' -f 1)"
+           {% endif %}
+         {% endif %}
+       {% endif %}
+
+       in_recovery="$(psql -h localhost -p "{{ item.value.ports.postgresql_raw }}" -U postgres -c 'select pg_is_in_recovery()' -t -A)"
+       slaves="$(psql -h localhost -p "{{ item.value.ports.postgresql_raw }}" -U postgres -c 'select * from pg_stat_replication'|tail -n +3|grep "|"|sed 's/ *//g'|cut -d '|' -f 5|while read slave_ip; do echo "$(getent hosts $slave_ip)"; done)"
+       if [ -f "/var/groupon/postgresql/data{{ postgresql_port_major }}/{{ gds_cluster }}-{{ item.key }}/data/recovery.conf" ]
+       then
+         has_recovery_file=true
+         master_ip=$(cat "/var/groupon/postgresql/data{{ postgresql_port_major }}/{{ gds_cluster }}-{{ item.key }}/data/recovery.conf"|grep primary_conninfo|sed "s/^.*host=\([^ ']*\).*$/\1/")
+       else
+         has_recovery_file=false
+       fi
+
+       if $isMaster
+       then
+         if [ "t" == "$in_recovery" ]
+         then
+           msg="${msg}not master "
+           fail=true
+         fi
+         if "$has_recovery_file"
+         then
+           msg="${msg}has recovery file "
+           fail=true
+         fi
+         if ! [ -z "$master_ip" ]
+         then
+           msg="${msg}following $(getent hosts "$master_ip") "
+           fail=true
+         fi
+       else
+         if [ "f" == "$in_recovery" ]
+         then
+           msg="${msg}not standby "
+           fail=true
+         fi
+         if ! "$has_recovery_file"
+         then
+           msg="${msg}has not recovery file "
+           fail=true
+         fi
+         if ! getent hosts "$master_ip"|grep -q -F "$followed"
+         then
+           msg="${msg}not following $followed but $(getent hosts "$master_ip")"
+           fail=true
+         fi
+       fi
+       #for follower in "${followers[@]}"
+       #do
+       #  if ! echo "$slaves"|grep -q -F "$follower"
+       #  then
+       #    msg="${msg}$follower is not following $(echo "$slaves"|tr '\n' ' ') "
+       #    fail=true
+       #  fi
+       #done
+       if $fail
+       then
+         echo "{{ inventory_hostname }}:{{ item.key }} [$dc $type $env] ${msg}" 
+       fi
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: item.value.type == 'postgresql' and item.value.hydra is defined and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"
+

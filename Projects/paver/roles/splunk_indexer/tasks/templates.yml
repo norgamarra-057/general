@@ -1,0 +1,60 @@
+- name: splunk | templates | render server.conf
+  template: 
+    src=roles/splunk_indexer/templates/server.conf.j2
+    dest=/var/groupon/splunk/etc/system/local/server.conf
+    owner=splunk
+    group=splunk
+    mode=0644
+
+- name: splunk | templates | render deploymentclient.conf
+  template: 
+    src=roles/splunk_indexer/templates/deploymentclient.conf.j2
+    dest=/var/groupon/splunk/etc/system/local/deploymentclient.conf
+    owner=splunk
+    group=splunk
+    mode=0644
+
+- name: splunk | templates | render alert_actions.conf
+  template: 
+    src=roles/splunk_indexer/templates/alert_actions.conf.j2 
+    dest=/var/groupon/splunk/etc/system/local/alert_actions.conf
+    owner=splunk
+    group=splunk
+    mode=0644
+
+- name: splunk | templates | render inputs.conf
+  template: 
+    src=roles/splunk_indexer/templates/inputs.conf.j2 
+    dest=/var/groupon/splunk/etc/system/local/inputs.conf
+    owner=splunk
+    group=splunk
+    mode=0644
+
+- name: splunk | templates | render web.conf
+  template: 
+    src=roles/splunk_indexer/templates/web.conf.j2
+    dest=/var/groupon/splunk/etc/system/local/web.conf
+    owner=splunk
+    group=splunk
+    mode=0644
+
+- name: splunk | templates | create directory for settings
+  file: 
+    path=/usr/local/etc/splunk/indexer/
+    state=directory
+    owner=splunk
+    group=splunk
+    mode=0755
+
+- name: splunk | templates | render settings.sh
+  template:
+    src=roles/splunk_indexer/templates/settings.sh.j2
+    dest=/usr/local/etc/splunk/indexer/settings.sh
+    owner=splunk
+    group=splunk
+    mode=0644
+
+#- name: splunk | templates | render startup script
+#  template:
+#    src=roles/splunk_indexer/templates/splunk_startup_script.j2
+#    dest=/usr/local/etc/rc.d/splunk

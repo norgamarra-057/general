@@ -1,0 +1,43 @@
+#!/bin/sh --
+
+REGEX=''
+NUMDEV=`/sbin/sysctl -n kern.disks | /usr/bin/xargs -n1 /bin/echo | /usr/bin/wc -l | /usr/bin/xargs /bin/echo`
+INTERVAL=1s
+NAGIOS=no
+PERF=no
+VERBOSE=no
+
+args=`getopt hi:n:NPr:v "$@"`
+if [ $? -ne 0 ]; then
+    echo 'See -h arg for help'
+    exit 2
+fi
+
+set -- $args
+while [ $# -gt 0 ]; do
+    case "$1" in
+        (-i) INTERVAL="$2"; shift;;
+        (-n) NUMDEV="$2"; shift;;
+        (-N) NAGIOS=yes;;
+        (-P) PERF=yes;;
+        (-r) REGEX="-f $2"; shift;;
+        (-v) VERBOSE=yes;;
+        (--) shift; break;;
+        (-h) echo "`basename $0`: Usage: [-hNPv] [-i 5s] [-n ${NUMDEV} ] [-r FILTER ]"; exit 0;;
+        (-*) echo "`basename $0`: ERROR: Unrecognized option $1" 1>&2; exit 1;;
+        (*) echo "`basename $0`: ERROR: Unrecognized argument $1" >&2; exit 1;;
+    esac
+    shift
+done
+
+if [ "${VERBOSE}" = 'yes' -a "${NAGIOS}" = 'no' ]; then
+    printf " L(q)  ops/s    r/s   kBps   ms/r    w/s   kBps   ms/w   %busy\n"
+fi
+/usr/local/bin/sudo \
+    /usr/sbin/gstat -b ${REGEX} -I "${INTERVAL}" | \
+        /usr/bin/awk \
+            -v "NUMDEV=${NUMDEV}" \
+            -v "NAGIOS=${NAGIOS}" \
+            -v "PERF=${PERF}" \
+            -v "VERBOSE=${VERBOSE}" \
+            -f /var/service/monitord_agent/bin/check_freebsd_iostat_sum.awk

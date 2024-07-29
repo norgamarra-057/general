@@ -1,0 +1,20 @@
+---
+# Register service status for pt-heartbeat instance
+
+- name: Decommission | pt-heartbeat | See if pt-heartbeat service exists
+  stat:
+    path: "{{ pt_heartbeat_service_path }}"
+  register: pt_heartbeat_service
+  changed_when: false
+
+- name: Decommission | pt-heartbeat | See if pt-heartbeat service data dir exists
+  stat:
+    path: "{{ pt_heartbeat_service_data_path }}"
+  register: pt_heartbeat_service_data
+  changed_when: false
+
+- name: Decommission | pt-heartbeat | Check if pt-heartbeat is running
+  shell: sv status {{ pt_heartbeat_service_data_path }} | cut -d':' -f1
+  register: pt_heartbeat_service_status
+  when: pt_heartbeat_service_data.stat.isdir is defined and pt_heartbeat_service_data.stat.isdir
+  changed_when: false

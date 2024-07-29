@@ -1,0 +1,35 @@
+- name: Get instance from host
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Get instance names
+      shell: ls /var/groupon/postgresql/data94 | cut -c20- | sed 's/^/  /' | awk '{print $0":"}'   > /etc/check_mk/local_pginstances.yml
+      register: instance_names
+
+    - name: Add header1
+      shell: echo 'inst_name:' | cat - /etc/check_mk/local_pginstances.yml > /etc/check_mk/temp && mv /etc/check_mk/temp /etc/check_mk/local_pginstances.yml
+
+    - name: Add header2
+      shell: echo '---' | cat - /etc/check_mk/local_pginstances.yml > /etc/check_mk/temp && mv /etc/check_mk/temp /etc/check_mk/local_pginstances.yml
+
+    - fetch: src=/etc/check_mk/local_pginstances.yml dest=files/temp/ flat=yes validate_checksum=yes fail_on_missing=yes
+
+    - include_vars: "files/temp/local_pginstances.yml"
+
+    - name: Checkpoint on all slave dbs
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "checkpoint"
+      with_dict: "{{inst_name}}"
+
+    - name: Promote all slave dbs
+      shell: su -m {{ gds_instances[item.key].unix_user }} -c "pg_ctl promote -D /var/groupon/postgresql/data94/{{ gds_cluster }}-{{ item.key }}/data"
+      with_dict: "{{inst_name}}"
+
+- name: a play that runs entirely on the ansible host
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Delete the temp file
+      file: path=files/temp/local_pginstances.yml state=absent

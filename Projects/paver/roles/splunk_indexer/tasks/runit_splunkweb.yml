@@ -1,0 +1,90 @@
+## runit for splunkweb
+
+- name: splunk | runit | splunkweb | create directory for script
+  file:
+    path=/var/service/splunkweb/
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+
+- name: splunk | runit | splunkweb | create directory for log
+  file:
+    path=/var/service/splunkweb/log/
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+
+- name: splunk | runit | splunkweb | create directory for svlogd
+  file:
+    path=/var/service/splunkweb/log/main
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+  changed_when: False
+
+- name: splunk | runit | splunkweb | create directory for env
+  file:
+    path=/var/service/splunkweb/env/
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+
+- name: splunk | runit | splunkweb | add env var SPLUNK_HOME
+  copy:
+    dest=/var/service/splunkweb/env/SPLUNK_HOME
+    content={{ splunk_home_dir }}
+    owner=splunk
+    group=splunk
+    mode=0644
+  notify:
+    - splunkweb restart
+
+- name: splunk | runit | splunkweb | add env var LICENSE_MANAGER
+  copy:
+    dest=/var/service/splunkweb/env/LICENSE_MANAGER
+    content={{ splunk_license_server }}
+    owner=splunk
+    group=splunk
+    mode=0644
+  notify:
+    - splunkweb restart
+
+- name: splunk | runit | splunkd | keeping splunkd down
+  file:
+    state: touch
+    path: /var/service/splunkweb/down
+
+- name: splunk | runit | splunkweb | startup script (start)
+  template:
+    dest=/var/service/splunkweb/run
+    mode=0744
+    src=splunkweb_run_runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - splunkweb restart
+
+- name: splunk | runit | splunkweb | startup script (stop)
+  template:
+    dest=/var/service/splunkweb/finish
+    mode=0744
+    src=splunkweb_finish_runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - splunkweb restart
+
+- name: splunk | runit | splunkweb | startup script log
+  template:
+    dest=/var/service/splunkweb/log/run
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - splunkweb log restart

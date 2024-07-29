@@ -1,0 +1,22 @@
+---
+- name: Check if mysql instance definitions are backed by services
+  become: yes
+  hosts: gds_all
+  tasks:
+    - name: MySQL instances on host
+      shell: /usr/local/sbin/list_instances | awk '{ print $NF }'
+      changed_when: false
+      register: host_mysql_instances
+
+    - name: Fail if MySQL instance is not in paver
+      fail:
+        msg: "instance is missing {{ item }}"
+      when: item not in gds_instances.keys()
+      with_items: host_mysql_instances.stdout_lines
+
+    - name: Get service stat for mysql services
+      shell: "sv stat /var/service/{{ item }}-{{ gds_cluster }}-mysql"
+      when: gds_instances[item].type == 'mysql'
+      with_items: gds_instances.keys()
+      changed_when: false
+      register: mysql_service_status

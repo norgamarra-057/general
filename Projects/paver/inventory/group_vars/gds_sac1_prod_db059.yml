@@ -1,0 +1,734 @@
+---
+gds_carp_peers:
+  - 10.32.86.250  # gds-sac1-prod-db059m1
+  - 10.32.86.251  # gds-sac1-prod-db059s1
+  - 10.32.80.250  # gds-sac1-prod-db059m1
+  - 10.32.80.251  # gds-sac1-prod-db059s1
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+gds_instance_group: gds_prod_sac1_db059
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  ls_va_orders_prod: # GDS-10518 - Decommed GDS-35464
+#  ls_va_users_prod: # GDS-10636 - Decommed GDS-35464
+  ls_va_deals_prod: # GDS-10637
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 8000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60003
+    nodes:
+      - gds-sac1-prod-db059m1.sac1
+      - gds-sac1-prod-db059s1.sac1
+    master_carp_interface: vlan204
+    slave_carp_interface: vlan205
+    vhid: 193
+    slave_vhid: 193
+    master_vip: 10.32.86.193
+    slave_vips:
+      - 10.32.80.193
+    replication_ips:
+      - 10.32.121.185 # gds-sac1-prod-db059m1.sac1
+      - 10.32.121.60 # gds-sac1-prod-db059s1.sac1
+      - 172.17.4.117 # db-deals02
+      - 172.17.4.51 # db-internal05
+      - 172.17.4.128 # db-external01
+      - 172.17.4.126  # db-people01
+      - 172.17.4.37  # db-subcribers01
+      - 10.22.148.30 # gds-snc1-prod-db059m1.snc1
+      - 10.22.148.25 # gds-snc1-prod-db059s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.233.56/32   #ls-voucher-archive-app1.snc1
+      - 10.20.87.243/32   #ls-voucher-archive-app2.snc1
+      - 10.32.162.19/32   #ls-voucher-archive-app1.sac1
+      - 10.32.164.91/32   #ls-voucher-archive-app2.sac1
+      - 10.22.195.10/32   # im-util1-uat.snc1
+      - 10.20.83.211/32   # im-util1-staging.snc1
+      - 10.22.75.224/32   # im-util1.snc1
+      - 10.22.75.122/32   # im-util2.snc1
+      - 10.22.133.212/32   # im-util3.snc1
+      - 10.22.135.54/32   # im-util4.snc1
+      - 10.22.71.153/32   # taxtech1.snc1
+      - 10.22.200.175/32   # subscription-service-app1-staging.snc1
+      - 10.20.129.69/32   # subscription-service-app2-staging.snc1
+      - 10.20.69.253/32   # subscription-service-app1.snc1
+      - 10.20.75.36/32   # subscription-service-app2.snc1
+      - 10.20.69.87/32   # pit-prod-etldata-mronly1
+      - 10.20.69.95/32   # pit-prod-etldata-mronly10
+      - 10.20.69.86/32   # pit-prod-etldata-mronly2
+      - 10.20.69.85/32   # pit-prod-etldata-mronly3
+      - 10.20.69.88/32   # pit-prod-etldata-mronly4
+      - 10.20.69.89/32   # pit-prod-etldata-mronly5
+      - 10.20.69.90/32   # pit-prod-etldata-mronly6
+      - 10.20.69.91/32   # pit-prod-etldata-mronly7
+      - 10.20.69.92/32   # pit-prod-etldata-mronly8
+      - 10.20.69.93/32   # pit-prod-etldata-mronly9
+      - 10.20.115.242/32   # pit-prod-etldata1
+      - 10.20.115.32/32   # pit-prod-etldata10
+      - 10.20.74.89/32   # pit-prod-etldata100
+      - 10.20.77.187/32   # pit-prod-etldata101
+      - 10.20.77.226/32   # pit-prod-etldata102
+      - 10.20.70.46/32   # pit-prod-etldata103
+      - 10.20.73.83/32   # pit-prod-etldata104
+      - 10.20.73.89/32   # pit-prod-etldata105
+      - 10.20.73.90/32   # pit-prod-etldata106
+      - 10.20.73.81/32   # pit-prod-etldata107
+      - 10.20.74.148/32   # pit-prod-etldata108
+      - 10.20.73.86/32   # pit-prod-etldata109
+      - 10.20.70.33/32   # pit-prod-etldata11
+      - 10.20.73.88/32   # pit-prod-etldata110
+      - 10.20.73.75/32   # pit-prod-etldata111
+      - 10.20.74.151/32   # pit-prod-etldata112
+      - 10.20.74.152/32   # pit-prod-etldata113
+      - 10.20.70.65/32   # pit-prod-etldata114
+      - 10.20.70.66/32   # pit-prod-etldata115
+      - 10.20.70.37/32   # pit-prod-etldata116
+      - 10.20.78.67/32   # pit-prod-etldata117
+      - 10.20.74.27/32   # pit-prod-etldata118
+      - 10.20.74.28/32   # pit-prod-etldata119
+      - 10.20.70.28/32   # pit-prod-etldata12
+      - 10.20.74.30/32   # pit-prod-etldata120
+      - 10.20.74.37/32   # pit-prod-etldata121
+      - 10.20.74.32/32   # pit-prod-etldata122
+      - 10.20.74.39/32   # pit-prod-etldata123
+      - 10.20.74.31/32   # pit-prod-etldata124
+      - 10.20.74.40/32   # pit-prod-etldata125
+      - 10.20.74.36/32   # pit-prod-etldata126
+      - 10.20.74.38/32   # pit-prod-etldata127
+      - 10.20.74.35/32   # pit-prod-etldata128
+      - 10.20.74.41/32   # pit-prod-etldata129
+      - 10.20.70.12/32   # pit-prod-etldata13
+      - 10.20.74.42/32   # pit-prod-etldata130
+      - 10.20.74.33/32   # pit-prod-etldata131
+      - 10.20.74.44/32   # pit-prod-etldata132
+      - 10.20.74.55/32   # pit-prod-etldata133
+      - 10.20.74.57/32   # pit-prod-etldata134
+      - 10.20.74.58/32   # pit-prod-etldata135
+      - 10.20.74.59/32   # pit-prod-etldata136
+      - 10.20.74.60/32   # pit-prod-etldata137
+      - 10.20.74.12/32   # pit-prod-etldata138
+      - 10.20.74.14/32   # pit-prod-etldata139
+      - 10.20.83.133/32   # pit-prod-etldata14
+      - 10.20.74.13/32   # pit-prod-etldata140
+      - 10.20.74.15/32   # pit-prod-etldata141
+      - 10.20.74.16/32   # pit-prod-etldata142
+      - 10.20.74.17/32   # pit-prod-etldata143
+      - 10.20.74.18/32   # pit-prod-etldata144
+      - 10.20.74.19/32   # pit-prod-etldata145
+      - 10.20.74.20/32   # pit-prod-etldata146
+      - 10.20.74.21/32   # pit-prod-etldata147
+      - 10.20.74.23/32   # pit-prod-etldata148
+      - 10.20.74.34/32   # pit-prod-etldata149
+      - 10.20.83.93/32   # pit-prod-etldata15
+      - 10.20.74.25/32   # pit-prod-etldata150
+      - 10.20.74.29/32   # pit-prod-etldata151
+      - 10.20.78.60/32   # pit-prod-etldata152
+      - 10.20.74.50/32   # pit-prod-etldata153
+      - 10.20.74.51/32   # pit-prod-etldata154
+      - 10.20.74.48/32   # pit-prod-etldata155
+      - 10.20.74.47/32   # pit-prod-etldata156
+      - 10.20.74.52/32   # pit-prod-etldata157
+      - 10.20.78.59/32   # pit-prod-etldata158
+      - 10.20.78.63/32   # pit-prod-etldata159
+      - 10.20.83.165/32   # pit-prod-etldata16
+      - 10.20.78.66/32   # pit-prod-etldata160
+      - 10.20.78.71/32   # pit-prod-etldata161
+      - 10.20.78.72/32   # pit-prod-etldata162
+      - 10.20.78.73/32   # pit-prod-etldata163
+      - 10.20.78.74/32   # pit-prod-etldata164
+      - 10.20.78.75/32   # pit-prod-etldata165
+      - 10.20.78.78/32   # pit-prod-etldata166
+      - 10.20.83.49/32   # pit-prod-etldata167
+      - 10.20.78.94/32   # pit-prod-etldata168
+      - 10.20.78.65/32   # pit-prod-etldata169
+      - 10.20.83.111/32   # pit-prod-etldata17
+      - 10.20.83.172/32   # pit-prod-etldata170
+      - 10.20.83.222/32   # pit-prod-etldata171
+      - 10.20.83.83/32   # pit-prod-etldata172
+      - 10.20.78.169/32   # pit-prod-etldata173
+      - 10.20.83.246/32   # pit-prod-etldata174
+      - 10.20.78.21/32   # pit-prod-etldata175
+      - 10.20.83.158/32   # pit-prod-etldata176
+      - 10.20.83.201/32   # pit-prod-etldata18
+      - 10.20.83.250/32   # pit-prod-etldata19
+      - 10.20.83.180/32   # pit-prod-etldata2
+      - 10.20.83.187/32   # pit-prod-etldata20
+      - 10.20.83.221/32   # pit-prod-etldata21
+      - 10.20.83.61/32   # pit-prod-etldata22
+      - 10.20.83.220/32   # pit-prod-etldata23
+      - 10.20.83.231/32   # pit-prod-etldata24
+      - 10.20.83.138/32   # pit-prod-etldata25
+      - 10.20.83.73/32   # pit-prod-etldata27
+      - 10.20.83.207/32   # pit-prod-etldata28
+      - 10.20.115.126/32   # pit-prod-etldata29
+      - 10.20.115.160/32   # pit-prod-etldata3
+      - 10.20.115.71/32   # pit-prod-etldata30
+      - 10.20.115.238/32   # pit-prod-etldata31
+      - 10.20.115.166/32   # pit-prod-etldata32
+      - 10.20.115.237/32   # pit-prod-etldata33
+      - 10.20.115.75/32   # pit-prod-etldata34
+      - 10.20.73.91/32   # pit-prod-etldata35
+      - 10.20.73.92/32   # pit-prod-etldata36
+      - 10.20.73.116/32   # pit-prod-etldata37
+      - 10.20.73.94/32   # pit-prod-etldata38
+      - 10.20.78.118/32   # pit-prod-etldata39
+      - 10.20.115.156/32   # pit-prod-etldata4
+      - 10.20.78.108/32   # pit-prod-etldata40
+      - 10.20.78.103/32   # pit-prod-etldata41
+      - 10.20.78.101/32   # pit-prod-etldata42
+      - 10.20.78.80/32   # pit-prod-etldata43
+      - 10.20.73.76/32   # pit-prod-etldata44
+      - 10.20.73.77/32   # pit-prod-etldata45
+      - 10.20.73.78/32   # pit-prod-etldata46
+      - 10.20.115.217/32   # pit-prod-etldata47
+      - 10.20.115.227/32   # pit-prod-etldata48
+      - 10.20.115.61/32   # pit-prod-etldata49
+      - 10.20.115.184/32   # pit-prod-etldata5
+      - 10.20.115.74/32   # pit-prod-etldata50
+      - 10.20.78.99/32   # pit-prod-etldata52
+      - 10.20.74.134/32   # pit-prod-etldata53
+      - 10.20.74.139/32   # pit-prod-etldata54
+      - 10.20.74.142/32   # pit-prod-etldata55
+      - 10.20.74.143/32   # pit-prod-etldata56
+      - 10.20.74.167/32   # pit-prod-etldata57
+      - 10.20.74.172/32   # pit-prod-etldata58
+      - 10.20.74.175/32   # pit-prod-etldata59
+      - 10.20.115.247/32   # pit-prod-etldata6
+      - 10.20.74.177/32   # pit-prod-etldata60
+      - 10.20.74.180/32   # pit-prod-etldata61
+      - 10.20.74.185/32   # pit-prod-etldata62
+      - 10.20.70.191/32   # pit-prod-etldata63
+      - 10.20.70.142/32   # pit-prod-etldata64
+      - 10.20.70.251/32   # pit-prod-etldata65
+      - 10.20.70.164/32   # pit-prod-etldata66
+      - 10.20.70.181/32   # pit-prod-etldata67
+      - 10.20.115.57/32   # pit-prod-etldata68
+      - 10.20.115.43/32   # pit-prod-etldata69
+      - 10.20.115.55/32   # pit-prod-etldata70
+      - 10.20.115.116/32   # pit-prod-etldata71
+      - 10.20.115.88/32   # pit-prod-etldata72
+      - 10.20.70.38/32   # pit-prod-etldata73
+      - 10.20.70.39/32   # pit-prod-etldata74
+      - 10.20.70.40/32   # pit-prod-etldata75
+      - 10.20.70.41/32   # pit-prod-etldata76
+      - 10.20.70.42/32   # pit-prod-etldata77
+      - 10.20.78.33/32   # pit-prod-etldata78
+      - 10.20.78.37/32   # pit-prod-etldata79
+      - 10.20.115.229/32   # pit-prod-etldata8
+      - 10.20.78.30/32   # pit-prod-etldata80
+      - 10.20.78.253/32   # pit-prod-etldata81
+      - 10.20.77.147/32   # pit-prod-etldata82
+      - 10.20.77.138/32   # pit-prod-etldata83
+      - 10.20.77.179/32   # pit-prod-etldata84
+      - 10.20.77.69/32   # pit-prod-etldata85
+      - 10.20.74.69/32   # pit-prod-etldata86
+      - 10.20.74.70/32   # pit-prod-etldata87
+      - 10.20.74.71/32   # pit-prod-etldata88
+      - 10.20.74.72/32   # pit-prod-etldata89
+      - 10.20.115.252/32   # pit-prod-etldata9
+      - 10.20.74.73/32   # pit-prod-etldata90
+      - 10.20.74.74/32   # pit-prod-etldata91
+      - 10.20.74.75/32   # pit-prod-etldata92
+      - 10.20.74.76/32   # pit-prod-etldata93
+      - 10.20.74.125/32   # pit-prod-etldata94
+      - 10.20.74.124/32   # pit-prod-etldata95
+      - 10.20.74.123/32   # pit-prod-etldata96
+      - 10.20.74.122/32   # pit-prod-etldata97
+      - 10.20.74.121/32   # pit-prod-etldata98
+      - 10.20.74.120/32   # pit-prod-etldata99
+      - 10.20.83.163/32   # pit-prod-etldata26
+      - 10.20.115.232/32   # pit-prod-etldata7
+      - 10.22.166.111/32   # gdoop-worker208.snc1
+      - 10.22.161.74/32   # gdoop-worker2.snc1
+      - 10.22.168.7/32   # gdoop-worker310.snc1
+      - 10.22.180.59/32   # gdoop-worker355.snc1
+      - 10.22.176.13/32   # gdoop-worker172.snc1
+      - 10.22.168.12/32   # gdoop-worker239.snc1
+      - 10.22.181.215/32   # gdoop-worker324.snc1
+      - 10.22.173.208/32   # gdoop-worker110.snc1
+      - 10.22.164.235/32   # gdoop-worker155.snc1
+      - 10.22.170.170/32   # gdoop-worker369.snc1
+      - 10.22.176.113/32   # gdoop-worker169.snc1
+      - 10.22.174.190/32   # gdoop-worker138.snc1
+      - 10.22.179.21/32   # gdoop-worker307.snc1
+      - 10.22.174.176/32   # gdoop-worker124.snc1
+      - 10.22.173.206/32   # gdoop-worker107.snc1
+      - 10.22.173.113/32   # gdoop-worker89.snc1
+      - 10.22.162.204/32   # gdoop-worker32.snc1
+      - 10.22.171.143/32   # gdoop-worker44.snc1
+      - 10.22.178.7/32   # gdoop-worker299.snc1
+      - 10.22.168.8/32   # gdoop-worker273.snc1
+      - 10.22.167.149/32   # gdoop-worker338.snc1
+      - 10.22.172.113/32   # gdoop-worker63.snc1
+      - 10.22.160.217/32   # gdoop-worker13.snc1
+      - 10.22.172.141/32   # gdoop-worker58.snc1
+      - 10.22.166.36/32   # gdoop-worker254.snc1
+      - 10.22.163.225/32   # gdoop-worker94.snc1
+      - 10.22.174.90/32   # gdoop-worker112.snc1
+      - 10.22.181.33/32   # gdoop-worker326.snc1
+      - 10.22.176.71/32   # gdoop-worker126.snc1
+      - 10.22.179.28/32   # gdoop-worker268.snc1
+      - 10.22.162.106/32   # gdoop-worker77.snc1
+      - 10.22.178.34/32   # gdoop-worker287.snc1
+      - 10.22.160.33/32   # gdoop-worker80.snc1
+      - 10.22.168.22/32   # gdoop-worker285.snc1
+      - 10.22.160.203/32   # gdoop-worker75.snc1
+      - 10.22.169.12/32   # gdoop-worker290.snc1
+      - 10.22.166.196/32   # gdoop-worker211.snc1
+      - 10.22.161.137/32   # gdoop-worker61.snc1
+      - 10.22.169.246/32   # gdoop-worker353.snc1
+      - 10.22.170.65/32   # gdoop-worker367.snc1
+      - 10.22.162.108/32   # gdoop-worker15.snc1
+      - 10.22.180.25/32   # gdoop-worker271.snc1
+      - 10.22.177.233/32   # gdoop-worker206.snc1
+      - 10.22.165.72/32   # gdoop-worker191.snc1
+      - 10.22.175.191/32   # gdoop-worker167.snc1
+      - 10.22.171.152/32   # gdoop-worker29.snc1
+      - 10.22.165.27/32   # gdoop-worker186.snc1
+      - 10.22.178.40/32   # gdoop-worker225.snc1
+      - 10.22.180.23/32   # gdoop-worker289.snc1
+      - 10.22.180.24/32   # gdoop-worker283.snc1
+      - 10.22.161.115/32   # gdoop-worker20.snc1
+      - 10.22.164.179/32   # gdoop-worker119.snc1
+      - 10.22.160.104/32   # gdoop-worker65.snc1
+      - 10.22.168.9/32   # gdoop-worker261.snc1
+      - 10.22.171.117/32   # gdoop-worker11.snc1
+      - 10.22.161.245/32   # gdoop-worker56.snc1
+      - 10.22.171.170/32   # gdoop-worker17.snc1
+      - 10.22.167.4/32   # gdoop-worker305.snc1
+      - 10.22.174.83/32   # gdoop-worker153.snc1
+      - 10.22.167.24/32   # gdoop-worker258.snc1
+      - 10.22.177.164/32   # gdoop-worker213.snc1
+      - 10.22.171.147/32   # gdoop-worker39.snc1
+      - 10.22.163.73/32   # gdoop-worker96.snc1
+      - 10.22.160.148/32   # gdoop-worker343.snc1
+      - 10.22.165.6/32   # gdoop-worker188.snc1
+      - 10.22.179.9/32   # gdoop-worker292.snc1
+      - 10.22.164.245/32   # gdoop-worker131.snc1
+      - 10.22.180.29/32   # gdoop-worker235.snc1
+      - 10.22.172.70/32   # gdoop-worker4.snc1
+      - 10.22.163.187/32   # gdoop-worker90.snc1
+      - 10.22.175.108/32   # gdoop-worker157.snc1
+      - 10.22.177.220/32   # gdoop-worker204.snc1
+      - 10.22.176.116/32   # gdoop-worker170.snc1
+      - 10.22.168.5/32   # gdoop-worker223.snc1
+      - 10.22.170.175/32   # gdoop-worker365.snc1
+      - 10.22.162.89/32   # gdoop-worker27.snc1
+      - 10.22.176.180/32   # gdoop-worker176.snc1
+      - 10.22.163.177/32   # gdoop-worker179.snc1
+      - 10.22.160.178/32   # gdoop-worker30.snc1
+      - 10.22.167.38/32   # gdoop-worker242.snc1
+      - 10.22.161.17/32   # gdoop-worker46.snc1
+      - 10.22.165.225/32   # gdoop-worker182.snc1
+      - 10.22.177.39/32   # gdoop-worker229.snc1
+      - 10.22.163.145/32   # gdoop-worker100.snc1
+      - 10.22.174.151/32   # gdoop-worker160.snc1
+      - 10.22.166.70/32   # gdoop-worker198.snc1
+      - 10.22.169.32/32   # gdoop-worker314.snc1
+      - 10.22.173.214/32   # gdoop-worker103.snc1
+      - 10.22.167.37/32   # gdoop-worker264.snc1
+      - 10.22.176.185/32   # gdoop-worker122.snc1
+      - 10.22.172.144/32   # gdoop-worker68.snc1
+      - 10.22.165.56/32   # gdoop-worker336.snc1
+      - 10.22.174.118/32   # gdoop-worker128.snc1
+      - 10.22.174.79/32   # gdoop-worker141.snc1
+      - 10.22.181.195/32   # gdoop-worker317.snc1
+      - 10.22.173.131/32   # gdoop-worker109.snc1
+      - 10.22.173.48/32   # gdoop-worker87.snc1
+      - 10.22.177.128/32   # gdoop-worker202.snc1
+      - 10.22.168.6/32   # gdoop-worker247.snc1
+      - 10.22.181.126/32   # gdoop-worker316.snc1
+      - 10.22.164.34/32   # gdoop-worker180.snc1
+      - 10.22.170.195/32   # gdoop-worker363.snc1
+      - 10.22.171.58/32   # gdoop-worker54.snc1
+      - 10.22.180.17/32   # gdoop-worker295.snc1
+      - 10.22.167.33/32   # gdoop-worker250.snc1
+      - 10.22.166.118/32   # gdoop-worker195.snc1
+      - 10.22.165.221/32   # gdoop-worker181.snc1
+      - 10.22.176.184/32   # gdoop-worker177.snc1
+      - 10.22.179.4/32   # gdoop-worker232.snc1
+      - 10.22.174.250/32   # gdoop-worker132.snc1
+      - 10.22.161.46/32   # gdoop-worker36.snc1
+      - 10.22.181.172/32   # gdoop-worker315.snc1
+      - 10.22.166.86/32   # gdoop-worker201.snc1
+      - 10.22.166.37/32   # gdoop-worker246.snc1
+      - 10.22.180.15/32   # gdoop-worker301.snc1
+      - 10.22.180.30/32   # gdoop-worker265.snc1
+      - 10.22.171.76/32   # gdoop-worker69.snc1
+      - 10.22.181.60/32   # gdoop-worker320.snc1
+      - 10.22.175.84/32   # gdoop-worker129.snc1
+      - 10.22.175.60/32   # gdoop-worker151.snc1
+      - 10.22.172.181/32   # gdoop-worker10.snc1
+      - 10.22.170.152/32   # gdoop-worker362.snc1
+      - 10.22.166.149/32   # gdoop-worker334.snc1
+      - 10.22.173.51/32   # gdoop-worker97.snc1
+      - 10.22.178.9/32   # gdoop-worker293.snc1
+      - 10.22.164.237/32   # gdoop-worker115.snc1
+      - 10.22.167.5/32   # gdoop-worker276.snc1
+      - 10.22.176.149/32   # gdoop-worker345.snc1
+      - 10.22.164.177/32   # gdoop-worker134.snc1
+      - 10.22.172.25/32   # gdoop-worker83.snc1
+      - 10.22.165.247/32   # gdoop-worker159.snc1
+      - 10.22.173.207/32   # gdoop-worker99.snc1
+      - 10.22.169.29/32   # gdoop-worker228.snc1
+      - 10.22.162.82/32   # gdoop-worker72.snc1
+      - 10.22.175.80/32   # gdoop-worker148.snc1
+      - 10.22.170.199/32   # gdoop-worker364.snc1
+      - 10.22.166.238/32   # gdoop-worker203.snc1
+      - 10.22.169.173/32   # gdoop-worker359.snc1
+      - 10.22.163.237/32   # gdoop-worker6.snc1
+      - 10.22.172.152/32   # gdoop-worker53.snc1
+      - 10.22.166.46/32   # gdoop-worker197.snc1
+      - 10.22.178.27/32   # gdoop-worker217.snc1
+      - 10.22.176.226/32   # gdoop-worker178.snc1
+      - 10.22.171.63/32   # gdoop-worker34.snc1
+      - 10.22.173.108/32   # gdoop-worker105.snc1
+      - 10.22.177.149/32   # gdoop-worker344.snc1
+      - 10.22.166.43/32   # gdoop-worker230.snc1
+      - 10.22.172.177/32   # gdoop-worker73.snc1
+      - 10.22.165.139/32   # gdoop-worker161.snc1
+      - 10.22.160.49/32   # gdoop-worker25.snc1
+      - 10.22.177.36/32   # gdoop-worker221.snc1
+      - 10.22.171.137/32   # gdoop-worker5.snc1
+      - 10.22.164.122/32   # gdoop-worker158.snc1
+      - 10.22.169.22/32   # gdoop-worker266.snc1
+      - 10.22.162.62/32   # gdoop-worker82.snc1
+      - 10.22.168.149/32   # gdoop-worker335.snc1
+      - 10.22.180.16/32   # gdoop-worker227.snc1
+      - 10.22.169.20/32   # gdoop-worker284.snc1
+      - 10.22.164.106/32   # gdoop-worker143.snc1
+      - 10.22.163.131/32   # gdoop-worker104.snc1
+      - 10.22.164.59/32   # gdoop-worker149.snc1
+      - 10.22.165.92/32   # gdoop-worker162.snc1
+      - 10.22.165.62/32   # gdoop-worker212.snc1
+      - 10.22.176.107/32   # gdoop-worker168.snc1
+      - 10.22.177.222/32   # gdoop-worker196.snc1
+      - 10.22.172.63/32   # gdoop-worker16.snc1
+      - 10.22.168.11/32   # gdoop-worker231.snc1
+      - 10.22.167.27/32   # gdoop-worker218.snc1
+      - 10.22.160.30/32   # gdoop-worker35.snc1
+      - 10.22.179.13/32   # gdoop-worker240.snc1
+      - 10.22.165.48/32   # gdoop-worker187.snc1
+      - 10.22.177.35/32   # gdoop-worker237.snc1
+      - 10.22.167.7/32   # gdoop-worker300.snc1
+      - 10.22.165.65/32   # gdoop-worker190.snc1
+      - 10.22.179.12/32   # gdoop-worker256.snc1
+      - 10.22.176.121/32   # gdoop-worker114.snc1
+      - 10.22.176.123/32   # gdoop-worker171.snc1
+      - 10.22.164.214/32   # gdoop-worker152.snc1
+      - 10.22.168.20/32   # gdoop-worker306.snc1
+      - 10.22.163.160/32   # gdoop-worker98.snc1
+      - 10.22.178.12/32   # gdoop-worker275.snc1
+      - 10.22.163.212/32   # gdoop-worker92.snc1
+      - 10.22.167.28/32   # gdoop-worker294.snc1
+      - 10.22.175.164/32   # gdoop-worker133.snc1
+      - 10.22.171.61/32   # gdoop-worker79.snc1
+      - 10.22.181.184/32   # gdoop-worker325.snc1
+      - 10.22.173.178/32   # gdoop-worker108.snc1
+      - 10.22.160.88/32   # gdoop-worker45.snc1
+      - 10.22.161.231/32   # gdoop-worker31.snc1
+      - 10.22.169.24/32   # gdoop-worker272.snc1
+      - 10.22.161.147/32   # gdoop-worker76.snc1
+      - 10.22.168.32/32   # gdoop-worker255.snc1
+      - 10.22.175.144/32   # gdoop-worker139.snc1
+      - 10.22.161.193/32   # gdoop-worker14.snc1
+      - 10.22.178.30/32   # gdoop-worker269.snc1
+      - 10.22.177.11/32   # gdoop-worker210.snc1
+      - 10.22.162.162/32   # gdoop-worker62.snc1
+      - 10.22.179.7/32   # gdoop-worker224.snc1
+      - 10.22.171.48/32   # gdoop-worker59.snc1
+      - 10.22.178.6/32   # gdoop-worker308.snc1
+      - 10.22.166.34/32   # gdoop-worker238.snc1
+      - 10.22.175.242/32   # gdoop-worker142.snc1
+      - 10.22.173.152/32   # gdoop-worker93.snc1
+      - 10.22.177.20/32   # gdoop-worker207.snc1
+      - 10.22.172.58/32   # gdoop-worker28.snc1
+      - 10.22.176.144/32   # gdoop-worker173.snc1
+      - 10.22.170.94/32   # gdoop-worker354.snc1
+      - 10.22.160.15/32   # gdoop-worker1.snc1
+      - 10.22.175.65/32   # gdoop-worker154.snc1
+      - 10.22.177.25/32   # gdoop-worker199.snc1
+      - 10.22.181.179/32   # gdoop-worker323.snc1
+      - 10.22.164.234/32   # gdoop-worker123.snc1
+      - 10.22.163.149/32   # gdoop-worker342.snc1
+      - 10.22.164.125/32   # gdoop-worker140.snc1
+      - 10.22.164.149/32   # gdoop-worker340.snc1
+      - 10.22.163.205/32   # gdoop-worker88.snc1
+      - 10.22.164.254/32   # gdoop-worker137.snc1
+      - 10.22.174.149/32   # gdoop-worker337.snc1
+      - 10.22.173.169/32   # gdoop-worker91.snc1
+      - 10.22.179.16/32   # gdoop-worker274.snc1
+      - 10.22.174.158/32   # gdoop-worker156.snc1
+      - 10.22.162.29/32   # gdoop-worker3.snc1
+      - 10.22.179.32/32   # gdoop-worker298.snc1
+      - 10.22.171.121/32   # gdoop-worker64.snc1
+      - 10.22.163.61/32   # gdoop-worker12.snc1
+      - 10.22.169.63/32   # gdoop-worker356.snc1
+      - 10.22.169.23/32   # gdoop-worker260.snc1
+      - 10.22.177.89/32   # gdoop-worker209.snc1
+      - 10.22.166.33/32   # gdoop-worker222.snc1
+      - 10.22.169.27/32   # gdoop-worker236.snc1
+      - 10.22.160.47/32   # gdoop-worker50.snc1
+      - 10.22.178.31/32   # gdoop-worker241.snc1
+      - 10.22.161.37/32   # gdoop-worker26.snc1
+      - 10.22.165.61/32   # gdoop-worker189.snc1
+      - 10.22.180.80/32   # gdoop-worker358.snc1
+      - 10.22.174.195/32   # gdoop-worker144.snc1
+      - 10.22.176.164/32   # gdoop-worker175.snc1
+      - 10.22.161.76/32   # gdoop-worker81.snc1
+      - 10.22.180.96/32   # gdoop-worker352.snc1
+      - 10.22.181.24/32   # gdoop-worker327.snc1
+      - 10.22.180.12/32   # gdoop-worker219.snc1
+      - 10.22.175.253/32   # gdoop-worker113.snc1
+      - 10.22.174.106/32   # gdoop-worker166.snc1
+      - 10.22.170.136/32   # gdoop-worker361.snc1
+      - 10.22.181.27/32   # gdoop-worker321.snc1
+      - 10.22.161.149/32   # gdoop-worker349.snc1
+      - 10.22.172.49/32   # gdoop-worker43.snc1
+      - 10.22.172.86/32   # gdoop-worker78.snc1
+      - 10.22.172.39/32   # gdoop-worker33.snc1
+      - 10.22.177.97/32   # gdoop-worker192.snc1
+      - 10.22.174.71/32   # gdoop-worker135.snc1
+      - 10.22.167.26/32   # gdoop-worker270.snc1
+      - 10.22.171.189/32   # gdoop-worker74.snc1
+      - 10.22.178.24/32   # gdoop-worker257.snc1
+      - 10.22.162.50/32   # gdoop-worker21.snc1
+      - 10.22.178.4/32   # gdoop-worker304.snc1
+      - 10.22.160.173/32   # gdoop-worker55.snc1
+      - 10.22.169.25/32   # gdoop-worker220.snc1
+      - 10.22.167.36/32   # gdoop-worker226.snc1
+      - 10.22.170.160/32   # gdoop-worker368.snc1
+      - 10.22.180.22/32   # gdoop-worker251.snc1
+      - 10.22.162.39/32   # gdoop-worker52.snc1
+      - 10.22.163.36/32   # gdoop-worker24.snc1
+      - 10.22.179.8/32   # gdoop-worker248.snc1
+      - 10.22.165.248/32   # gdoop-worker185.snc1
+      - 10.22.177.42/32   # gdoop-worker245.snc1
+      - 10.22.170.187/32   # gdoop-worker371.snc1
+      - 10.22.179.6/32   # gdoop-worker311.snc1
+      - 10.22.165.244/32   # gdoop-worker163.snc1
+      - 10.22.168.35/32   # gdoop-worker267.snc1
+      - 10.22.163.238/32   # gdoop-worker106.snc1
+      - 10.22.171.84/32   # gdoop-worker49.snc1
+      - 10.22.179.149/32   # gdoop-worker339.snc1
+      - 10.22.170.210/32   # gdoop-worker330.snc1
+      - 10.22.175.135/32   # gdoop-worker125.snc1
+      - 10.22.179.25/32   # gdoop-worker286.snc1
+      - 10.22.171.149/32   # gdoop-worker333.snc1
+      - 10.22.160.71/32   # gdoop-worker70.snc1
+      - 10.22.174.157/32   # gdoop-worker147.snc1
+      - 10.22.161.58/32   # gdoop-worker8.snc1
+      - 10.22.168.4/32   # gdoop-worker302.snc1
+      - 10.22.171.33/32   # gdoop-worker84.snc1
+      - 10.22.162.203/32   # gdoop-worker37.snc1
+      - 10.22.178.149/32   # gdoop-worker347.snc1
+      - 10.22.163.254/32   # gdoop-worker102.snc1
+      - 10.22.179.40/32   # gdoop-worker280.snc1
+      - 10.22.175.86/32   # gdoop-worker164.snc1
+      - 10.22.174.197/32   # gdoop-worker116.snc1
+      - 10.22.174.228/32   # gdoop-worker150.snc1
+      - 10.22.162.38/32   # gdoop-worker67.snc1
+      - 10.22.179.11/32   # gdoop-worker216.snc1
+      - 10.22.172.228/32   # gdoop-worker22.snc1
+      - 10.22.162.183/32   # gdoop-worker350.snc1
+      - 10.22.172.148/32   # gdoop-worker346.snc1
+      - 10.22.169.117/32   # gdoop-worker332.snc1
+      - 10.22.180.26/32   # gdoop-worker277.snc1
+      - 10.22.178.25/32   # gdoop-worker281.snc1
+      - 10.22.173.229/32   # gdoop-worker85.snc1
+      - 10.22.160.199/32   # gdoop-worker40.snc1
+      - 10.22.173.203/32   # gdoop-worker101.snc1
+      - 10.22.164.126/32   # gdoop-worker146.snc1
+      - 10.22.160.238/32   # gdoop-worker7.snc1
+      - 10.22.174.211/32   # gdoop-worker120.snc1
+      - 10.22.161.31/32   # gdoop-worker71.snc1
+      - 10.22.161.228/32   # gdoop-worker66.snc1
+      - 10.22.168.15/32   # gdoop-worker279.snc1
+      - 10.22.169.14/32   # gdoop-worker296.snc1
+      - 10.22.170.158/32   # gdoop-worker351.snc1
+      - 10.22.180.111/32   # gdoop-worker331.snc1
+      - 10.22.173.149/32   # gdoop-worker348.snc1
+      - 10.22.181.20/32   # gdoop-worker318.snc1
+      - 10.22.176.138/32   # gdoop-worker118.snc1
+      - 10.22.163.141/32   # gdoop-worker86.snc1
+      - 10.22.166.23/32   # gdoop-worker200.snc1
+      - 10.22.175.159/32   # gdoop-worker145.snc1
+      - 10.22.167.6/32   # gdoop-worker282.snc1
+      - 10.22.181.72/32   # gdoop-worker329.snc1
+      - 10.22.166.101/32   # gdoop-worker214.snc1
+      - 10.22.163.6/32   # gdoop-worker18.snc1
+      - 10.22.178.20/32   # gdoop-worker263.snc1
+      - 10.22.171.221/32   # gdoop-worker23.snc1
+      - 10.22.177.212/32   # gdoop-worker194.snc1
+      - 10.22.169.21/32   # gdoop-worker252.snc1
+      - 10.22.162.235/32   # gdoop-worker9.snc1
+      - 10.22.162.210/32   # gdoop-worker42.snc1
+      - 10.22.178.32/32   # gdoop-worker233.snc1
+      - 10.22.181.246/32   # gdoop-worker319.snc1
+      - 10.22.169.18/32   # gdoop-worker244.snc1
+      - 10.22.172.91/32   # gdoop-worker48.snc1
+      - 10.22.166.26/32   # gdoop-worker205.snc1
+      - 10.22.176.171/32   # gdoop-worker130.snc1
+      - 10.22.165.239/32   # gdoop-worker183.snc1
+      - 10.22.168.37/32   # gdoop-worker297.snc1
+      - 10.22.170.82/32   # gdoop-worker366.snc1
+      - 10.22.161.26/32   # gdoop-worker51.snc1
+      - 10.22.167.11/32   # gdoop-worker313.snc1
+      - 10.22.175.232/32   # gdoop-worker121.snc1
+      - 10.22.167.14/32   # gdoop-worker288.snc1
+      - 10.22.180.18/32   # gdoop-worker243.snc1
+      - 10.22.164.71/32   # gdoop-worker127.snc1
+      - 10.22.165.242/32   # gdoop-worker184.snc1
+      - 10.22.170.209/32   # gdoop-worker357.snc1
+      - 10.22.178.10/32   # gdoop-worker312.snc1
+      - 10.22.162.18/32   # gdoop-worker47.snc1
+      - 10.22.178.16/32   # gdoop-worker249.snc1
+      - 10.22.170.131/32   # gdoop-worker370.snc1
+      - 10.22.179.19/32   # gdoop-worker262.snc1
+      - 10.22.166.246/32   # gdoop-worker193.snc1
+      - 10.22.173.77/32   # gdoop-worker165.snc1
+      - 10.22.160.233/32   # gdoop-worker60.snc1
+      - 10.22.168.24/32   # gdoop-worker215.snc1
+      - 10.22.179.22/32   # gdoop-worker303.snc1
+      - 10.22.160.133/32   # gdoop-worker19.snc1
+      - 10.22.161.54/32   # gdoop-worker41.snc1
+      - 10.22.167.42/32   # gdoop-worker234.snc1
+      - 10.22.172.67/32   # gdoop-worker38.snc1
+      - 10.22.176.156/32   # gdoop-worker174.snc1
+      - 10.22.175.225/32   # gdoop-worker117.snc1
+      - 10.22.177.33/32   # gdoop-worker253.snc1
+      - 10.22.162.48/32   # gdoop-worker57.snc1
+      - 10.22.180.28/32   # gdoop-worker259.snc1
+      - 10.22.181.5/32   # gdoop-worker328.snc1
+      - 10.22.181.67/32   # gdoop-worker322.snc1
+      - 10.22.164.251/32   # gdoop-worker111.snc1
+      - 10.22.170.141/32   # gdoop-worker360.snc1
+      - 10.22.173.47/32   # gdoop-worker95.snc1
+      - 10.22.168.26/32   # gdoop-worker291.snc1
+      - 10.22.167.8/32   # gdoop-worker309.snc1
+      - 10.22.175.149/32   # gdoop-worker341.snc1
+      - 10.22.169.11/32   # gdoop-worker278.snc1
+      - 10.22.175.193/32   # gdoop-worker136.snc1
+      - 10.20.70.74/32   # pit-prod-megatron-master1.snc1
+      - 10.20.42.47/32   # pit-prod-megatron-master2.snc1
+      - 10.22.70.192/32   # pit-prod-megatron-master3.snc1
+      - 10.20.70.79/32   # pit-prod-megatron-slave2.snc1
+      - 10.20.42.46/32   # pit-prod-megatron-slave1.snc1
+      - 10.22.37.175/32   # pit-prod-megatron-slave3.snc1
+      - 10.13.122.228/32   # pit-prod-megatron-master1.dub1
+      - 10.32.69.107/32   # users-service-utility1.sac1
+      - 10.32.148.130/32   # users-service-utility2.sac1
+      - 10.20.73.174/32   # users-service-spare1.snc1
+      - 10.20.112.149/32   # user-sync-utility1.snc1
+      - 10.22.72.80/32   # user-sync-utility2.snc1
+      - 10.32.176.54/32   # user-sync-utility1.sac1
+      - 10.32.105.159/32   # user-sync-utility2.sac1
+      - 10.22.70.28/32   # users-service-utility1.snc1
+      - 10.20.91.103/32   # users-service-utility2.snc1
+      - 10.32.170.34/32   # ls-voucher-archive-app3.sac1
+      - 10.22.219.104/32   # ls-voucher-archive-app3.snc1
+      - 10.32.172.22/32   # ls-voucher-archive-app4.sac1
+      - 10.22.133.165/32   # ls-voucher-archive-app4.snc1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: ls_va_deals_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.snc1
+    ports:
+      mysqld: 20003
+    admin_redirect_peers:
+      - 172.17.4.117/32 # db-deals02
+      - 172.17.4.51/32 # db-internal05
+      - 172.17.4.128/32 # db-external01
+      - 172.17.4.126/32  # db-people01
+      - 172.17.4.37/32  # db-subcribers01
+      - 10.23.95.152/32 # gds-snc1-stg-db005m1.snc1
+      - 10.23.95.153/32 # gds-snc1-stg-db005s1.snc1
+  ls_va_travel_prod: # GDS-10638
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 8000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60004
+    nodes:
+      - gds-sac1-prod-db059m1.sac1
+      - gds-sac1-prod-db059s1.sac1
+    master_carp_interface: vlan204
+    slave_carp_interface: vlan205
+    vhid: 194
+    slave_vhid: 194
+    master_vip: 10.32.86.194
+    slave_vips:
+      - 10.32.80.194
+    replication_ips:
+      - 10.32.121.185 # gds-sac1-prod-db059m1.sac1
+      - 10.32.121.60 # gds-sac1-prod-db059s1.sac1
+      - 172.17.4.117 # db-deals02
+      - 172.17.4.51 # db-internal05
+      - 172.17.4.128 # db-external01
+      - 172.17.4.126  # db-people01
+      - 172.17.4.37  # db-subcribers01
+      - 10.22.148.30 # gds-snc1-prod-db059m1.snc1
+      - 10.22.148.25 # gds-snc1-prod-db059s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.233.56/32   #ls-voucher-archive-app1.snc1
+      - 10.20.87.243/32   #ls-voucher-archive-app2.snc1
+      - 10.32.162.19/32   #ls-voucher-archive-app1.sac1
+      - 10.32.164.91/32   #ls-voucher-archive-app2.sac1
+      - 10.22.195.10/32   # im-util1-uat.snc1
+      - 10.20.83.211/32   # im-util1-staging.snc1
+      - 10.22.75.224/32   # im-util1.snc1
+      - 10.22.75.122/32   # im-util2.snc1
+      - 10.22.133.212/32   # im-util3.snc1
+      - 10.22.135.54/32   # im-util4.snc1
+      - 10.22.71.153/32   # taxtech1.snc1
+      - 10.32.170.34/32   # ls-voucher-archive-app3.sac1
+      - 10.22.219.104/32   # ls-voucher-archive-app3.snc1
+      - 10.32.172.22/32   # ls-voucher-archive-app4.sac1
+      - 10.22.133.165/32   # ls-voucher-archive-app4.snc1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: ls_va_travel_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.snc1
+    ports:
+      mysqld: 20004
+    admin_redirect_peers:
+      - 172.17.4.117/32 # db-deals02
+      - 172.17.4.51/32 # db-internal05
+      - 172.17.4.128/32 # db-external01
+      - 172.17.4.126/32  # db-people01
+      - 172.17.4.37/32  # db-subcribers01
+      - 10.23.95.152/32 # gds-snc1-stg-db005m1.snc1
+      - 10.23.95.153/32 # gds-snc1-stg-db005s1.snc1
+#  ls_va_subscript_prod: # GDS-10638 - Decommed GDS-35464

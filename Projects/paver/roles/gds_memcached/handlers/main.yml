@@ -1,0 +1,6 @@
+---
+- name: memcached restart
+  command: /usr/local/sbin/sv term "{{ memcached_path }}"
+
+- name: memcached log restart
+  command: /usr/local/sbin/sv term "{{ memcached_path }}/log"

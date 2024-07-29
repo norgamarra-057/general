@@ -1,0 +1,5 @@
+#!/bin/sh --
+set -e
+exec 2>&1
+/usr/local/sbin/nginx -t -c {{ nginx_runit_service_dir }}/nginx.conf
+exec /usr/local/sbin/nginx -c {{ nginx_runit_service_dir }}/nginx.conf

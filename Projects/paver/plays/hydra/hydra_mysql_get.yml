@@ -1,0 +1,81 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+   - name: FreeBSD | run | get mysql
+     shell: |
+       exec 2>&1
+       dc="$(echo "{{ inventory_hostname }}"|cut -d . -f 2)"
+       id="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d- -f 4)"
+       env="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d- -f 3)"
+       cluster="$(echo $id|head -c 5)"
+       type="$(echo $id|tail -c 3)"
+       read_only="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e "SHOW GLOBAL VARIABLES WHERE Variable_name = 'read_only'" -t -s -N|tail -n -2|head -n +1|sed 's/  *//g'|cut -d '|' -f 3)"
+       slaves="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW SLAVE HOSTS' -t -s -N|tail -n +3|wc -l|tr -d ' ')"
+       master_ip="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW SLAVE STATUS\G'|grep 'Master_Host:'|sed 's/  *//g'|cut -d ':' -f 2)"
+       last_io_error="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW SLAVE STATUS\G'|grep 'Last_IO_Error:'|sed 's/  *//g'|cut -d ':' -f 2)"
+       last_sql_error="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW SLAVE STATUS\G'|grep 'Last_SQL_Error:'|sed 's/  *//g'|cut -d ':' -f 2)"
+       position_1="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW BINARY LOGS' -t -s -N|tail -n 2|head -n 1|cut -d '|' -f 3|sed 's/[^0-9]*//g')"
+       sleep 10
+       position_2="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW BINARY LOGS' -t -s -N|tail -n 2|head -n 1|cut -d '|' -f 3|sed 's/[^0-9]*//g')"
+       binlog_events_threashold="$(((position_2 - position_1) * 4 / 10))"
+       binlog_batch_size="{{ ((item.value.hydra|default({})).extras|default({}))['mysql_binlog_batch_size']|default(8192) }}"
+       binlog_batch_interval="{{ ((item.value.hydra|default({})).extras|default({}))['mysql_binlog_batch_sleep_interval']|default(2000) }}"
+       binlog_events_configured_threashold="$((1000 * $binlog_batch_size / $binlog_batch_interval))"
+       echo -n "{{ item.key }},{{ inventory_hostname }},"
+       if [ "ON" != "$read_only" ]
+       then
+         echo -n "TRUE,"
+       else
+         echo -n "FALSE,"
+       fi
+       if [ ! -z "$master_ip" ]
+       then
+         echo -n "$(getent hosts $master_ip|sed 's/  */ /g'|cut -d ' ' -f 2),"
+       else
+         echo -n ","
+       fi 
+       echo -n "$slaves,"
+       if [ "$binlog_events_threashold" -gt "$binlog_events_configured_threashold" ]
+       then
+         echo -n "$binlog_events_threashold,"
+       else
+         echo -n ","
+       fi
+       if [ ! -z "$last_io_error" ]
+       then
+         echo -n "\"$last_io_error\","
+       else
+         echo -n ","
+       fi
+       if [ ! -z "$last_sql_error" ]
+       then
+         echo -n "\"$last_sql_error\","
+       else
+         echo -n ","
+       fi
+       echo
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: item.value.type == 'mysql' and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+     async: 20
+     pool: 12
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"
+

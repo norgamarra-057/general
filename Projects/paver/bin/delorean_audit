@@ -1,0 +1,47 @@
+#! /usr/bin/env python
+###################################################
+# delorean_audit
+#
+# Version:      1.0.0
+#
+# Description:  Reports the time of the last back up of all GDS database servers, configured on the specified delorean host.
+#
+# Usage:        delorean_audit server
+#
+# Requirements: python 2.7
+#
+# Notes:        
+###################################################
+
+# Import needed modules
+
+import sys
+import string
+import os
+import paramiko
+from datetime import datetime
+
+# Default values
+Version = "1.0.0"
+
+node = sys.argv[1]
+
+try:
+   remote = paramiko.SSHClient()
+   remote.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+   remote.connect(node)
+except:
+   print (node + " cannot connect to server")
+   sys.exit()
+
+remote_command = "find /var/groupon/delorean/pools/ -name \"*gz\" -print -exec stat -f %m {} \;"
+stdin, stdout, stderr = remote.exec_command(remote_command)
+
+lines = stdout.readlines()
+for line in lines:
+   if line[0] == '/':
+      print ('')
+      print(line.rstrip())
+   else:
+      mtime = datetime.fromtimestamp(int(line.rstrip()))
+      print(mtime)

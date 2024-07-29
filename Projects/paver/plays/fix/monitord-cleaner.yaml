@@ -1,0 +1,54 @@
+---
+###################################################
+# This playbook is for disable the old monitord config.
+#
+# Usage: ansible-playbook plays/monitord-cleaner.yaml -e 'node=gds-snc1-test-db002m1.snc1'
+#
+####################################################
+- name: Validate global settings
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Assert that required params are set
+      assert:
+        that:
+          - node is defined
+- name: Validate settings for target host
+  hosts:
+    - "{{ node }}"
+  gather_facts: false
+  tasks:
+    - name: Fail if there are no instances defined for target host
+      fail:
+        msg: "no instances defined for {{ node }}"
+      when: gds_instances is not defined
+      
+- name: FreeBSD | Check instance
+  hosts: "{{ node }}"
+  gather_facts: False 
+  become: yes
+  tasks:
+    - name: Monitord cleaner | List directories to delete.
+      shell: 'ls /var/groupon/service | grep monitord_agent'
+      register: monitord_dirs
+      changed_when: false
+    
+    - debug: var=monitord_dirs.stdout_lines
+
+    - name: Monitord cleaner | Stop monitord
+      runit:
+        name: "{{ item }}"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: stopped
+      with_items: "{{ monitord_dirs.stdout_lines }}"
+      ignore_errors: False
+
+    - name: Monitord cleaner | Unlink monitord instance service link
+      file:
+        path: /var/service/{{ item }}
+        state: absent
+      with_items: "{{ monitord_dirs.stdout_lines }}"
+      ignore_errors: False
+

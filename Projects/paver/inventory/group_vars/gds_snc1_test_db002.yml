@@ -1,0 +1,227 @@
+---
+gds_carp_peers:
+  - 10.24.124.20  # gds-snc1-test-db002m1-vlan325.snc1
+  - 10.24.125.20  # gds-snc1-test-db002m1-vlan326.snc1
+  - 10.24.124.169 # gds-snc1-test-db002s1-vlan325.snc1
+  - 10.24.125.169 # gds-snc1-test-db002s1-vlan326.snc1
+gds_carp_interfaces:
+  - vlan325
+  - vlan326
+gds_instance_group: gds_snc1_test_db002
+gds_monitor_cluster_type: mix
+
+hydra_server_bind: 0.0.0.0
+hydra_server_port: 8080
+hydra_jks_file: hydra-server-staging.jks
+hydra_server_jks_password: 123456
+
+gds_instances:
+#  users_prod:
+#  taxonomy_prod: # GDS-10503
+#  pwa_prod: # GDS-10503
+#  orders_prod: # GDS-10503
+#  gds_test3: # GDS-14922
+#  gds_test4: # GDS-14922
+#  backup_restore: # GDS-14922
+#  dminor2_test: # GDS-XXXXX - decommed
+###### PostgreSQL ######
+  gds_test1: #GDS-14922
+    type: postgresql
+    dbnames:
+      - test1
+    schemas:
+      test1:
+        - testdb
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 400
+    unix_user: gds_uid60051
+    master_vip: 10.24.124.106
+    slave_vips:
+      - 10.24.125.106
+    replication_ips:
+      - 10.32.114.142 # gds-sac1-stg-db022m1.sac1
+      - 10.32.114.248  # gds-sac1-stg-db022s1.sac1
+      - 10.20.114.47   # gds-snc1-test-db002m1.snc1
+      - 10.20.114.166  # gds-snc1-test-db002s1.snc1
+      - 10.23.90.23  # gds-snc1-stg-db026m1.snc1
+      - 10.23.92.73  # gds-snc1-stg-db026s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32 # gds-admin01.snc1
+      - 10.23.92.122/32 # switchboard-app1-dev.snc1
+      - 10.23.44.97/32 # switchboard-app3-dev.snc1
+      - 10.23.43.233/32 # switchboard-app1-uat.snc1
+    dba_account_name: gds_test1_stg_dba
+    app_account_name: gds_test1_stg_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin01.snc1
+      - 10.23.92.122/32 # switchboard-app1-dev.snc1
+      - 10.23.44.97/32 # switchboard-app3-dev.snc1
+      - 10.23.43.233/32 # switchboard-app1-uat.snc1
+    ports:
+      pgbouncer_txn: 20104
+      pgbouncer_session: 20105
+      postgresql_raw: 20106
+    extra_variables:
+    hydra:
+      ids:
+       - 46c7c221-7c6a-47d1-a082-4bdb52920bd5
+       - 74821edc-2fc7-49fd-b4c5-cc2b507152fd
+      default_primary: gds-snc1-test-db002m1.snc1
+      cascading:
+        gds-snc1-test-db002m1.snc1:
+          gds-sac1-stg-db022s1.sac1:20106: gds-sac1-stg-db022m1.sac1:20106
+          gds-snc1-stg-db026s1.snc1:20106: gds-snc1-stg-db026m1.snc1:20106
+        gds-snc1-test-db002s1.snc1:
+          gds-sac1-stg-db022m1.sac1:20106: gds-sac1-stg-db022s1.sac1:20106
+          gds-snc1-stg-db026m1.snc1:20106: gds-snc1-stg-db026s1.snc1:20106
+      priority:
+        - gds-snc1-test-db002m1.snc1:20106
+        - gds-sac1-stg-db022m1.sac1:20106
+        - gds-snc1-stg-db026m1.snc1:20106
+  gds_test2: #GDS-14922
+    type: postgresql
+    dbnames:
+      - test2
+    schemas:
+      test2:
+        - testdb
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 400
+    unix_user: gds_uid60052
+    master_vip: 10.24.124.107
+    slave_vips:
+      - 10.24.125.107
+    replication_ips:
+      - 10.32.114.142 # gds-sac1-stg-db022m1.sac1
+      - 10.32.114.248  # gds-sac1-stg-db022s1.sac1
+      - 10.20.114.47   # gds-snc1-test-db002m1.snc1
+      - 10.20.114.166  # gds-snc1-test-db002s1.snc1
+      - 10.23.90.23  # gds-snc1-stg-db026m1.snc1
+      - 10.23.92.73  # gds-snc1-stg-db026s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32 # gds-admin01.snc1
+      - 10.23.92.122/32 # switchboard-app1-dev.snc1
+      - 10.23.44.97/32 # switchboard-app3-dev.snc1
+      - 10.23.43.233/32 # switchboard-app1-uat.snc1
+    dba_account_name: gds_test2_stg_dba
+    app_account_name: gds_test2_stg_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin01.snc1
+      - 10.23.92.122/32 # switchboard-app1-dev.snc1
+      - 10.23.44.97/32 # switchboard-app3-dev.snc1
+      - 10.23.43.233/32 # switchboard-app1-uat.snc1
+    ports:
+      pgbouncer_txn: 20107
+      pgbouncer_session: 20108
+      postgresql_raw: 20109
+    extra_variables:
+    hydra:
+      ids:
+       - 023de7de-969c-4988-8857-566ac1def909
+       - de95b0b1-05ee-403c-9c3c-c823e529d30b
+      default_primary: gds-snc1-test-db002m1.snc1
+      cascading:
+        gds-snc1-test-db002m1.snc1:
+          gds-sac1-stg-db022s1.sac1:20109: gds-sac1-stg-db022m1.sac1:20109
+          gds-snc1-stg-db026s1.snc1:20109: gds-snc1-stg-db026m1.snc1:20109
+        gds-snc1-test-db002s1.snc1:
+          gds-sac1-stg-db022m1.sac1:20109: gds-sac1-stg-db022s1.sac1:20109
+          gds-snc1-stg-db026m1.snc1:20109: gds-snc1-stg-db026s1.snc1:20109
+      priority:
+        - gds-snc1-test-db002m1.snc1:20109
+        - gds-sac1-stg-db022m1.sac1:20109
+        - gds-snc1-stg-db026m1.snc1:20109
+
+  gds_dminor: #GDS-XXXX
+    type: postgresql
+    dbnames:
+      - dminor
+    schemas:
+      dminor:
+        - testdb
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 400
+    unix_user: gds_uid60053
+    master_vip: 10.24.124.108
+    slave_vips:
+      - 10.24.125.108
+    replication_ips:
+      - 10.32.114.142 # gds-sac1-stg-db022m1.sac1
+      - 10.32.114.248  # gds-sac1-stg-db022s1.sac1
+      - 10.20.114.47   # gds-snc1-test-db002m1.snc1
+      - 10.20.114.166  # gds-snc1-test-db002s1.snc1
+      - 10.23.90.23  # gds-snc1-stg-db026m1.snc1
+      - 10.23.92.73  # gds-snc1-stg-db026s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32 # gds-admin01.snc1
+      - 10.23.92.122/32 # switchboard-app1-dev.snc1
+      - 10.23.44.97/32 # switchboard-app3-dev.snc1
+      - 10.23.43.233/32 # switchboard-app1-uat.snc1
+    dba_account_name: gds_dminor_stg_dba
+    app_account_name: gds_dminor_stg_app
+    dba_src_cidrs:
+      - 10.20.130.164/32  # dbclustermon2.snc1
+      - 10.12.33.17/32    # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32   # gds-admin01.snc1
+      - 10.22.74.10/32    # gds-admin01.snc1
+      - 10.23.92.122/32 # switchboard-app1-dev.snc1
+      - 10.23.44.97/32 # switchboard-app3-dev.snc1
+      - 10.23.43.233/32 # switchboard-app1-uat.snc1
+    ports:
+      pgbouncer_txn: 20110
+      pgbouncer_session: 20111
+      postgresql_raw: 20112
+    extra_variables:
+    hydra:
+      ids:
+       - 023de7de-969c-4988-8857-566ac1def909
+       - de95b0b1-05ee-403c-9c3c-c823e529d30b
+      default_primary: gds-snc1-test-db002m1.snc1
+      cascading:
+        gds-snc1-test-db002m1.snc1:
+          gds-sac1-stg-db022s1.sac1:20112: gds-sac1-stg-db022m1.sac1:20112
+          gds-snc1-stg-db026s1.snc1:20112: gds-snc1-stg-db026m1.snc1:20112
+        gds-snc1-test-db002s1.snc1:
+          gds-sac1-stg-db022m1.sac1:20112: gds-sac1-stg-db022s1.sac1:20112
+          gds-snc1-stg-db026m1.snc1:20112: gds-snc1-stg-db026s1.snc1:20112
+      priority:
+        - gds-snc1-test-db002m1.snc1:20112
+        - gds-sac1-stg-db022m1.sac1:20112
+        - gds-snc1-stg-db026m1.snc1:20112
+

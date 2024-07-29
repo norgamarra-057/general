@@ -1,0 +1,409 @@
+Index: sys/kern/vfs_bio.c
+===================================================================
+--- sys/kern/vfs_bio.c	(revision 278954)
++++ sys/kern/vfs_bio.c	(working copy)
+@@ -321,6 +321,7 @@
+ #ifdef INVARIANTS
+ static int bq_len[BUFFER_QUEUES];
+ #endif
++static int bqgen;
+ 
+ /*
+  * Single global constant for BUF_WMESG, to avoid getting multiple references.
+@@ -445,6 +446,7 @@
+ 		    on & ~VFS_BIO_NEED_BUFSPACE))
+ 			break;
+ 	}
++	atomic_add_int(&bqgen, 1);
+ 	if (need_wakeup)
+ 		wakeup(__DEVOLATILE(void *, &needsbuffer));
+ 	rw_runlock(&nblock);
+@@ -528,6 +530,7 @@
+ 		if (atomic_cmpset_rel_int(&needsbuffer, on, on & ~mask))
+ 			break;
+ 	}
++	atomic_add_int(&bqgen, 1);
+ 	if (need_wakeup)
+ 		wakeup(__DEVOLATILE(void *, &needsbuffer));
+ 	rw_runlock(&nblock);
+@@ -2061,14 +2064,12 @@
+  */
+ static void
+ getnewbuf_bufd_help(struct vnode *vp, int gbflags, int slpflag, int slptimeo,
+-    int defrag)
++    int defrag, int bqlen_old)
+ {
+ 	struct thread *td;
+ 	char *waitmsg;
+ 	int cnt, error, flags, norunbuf, wait;
+ 
+-	mtx_assert(&bqclean, MA_OWNED);
+-
+ 	if (defrag) {
+ 		flags = VFS_BIO_NEED_BUFSPACE;
+ 		waitmsg = "nbufkv";
+@@ -2080,7 +2081,6 @@
+ 		flags = VFS_BIO_NEED_ANY;
+ 	}
+ 	atomic_set_int(&needsbuffer, flags);
+-	mtx_unlock(&bqclean);
+ 
+ 	bd_speedup();	/* heeeelp */
+ 	if ((gbflags & GB_NOWAIT_BD) != 0)
+@@ -2119,6 +2119,14 @@
+ 			if ((needsbuffer & flags) == 0)
+ 				break;
+ 		}
++		/*
++		 * We did not found a buffer on the queues, but queues
++		 * were modified behind us and we could not noticed.
++		 * Avoid sleep to ensure that we are not blocked
++		 * forever without a thread that can wake us up.
++		 */
++		if (bqgen != bqlen_old)
++			break;
+ 		error = rw_sleep(__DEVOLATILE(void *, &needsbuffer), &nblock,
+ 		    (PRIBIO + 4) | slpflag, waitmsg, slptimeo);
+ 		if (error != 0)
+@@ -2230,7 +2238,6 @@
+ 	 * where we cannot backup.
+ 	 */
+ 	nbp = NULL;
+-	mtx_lock(&bqclean);
+ 	if (!defrag && unmapped) {
+ 		nqindex = QUEUE_EMPTY;
+ 		nbp = TAILQ_FIRST(&bufqueues[QUEUE_EMPTY]);
+@@ -2311,16 +2318,6 @@
+ 				break;
+ 			}
+ 		}
+-		/*
+-		 * If we are defragging then we need a buffer with 
+-		 * b_kvasize != 0.  XXX this situation should no longer
+-		 * occur, if defrag is non-zero the buffer's b_kvasize
+-		 * should also be non-zero at this point.  XXX
+-		 */
+-		if (defrag && bp->b_kvasize == 0) {
+-			printf("Warning: defrag empty buffer %p\n", bp);
+-			continue;
+-		}
+ 
+ 		/*
+ 		 * Start freeing the bp.  This is somewhat involved.  nbp
+@@ -2327,19 +2324,29 @@
+ 		 * remains valid only for QUEUE_EMPTY[KVA] bp's.
+ 		 */
+ 		if (BUF_LOCK(bp, LK_EXCLUSIVE | LK_NOWAIT, NULL) != 0)
+-			continue;
++			goto restart;
+ 		/*
+ 		 * BKGRDINPROG can only be set with the buf and bufobj
+ 		 * locks both held.  We tolerate a race to clear it here.
+ 		 */
+-		if (bp->b_vflags & BV_BKGRDINPROG) {
++		if ((bp->b_vflags & BV_BKGRDINPROG) != 0 ||
++		    bp->b_qindex != qindex) {
+ 			BUF_UNLOCK(bp);
++			goto restart;
++		}
++
++		/*
++		 * If we are defragging then we need a buffer with
++		 * b_kvasize != 0.  XXX this situation should no longer
++		 * occur, if defrag is non-zero the buffer's b_kvasize
++		 * should also be non-zero at this point.  XXX
++		 */
++		if (defrag && bp->b_kvasize == 0) {
++			printf("Warning: defrag empty buffer %p\n", bp);
+ 			continue;
+ 		}
+ 
+-		KASSERT(bp->b_qindex == qindex,
+-		    ("getnewbuf: inconsistent queue %d bp %p", qindex, bp));
+-
++		mtx_lock(&bqclean);
+ 		bremfreel(bp);
+ 		mtx_unlock(&bqclean);
+ 		/*
+@@ -2415,7 +2422,7 @@
+     int gbflags)
+ {
+ 	struct buf *bp;
+-	int defrag, metadata;
++	int defrag, metadata, bqgen_old;
+ 
+ 	KASSERT((gbflags & (GB_UNMAPPED | GB_KVAALLOC)) != GB_KVAALLOC,
+ 	    ("GB_KVAALLOC only makes sense with GB_UNMAPPED"));
+@@ -2437,8 +2444,10 @@
+ 	atomic_add_int(&getnewbufcalls, 1);
+ 	atomic_subtract_int(&getnewbufrestarts, 1);
+ restart:
++	bqgen_old = bqgen;
+ 	bp = getnewbuf_scan(maxsize, defrag, (gbflags & (GB_UNMAPPED |
+ 	    GB_KVAALLOC)) == GB_UNMAPPED, metadata);
++	mtx_assert(&bqclean, MA_NOTOWNED);
+ 	if (bp != NULL)
+ 		defrag = 0;
+ 
+@@ -2449,12 +2458,13 @@
+ 	 * Generally we are sleeping due to insufficient buffer space.
+ 	 */
+ 	if (bp == NULL) {
+-		mtx_assert(&bqclean, MA_OWNED);
+-		getnewbuf_bufd_help(vp, gbflags, slpflag, slptimeo, defrag);
++		if (bqgen != bqgen_old) {
++			goto restart;
++		}
++		getnewbuf_bufd_help(vp, gbflags, slpflag, slptimeo, defrag,
++		    bqgen_old);
+ 		mtx_assert(&bqclean, MA_NOTOWNED);
+ 	} else if ((gbflags & (GB_UNMAPPED | GB_KVAALLOC)) == GB_UNMAPPED) {
+-		mtx_assert(&bqclean, MA_NOTOWNED);
+-
+ 		bfreekva(bp);
+ 		bp->b_flags |= B_UNMAPPED;
+ 		bp->b_kvabase = bp->b_data = unmapped_buf;
+@@ -2463,8 +2473,6 @@
+ 		atomic_add_long(&unmapped_bufspace, bp->b_kvasize);
+ 		atomic_add_int(&bufreusecnt, 1);
+ 	} else {
+-		mtx_assert(&bqclean, MA_NOTOWNED);
+-
+ 		/*
+ 		 * We finally have a valid bp.  We aren't quite out of the
+ 		 * woods, we still have to reserve kva space.  In order
+Index: sys/vm/vm_fault.c
+===================================================================
+--- sys/vm/vm_fault.c	(revision 278954)
++++ sys/vm/vm_fault.c	(working copy)
+@@ -400,6 +400,47 @@
+ 		VM_OBJECT_WLOCK(fs.first_object);
+ 	}
+ 
++	if ((fault_flags & (VM_FAULT_CHANGE_WIRING | VM_FAULT_DIRTY)) == 0 &&
++	    (fs.first_object->type == OBJT_DEFAULT ||
++	    fs.first_object->type == OBJT_SWAP ||
++	    fs.first_object->type == OBJT_PHYS)) {
++		VM_OBJECT_RLOCK(fs.first_object);
++		fs.first_m = vm_page_lookup(fs.first_object, fs.first_pindex);
++		if (fs.first_m != NULL) {
++			if (!vm_page_tryxbusy(fs.first_m)) {
++				vm_page_lock(fs.first_m);
++				VM_OBJECT_RUNLOCK(fs.first_object);
++				vm_page_busy_sleep(fs.first_m, "vmpffb");
++				vm_map_lookup_done(fs.map, fs.entry);
++				goto RetryFault;
++			}
++			VM_OBJECT_RUNLOCK(fs.first_object);
++			/*
++			 * The object cannot go away after unlock
++			 * since it has a non-vnode type and the map
++			 * references it.
++			 */
++
++			pmap_enter(fs.map->pmap, vaddr, fault_type, fs.first_m,
++			    prot, wired);
++			VM_OBJECT_RLOCK(fs.first_object);
++			vm_page_lock(fs.first_m);
++			vm_page_activate(fs.first_m);
++			if (m_hold != NULL) {
++				*m_hold = fs.first_m;
++				vm_page_hold(fs.first_m);
++			}
++			vm_page_unlock(fs.first_m);
++			vm_page_xunbusy(fs.first_m);
++			VM_OBJECT_RUNLOCK(fs.first_object);
++			vm_map_lookup_done(fs.map, fs.entry);
++			curthread->td_ru.ru_minflt++;
++			return (KERN_SUCCESS);
++		} else {
++			VM_OBJECT_RUNLOCK(fs.first_object);
++		}
++	}
++
+ 	/*
+ 	 * Make a reference to this object to prevent its disposal while we
+ 	 * are messing with it.  Once we have the reference, the map is free
+Index: sys/vm/vm_mmap.c
+===================================================================
+--- sys/vm/vm_mmap.c	(revision 278954)
++++ sys/vm/vm_mmap.c	(working copy)
+@@ -96,6 +96,15 @@
+     "Do not apply RLIMIT_MEMLOCK on mlockall");
+ TUNABLE_INT("vm.old_mlock", &old_mlock);
+ 
++static int shared_anon_use_phys;
++SYSCTL_INT(_vm, OID_AUTO, shm_anon_use_phys, CTLFLAG_RW,
++    &shared_anon_use_phys, 0,
++    "Enable/Disable locking of shared anonymous memory pages in core");
++static int shared_anon_phys_preload;
++SYSCTL_INT(_vm, OID_AUTO, shm_anon_phys_preload, CTLFLAG_RW,
++    &shared_anon_phys_preload, 0,
++    "");
++
+ #ifdef MAP_32BIT
+ #define	MAP_32BIT_MAX_ADDR	((vm_offset_t)1 << 31)
+ #endif
+@@ -321,7 +330,10 @@
+ 		 * Mapping blank space is trivial.
+ 		 */
+ 		handle = NULL;
+-		handle_type = OBJT_DEFAULT;
++		if ((flags & MAP_SHARED) != 0 && shared_anon_use_phys)
++			handle_type = OBJT_PHYS;
++		else
++			handle_type = OBJT_DEFAULT;
+ 		maxprot = VM_PROT_ALL;
+ 		cap_maxprot = VM_PROT_ALL;
+ 	} else {
+@@ -1509,16 +1521,18 @@
+ 	objtype_t handle_type, void *handle,
+ 	vm_ooffset_t foff)
+ {
+-	boolean_t fitit;
+-	vm_object_t object = NULL;
+-	struct thread *td = curthread;
++	vm_object_t object;
++	vm_page_t m;
++	struct thread *td;
++	vm_pindex_t pi, psize;
+ 	int docow, error, findspace, rv;
+-	boolean_t writecounted;
++	boolean_t fitit, writecounted;
+ 
+ 	if (size == 0)
+ 		return (0);
+ 
+ 	size = round_page(size);
++	td = curthread;
+ 
+ 	if (map == &td->td_proc->p_vmspace->vm_map) {
+ 		PROC_LOCK(td->td_proc);
+@@ -1570,6 +1584,7 @@
+ 		fitit = FALSE;
+ 	}
+ 	writecounted = FALSE;
++	object = NULL;
+ 
+ 	/*
+ 	 * Lookup/allocate object.
+@@ -1587,6 +1602,7 @@
+ 		error = vm_mmap_shm(td, size, prot, &maxprot, &flags,
+ 		    handle, foff, &object);
+ 		break;
++	case OBJT_PHYS:
+ 	case OBJT_DEFAULT:
+ 		if (handle == NULL) {
+ 			error = 0;
+@@ -1600,7 +1616,27 @@
+ 	if (error)
+ 		return (error);
+ 	if (flags & MAP_ANON) {
+-		object = NULL;
++		if (handle_type == OBJT_PHYS) {
++			object = vm_pager_allocate(OBJT_PHYS, NULL, size,
++			    prot, 0, td->td_ucred);
++			if (shared_anon_phys_preload) {
++				psize = OFF_TO_IDX(size);
++				VM_OBJECT_WLOCK(object);
++				for (pi = 0; pi < psize; pi++) {
++					m = vm_page_grab(object, pi,
++					    VM_ALLOC_NOBUSY | VM_ALLOC_ZERO);
++					m->valid = VM_PAGE_BITS_ALL;
++					if (should_yield()) {
++						VM_OBJECT_WUNLOCK(object);
++						kern_yield(PRI_USER);
++						VM_OBJECT_WLOCK(object);
++					}
++				}
++				VM_OBJECT_WUNLOCK(object);
++			}
++		} else {
++			object = NULL;
++		}
+ 		docow = 0;
+ 		/*
+ 		 * Unnamed anonymous regions always start at 0.
+Index: sys/vm/vm_page.c
+===================================================================
+--- sys/vm/vm_page.c	(revision 278954)
++++ sys/vm/vm_page.c	(working copy)
+@@ -345,6 +345,9 @@
+ 	mtx_init(&vm_page_queue_free_mtx, "vm page free queue", NULL, MTX_DEF);
+ 	for (i = 0; i < PA_LOCK_COUNT; i++)
+ 		mtx_init(&pa_lock[i], "vm page", NULL, MTX_DEF);
++
++	TUNABLE_INT_FETCH("vm.ndomain_split_factor", &vm_ndom_split_factor);
++	vm_ndomains *= vm_ndom_split_factor;
+ 	for (i = 0; i < vm_ndomains; i++)
+ 		vm_page_domain_init(&vm_dom[i]);
+ 
+Index: sys/vm/vm_phys.c
+===================================================================
+--- sys/vm/vm_phys.c	(revision 278954)
++++ sys/vm/vm_phys.c	(working copy)
+@@ -71,6 +71,7 @@
+ struct mem_affinity *mem_affinity;
+ 
+ int vm_ndomains = 1;
++int vm_ndom_split_factor = 1;
+ 
+ struct vm_phys_seg vm_phys_segs[VM_PHYSSEG_MAX];
+ int vm_phys_nsegs;
+@@ -263,6 +264,30 @@
+ }
+ 
+ static void
++vm_phys_create_seg_split(vm_paddr_t start, vm_paddr_t end, int flind,
++    int hwdomain)
++{
++	vm_paddr_t split_end, split_start, split_sz;
++	int domain;
++
++	domain = hwdomain * vm_ndom_split_factor;
++	split_sz = roundup2((end - start) / vm_ndom_split_factor, PAGE_SIZE);
++	/* Do not split into segments less than 1M */
++	if (split_sz < 1024 * 1024) {
++		_vm_phys_create_seg(start, end, flind, domain);
++		return;
++	}
++
++	for (split_start = start; split_start < end;) {
++		split_end = split_start + split_sz;
++		if (end < split_end)
++			split_end = end;
++		_vm_phys_create_seg(split_start, split_end, flind, domain++);
++		split_start = split_end;
++	}
++}
++
++static void
+ vm_phys_create_seg(vm_paddr_t start, vm_paddr_t end, int flind)
+ {
+ 	int i;
+@@ -281,11 +306,11 @@
+ 			panic("No affinity info for start %jx",
+ 			    (uintmax_t)start);
+ 		if (mem_affinity[i].end >= end) {
+-			_vm_phys_create_seg(start, end, flind,
++			vm_phys_create_seg_split(start, end, flind,
+ 			    mem_affinity[i].domain);
+ 			break;
+ 		}
+-		_vm_phys_create_seg(start, mem_affinity[i].end, flind,
++		vm_phys_create_seg_split(start, mem_affinity[i].end, flind,
+ 		    mem_affinity[i].domain);
+ 		start = mem_affinity[i].end;
+ 	}
+Index: sys/vm/vm_phys.h
+===================================================================
+--- sys/vm/vm_phys.h	(revision 278954)
++++ sys/vm/vm_phys.h	(working copy)
+@@ -62,6 +62,7 @@
+ 
+ extern struct mem_affinity *mem_affinity;
+ extern int vm_ndomains;
++extern int vm_ndom_split_factor;
+ extern struct vm_phys_seg vm_phys_segs[];
+ extern int vm_phys_nsegs;
+ 

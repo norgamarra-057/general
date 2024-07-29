@@ -1,0 +1,9 @@
+[tcpout]
+defaultGroup = primary_indexers
+
+[tcpout:primary_indexers]
+server = {{ splunk_server }}
+autoLB = true
+compressed = true
+
+

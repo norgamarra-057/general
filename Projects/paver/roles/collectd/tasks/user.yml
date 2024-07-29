@@ -1,0 +1,20 @@
+---
+- name: collectd | group | FreeBSD
+  group:
+     name="{{ collectd_groupname }}"
+     state="present"
+
+- name: collectd | user
+  user:
+    name="{{ collectd_username }}"
+    state='present'
+    home="{{ collectd_service_dir }}"
+    comment="Circonus collectd agent"
+    uid="{{ collectd_uid }}"
+    group="{{ collectd_groupname }}"
+    append="yes"
+
+- name: collectd | group | FreeBSD (check)
+  command: /usr/bin/id -g {{ collectd_groupname }}
+  register: gid_collectd
+  when: ansible_os_family == 'FreeBSD'

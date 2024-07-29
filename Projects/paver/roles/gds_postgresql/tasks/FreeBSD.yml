@@ -1,0 +1,195 @@
+---
+# Create parent if it doens't exist
+- name: PostgreSQL | FreeBSD | zfs | groupon root  
+  zfs:
+    name: "tank/var/groupon"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'on'
+    mountpoint: "{{ groupon_root }}"
+    primarycache: all
+    readonly: 'off'
+    recordsize: 16K
+    secondarycache: all
+    setuid: 'off'
+    state: present
+    sync: standard
+
+# Create the base dataset that all databases inherit from
+- name: PostgreSQL | FreeBSD | zfs | root
+  zfs:
+    name: "tank/var/groupon/postgresql"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "{{ postgresql_root }}"
+    primarycache: all
+    readonly: 'off'
+    recordsize: 16K
+    secondarycache: all
+    setuid: 'off'
+    state: present
+    sync: disabled
+
+- name: PostgreSQL | FreeBSD | zfs | datadir
+  zfs:
+    name: "tank{{ postgresql_datadir }}"
+    state: present
+
+- name: PostgreSQL | FreeBSD | zfs | cluster_path
+  zfs:
+    name: "tank{{ postgresql_cluster_path }}"
+    state: present
+
+- name: PostgreSQL | FreeBSD | initdb | perms
+  file:
+    name: "{{ postgresql_cluster_path }}/data"
+    state: directory
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instances[instance_name].unix_user].group }}"
+    mode: 0700
+
+- name: "PostgreSQL | FreeBSD | initdb cluster | {{ gds_cluster }}"
+  command: "/usr/local/bin/initdb -D {{ postgresql_cluster_path }}/data --no-locale --encoding=UTF-8 -U {{ postgresql_admin_role }}"
+  become_user: "{{ gds_instances[instance_name].unix_user }}"
+  when: PGDATA_PG_VERSION_stat.stat.exists == false
+  changed_when: False
+
+- name: PostgreSQL | FreeBSD | pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_pgdata }}/pg_hba.conf"
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instance_username].group }}"
+    mode: 0600
+  notify:
+    - PostgreSQL reload
+
+- name: PostgreSQL | Create folder for additional configuration files
+  file:
+    name: "{{ postgresql_pgdata }}/postgresql.conf.d"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: PostgreSQL | FreeBSD | postgresql.conf fragment
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ postgresql_pgdata }}/postgresql.conf.d/010_postgresql.conf"
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instance_username].group }}"
+    mode: 0644
+  when: postgresql_port_major in ('94')
+  notify:
+    - PostgreSQL reload
+
+- name: PostgreSQL11 | FreeBSD | postgresql.conf fragment
+  template:
+    src: postgresql11.conf.j2
+    dest: "{{ postgresql_pgdata }}/postgresql.conf.d/010_postgresql.conf"
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instance_username].group }}"
+    mode: 0644
+  when: postgresql_port_major in ('11')
+  notify:
+    - PostgreSQL reload
+
+- name: PostgreSQL | FreeBSD | postgresql.conf
+  assemble:
+    src: "{{ postgresql_pgdata }}/postgresql.conf.d"
+    dest: "{{ postgresql_pgdata }}/postgresql.conf"
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instance_username].group }}"
+    regexp: '\.conf$'
+    mode: 0640
+  notify:
+    - PostgreSQL reload
+
+# - name: PostgreSQL | Create folder for additional configuration files
+#   file:
+#     name: "{{ postgresql_pgdata }}/conf.d"
+#     state: directory
+#     owner: pgsql
+#     group: pgsql
+#     mode: 0755
+
+- name: PostgreSQL | FreeBSD | runit | directories (read-only)
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+  with_items:
+    - "{{ postgresql_service_dir }}"
+    - "{{ postgresql_service_dir }}/env"
+    - "{{ postgresql_service_dir }}/log"
+
+- name: PostgreSQL | Create convenience symlink to PGDATA dir in service dir
+  file:
+    src: "{{ postgresql_pgdata }}"
+    dest: "{{ postgresql_service_dir }}/data"
+    owner: root
+    group: wheel
+    state: link
+
+- name: PostgreSQL | FreeBSD | runit | directory | svlogd
+  file:
+    path: "{{ postgresql_service_dir }}/log/main"
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+
+- name: PostgreSQL | FreeBSD | runit | environment
+  copy:
+    dest: "{{ postgresql_service_dir }}/env/PATH"
+    content: "/usr/local/bin:/usr/bin:/bin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: PostgreSQL | FreeBSD | runit | log
+  template:
+    src: svlogd.sh.j2
+    dest: "{{ postgresql_service_dir }}/log/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+
+- name: PostgreSQL | FreeBSD | runit | log filesize to 100mb
+  template:
+    src: logconfig.j2
+    dest: "{{ postgresql_service_dir }}/log/main/config"
+    owner: _log
+    group: _log
+    mode: 0744
+  notify:
+    - PostgreSQL log restart
+
+
+- name: PostgreSQL | runit
+  template:
+    src: runit.sh.j2
+    dest: "{{ postgresql_service_dir }}/run"
+    owner: root
+    group: wheel
+    mode: 0744
+  notify:
+    - PostgreSQL reload
+
+- name: PostgreSQL | runit enable
+  file:
+    src: "{{ postgresql_service_dir }}"
+    dest: "/var/service/postgresql-{{ gds_cluster }}-{{ instance_name }}"
+    owner: root
+    group: wheel
+    state: link

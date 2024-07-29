@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Save current instance pointer
+current_instance=$(current_instance)
+
+[ $# -gt 0 ] && instances=$@ || instances=$(list_instances | awk '{print $NF}')
+
+# Perform action
+for instance in ${instances}; do
+  select_instance ${instance}
+  RO=$(mysql -sse 'select @@global.read_only')
+  if [ ${RO} -eq 1 ]; then
+    mysql -sse "set @@global.read_only=0"
+    echo " [*] ${instance} read-only -> read-write"
+  else
+    echo " [.] ${instance} read-write already"
+  fi
+done
+
+# Restore instance pointer
+select_instance ${current_instance}

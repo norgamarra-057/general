@@ -1,0 +1,14 @@
+---
+non_gds_ports:
+  - { group: devel, package: git }
+  - { group: devel, package: bzr }
+  - { group: editors, package: vim }
+  - { group: sysutils, package: pv }
+  - { group: textproc, package: intltool }
+  - { group: devel, package: boost-libs }
+  - { group: databases, package: libdrizzle }
+  - { group: net, package: libpcap }
+  - { group: devel, package: tbb }
+
+gds_ports:
+  - gds-percona56-client

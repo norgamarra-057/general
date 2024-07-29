@@ -1,0 +1,25 @@
+---
+- name: GDS carp(4) Setup | antifootshooting
+  assert:
+    that:
+      - "carp_vlan is defined"
+      - "carp_master_weight is defined"
+      - "carp_replication_timeline_read_only_ipv4 is defined"
+      - "carp_replication_timeline_read_only_password is defined"
+      - "carp_replication_timeline_read_write_ipv4 is defined"
+      - "carp_replication_timeline_read_write_password is defined"
+
+
+- name: GDS Carp Setup | FreeBSD | rc.conf | enable the master interface
+  command: "/sbin/ifconfig vlan{{ carp_vlan }} create"
+
+- name: GDS Carp Setup | FreeBSD | rc.conf | enable the master interface
+  command: "/sbin/ifconfig vlan{{ carp_vlan }} inet {{ item.value.slave_vips }}/32"
+  with_dict: instances
+
+- name: GDS Carp Setup | FreeBSD | rc.conf | enable the slave interface
+  command: "/sbin/ifconfig vlan{{ carp_vlan }} alias vhid {{ ansible_local.carp.server_last_octet }} advskew {{ carp_slave_weight }} pass {{ 
+carp_replication_timeline_read_only_password }} alias {{ carp_replication_timeline_read_only_ipv4 }}/32"
+
+#- name: GDS Carp Setup | FreeBSD | rc.conf | enable the master interface rc.conf
+#  sysrc: name=ifconfig_{{ carp_interface }}_alias0 value='vhid {{ carp_vhid }} advskew {{ carp_master_weight }} pass {{ carp_password }} alias {{ carp_ip_aliases }}'

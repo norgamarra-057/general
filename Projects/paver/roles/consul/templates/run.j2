@@ -1,0 +1,12 @@
+#!/bin/sh --
+
+set -e
+exec /usr/local/sbin/chpst -e ./env \
+    /usr/local/bin/consul agent \
+        -config-dir={{ consul_service_dir }}/etc \
+        -data-dir={{ consul_data_dir }} \
+        -dc={{ consul_dc }} \
+{% for consul_server in consul[consul_dc].join_servers %}
+        -join={{ consul_server }} \
+{% endfor %}
+        -node={{ ansible_hostname }}

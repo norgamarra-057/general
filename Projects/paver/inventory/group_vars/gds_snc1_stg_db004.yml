@@ -1,0 +1,12 @@
+---
+gds_carp_peers:
+  - 10.23.36.252  # gds-snc1-stg-db004m1
+  - 10.23.36.253  # gds-snc1-stg-db004s1
+  - 10.23.37.252  # gds-snc1-stg-db004m1
+  - 10.23.37.253  # gds-snc1-stg-db004s1
+gds_carp_interfaces:
+  - vlan336
+  - vlan337
+gds_instance_group: gds_snc1_stg_db004
+gds_monitor_cluster_type: gds_postgresql
+gds_instances:

@@ -1,0 +1,19 @@
+---
+gds_carp_peers:
+  - 10.22.182.234  # gds-snc1-prod-db101m1
+  - 10.22.182.235  # gds-snc1-prod-db101s1
+  - 10.22.183.234  # gds-snc1-prod-db101m1
+  - 10.22.183.235  # gds-snc1-prod-db101s1
+gds_carp_interfaces:
+  - vlan334
+  - vlan335
+gds_instance_group: gds_prod_snc1_db101
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+
+#destroyed GDS-27525 accounting_prod: # GDS-11578
+#  killbill_prod: # GDS-11578 - Decommed GDS-35747
+#  dealservice_prod: # GDS-16953 - Decommed GDS-35747
+#  client_id_prod: # GDS-19007 - Decommed GDS-35747
+#  gtwy_travel_inv_prod: # GDS-21900 - Decommed GDS-35747

@@ -1,0 +1,106 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.34.185.234 # gds-sac1-prod-db062m1
+  - 10.34.185.235 # gds-sac1-prod-db062s1
+  - 10.34.161.234 # gds-sac1-prod-db062m1
+  - 10.34.161.235 # gds-sac1-prod-db062s1
+gds_instance_group: gds_prod_sac1_db062
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan206
+  - vlan207
+# List of all GDS instances in this timeline
+gds_instances:
+  #ambari_sac1_prod: #  GDS-13038 #Decom #GPROD-196345
+  #mds_merchand_tag_prod: # GDS-13198 #Decom #GPROD-224369
+  merch_rept_files_prod: # GDS-13104
+    type: postgresql
+    dbnames:
+      - merch_rept_files_prod
+    schemas:
+      merch_rept_files_prod:
+        - merch_rept_files
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60003
+    master_vip: 10.34.185.103
+    slave_vips:
+      - 10.34.161.103
+    replication_ips:
+      - 10.22.148.208  # gds-snc1-prod-db062m1
+      - 10.22.148.158 # gds-snc1-prod-db062s1
+      - 10.32.121.153  # gds-sac1-prod-db062m1
+      - 10.32.121.19 # gds-sac1-prod-db062s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.71.118/32 # merchant-experience-app1.snc1
+      - 10.22.67.205/32 # merchant-experience-app2.snc1
+      - 10.22.71.169/32 # merchant-experience-app3.snc1
+      - 10.32.168.243/32 # merchant-experience-app1.sac1
+      - 10.32.49.222/32 # merchant-experience-app2.sac1
+      - 10.32.170.193/32 # merchant-experience-app3.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: merch_rept_files_prod_dba
+    app_account_name: merch_rept_files_prod_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.71.118/32 # merchant-experience-app1.snc1
+      - 10.22.67.205/32 # merchant-experience-app2.snc1
+      - 10.22.71.169/32 # merchant-experience-app3.snc1
+      - 10.32.168.243/32 # merchant-experience-app1.sac1
+      - 10.32.49.222/32 # merchant-experience-app2.sac1
+      - 10.32.170.193/32 # merchant-experience-app3.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20006
+      pgbouncer_session: 20007
+      postgresql_raw: 20008
+    extra_variables:
+      default_pool_size: 50
+  # cronus_prod: # GDS-13043 # decomissioned #
+
+  #deals_cluster_prod: # GDS-13205 #Decom #GPROD-196541
+  #online_bookingcs_prod: # GDS-13321# Decomm #GDS-34366
+  #ambari_sox_prod: # GDS-13527  #Decom #GPROD-196593
+#  conveyor_sac1_prod: # GDS-13781 #Decomm GDS-29822#
+  #clo_cis_prod: # GDS-14207 #Decom #GPROD-196273
+
+  # merch_change_mgmt_prod: # GDS-24285 # decomm
+  #keyword_kb_prod: # GDS-14222 #Decom #GPROD-196285
+  #reg_cons_log_prod: # GDS-15403 #Decom #GPROD-197886
+  # partner_attr_map_prod: # GDS-15425 __SOX__ # decommissioned
+#  erin_prod: # GDS-14338
+  #email_campaign_prod: # GDS-14566 #Decom #GPROD-196585
+
+  #jira_prod: # GDS-14782 #Decom #GPROD-196568
+
+  # grodd_prod: # GDS-14817 # Decom # GDS-33573
+  
+ #sem_blacklist_prod: # GDS-15111 #Decom #GPROD-196275
+  #ambari_sac1_sox_prod: # GDS-14930 #Decomm GDS-34366

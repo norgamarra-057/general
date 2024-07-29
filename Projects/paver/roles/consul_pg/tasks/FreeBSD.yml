@@ -1,0 +1,23 @@
+---
+- name: Set consul instance name
+  tags: consul_check
+  set_fact:
+    consul_instance_name:  "gds-daas-prod-{{ instance_name|regex_replace('_(dev|uat|stg|prod)$', '')|regex_replace('[_]', '-') }}"
+
+- name: consul_pg | check_postgres
+  copy:
+    src: check_postgres.pl
+    dest: "{{ consul_service_dir }}/etc/check_postgres.pl"
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: consul_pg | instances_scripts 
+  template:
+    dest: "{{ consul_service_dir }}/etc/postgres_{{ instance_name }}.json"
+    src: "postgres_consul_probe.j2"
+    owner: root
+    group: wheel
+    mode: 0755
+  notify:
+    - Consul reload

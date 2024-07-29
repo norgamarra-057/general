@@ -1,0 +1,5 @@
+[user]
+	name = {{ users[item].name }}
+	email = {{ users[item].email_primary | default(item) }}@groupon.com
+[push]
+	default = simple

@@ -1,0 +1,5 @@
+---
+- include_tasks: FreeBSD.yml
+  tags:
+    - mcelog
+  when: ansible_os_family == 'FreeBSD'

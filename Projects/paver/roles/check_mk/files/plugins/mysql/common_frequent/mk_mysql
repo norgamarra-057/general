@@ -1,0 +1,410 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# +------------------------------------------------------------------+
+# |             ____ _               _        __  __ _  __           |
+# |            / ___| |__   ___  ___| | __   |  \/  | |/ /           |
+# |           | |   | '_ \ / _ \/ __| |/ /   | |\/| | ' /            |
+# |           | |___| | | |  __/ (__|   <    | |  | | . \            |
+# |            \____|_| |_|\___|\___|_|\_\___|_|  |_|_|\_\           |
+# |                                                                  |
+# | Copyright Mathias Kettner 2014             mk@mathias-kettner.de |
+# +------------------------------------------------------------------+
+#
+# This file is part of Check_MK.
+# The official homepage is at http://mathias-kettner.de/check_mk.
+#
+# check_mk is free software;  you can redistribute it and/or modify it
+# under the  terms of the  GNU General Public License  as published by
+# the Free Software Foundation in version 2.  check_mk is  distributed
+# in the hope that it will be useful, but WITHOUT ANY WARRANTY;  with-
+# out even the implied warranty of  MERCHANTABILITY  or  FITNESS FOR A
+# PARTICULAR PURPOSE. See the  GNU General Public License for more de-
+# ails.  You should have  received  a copy of the  GNU  General Public
+# License along with GNU Make; see the file  COPYING.  If  not,  write
+# to the Free Software Foundation, Inc., 51 Franklin St,  Fifth Floor,
+# Boston, MA 02110-1301 USA.
+
+# gets optional socket as argument
+function do_query() {
+  INSTANCE=$(echo $1|cut -d= -f2)
+  PORT="$(grep -B2 ${INSTANCE} ${MK_CONFDIR}/mysql.cfg | grep "port=" | cut -d= -f2)"
+  INSTANCE_NAME="[[${PORT} - $(echo "${INSTANCE}"|sed -e 's#/var/groupon/percona/##g' -e 's#/mysql.sock##g')]]"
+
+  stamp=$(date +%s)
+  lifetime=$(realpath $0 | egrep -o "[0-9]+")
+
+  if [[ -z "${lifetime}" ]]; then
+    lifetime=60
+  else
+    lifetime=$((lifetime * 2))
+  fi
+
+  echo "<<<mysql:cached(${stamp},${lifetime})>>>"
+  echo $INSTANCE_NAME
+  echo "measured_at ${stamp}"
+  mysql --defaults-extra-file=$MK_CONFDIR/mysql.cfg $1 -sN \
+     -e "show global status ; show global variables ;" || (echo -e "Threads_connected not_running\nThreads_running not_running" && continue)
+  pre_result=$(mysql --defaults-extra-file=$MK_CONFDIR/mysql.cfg $1 -sN \
+               -e "SHOW /*!50000 ENGINE*/ INNODB STATUS")
+
+  IFS=$'\n' read -rd '' -a result <<<"$pre_result"
+
+  echo -e "$result" | awk \
+  -v hash_index_cells_total=0 \
+  -v hash_index_cells_used=0 \
+  -v innodb_sem_waits_ms=0 \
+  -v innodb_sem_waits=0 \
+  -v current_transactions=0 \
+  -v active_transactions=0 \
+  -v innodb_lock_wait_secs=0 \
+  -v innodb_tables_in_use=0 \
+  -v innodb_locked_tables=0 \
+  -v innodb_lock_structs=0 \
+  -v locked_transactions=0 \
+  -v ibuf_inserts=0 \
+  -v ibuf_merged=0 \
+  -v ibuf_merges=0 \
+  -v thread_hash_memory=0 \
+  -v innodb_io_pattern_memory=0 \
+  '{
+    if ( $1 " " $2 " " $3 == "Mutex spin waits" ) {
+      spin_waits_1=int($4);
+      os_waits_1=int($9);
+      spin_rounds=int($6);
+    }
+    else if ( $1 " " $2 == "RW-shared spins" ) {
+      spin_waits_2=int($3);
+      spin_waits_3=int($9);
+      os_waits_2=int($6)
+      os_waits_3=int($12);
+    }
+    else if ( NF >= 3  &&  $NF-1 " " $NF == "the semaphore:" ) {
+      innodb_sem_waits=int(innodb_sem_waits + 1)
+      innodb_sem_waits_ms=int(innodb_sem_waits + int($10 * 1000));
+    }
+    else if ( $1 " " $2 " " $3 == "Trx id counter" ) {
+      innodb_transactions=int($4);
+    }
+    else if ( $1 " " $2 " " $3 == "Purge done for" ) {
+      purged_trx=int($7);
+      unpurged_txns=innodb_transactions - purged_trx;
+    }
+    else if ( $1 " " $2 " " $3 == "History list length") {
+      history_list=int($4);
+    }
+    else if ( innodb_transactions != "" && $1 == "---TRANSACTION" ) {
+      current_transactions=current_transactions + 1;
+      if ( match($0,"ACTIVE") ) {
+        active_transactions=active_transactions + 1;
+      }
+    }
+    else if ( innodb_transactions != "" && $1 " " $2 " " $3 " " $4 == "------- TRX HAS BEEN" ) {
+      innodb_lock_wait_secs=innodb_lock_wait_secs + int($6);
+    }
+    else if ( $2 " " $3 " " $4 " " $5 " " $6 == "read views open inside InnoDB") {
+      read_views=int($1);
+    }
+    else if ( $1 " " $2 " " $3 " " $4 == "mysql tables in use" ) {
+      innodb_tables_in_use=innodb_tables_in_use + int($5);
+      innodb_locked_tables=innodb_locked_tables + int($7);
+    }
+    else if ( innodb_transactions != "" && match($0,"lock struct") ) {
+      if ( $1 " " $2 == "LOCK WAIT" ) {
+        innodb_lock_structs=innodb_lock_structs + int($3);
+        locked_transactions=locked_transactions + 1;
+      }
+      else {
+        innodb_lock_structs=innodb_lock_structs + int($1);
+      }
+    }
+    else if ( $2 " " $3 " " $4 == "OS file reads," ) {
+      file_reads=int($1);
+      file_writes=int($5);
+      file_fsyncs=int($9);
+    }
+    else if ( $1 " " $2 " " $3 " " $4 == "Pending normal aio reads:" ) {
+      pending_normal_aio_reads=int($5);
+      pending_normal_aio_writes=int($8);
+    }
+    else if ( $1 " " $2 " " $3 == "ibuf aio reads:" ) {
+      pending_ibuf_aio_reads=int($4);
+      pending_aio_log_ios=int($7);
+      pending_aio_sync_ios=int($10);
+    }
+    else if ( $1 " " $2 == "Pending flushes" ) {
+      pending_log_flushes=int($5);
+      pending_buf_pool_flushes=int($8);
+    }
+    else if ( $1 " " $2 == "Ibuf: size" ) {
+      ibuf_used_cells=int($3);
+      ibuf_free_cells=int($7);
+      ibuf_cell_count=int($10);
+    }
+    else if ( match($0,"merged recs,") ) {
+      ibuf_inserts=int($1);
+      ibuf_merged=int($3);
+      ibuf_merges=int($6);
+    }
+    else if ( $1 " " $2 " " $3 == "Hash table size" ) {
+      hash_index_cells_total=int($4);
+      if ( match($0,"used cells") ) {
+        hash_index_cells_used=int($7);
+      }
+      else {
+        hash_index_cells_used=0;
+      }
+    }
+    else if ( match($0, "log i/o\047s done,") ) {
+      log_writes=int($1);
+    }
+    else if ( match($0, "pending log writes,") ) {
+      pending_log_writes=int($1);
+      pending_chkp_writes=int($5);
+    }
+    else if ( $1 " " $2 " " $3 == "Log sequence number" ) {
+      log_bytes_written=int($4);
+    }
+    else if ( $1 " " $2 " " $3 " " $4 == "Log flushed up to" ) {
+      log_bytes_flushed=int($5);
+    }
+    else if ( $1 " " $2 " " $3 == "Last checkpoint at" ) {
+      last_checkpoint=int($4);
+    }
+    else if ( match($0, "Total memory allocated [0-9]+" ) ) {
+      total_mem_alloc=int($4);
+      additional_pool_alloc=int($9);
+    }
+    else if ( $1 " " $2 " " $3 == "Adaptive hash index" ) {
+      adaptive_hash_memory=int($4);
+    }
+    else if ( $1 " " $2 == "Page hash" ) {
+      page_hash_memory=int($3);
+    }
+    else if ( $1 " " $2 == "Dictionary cache" ) {
+      dictionary_cache_memory=int($3);
+    }
+    else if ( $1 " " $2 == "File system" ) {
+      file_system_memory=int($3);
+    }
+    else if ( $1 " " $2 == "Lock system" ) {
+      lock_system_memory=int($3);
+    }
+    else if ( $1 " " $2 == "Recovery system" ) {
+      recovery_system_memory=int($3);
+    }
+    else if ( $1 == "Threads" ) {
+      thread_hash_memory=int($2);
+    }
+    else if ( $1 == "innodb_io_pattern" ) {
+      innodb_io_pattern_memory=int($2);
+    }
+    else if ( match($0, "Buffer pool size .* [0-9]+" ) ) {
+      print $0
+      pool_size=int($4);
+    }
+    else if ( $1 " " $2 == "Free buffers" ) {
+      free_pages=int($3);
+    }
+    else if ( $1 " " $2 == "Database pages" ) {
+      database_pages=int($3);
+    }
+    else if ( $1 " " $2 " " $3 == "Modified db pages" ) {
+      modified_pages=int($4)
+    }
+    else if ( match($0, "Pages read [0-9]+" ) ) {
+      pages_read=int($3);
+      pages_created=int($5);
+      pages_written=int($7);
+    }
+    else if ( $1 " " $2 " " $3 " " $4 == "Number of rows inserted" ) {
+      rows_inserted=int($5);
+      rows_updated=int($7);
+      rows_deleted=int($9);
+      rows_read=int($11);
+    }
+    else if ( match($0, "[0-9]+ queries inside InnoDB,") ) {
+      queries_inside=int($1);
+      queries_queued=int($5);
+    }
+    else if ( $0 == "END OF INNODB MONITOR OUTPUT" ) {
+      unflushed_log=log_bytes_written - log_bytes_flushed
+      uncheckpointed_bytes=log_bytes_written - last_checkpoint
+      spin_waits=spin_waits_1 + spin_waits_2 + spin_waits_3
+      os_waits=os_waits_1 + os_waits_2 + os_waits_3
+      print "spin_waits " spin_waits;
+      print "spin_rounds " spin_rounds;
+      print "os_waits " os_waits;
+      print "innodb_sem_wait_time_ms " innodb_sem_waits_ms;
+      print "innodb_sem_waits " innodb_sem_waits;
+      print "innodb_transactions " innodb_transactions;
+      print "unpurged_txns " unpurged_txns;
+      print "history_list " history_list;
+      print "current_transactions " current_transactions;
+      print "active_transactions " active_transactions;
+      print "innodb_lock_wait_secs " innodb_lock_wait_secs;
+      print "read_views " read_views;
+      print "innodb_tables_in_use " innodb_tables_in_use;
+      print "innodb_locked_tables " innodb_locked_tables;
+      print "innodb_lock_structs " innodb_lock_structs;
+      print "locked_transactions " locked_transactions;
+      print "file_reads " file_reads;
+      print "file_writes " file_writes;
+      print "file_fsyncs " file_fsyncs;
+      print "pending_normal_aio_reads " pending_normal_aio_reads;
+      print "pending_normal_aio_writes " pending_normal_aio_writes;
+      print "pending_ibuf_aio_reads " pending_ibuf_aio_reads;
+      print "pending_aio_log_ios " pending_aio_log_ios;
+      print "pending_aio_sync_ios " pending_aio_sync_ios;
+      print "pending_log_flushes " pending_log_flushes;
+      print "pending_buf_pool_flushes " pending_buf_pool_flushes;
+      print "ibuf_used_cells " ibuf_used_cells;
+      print "ibuf_free_cells " ibuf_free_cells;
+      print "ibuf_cell_count " ibuf_cell_count;
+      print "ibuf_inserts " ibuf_inserts;
+      print "ibuf_merged " ibuf_merged;
+      print "ibuf_merges " ibuf_merges;
+      print "hash_index_cells_total " hash_index_cells_total;
+      print "hash_index_cells_used " hash_index_cells_used;
+      print "log_writes " log_writes;
+      print "pending_log_writes " pending_log_writes;
+      print "pending_chkp_writes " pending_chkp_writes;
+      print "log_bytes_written " log_bytes_written;
+      print "log_bytes_flushed " log_bytes_flushed;
+      print "last_checkpoint " last_checkpoint;
+      print "total_mem_alloc " total_mem_alloc;
+      print "additional_pool_alloc " additional_pool_alloc;
+      print "adaptive_hash_memory " adaptive_hash_memory;
+      print "page_hash_memory " page_hash_memory;
+      print "dictionary_cache_memory " dictionary_cache_memory;
+      print "file_system_memory " file_system_memory;
+      print "lock_system_memory " lock_system_memory;
+      print "recovery_system_memory " recovery_system_memory;
+      print "thread_hash_memory " thread_hash_memory;
+      print "innodb_io_pattern_memory " innodb_io_pattern_memory;
+      print "pool_size " pool_size;
+      print "free_pages " free_pages;
+      print "database_pages " database_pages;
+      print "modified_pages " modified_pages;
+      print "pages_read " pages_read;
+      print "pages_created " pages_created;
+      print "pages_written " pages_written;
+      print "rows_inserted " rows_inserted;
+      print "rows_updated " rows_updated;
+      print "rows_deleted " rows_deleted;
+      print "rows_read " rows_read;
+      print "queries_inside " queries_inside;
+      print "queries_queued " queries_queued;
+      print "unflushed_log " unflushed_log;
+      print "uncheckpointed_bytes " uncheckpointed_bytes;
+    }
+  }'
+
+  pre_result=$(mysql --defaults-extra-file=$MK_CONFDIR/mysql.cfg $1 -sN \
+                 -e "SELECT command FROM information_schema.processlist;" \
+                     | sed -e 's/ /_/g' \
+                     | tr '[:upper:]' '[:lower:]'\
+                     ;echo "ENDOFTHEWORLD")
+  echo -e "$pre_result" | awk \
+  -v closing_tables=0 \
+  -v end=0 \
+  -v freeing_items=0 \
+  -v init=0 \
+  -v locked=0 \
+  -v login=0 \
+  -v preparing=0 \
+  -v reading_from_net=0 \
+  -v sending_data=0 \
+  -v sorting_result=0 \
+  -v statistics=0 \
+  -v updating=0 \
+  -v writing_to_net=0 \
+  -v none=0 \
+  -v other=0 \
+  '{
+    if ( $1 == "closing_tables" ) {
+      closing_tables=closing_tables + 1;
+    }
+    else if ( $1 == "end" ) {
+      end=end + 1;
+    }
+    else if ( $1 == "freeing_items" ) {
+      freeing_items=freeing_items + 1;
+    }
+    else if ( $1 == "init" ) {
+      init=init + 1;
+    }
+    else if ( $1 == "locked" ) {
+      locked=locked + 1;
+    }
+    else if ( $1 == "login" ) {
+      login=login + 1;
+    }
+    else if ( $1 == "preparing" ) {
+      preparing=preparing + 1;
+    }
+    else if ( $1 == "reading_from_net" ) {
+      reading_from_net=reading_from_net + 1;
+    }
+    else if ( $1 == "sending_data" ) {
+      sending_data=sending_data + 1;
+    }
+    else if ( $1 == "sorting_result" ) {
+      sorting_result=sorting_result + 1;
+    }
+    else if ( $1 == "statistics" ) {
+      statistics=statistics + 1;
+    }
+    else if ( $1 == "updating" ) {
+      updating=updating + 1;
+    }
+    else if ( $1 == "writing_to_net" ) {
+      writing_to_net=writing_to_net + 1;
+    }
+    else if ( $1 == "none" ) {
+      none=none + 1;
+    }
+    else {
+      if ( $1 != "ENDOFTHEWORLD" ) {
+        other=other + 1;
+      }
+      else {
+        print "State_closing_tables " closing_tables;
+        print "State_end " end;
+        print "State_freeing_items " freeing_items;
+        print "State_init " init;
+        print "State_locked " locked;
+        print "State_login " login;
+        print "State_preparing " preparing;
+        print "State_reading_from_net " reading_from_net;
+        print "State_sending_data " sending_data;
+        print "State_sorting_result " sorting_result;
+        print "State_statistics " statistics;
+        print "State_updating " updating;
+        print "State_writing_to_net " writing_to_net;
+        print "State_none " none;
+        print "State_other " other;
+      }
+    }
+  }'
+
+  echo "<<<mysql_capacity>>>"
+  echo $INSTANCE_NAME
+  mysql --defaults-extra-file=$MK_CONFDIR/mysql.cfg $1 -sN \
+      -e "SELECT table_schema, sum(data_length + index_length), sum(data_free)
+         FROM information_schema.TABLES GROUP BY table_schema"
+
+  echo "<<<mysql_slave>>>"
+  echo $INSTANCE_NAME
+  mysql --defaults-extra-file=$MK_CONFDIR/mysql.cfg $1 -s \
+     -e "show slave status\G"
+
+}
+
+if which mysqladmin >/dev/null
+then
+  mysql_sockets=$(fgrep socket $MK_CONFDIR/mysql.cfg)
+  for socket in $mysql_sockets ; do
+    do_query "--"$socket
+    sleep 0.5
+  done
+fi

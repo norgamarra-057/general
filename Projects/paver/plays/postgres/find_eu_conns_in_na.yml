@@ -1,0 +1,52 @@
+- name: Get instance from host
+  gather_facts: False
+  sudo: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Get instance names
+      shell: ls /var/groupon/postgresql/data94 | cut -c21- | sed 's/^/  /' | awk '{print $0":"}'   > /etc/check_mk/local_pginstances.yml
+      register: instance_names
+
+    - name: Add header1
+      shell: echo 'inst_name:' | cat - /etc/check_mk/local_pginstances.yml > /etc/check_mk/temp && mv /etc/check_mk/temp /etc/check_mk/local_pginstances.yml
+
+    - name: Add header2
+      shell: echo '---' | cat - /etc/check_mk/local_pginstances.yml > /etc/check_mk/temp && mv /etc/check_mk/temp /etc/check_mk/local_pginstances.yml
+
+    - fetch: src=/etc/check_mk/local_pginstances.yml dest=files/temp/ flat=yes validate_checksum=yes fail_on_missing=yes
+
+    - include_vars: "files/temp/local_pginstances.yml"
+
+    - name: Print 1
+      shell: | 
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select addr,database,count(*) from dba.pgbouncer_trx_view_clients where addr::inet << inet '10.13.0.0/16' OR addr::inet << inet '10.228.48.0/20' OR addr::inet << inet '10.228.64.0/20' OR addr::inet << inet '10.228.80.0/20' group by 1,2 order by 3 desc" >> /etc/check_mk/eucons_{{ target_host }}.txt
+      with_dict: "{{inst_name}}"
+      ignore_errors: yes
+
+    - name: Print 2
+      shell: |
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select addr,database,count(*) from dba.pgbouncer_ses_view_clients where addr::inet << inet '10.13.0.0/16' OR addr::inet << inet '10.228.48.0/20' OR addr::inet << inet '10.228.64.0/20' OR addr::inet << inet '10.228.80.0/20' group by 1,2 order by 3 desc" >> /etc/check_mk/eucons_{{ target_host }}.txt
+      with_dict: "{{inst_name}}"
+      ignore_errors: yes
+
+    - name: Print 3
+      shell: |
+        psql -U postgres -A -t -d {{ gds_instances[item.key].dbnames.0 }} -p {{ gds_instances[item.key].ports.postgresql_raw }} -c "select client_addr,datname,count(*) from pg_stat_activity where client_addr::inet << inet '10.13.0.0/16' OR client_addr::inet << inet '10.228.48.0/20' OR client_addr::inet << inet '10.228.64.0/20' OR client_addr::inet << inet '10.228.80.0/20' group by 1,2 order by 3 desc" >> /etc/check_mk/eucons_{{ target_host }}.txt
+      with_dict: "{{inst_name}}"
+      ignore_errors: yes
+
+    - fetch:
+        src: /etc/check_mk/eucons_{{ target_host }}.txt
+        dest: /home/fkalamidas/git/my_untr_f/
+        flat: yes
+
+
+- name: a play that runs entirely on the ansible host
+  sudo: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Delete the temp file
+      file: path=files/temp/local_pginstances.yml state=absent
+

@@ -1,0 +1,13 @@
+---
+- name: Identify disks with errors
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Obtain zpool status for zroot
+      shell: zpool status -vx
+      register: zpool_status
+
+    - name: Check if errors is non-zero
+      fail: msg="zpool has errors"
+      when: zpool_status.stdout | search("all pools are healthy") == false
+

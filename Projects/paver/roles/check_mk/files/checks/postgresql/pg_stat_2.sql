@@ -1,0 +1,1 @@
+SELECT rolname, calls, round(total_time::numeric, 1) AS total, round((total_time / calls)::numeric, 3) AS per_call, rows, regexp_replace(query, '[ \t\n]+', ' ', 'g') AS query_text FROM pg_stat_statements JOIN pg_roles r ON r.oid = userid ORDER BY total_time / calls DESC LIMIT 5;

@@ -1,0 +1,31 @@
+- name: hydra agent start
+  become: yes
+  command: /usr/local/sbin/sv -w 60 start /var/service/hydra-agent
+
+- name: hydra agent restart
+  become: yes
+  command: /usr/local/sbin/sv -w 60 restart /var/service/hydra-agent
+
+- name: hydra agent reload
+  become: yes
+  command: /usr/local/sbin/sv -w 60 reload /var/service/hydra-agent
+
+- name: hydra agent log restart
+  become: yes
+  command: /usr/local/sbin/sv term /var/service/hydra-agent/log
+
+- name: hydra server start
+  become: yes
+  command: /usr/local/sbin/sv -w 60 start /var/service/hydra-server
+
+- name: hydra server restart
+  become: yes
+  command: /usr/local/sbin/sv -w 60 restart /var/service/hydra-server
+
+- name: hydra server reload
+  become: yes
+  command: /usr/local/sbin/sv -w 60 reload /var/service/hydra-server
+
+- name: hydra server log restart
+  become: yes
+  command: /usr/local/sbin/sv term /var/service/hydra-server/log

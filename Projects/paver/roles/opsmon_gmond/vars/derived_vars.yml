@@ -1,0 +1,4 @@
+---
+gmond_cluster_name: '{{ ganglia_cluster_name }}-{{ dns.domain }}'
+ganglia_cluster_path: '{{ ganglia_root }}/{{ gmond_cluster_name }}'
+gmond_service_path: '/var/service/ganglia-{{ gmond_cluster_name }}-gmond'

@@ -1,0 +1,153 @@
+#! /usr/bin/env python
+###################################################
+# group_var_report
+#
+# Version:      1.0.0
+#
+# Descripton:   Parses group_vars files and produces CSV output of Host, Database Instance, and Master or Slave VIP to STDOUT.
+#
+# Usage:        group_var_report [-i inventory-path] [ [-d snc1|sac1|dub1] [-t prod|stg|uat] [-l mysql|postgresql] | [-f "filename"] ] [-v] [-V]
+#
+# Optional arguments:
+#   -h, --help            show this help message and exit
+#   -i path_to_inventory_group_vars, --inventory path_to_inventory_group_vars
+#                         Override default inventory path to group_vars files
+#   -d {snc1,sac1,dub1}, --datacenter {snc1,sac1,dub1}
+#                         snc1|sac1|dub1
+#   -t {prod,stg,uat}, --type {prod,stg,uat}
+#                         prod|stg|uat
+#   -l {mysql,postgresql}, --limit {mysql,postgresql}
+#                         Limits instance type to MySQL or PostgreSQL.  Default is no limit.
+#   -f FILENAME, --filename FILENAME
+#                         Group_vars "filename". Can include a wildcard, but
+#                         must be quoted. Note: overrides -d and -t
+#   -v, --verbose         Display skipped files/instances. Default is do not
+#                         display
+#   -V, --version         displays version and exits
+#
+# Requirements: python 2.7
+#
+# Notes:        If no options provided, will default to every .yml file in the inventory/group_vars relative to the current path.
+#               Output format example: 
+#               gds-snc1-prod-db017m1.snc1,pwa_prod,gds-snc1-prod-pwa-rw-vip.snc1
+###################################################
+
+# Import needed modules
+
+import yaml
+import sys
+import string
+import socket
+import argparse
+import glob
+import os
+
+# Default values
+Version = "1.0.0"
+inventory = "inventory/group_vars"
+datacenter = "*"
+type = "*"
+limit = "*"
+filename = "*"
+
+# Parse and load command line options
+parser = argparse.ArgumentParser(description="group_var_report parses group_vars files and produces CSV output of Host, Database Instance, and Master or Slave VIP to STDOUT.  group_var_report: [-i inventory-path] [ [-d snc1|sac1|dub1] [-t prod|stg|uat] | [-l mysql|postgresql] [-f \"filename\"] ] [-v]")
+
+parser.add_argument("-i", "--inventory", help="Override default inventory path to group_vars files", metavar='path_to_inventory_group_vars')
+parser.add_argument("-d", "--datacenter", help="snc1|sac1|dub1", choices=['snc1','sac1','dub1'])
+parser.add_argument("-t", "--type", help="prod|stg|uat", choices=['prod','stg','uat'])
+parser.add_argument("-l", "--limit", help="Limits instance type to MySQL or PostgreSQL.  Default is no limit.", choices=['mysql','postgresql'])
+parser.add_argument("-f", "--filename", help="group_vars \"filename\".  Can include a wildcard, but must be quoted.  Note: overrides -d and -t")
+parser.add_argument("-v", "--verbose", help="Display skipped files/instances. Default is do not display", action='store_true')
+parser.add_argument("-V", "--version", help="Displays version and exits.", action='store_true')
+args = parser.parse_args()
+
+if args.inventory:
+   inventory = args.inventory
+   inventory = inventory.rstrip('/')
+if args.datacenter:
+   datacenter = args.datacenter
+if args.type:
+   type = args.type
+if args.limit:
+   limit = args.limit
+if args.filename:
+   filename = args.filename 
+if args.version:
+   print "Version: " + Version
+   quit()
+
+# Build filename search path and name
+
+if filename == "*":
+   filename = inventory + "/gds_" + datacenter + "_" + type + "_db*.yml"
+else:
+   filename = inventory + "/" + filename
+   
+# Load all found files
+files = glob.glob(filename)
+
+# Loop through each file found
+for file in files:
+   stream = open(file,'r')
+   
+   # Load all yml data from the file in to 'data' variable
+   data = yaml.load(stream)
+   
+   # Get the name of the server from the file name. e.g. gds_snc1_prod_db017 from inventory/group_vars/gds_snc1_prod_db017.yml
+   server = os.path.splitext(os.path.basename(file))[0]
+
+   # Get the type of prod, stg or uat. 'test' is ignored because the names are not standard
+   type_array = server.split("_")
+   type = type_array[2]
+   if type == "test":
+      continue
+
+   # Get the actual server name from the file name. e.g. gds_snc1_prod_db017 -> gds-snc1-prod-db017m1 (or s1)
+   server_m1 = string.replace(server,'_','-') + "m1"
+   server_s1 = string.replace(server,'_','-') + "s1"
+
+   # Process each instance on each file found
+   for instance in data['gds_instances'].keys():
+
+      # Extract db type, e.g. mysql or postgres[ql]
+      db_type = data['gds_instances'][instance]['type'] 
+
+      # Add the 'ql' to make data type constant.
+      if db_type == "postgres":
+         db_type = "postgresql"
+
+      # Verify that if limit is set, it matches the db_type specified, e.g. limit=mysql, db_type=mysql
+      if limit != "*":
+         if limit != db_type:
+            continue
+
+      # Extract master_vip and slave_vip.
+      master_vip = data['gds_instances'][instance]['master_vip']
+      slave_vip = data['gds_instances'][instance]['slave_vips'][0]
+
+      # Do a reverse lookup on the master_vip to get the RW VIP
+      # Use IP if master_vip doesn't resolve
+      try:
+         fqdn_array = socket.gethostbyaddr(master_vip)
+      except:
+         if args.verbose:
+            print "file: " + file + ", instance: " + instance + ", master_vip: " + master_vip + " is not in DNS"
+         m_vip = master_vip
+      else:
+         m_vip = fqdn_array[0]   
+
+      # Do a reverse lookup on the slave_vip to get the RO VIP
+      # Use IP if slave_vip doesn't resolve
+      try:
+         fqdn_array = socket.gethostbyaddr(slave_vip)
+      except:
+         if args.verbose:
+            print "file: " + file + ", instance: " + instance + ", slave_vip: " + slave_vip + " is not in DNS"
+         s_vip = slave_vip
+      else:
+        s_vip = fqdn_array[0]
+
+      print server_m1 + "," + instance + "," + m_vip
+      print server_s1 + "," + instance + "," + s_vip
+   stream.close()

@@ -1,0 +1,29 @@
+---
+- name: Check ZFS related read-only tunables
+  hosts: gds_all
+  become: yes
+  vars:
+    - check_limit: 500000
+    - sync_limit: 100000000
+  tasks:
+    - name: check deadman check timer
+      command: sysctl -n vfs.zfs.deadman_checktime_ms
+      changed_when: false
+      register: deadman_check_timer
+
+    - name: check deadman sync timer
+      command: sysctl -n vfs.zfs.deadman_synctime_ms
+      changed_when: false
+      register: deadman_sync_timer
+
+    - name: check zfs trim
+      command: sysctl -n vfs.zfs.trim.enabled
+      changed_when: false
+      register: zfs_trim
+
+    - debug: var=deadman_check_timer.stdout
+    - debug: var=deadman_sync_timer.stdout
+    - debug: var=zfs_trim.stdout
+
+    - fail: msg="host needs to be rebooted"
+      when: deadman_check_timer.stdout|int < check_limit or deadman_sync_timer.stdout|int < sync_limit or zfs_trim.stdout|int == 1

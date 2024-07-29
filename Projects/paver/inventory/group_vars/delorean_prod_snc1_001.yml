@@ -1,0 +1,1686 @@
+---
+host_zfs:
+  - { name: zroot, mountpoint: none, compression: lz4, copies: 2, atime: 'off' }
+  - { name: zroot/root, mountpoint: / }
+  - { name: zroot/root/tmp, sync: disabled }
+  - { name: zroot/root/var }
+  - { name: tank, mountpoint: none, compression: gzip-9, copies: 1, atime: 'off', logbias: throughput, sync: disabled }
+  - { name: tank/var }
+  - { name: tank/var/tmp, sync: disabled }
+  - { name: tank/var/groupon, mountpoint: /var/groupon }
+  - { name: tank/var/groupon/delorean, dedup: 'off' }
+  - { name: tank/var/groupon/delorean/pools, exec: 'off', setuid: 'off' }
+  - { name: tank/var/groupon/delorean/pools/us }
+  - { name: tank/var/groupon/delorean/pools/us/mysql, dedup: 'off', compression: 'off' }
+  - { name: tank/var/groupon/delorean/pools/us/postgres, dedup: 'off', compression: 'off' }
+  - { name: tank/var/groupon/delorean/pools/sox }
+  - { name: tank/var/groupon/delorean/pools/sox/mysql, dedup: 'off', compression: 'off' }
+  - { name: tank/var/groupon/delorean/pools/sox/github, quota: 50T, compression: gzip-9, dedup: 'off' }
+  - { name: tank/var/groupon/delorean/pools/us/docker }
+  - { name: tank/var/groupon/delorean/pools/us/postgresql, dedup: 'off', compression: 'off' }
+  - { name: tank/var/groupon/delorean/pools/sox/postgresql, dedup: 'off', compression: 'off' }
+
+host_zfsnap:
+  - { name: zroot/root, recursive: true, hourly: true, daily: true, weekly: true, monthly: true, reboot: true }
+  - { name: tank/var/groupon/delorean, recursive: false, hourly: true, daily: true, weekly: true, monthly: true, reboot: true }
+  - { name: tank/var/groupon/delorean/data, recursive: false, hourly: true, daily: true, weekly: true, monthly: true, reboot: true }
+  - { name: tank/var/groupon/delorean/pools/us, recursive: true, hourly: true, daily: true, weekly: true, monthly: true, reboot: true, hourly_ttl: 25h, daily_ttly: 8d, weekly_ttl: 5w, monthly_ttl: 2y }
+  - { name: tank/var/groupon/delorean/pools/sox, recursive: true, hourly: true, daily: true, weekly: true, monthly: true, reboot: true, hourly_ttl: 25h, daily_ttly: 8d, weekly_ttl: 5w, monthly_ttl: 7y }
+
+# NOTE: Please alpha sort all backup jobs
+pull_backup_jobs:
+  accounting-db4.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  apac-pop-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  api-client-access-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  auto-approval-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  babar-db4.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  birdcage-db4.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  booking-engine-3rd-party-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  booking-engine-appointments-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  booking-engine-availability-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  booking-engine-notifications-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  booking-engine-setup-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  cart-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  coffee-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  consumer-data-service-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  contract-service-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  coupon-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  custsvc-db2.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  db5.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  deal-book-service-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  deal-ecosystem-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  deal-guide-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  deal-management-db1.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  dealestate-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  dealguide-optimizer-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  dealguide-terminator-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  dealservice-db5.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+# MISSING ENTRY: docker1.snc1
+  editorial-content-service-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  editorial-writers-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  espresso-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  event-data-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  gan-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  gan-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  gds-snc1-prod-client-id-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: client_id_prod
+  gds-snc1-prod-cs-tools-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: cs_tools_prod
+  gds-snc1-prod-dealwizard-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: dynamic_pricing_prod
+  gds-snc1-prod-dynamic-pricing-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: dynamic_pricing_prod
+  gds-snc1-prod-getaways-search-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: getaways_search_prod
+  gds-snc1-prod-getaways-security-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: getaways_security_prod
+  gds-snc1-prod-glive-gia-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: glive_gia_prod
+  gds-snc1-prod-glive-inventory-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: glive_inventory_prod
+  gds-snc1-prod-killbill-latam-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: killbill_latam_prod
+  gds-snc1-prod-killbill-ro-vip.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: daas_mysql
+    instance_name: killbill_prod
+  gds-snc1-prod-merchant-ssd-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: merchant_ssd_prod
+  gds-snc1-prod-mission-control-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: mission_control_prod
+  gds-snc1-prod-mmi-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: espresso_prod
+  gds-snc1-prod-po-manager-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: po_manager_prod
+  gds-snc1-prod-pricing-dim-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: pricing_dim_prod
+  gds-snc1-prod-pricing-s4-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: pricing_s4_prod
+  gds-snc1-prod-rocketman-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: rocketman_prod
+  gds-snc1-prod-scamtracker-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: scamtracker_prod
+  gds-snc1-prod-service-portal-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  geoservices-app2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  getaways-content-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  getaways-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  getaways-mysql-torch2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  getaways-mysql-travel-inventory-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  glive-admin-db1.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  glive-services-db1.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  goods-cbt-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-cbt-emea-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-db2.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  goods-inventory-management-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-itemmaster-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-outbound-controller-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-po-gateway-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-product-review-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-receiver-db1.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  goods-receiver-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-shipment-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goods-warehouse-load-manager-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  goodslatam-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  gpn-vm-db2-perf.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  grouponlivegateway-app1-prod.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  grouponworks-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  humor-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  iamsam-svc-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  inbound-scheduling-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  incentive-db1.snc1:
+    directory: postgres
+    pool: us
+    target: postgres
+    template: postgresql
+    instance_name: incentive_service
+  interactionstore-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  jira-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  latam-mysql-big-3.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  latam-mysql-payments-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  marketing-analytics-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mastermerchant-vm-db1-uat.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mastermerchant-vm-db2-uat.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  merchant-data-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  merchant-data-mcrud-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  merchant-preview-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  merchant-self-service-engine-db2.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  merchantos-app1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  microstrategy-metadata-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mkt-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-customer-db1-staging.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-customer-db1-uat.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-customer-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-customer-db2-uat.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-customer-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-data-db1-staging.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-data-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-data-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-giftcard-db1-staging.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-pos-service-db1-perf.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  mos-pos-service-db2-perf.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  nagios20.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios21.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios22.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios23.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios24.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios25.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios26.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios27.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios28.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios29.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios30.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios31.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios32.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios33.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios34.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios35.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios36.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios37.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios38.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios39.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios40.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios41.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios42.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios43.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios44.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios46.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios47.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios48.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  nagios49.snc1:
+    directory: /var/groupon/nagios/retention.dat
+    pool: us
+    target: nagios
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: nagios
+  notifications-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  orders-db4.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  paygw-db1-perf.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  paygw-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  paygw-db2-perf.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  paygw-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  paygw-db6.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  payments-data-vm-db1-uat.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  payrules-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  pdns-testvm1.snc1:
+    directory: /var/groupon
+    pool: us
+    target: pdns
+    frequency: daily
+    template: pull_tar_pigz
+    zfs_fs: pdns
+  phabricator-app1-uat.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  pit-dev-owmaster1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  pit-prod-owmaster1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  pit-share-hdphive1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  pricing-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  pricing-differential-db3.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  pricing-engine-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  pricing-tagging-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  prod-tools-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  profit-prod-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  rds-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  roi-analytics-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  roi-analytics-warehouse4.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  samiam-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  savored-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  scheduler-db2-sam.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  scheduler-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  seo-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  si-forecasting-dev.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  si-forecasting2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  si-pomanager-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  si-reconpo-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  smartdeals-logdash-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  squash-db1.snc1:
+    directory: postgres
+    pool: us
+    target: postgres
+    template: postgresql
+    instance_name: squash_production
+  sre-mission-control1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  sre-web1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  storm-service-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  surveys-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  ss-1.snc1:
+    directory: /var/groupon/SecretService_backup/*.tgz.enc
+    pool: us
+    target: ss
+    zfs_fs: ss
+    template: pull_tar_pigz
+  ss-2.snc1:
+    directory: /var/groupon/SecretService_backup/*.tgz.enc
+    pool: us
+    target: ss
+    zfs_fs: ss
+    template: pull_tar_pigz
+  ss-3.snc1:
+    directory: /var/groupon/SecretService_backup/*.tgz.enc
+    pool: us
+    target: ss
+    zfs_fs: ss
+    template: pull_tar_pigz
+  taxonomy-authoring-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  taxonomy-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  testrail-app1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  testrails-db1.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  transam-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  travel-payment-reconciliation-db2.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  txs-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  ugc-places-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  users-db3.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  video-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  voucher-txn-service-db4.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  web-crawl-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  wilson-app-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  wms-us-wmos1-prod.snc1:
+    directory: /apps /manh /etc
+    pool: us
+    target: wms
+    zfs_fs: wms
+    template: pull_tar_pigz
+  wms-us-wmos2-prod.snc1:
+    directory: /apps /manh /etc
+    pool: us
+    target: wms
+    zfs_fs: wms
+    template: pull_tar_pigz
+  wms-us-wmos3-prod.snc1:
+    directory: /apps /manh /etc
+    pool: us
+    target: wms
+    zfs_fs: wms
+    template: pull_tar_pigz
+  wms-us-wmos4-prod.snc1:
+    directory: /apps /manh /etc
+    pool: us
+    target: wms
+    zfs_fs: wms
+    template: pull_tar_pigz
+  wms-us-db1-prod.snc1:
+    directory: /u01
+    pool: us
+    target: wms
+    zfs_fs: wms
+    template: pull_tar_pigz
+  wms-us-db2-prod.snc1:
+    directory: /u01
+    pool: us
+    target: wms
+    zfs_fs: wms
+    template: pull_tar_pigz
+  zenmaster-db1.snc1:
+  zenmaster-db1.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+# FIXME (seanc@): Backups that are homeless listed below - but still alpha
+# sorted (i.e. don't have an entry anywhere in inventory/'*' or
+# group_vars/'*').
+  audience-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  custsvc-intl-db2.snc1:
+    directory: mysql
+    pool: sox
+    target: mysql
+    template: mysql
+  gds-snc1-prod-goods-inbound-pickup-sch-rw-vip.snc1:
+    directory: postgres
+    pool: us
+    target: postgres
+    template: postgresql
+    instance_name: inb_sch_prod
+  gds-snc1-prod-ops-ddb-rw-vip.snc1:
+    directory: postgres
+    pool: us
+    target: postgres
+    template: postgresql
+    instance_name: ops_ddb_prod
+  geoservices-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  github1-backup.snc1:
+    directory: /var/groupon/github/current
+    pool: sox
+    target: github
+    frequency: daily
+    template: github
+  merchant-data-brands-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  stores-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  test-db2.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  gds-snc1-prod-getaways-geo-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-snapshotter-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-snap-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: snap_prod
+  gds-snc1-prod-lb-service-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-testrail-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-fb-wizard-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-phabricator-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-reviewboard-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-getaways-torch-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-birdcage-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-booking-appoint-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-booking-avail-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-booking-notify-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: service_portal_prod
+  gds-snc1-prod-host-harvester-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: host_harvester_prod
+## Cluster13
+  gds-snc1-prod-da-prn-abst-app-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: da_prn_abst_app_prod
+  gds-snc1-prod-travel-workflow-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: travel_workflow_prod
+  gds-snc1-prod-breadcrumb-rpt-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: breadcrumb_rpt_prod
+  gds-snc1-prod-drinking-bird-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: drinking_bird_prod
+  gds-snc1-prod-glive-3rd-party-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: glive_3rd_party
+  gds-snc1-prod-collins-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: collins_prod
+  gds-snc1-prod-flying-dutchman-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: flying_dutchman_prod
+  gds-snc1-prod-problem-mgmt-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: problem_mgmt_prod
+  gds-snc1-prod-user-lists-api-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: user_lists_api_prod
+  gds-snc1-prod-local-intelli-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: local_intelli_prod
+  gds-snc1-prod-hive-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: hive_prod
+  gds-snc1-prod-jira-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: jira_prod
+  gds-snc1-prod-goods-stores-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: goods_stores_prod
+  gds-snc1-prod-blacklist-rule-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: blacklist_rule_prod
+## Cluster 9
+  gds-snc1-prod-lone-bird-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: lone_bird_prod
+  gds-snc1-prod-custsvc-latam-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: custsvc_latam_prod
+  gds-snc1-prod-ayudagroupon-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: ayudagroupon_prod
+  gds-snc1-prod-deal-book-service-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: deal_book_service_prod
+  gds-snc1-prod-revrpoc-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: revrpoc_prod
+  gds-snc1-prod-backbeat-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: backbeat_prod
+  gds-snc1-prod-killbill-subs-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: killbill_subs_prod
+  gds-snc1-prod-starman-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: starman_prod
+  gds-snc1-prod-finch-experiments-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: finch_experiments_prod
+  gds-snc1-prod-deal-management-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: deal_management_prod
+  gds-snc1-prod-crm-msg-service-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: crm_msg_service_prod
+  gds-snc1-prod-getaways_inventory-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: getaways_inventory_prod
+  gds-snc1-prod-taxonomy-authoring-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: taxonomy_authoring_prod
+  gds-snc1-prod-getaways-content-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: getaways_content_prod
+### Cluster 19
+  gds-snc1-prod-voucher-service-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: voucher_service_prod
+  gds-snc1-prod-voucherinventory-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: voucherinventory_prod
+  gds-snc1-prod-travel-itinerary-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: travel_itinerary_prod
+  gds-snc1-prod-gifting-service-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: gifting_service_prod
+### Cluster 21
+  gds-snc1-prod-dealwizard-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: dealwizard_prod
+  gds-snc1-prod-birdcage-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: birdcage_prod
+  gds-snc1-prod-wilson-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: wilson_prod
+  gds-snc1-prod-cscs-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: cscs_prod
+  gds-snc1-prod-lbms-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: lbms_prod
+  gds-snc1-prod-connect-bdm-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: connect_bdm_prod
+  gds-snc1-prod-commerce-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: commerce_prod
+  gds-snc1-prod-groupon-works-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: groupon_works_prod
+  gds-snc1-prod-groupon-blog-net-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: groupon_blog_net_prod
+  gds-snc1-prod-mpp-offer-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: mpp_offer_prod
+## Cluster 23
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-optimus-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: optimus_prod
+  gds-snc1-prod-disbursement-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: disbursement_prod
+  gds-snc1-prod-janus-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: janus_prod
+  gds-snc1-prod-vendor-returns-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: vendor_returns_prod
+  gds-snc1-prod-content-builder-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: content_builder_prod
+  gds-snc1-prod-careers-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: careers_prod
+  gds-snc1-prod-cerebro-hive-hue-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: cerebro_hive_hue_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-psion-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: psion_prod
+  gds-snc1-prod-crm-regla-ro-vip.snc1:
+    directory: postgres
+    pool: us
+    target: postgres
+    template: postgresql
+    instance_name: crm_regla
+  mos-data-db3.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  sem-db3.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  sem-db5.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: mysql
+  jira-n01.snc1:
+    directory: /var/atlassian/application-data/jira/data/attachments /var/atlassian/application-data/jira/data/avatars
+    pool: us
+    target: jira-bkup
+    zfs_fs: jira
+    template: pull_tar_pigz
+  wiki-app1.snc1:
+    directory: /var/groupon/wiki/uploads
+    pool: us
+    target: jira-bkup
+    zfs_fs: jira
+    template: pull_tar_pigz
+  email-msys-db1.snc1:
+    directory: /var/groupon/msys_db_backup
+    pool: us
+    target: emailmsysdb
+    zfs_fs: emailmsysdb
+    template: pull_tar
+  email-msys-db2.snc1:
+    directory: /var/groupon/msys_db_backup
+    pool: us
+    target: emailmsysdb
+    zfs_fs: emailmsysdb
+    template: pull_tar
+  gan-app4.snc1:
+    directory: /var/groupon/redis/dump.redis-nats.rdb /var/groupon/redis/redis.redis-nats.aof
+    pool: us
+    target: gan
+    zfs_fs: gan
+    template: pull_tar_pigz
+  gan-app5.snc1:
+    directory: /var/groupon/redis/dump.redis-nats.rdb /var/groupon/redis/redis.redis-nats.aof
+    pool: us
+    target: gan
+    zfs_fs: gan
+    template: pull_tar_pigz
+### Cluster 53
+  gds-snc1-prod-message2ledger-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: message2ledger_prod
+### Cluster 54
+  gds-snc1-prod-metro-draft-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: metro_draft_prod
+### Cluster 63
+  gds-snc1-prod-getaways-maris-ro-vip.snc1:
+    directory: mysql
+    pool: us
+    target: mysql
+    template: daas_mysql
+    instance_name: getaways_maris_prod
+
+delorean_pools_base_dir: /var/groupon/delorean/pools
+
+delorean_backup_pools:
+  us:
+    base_dir: '{{ delorean_pools_base_dir }}/us'
+  sox:
+    base_dir: '{{ delorean_pools_base_dir }}/sox'
+
+delorean_backup_users:
+#  - { user: docker, pool: us }
+  - { user: github, pool: sox }
+  - { user: mysql, pool: us }
+  - { user: mysql, pool: sox }
+  - { user: nagios, pool: us }
+  - { user: pdns, pool: us }
+  - { user: postgres, pool: us }
+  - { user: wms, pool: us }
+  - { user: ss, pool: us }
+  - { user: jira-bkup, pool: us }
+  - { user: emailmsysdb, pool: us }
+  - { user: gan, pool: us }
+  - { user: gds_prod_snc1_db015, pool: us }
+  - { user: gds_prod_snc1_db021, pool: us }
+#  - { user: postgresql, pool: us }
+#  - { user: postgresql, pool: sox }

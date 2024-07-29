@@ -1,0 +1,133 @@
+---
+- name: FreeBSD | nagios-plugins
+  pkgng: name="{{ item }}" state=present
+  when: ansible_os_family == "FreeBSD"
+  with_items:
+    - nagios-check_cpu_usage
+    - nagios-plugins
+
+- name: FreeBSD | check | check_fbsd_mem
+  template:
+    dest="/usr/local/libexec/nagios/check_fbsd_mem"
+    mode=0755
+    src=check_fbsd_mem.sh.j2
+    owner=root
+    group=wheel
+
+# - name: FreeBSD | check | check_iostat_bsd
+#   template:
+#     dest="/usr/local/libexec/nagios/check_iostat_bsd"
+#     mode=0755
+#     src=check_iostat_bsd.sh.j2
+#     owner=root
+#     group=wheel
+
+
+
+- name: FreeBSD | check | MegaCli | log file
+  file:
+    dest="/var/groupon/log/MegaSAS.log"
+    state=touch
+    owner=monitord
+    group="{{ foreman_groups[users['monitord'].group ].gid }}"
+    mode=0644
+  changed_when: false
+- name: FreeBSD | check | monitord sudoers | gstat
+  lineinfile: "line='monitord ALL=NOPASSWD: /usr/sbin/gstat' dest=/usr/local/etc/sudoers.d/monitord insertafter=EOF create=yes state=present"
+
+# Scripts are a copy from
+# git@github.groupondev.com:prod-tools/monitoring_script.git
+- name: FreeBSD | prod-tools/monitoring_scripts/lib
+  copy:
+    dest="/usr/local/lib/ruby/site_ruby/{{ item }}"
+    src="{{ item }}"
+    owner=root
+    group=wheel
+    mode=0644
+  with_items:
+    - monitoring_script.rb
+    - monitoring_script_multithreshold.rb
+    - monitoring_script_multithreshold_rate.rb
+    - nagios_plugin.rb
+    - nagios_plugin_multithreshold.rb
+    - nagios_plugin_multithreshold_rate.rb
+    - trollop.rb
+
+
+# Scripts are a copy from 
+# git@github.groupondev.com:prod-tools/mysql_config.git
+- name: FreeBSD | prod-tools/mysql_config/libexec
+  copy:
+    dest="/usr/local/libexec/{{ item }}"
+    src="{{ item }}"
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - check_mysql
+    - check_mysql_autoinc
+    - check_mysql_query
+    - check_mysql_disk_space
+    - check_mysql_slave
+    - ss_get_mysql_stats.php
+    - check_disk_space_all
+
+
+- name: FreeBSD | check | monitord sudoers | MegaCli
+  lineinfile: "line='monitord ALL=NOPASSWD: /usr/local/sbin/MegaCli' dest=/usr/local/etc/sudoers.d/monitord insertafter=EOF create=yes state=present"
+
+- name: FreeBSD | check | check_freebsd_iostat_sum
+  template:
+    dest="/var/groupon/service/monitord_agent/bin/check_freebsd_iostat_sum.awk"
+    mode=0755
+    src=check_freebsd_iostat_sum.awk.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | check | check_freebsd_iostat
+  template:
+    dest="/usr/local/libexec/nagios/check_freebsd_iostat.sh"
+    mode=0755
+    src=check_freebsd_iostat.sh.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | check | check_megacli
+  template:
+    dest="/usr/local/libexec/nagios/check_megacli"
+    mode=0755
+    src=check_megacli.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | check | check_freebsd_netstat
+  template:
+    dest="/usr/local/libexec/nagios/check_freebsd_netstat"
+    mode=0755
+    src=check_freebsd_netstat.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | check | check_freebsd_pgbouncer
+  template:
+    dest="/usr/local/libexec/nagios/check_freebsd_pgbouncer"
+    mode=0755
+    src=check_freebsd_pgbouncer.j2
+    owner=root
+    group=wheel
+
+- name: FreeBSD | check | check_postgres_new.pl
+  copy:
+    src: "{{ role_path }}/../check_mk/files/locals/postgresql/custom/check_postgres_new.pl"
+    dest: "/usr/local/bin/"
+    owner: root
+    group: wheel
+    mode: 0655
+
+- name: FreeBSD | check | dbstats_delta.sh
+  copy:
+    src: "{{ role_path }}/../check_mk/files/locals/postgresql/custom/dbstats_delta.sh"
+    dest: "/usr/local/bin/"
+    owner: root
+    group: wheel
+    mode: 0655

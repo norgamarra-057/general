@@ -1,0 +1,12 @@
+---
+- name: btsync_start
+  command: /usr/local/etc/rc.d/btsync start
+
+- name: btsync_stop
+  command: /usr/local/etc/rc.d/btsync stop
+
+- name: btsync_restart
+  command: /usr/local/etc/rc.d/btsync restart
+
+- name: sshd_restart
+  command: /etc/rc.d/sshd restart

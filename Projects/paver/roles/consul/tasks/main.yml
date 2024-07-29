@@ -1,0 +1,11 @@
+---
+- name: consul Load variables
+  tags:
+    - consul
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: FreeBSD specific steps
+  tags:
+    - consul
+  include_tasks: FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'

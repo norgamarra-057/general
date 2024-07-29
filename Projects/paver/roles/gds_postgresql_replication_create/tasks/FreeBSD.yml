@@ -1,0 +1,40 @@
+---
+- name: "GDS PostgreSQL Replication Create | FreeBSD | stop runit "
+  command: "/var/service/postgresql-{{ gds_cluster }}-{{ instance_name }}/sv down ."
+  become_user: root
+
+- name: GDS PostgreSQL Replication Create | FreeBSD | initdb | perms
+  file:
+    name: "{{ postgresql_cluster_path }}/data"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0700
+
+- name: "GDS PostgreSQL Replication Create | FreeBSD | pg_basebackup "
+  command: "/usr/local/bin/pg_basebackup -U postgres -R -D {{ postgresql_cluster_path }}/data -P -p {{ item.value.ports.postgresql_raw }} -h {{ item.value.master_vip }}"
+  become_user: root
+  changed_when: False
+  with_dict: gds_instances
+
+- name: GDS PostgreSQL Replication Create | FreeBSD | initdb | perms
+  file:
+    name: "{{ postgresql_cluster_path }}/data"
+    state: directory
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instances[instance_name].unix_user].group }}"
+    mode: 0700
+
+- name:  GDS PostgreSQL Replication Create | FreeBSD | recovery.conf
+  template:
+    src: recovery.conf.j2
+    dest: "{{ postgresql_pgdata }}/recovery.conf"
+    owner: "{{ gds_instances[instance_name].unix_user }}"
+    group: "{{ users[gds_instance_username].group }}"
+    mode: 0640
+    with_dict: gds_instances
+
+- name: GDS PostgreSQL Replication Create | start runit
+- name: "GDS PostgreSQL Replication Create | FreeBSD | pg_basebackup "
+  command: "/var/service/postgresql-{{ gds_cluster }}-{{ instance_name }}/sv up ."
+  become_user: root

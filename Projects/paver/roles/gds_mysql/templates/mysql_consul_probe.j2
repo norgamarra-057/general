@@ -1,0 +1,16 @@
+{
+    "service": {
+    "name": "{{ consul_instance_name }}",
+    "port": {{ gds_instances[instance_name].ports.mysqld }},
+    "token": "a632a83a-0a3b-9632-3eb6-7716e36b9655"
+    },
+    "checks": [
+        {
+            "id": "{{ consul_instance_name }}-live",
+            "name": "Check {{ consul_instance_name }} MySQL",
+            "notes": "MySQL health check for {{ consul_instance_name }}",
+            "script": "/usr/local/libexec/nagios/check_mysql -umonitor -p od7IEWr2xKgSie -d percona -H 127.0.0.1 -P {{ gds_instances[instance_name].ports.mysqld }}",
+            "interval": "10s"
+        }
+    ]
+}

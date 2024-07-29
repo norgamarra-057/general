@@ -1,0 +1,156 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+          - aws_host is defined
+          - admin_password is defined
+
+    - set_fact: 
+        pglogical_status={{ gds_instances[instance].extra_variables.pglogical }}
+        my_db_schema={{ gds_instances[instance].schemas }}
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+
+    - name: check if pglogical is on
+      fail: msg="Exiting ---------pglogical variable is not set to on"
+      when:  pglogical_status is not defined or pglogical_status != 'on' 
+
+    - name: check if database is defined
+      fail: msg="Exiting ---------database is not defined"
+      when:  my_db_name is not defined
+
+    - name: check if db schema is defined
+      fail: msg="Exiting --------- dba user is not defined"
+      when:  my_db_schema is not defined
+
+- name: Aws part
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_first_db: "{{ hostvars[daas_host]['my_first_db'] }}"
+        my_db_schema: "{{ hostvars[daas_host]['my_db_schema'] }}"
+
+    - name: Create extension
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "create extension if not exists pglogical"
+
+    - name: Check if provider exists
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select count(*) from pglogical.node_interface where if_name='{{ my_db_name }}_aws_provider'"
+      register: count_provider
+
+    - name: Create provider
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "SELECT pglogical.create_node(node_name := '{{ my_db_name }}_aws_provider', dsn := 'host=127.0.0.1 port=5432  dbname={{ my_db_name }} user=gds_admin password={{ admin_password }}')"
+      when:  count_provider.stdout|int  == 0
+
+    - name: Add tables
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "SELECT pglogical.replication_set_add_all_tables('default', '{ {{ item }} }'::text[])"
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Add sequences
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "SELECT pglogical.replication_set_add_all_sequences('default', '{ {{ item }} }'::text[],true )"
+      with_items: "{{ my_db_schema[my_db_name] }}"
+
+    - name: Check if heartbeat exists
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select count(*) from pglogical.replication_set_table where set_reloid='heartbeat.repl_status'::regclass"
+      register: count_heartbeat
+      when: 'my_db_name == my_first_db'
+
+    - name: Add heartbeat
+      shell: psql -U gds_admin -d {{ my_db_name }} -At -p 5432 -h {{ aws_host }} -c "select pglogical.replication_set_add_table('default','heartbeat.repl_status'::regclass)"
+      when: 'my_db_name == my_first_db and count_heartbeat.stdout|int == 0'
+
+
+- name: Daas part 
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+        my_first_db: "{{ hostvars[daas_host]['my_first_db'] }}"
+        my_db_schema: "{{ hostvars[daas_host]['my_db_schema'] }}"
+
+    - name: Check if database exists
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select count(*) from pg_database where datname = '{{ my_db_name }}'"
+      register: count_database
+
+    - name: Create database
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "create database {{ my_db_name }}"
+      when: 'count_database.stdout|int == 0'
+
+    - name: export schema
+      shell: pg_dump -U postgres -N heartbeat -N pglogical -N pglogical_origin -N dba -F p -s -f /tmp/{{ my_db_name }}_schema.sql -p {{ gds_instances[instance].ports.postgresql_raw }} {{ my_db_name }}_old
+
+    - name: Import schema
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} < /tmp/{{ my_db_name }}_schema.sql
+      register: db_import
+
+    - name: Check if heartbeat exists
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select count(*) from pg_namespace where nspname = 'heartbeat'"
+      register: count_heartbeat
+
+    - name: Create heartbeat schema
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "create schema heartbeat" 
+      when: 'my_db_name == my_first_db and count_heartbeat.stdout|int == 0'
+
+    - name: Check if heartbeat.repl_status exists
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select count(*) from pg_stat_user_tables where schemaname = 'heartbeat' and relname='repl_status'"
+      register: count_heartbeat_table
+
+    - name: Create heartbeat table
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "CREATE TABLE heartbeat.repl_status (    pid integer,    usesysid oid,    usename name,    application_name text,    client_addr inet,    client_hostname text,    client_port integer,    backend_start timestamp with time zone,    backend_xmin xid,    state text,    sent_location pg_lsn,    write_location pg_lsn,    flush_location pg_lsn,    replay_location pg_lsn,    sync_priority integer,    sync_state text,    last_updated timestamp without time zone,    current_position_master pg_lsn NOT NULL,    master_host inet)"
+      when: 'my_db_name == my_first_db and count_heartbeat_table.stdout|int == 0'
+
+    - name: Alter heartbeat table
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "ALTER TABLE ONLY heartbeat.repl_status    ADD CONSTRAINT repl_status_pkey PRIMARY KEY (current_position_master,client_port)"
+      when: 'my_db_name == my_first_db and count_heartbeat_table.stdout|int == 0'
+
+    - name: Create extension 1/2
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "create extension if not exists pglogical_origin"
+
+    - name: Create extension 2/2
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "create extension if not exists pglogical"
+
+    - name: Check if subscriber exists
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select count(*) from pglogical.node_interface where if_name='{{ my_db_name }}_pg94_subscriber'"
+      register: count_subscriber
+
+    - name: Create subscriber
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "SELECT pglogical.create_node(node_name := '{{ my_db_name }}_pg94_subscriber', dsn := 'port={{ gds_instances[instance].ports.postgresql_raw }} dbname={{ my_db_name }} user=gds_admin')" 
+      when:  count_subscriber.stdout|int  == 0
+
+    - name: Check if subscription exists
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c "select count(*) from pglogical.subscription where sub_name='{{ my_db_name }}_pg94_subscription'"
+      register: count_subscription
+
+    - name: Create subscription
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -d {{ my_db_name }} -c " SELECT pglogical.create_subscription(subscription_name := '{{ my_db_name }}_pg94_subscription', provider_dsn := 'host={{ aws_host }} port=5432 dbname={{ my_db_name }} user=gds_admin password={{ admin_password }}', replication_sets := '{default}'::text[] );"
+      when:  count_subscription.stdout|int  == 0
+
+    - name: Remove dump file
+      file: path=/tmp/{{ my_db_name }}_schema.sql state=absent
+
+
+

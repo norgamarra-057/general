@@ -1,0 +1,4 @@
+---
+# tasks file for gds-mysql-ha
+- fail: msg="Please specify instance!"
+  when: instance is not defined

@@ -1,0 +1,10 @@
+{
+   "acl_datacenter": "{{ datacenter|default("snc1") }}",
+   "acl_default_policy": "deny",
+   "datacenter": "{{ datacenter|default("snc1") }}",
+   "dns_config": {"allow_stale": true, "max_stale": "5s", "node_ttl": "0s", "enable_truncate": true },
+   "leave_on_terminate": false,
+    {% if bootstrap is not defined and server_list is defined -%}
+    "start_join": {% for s in server_list %} {{ s }} {% endfor %},
+    {% endif %}
+}

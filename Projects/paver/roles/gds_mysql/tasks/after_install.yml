@@ -1,0 +1,93 @@
+# V1, crude version to replace mysql_first_roll in roller
+- name: Percona | FreeBSD | after_install | client configuration
+  template:
+    dest: /root/.my.cnf-{{ instance_name }}
+    src: my_client.cnf.j2
+    owner: root
+    group: wheel
+    mode: 0600
+
+- name: Create symlinks to client configuration (for autocomplete)
+  file:
+    dest: /root/{{ instance_name }}
+    src: /root/.my.cnf-{{ instance_name }}
+    state: link
+
+- name: Percona | FreeBSD | after_install | render administrative tables
+  template:
+    dest: /var/tmp/administrative_tables_{{item }}.sql
+    src: administrative_tables.sql.j2
+    owner: root
+    group: wheel
+    mode: 0600
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | after_install | render administrative tables (additional heartbeat schemas)
+  template:
+    dest: /var/tmp/administrative_tables_{{ item }}.sql
+    src: administrative_tables.sql.j2
+    owner: root
+    group: wheel
+    mode: 0600
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | after_install | render administrative users
+  template:
+    dest: /var/tmp/administrative_users.sql
+    src: administrative_users.sql.j2
+    owner: root
+    group: wheel
+    mode: 0600
+
+- name: Percona | FreeBSD | after_install | create administrative tables
+  shell: /usr/local/bin/mysql --defaults-file=/root/.my.cnf-{{ instance_name }} < /var/tmp/administrative_tables_{{ item }}.sql
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | after_install | create administrative tables (additional heartbeat schemas)
+  shell: /usr/local/bin/mysql --defaults-file=/root/.my.cnf-{{ instance_name }} < /var/tmp/administrative_tables_{{ item }}.sql
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | after_install | detect if node is slave
+  shell: /usr/local/bin/mysql --defaults-file=/root/.my.cnf-{{instance_name }} -e "show slave status\G"
+  register: mysql_slave_configured
+
+- name: Percona | FreeBSD | after_install | create administrative users
+  shell: /usr/local/bin/mysql --defaults-file=/root/.my.cnf-{{ instance_name }} < /var/tmp/administrative_users.sql
+  when: mysql_slave_configured.stdout == ""
+
+- name: Percona | FreeBSD | after_install | delete administrative tables temp file
+  file:
+    name: /var/tmp/administrative_tables_{{ item }}.sql
+    state: absent
+  with_items:
+  - percona
+
+- name: Percona | FreeBSD | after_install | delete administrative tables temp file (additional schemas)
+  file:
+    name: /var/tmp/administrative_tables_{{ item }}.sql
+    state: absent
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined
+
+- name: Percona | FreeBSD | after_install | delete administrative users temp file
+  file:
+    name: /var/tmp/administrative_users.sql
+    state: absent
+
+- name: Percona | FreeBSD | after_install | delete administrative tables temp file
+  file:
+    name: /var/tmp/administrative_tables_{{ item }}.sql
+    state: absent
+  with_items:
+    - percona
+
+- name: Percona | FreeBSD | after_install | delete administrative tables temp file
+  file:
+    name: /var/tmp/administrative_tables_{{ item }}.sq
+    state: absent
+  with_items: heartbeat_additional_schemas
+  when: heartbeat_additional_schemas is defined

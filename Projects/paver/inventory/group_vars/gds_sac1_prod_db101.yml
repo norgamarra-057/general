@@ -1,0 +1,18 @@
+---
+gds_carp_peers:
+  - 10.34.185.230  # gds-sac1-prod-db101m1
+  - 10.34.185.231  # gds-sac1-prod-db101s1
+  - 10.34.161.230  # gds-sac1-prod-db101m1
+  - 10.34.161.231  # gds-sac1-prod-db101s1
+gds_carp_interfaces:
+  - vlan206
+  - vlan207
+gds_instance_group: gds_prod_sac1_db101
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  accounting_prod:  # GDS-15399 - Decommed GDS-35747
+#  shipment_tracker_prod:  # GDS-15399 - Decommed GDS-35747
+#  goods_stores_prod: # GDS-16285  # __SOX__ - Decommed GDS-35747
+#  dealservice_prod: # GDS-21727 - Decommed GDS-35747
+#  gtwy_travel_inv_prod: # GDS-21900 - Decommed GDS-35747

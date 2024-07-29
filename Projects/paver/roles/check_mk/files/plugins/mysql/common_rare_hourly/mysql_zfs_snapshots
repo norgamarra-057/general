@@ -1,0 +1,37 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# instances to check
+echo '<<<mysql_zfs_snapshots>>>'
+for mysqlinstance in $(grep -e '\[.*\]' $MK_CONFDIR/mysql.cfg | sed -e 's/\[//g' -e 's/\]//g' | tr '\n' ' ');do
+    currentinstance=$(grep -A3 "\[${mysqlinstance}\]" $MK_CONFDIR/mysql.cfg)
+    port=$(echo "$currentinstance" | grep "port=" | sed -e 's/port=//')
+    socket=$(echo "$currentinstance" | grep "socket=")
+    name=$(echo "${port} - ${mysqlinstance}")
+
+    echo "[[$name]]"
+
+    HOURS=24
+    TIME_NOW=$(date +'%s')
+    TWENTYFOUR_HOUR=$(($HOURS * 60 * 60))
+    DELTA=$(($TIME_NOW - $TWENTYFOUR_HOUR))
+
+    database_folder=$(mysql -u root -P ${port} --${socket} -e "select @@datadir;" -s -N 2> /dev/null)
+
+    exit_code=$(echo $?)
+
+    if [[ "${exit_code}" -eq "1" ]]; then
+        echo "-1"
+        continue
+    fi
+
+    birthday_of_data_dir=$(stat -f '%B' $database_folder)
+
+    if [ -n "$DELTA" ] && [ -n "$birthday_of_data_dir" ] && [ "$DELTA" -gt "$birthday_of_data_dir" ]; then
+        zfs_info=$(echo "$database_folder" | xargs -n1 zfs list -p -r -t snapshot -o name,creation)
+        get_snapshots=$(echo "$zfs_info" | awk -v now="$TIME_NOW" -v twenty_four_h="$TWENTYFOUR_HOUR" '$2 >= (now - twenty_four_h)' | sed -n '1!p')
+        echo "$get_snapshots" | wc -l | awk '{print $NF}'
+    else
+        echo "None: $birthday_of_data_dir"
+    fi
+    sleep 0.5
+done

@@ -1,0 +1,34 @@
+---
+- name: Export list of firewall IPs for all instances
+  hosts: gds_all
+  vars:
+    - mysql_user: report
+    - mysql_pass: secret4rep0rt
+    - mysql_db: sox
+    - mysql_table: access
+    - mysql_host: chschneider-bootcamp.snc1
+    - mysql_port: 3306
+    - target_file: /tmp/ips.txt
+  tasks:
+    - name: Initialize file
+      shell: "echo -n '' > {{ target_file }}"
+
+    - name: Iterate through local instances
+      shell: "echo \"{{ gds_instances[item]|mkinserts(item, ansible_fqdn) }}\" >> {{ target_file }}"
+      when: gds_instances is defined
+      with_items: gds_instances.keys()
+      register: create_inserts
+
+    - name: Check for generated SQL file
+      stat: 
+        path: "{{ target_file }}"
+      register: sql_generated
+
+    - name: Execute inserts if generated SQL file exists
+      shell: "cat {{ target_file }} | mysql -h {{ mysql_host }} -u {{ mysql_user }} -p{{ mysql_pass }} {{ mysql_db }}"
+      when: sql_generated.stat.exists
+
+    - name: Remove temp file
+      file: 
+        path: "{{ target_file }}"
+        state: absent

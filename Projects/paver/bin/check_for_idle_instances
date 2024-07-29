@@ -1,0 +1,213 @@
+#! /usr/bin/env python
+###################################################
+# check_for_idle_instances
+#
+# Version:      1.1.1
+#
+# Descripton:   Checks all configured instances on a server (node) for activity.  If 'instance' is provided, 
+#               only provides information about that instance, but in detail.
+#
+# Usage:        check_for_idle_instances  -n server [-i instance-path] [-a] | [-v]
+#
+# Optional arguments:
+#   -h, --help            Show this help message and exit
+#   -i instance, --instance Name of specific instance to report detailed information for
+#   -a --all Show all instances, regardless of app connections or QPS
+#   -n server, --node server
+#                         Server that will be processed
+#   -v, --version         displays version and exits
+#
+# Requirements: python 2.7
+#
+# Notes:        
+###################################################
+
+# Import needed modules
+
+import yaml
+import sys
+import string
+import socket
+import argparse
+import glob
+import os
+import paramiko
+
+# Default values
+Version = "1.1.1"
+inventory = "inventory/group_vars"
+all = 0
+
+# Parse and load command line options
+parser = argparse.ArgumentParser(description="check_for_idle_instances checks all configured instances on a server (node) for activity.  If 'instance' is provided, only provides information about that instance, but in detail. check_for_idle_instances: -n server [-i instance] [-a] | [-v]")
+
+parser.add_argument("-a", "--all", help="Optionally show all instances, regardless of app connectsion or QPS", action='store_true')
+parser.add_argument("-i", "--instance", help="Optional name of instance to process.")
+parser.add_argument("-n", "--node", help="Name of server (node) to process.  This is required", required=True)
+parser.add_argument("-v", "--version", help="Displays version and exits.", action='store_true')
+args = parser.parse_args()
+
+if args.all:
+   all = 1
+if args.instance:
+   instance = args.instance
+if args.node:
+   node = args.node 
+if args.version:
+   print "Version: " + Version
+   sys.exit()
+
+# Build filename from node
+
+size = len(node)
+short_server = node[:size - 7]
+
+filename = inventory + "/" + string.replace(short_server,'-','_') + ".yml"
+   
+try:
+   stream = open(filename,'r')
+   data = yaml.safe_load(stream)
+except:
+   print (node + " server does not exist")
+   sys.exit()
+
+try:
+   remote = paramiko.SSHClient()
+   remote.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+   remote.connect(node)
+except:
+   print (node + " cannot connect to server")
+   sys.exit()
+
+if args.instance:
+   # MySQL only
+   try:
+      if data['gds_instances'][instance]['type'] != "mysql":
+         print ("Instance: " + instance + " is not MySQL")
+         stream.close()
+         sys.exit()
+   except:
+      print (node + " " + instance + " - instance is down or improperly configured")
+      stream.close()
+      sys.exit()
+   try:
+      remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BAN -e\"status\""
+      stdin, stdout, stderr = remote.exec_command(remote_command)
+
+      lines = stdout.readlines()
+      for line in lines:
+         print(line.rstrip())
+
+      remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BA -e\"SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) AS 'Total Database Size in GB' FROM information_schema.tables\""
+      stdin, stdout, stderr = remote.exec_command(remote_command)
+
+      lines = stdout.readlines()
+      for line in lines:
+         print(line.rstrip())
+      print ('--------------\n')
+
+      remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BA -e\"select table_schema as 'Databases', count(*) as 'Number of Tables' from information_schema.tables where table_schema not in ('information_schema', 'mysql','percona','performance_schema','sys','gds_pm','gds_validate') group by 1\""
+      stdin, stdout, stderr = remote.exec_command(remote_command)
+
+      lines = stdout.readlines()
+      for line in lines:
+         print(line.rstrip())
+      print ('--------------\n')
+
+      remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BAN -e\"select  concat(user, '@', substring_index(host, ':', 1)) as Connection,  count(*) as Total from  information_schema.processlist  where  user not in ('pt_heartbeat', 'replication', 'root', 'db_util', 'monitor', 'event_scheduler') group by 1  order by 2 desc\""
+      stdin, stdout, stderr = remote.exec_command(remote_command)
+
+      print("Connection\tTotal")
+      lines = stdout.readlines()
+      for line in lines:
+         text = line.split('@')
+         user = str(text[0])
+         work = text[1].split('\t')
+         IP = str(work[0])
+         try:
+            fqdn_array = socket.gethostbyaddr(IP)
+         except:
+            DNS = IP
+         else:
+            DNS = fqdn_array[0]
+         count = str(work[1])
+         output = user + "@" + DNS + "  " + count
+         print(output.rstrip())
+      print ('--------------\n')
+ 
+      remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BA -e\"select host as Host, total_connections as Total from performance_schema.hosts where host not in ('localhost', '127.0.0.1') and host is not null order by total_connections desc;\""
+      stdin, stdout, stderr = remote.exec_command(remote_command)
+
+      lines = stdout.readlines()
+      for line in lines:
+         text = line.split('\t')
+         IP = str(text[0])
+         try:
+            fqdn_array = socket.gethostbyaddr(IP)
+         except:
+            DNS = IP
+         else:
+            DNS = fqdn_array[0]
+         total = str(text[1])
+         output = DNS + "  " + total
+         print(output.rstrip())
+      print ('--------------\n')
+
+      remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BA -e\"select user as User, total_connections as Total from performance_schema.users where user not in ('dba_util', 'pt_heartbeat', 'monitor', 'root', 'replication') order by total_connections desc;\""
+      stdin, stdout, stderr = remote.exec_command(remote_command)
+
+      lines = stdout.readlines()
+      for line in lines:
+         print(line.rstrip())
+      print ('--------------\n')
+   except:
+      print (node + " " + instance + " - instance is down or improperly configured")
+      stream.close()
+      sys.exit()
+else:
+   # Process each instance
+   for instance in data['gds_instances'].keys():
+
+      # MySQL only
+      if data['gds_instances'][instance]['type'] != "mysql":
+         continue
+   
+      try:
+         remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BAN -e\"SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) FROM information_schema.tables\""
+         stdin, stdout, stderr = remote.exec_command(remote_command)
+         size = stdout.readline()
+         size = size.lstrip()
+         size = size.rstrip()
+
+         remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BAN -e\"select variable_value from information_schema.global_status where variable_name = 'Queries'\""
+         stdin, stdout, stderr = remote.exec_command(remote_command)
+         queries = stdout.readline()
+  
+         remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BAN -e\"select variable_value from information_schema.global_status where variable_name = 'Uptime'\""
+         stdin, stdout, stderr = remote.exec_command(remote_command)
+         uptime = stdout.readline()
+ 
+         QPS = int(queries) / int(uptime)
+   
+         remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BAN -e\"status\" | grep Uptime | cut -d: -f2"
+         stdin, stdout, stderr = remote.exec_command(remote_command)
+
+         read_uptime = stdout.readline()
+         read_uptime = read_uptime.lstrip()
+         read_uptime = read_uptime.rstrip()
+ 
+         remote_command = "sudo mysql -S /var/groupon/percona/" + instance + "/mysql.sock -BAN -e\"select count(*) from information_schema.processlist where user not in ('dba_util', 'pt_heartbeat', 'monitor', 'root', 'replication','event_scheduler','system user')\""
+   
+         stdin, stdout, stderr = remote.exec_command(remote_command)
+         procs = stdout.readline()
+         procs = procs.lstrip()
+         procs = procs.rstrip()
+
+         if all or (QPS < 10 and int(procs) == 0):
+            line = "node: " + node + ", instance: " + instance + ", Uptime: " + read_uptime + ", QPS: " + str(QPS) + ", app connections: " + procs + ", DB Size GB: " + size
+            print line.rstrip()
+      except:
+         print (node + " " + instance + " - instance is down or improperly configured")
+         continue
+stream.close()
+   

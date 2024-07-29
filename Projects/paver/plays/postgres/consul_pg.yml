@@ -1,0 +1,211 @@
+---
+- hosts: gds_snc1_prod_db010
+  become: yes
+  roles:
+    - { role: consul_pg,
+        instance_name: rapt_squash_prod }
+    - { role: consul_pg,
+        instance_name: keen_eye_prod }
+    - { role: consul_pg,
+        instance_name: incentive_service_prod }
+    - { role: consul_pg,
+        instance_name: marketing_rt_rpt_prod }
+    - { role: consul_pg,
+        instance_name: confluence_prod }
+    - { role: consul_pg,
+        instance_name: partner_abst_prod }
+    - { role: consul_pg,
+        instance_name: goods_product_cat_prod }
+    - { role: consul_pg,
+        instance_name: clusteragg_prod }
+    - { role: consul_pg,
+        instance_name: goods_mkt_orders_prod }
+    - { role: consul_pg,
+        instance_name: goods_sem_prod }
+    - { role: consul_pg,
+        instance_name: darwin_indexer_prod }
+    - { role: consul_pg,
+        instance_name: goods_mkt_pric_prod }
+    - { role: consul_pg,
+        instance_name: gls_datamart_prod }
+    - { role: consul_pg,
+        instance_name: orchestrator_prod }
+    - { role: consul_pg,
+        instance_name: gstream_prod }
+    - { role: consul_pg,
+        instance_name: qed_prod }
+    - { role: consul_pg,
+        instance_name: crs_prod }
+    - { role: consul_pg,
+        instance_name: tx_ledger_prod }
+    - { role: consul_pg,
+        instance_name: message_ledger_prod }
+- hosts: gds_snc1_prod_db012
+  become: yes
+  roles:
+    - { role: consul_pg,
+        instance_name: gds_stg_all }
+- hosts: gds_snc1_prod_db014
+  become: yes
+  roles:
+    - { role: consul_pg,
+        instance_name: facebook_auto_prod }
+    - { role: consul_pg,
+        instance_name: crowd_prod }
+    - { role: consul_pg,
+        instance_name: oxygen_prod }
+    - { role: consul_pg,
+        instance_name: snap_products_prod }
+    - { role: consul_pg,
+        instance_name: content_assembly_prod }
+    - { role: consul_pg,
+        instance_name: nozilla_prod }
+    - { role: consul_pg,
+        instance_name: seo_cont_opt_prod }
+    - { role: consul_pg,
+        instance_name: menu_service_prod }
+    - { role: consul_pg,
+        instance_name: psu_orchestrator_prod }
+    - { role: consul_pg,
+        instance_name: local_3rd_party_prod }
+    - { role: consul_pg,
+        instance_name: hris_prod }
+    - { role: consul_pg,
+        instance_name: pay_groupon_prod }
+    - { role: consul_pg,
+        instance_name: brands_prod }
+    - { role: consul_pg,
+        instance_name: merchant_access_prod }
+    - { role: consul_pg,
+        instance_name: merchant_notif_prod }
+    - { role: consul_pg,
+        instance_name: merchant_analyt_prod }
+    - { role: consul_pg,
+        instance_name: snap_api_prod }
+    - { role: consul_pg,
+        instance_name: goods_invoicing_prod }
+    - { role: consul_pg,
+        instance_name: goods_apac_ci_prod }
+    - { role: consul_pg,
+        instance_name: proximityindexer_prod }
+- hosts: gds_snc1_prod_db016
+  become: yes
+  roles:
+    - { role: consul_pg,
+        instance_name: glob_subs_prod }
+- hosts: gds_snc1_prod_db018
+  become: yes
+  roles:
+    - { role: consul_pg,
+        instance_name: eng_points_prod }
+- hosts: gds_snc1_prod_db020
+  become: yes
+  roles:
+    - { role: consul_pg,
+        instance_name: rainbow_prod }
+- hosts: gds_snc1_stg_db011
+  become: yes
+  roles:
+    - { role: consul_pg,
+        instance_name: snap_products_uat }
+    - { role: consul_pg,
+        instance_name: snap_products_stg }
+    - { role: consul_pg,
+        instance_name: gdt_search_stg }
+    - { role: consul_pg,
+        instance_name: gdt_search_uat }
+    - { role: consul_pg,
+        instance_name: editorial_cont_uat }
+    - { role: consul_pg,
+        instance_name: pay_groupon_api_uat }
+    - { role: consul_pg,
+        instance_name: goods_mkt_pric_uat }
+    - { role: consul_pg,
+        instance_name: im_push_uat }
+    - { role: consul_pg,
+        instance_name: menu_service_uat }
+    - { role: consul_pg,
+        instance_name: seo_cont_opt_stg }
+    - { role: consul_pg,
+        instance_name: menu_service_stg }
+    - { role: consul_pg,
+        instance_name: local_3rd_party_stg }
+    - { role: consul_pg,
+        instance_name: pay_with_groupon_stg }
+    - { role: consul_pg,
+        instance_name: brands_uat }
+    - { role: consul_pg,
+        instance_name: brands_stg }
+    - { role: consul_pg,
+        instance_name: reading_rainbow_stg }
+    - { role: consul_pg,
+        instance_name: goods_mkt_pric_stg }
+    - { role: consul_pg,
+        instance_name: quantumlead_stg }
+    - { role: consul_pg,
+        instance_name: marketplace_ugc_stg }
+    - { role: consul_pg,
+        instance_name: marketplace_ugc_uat }
+    - { role: consul_pg,
+        instance_name: gls_datamart_stg }
+    - { role: consul_pg,
+        instance_name: orchestrator_stg }
+    - { role: consul_pg,
+        instance_name: snap_api_uat }
+    - { role: consul_pg,
+        instance_name: snap_api_stg }
+- hosts: gds_snc1_stg_db022
+  become: yes
+  roles:
+    - { role: consul_pg,
+        instance_name: im_push_stg }
+    - { role: consul_pg,
+        instance_name: orchestrator_uat }
+    - { role: consul_pg,
+        instance_name: points_uat }
+    - { role: consul_pg,
+        instance_name: points_stg }
+    - { role: consul_pg,
+        instance_name: mds_uat }
+    - { role: consul_pg,
+        instance_name: audience_service_stg }
+    - { role: consul_pg,
+        instance_name: gstream_stg }
+    - { role: consul_pg,
+        instance_name: ci_apac_uat }
+    - { role: consul_pg,
+        instance_name: qed_uat }
+    - { role: consul_pg,
+        instance_name: qed_stg }
+    - { role: consul_pg,
+        instance_name: fba_stg }
+    - { role: consul_pg,
+        instance_name: goods_invoice_uat }
+    - { role: consul_pg,
+        instance_name: goods_invoice_stg }
+    - { role: consul_pg,
+        instance_name: ondemand_backend_stg }
+    - { role: consul_pg,
+        instance_name: spaceman_tpis_uat }
+    - { role: consul_pg,
+        instance_name: proximityindexer_uat }
+    - { role: consul_pg,
+        instance_name: proximityindexer_stg }
+    - { role: consul_pg,
+        instance_name: fed_ledger_uat }
+    - { role: consul_pg,
+        instance_name: fed_ledger_stg }
+    - { role: consul_pg,
+        instance_name: compass_stg }
+    - { role: consul_pg,
+        instance_name: merchant_spl_stg }
+    - { role: consul_pg,
+        instance_name: msg_to_ledger_uat }
+    - { role: consul_pg,
+        instance_name: god_dashboard_stg }
+    - { role: consul_pg,
+        instance_name: filippos_test }
+    - { role: consul_pg,
+        instance_name: crs_uat }
+    - { role: consul_pg,
+        instance_name: msg_to_ledger_stg }

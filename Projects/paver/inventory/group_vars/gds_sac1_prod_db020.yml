@@ -1,0 +1,18 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.32.86.236 # gds-sac1-prod-db020m1
+  - 10.32.86.237 # gds-sac1-prod-db020s1
+  - 10.32.80.236 # gds-sac1-prod-db020m1
+  - 10.32.80.237 # gds-sac1-prod-db020s1
+
+gds_instance_group: gds_prod_sac1_db020
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+# List of all GDS instances in this timeline
+# List of all GDS instances in this timeline
+gds_instances:
+  #rainbow_prod: #Decomm GDS-34366

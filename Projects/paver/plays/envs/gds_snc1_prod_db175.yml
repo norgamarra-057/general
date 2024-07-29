@@ -1,0 +1,6 @@
+---
+- hosts: gds_snc1_prod_db175
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: pwa_prod }

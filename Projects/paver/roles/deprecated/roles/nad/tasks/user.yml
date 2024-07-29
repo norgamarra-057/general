@@ -1,0 +1,20 @@
+---
+- name: nad | group | FreeBSD
+  group:
+     name="{{ nad_groupname }}"
+     state="present"
+
+- name: nad | user
+  user:
+    name="{{ nad_username }}"
+    state='present'
+    home="{{ nad_service_dir }}"
+    comment="Circonus NAD agent"
+    uid="{{ nad_uid }}"
+    group="{{ nad_groupname }}"
+    append="yes"
+
+- name: nad | group | FreeBSD (check)
+  command: /usr/bin/id -g {{ nad_groupname }}
+  register: gid_nad
+  when: ansible_os_family == 'FreeBSD'

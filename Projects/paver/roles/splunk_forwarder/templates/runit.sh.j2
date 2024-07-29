@@ -1,0 +1,7 @@
+#!/bin/sh --
+exec 2>&1
+exec \
+    /usr/bin/env -i \
+    /usr/local/sbin/chpst -v \
+        -u splunk:{{ users['splunk'].group }} \
+    ./run2

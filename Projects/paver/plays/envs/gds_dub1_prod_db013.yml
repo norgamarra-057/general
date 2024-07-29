@@ -1,0 +1,6 @@
+---
+- hosts: gds_dub1_prod_db013
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: orders_msg_prod }

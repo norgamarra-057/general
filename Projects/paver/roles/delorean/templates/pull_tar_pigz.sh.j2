@@ -1,0 +1,41 @@
+#!/bin/sh --
+
+exec 1>>{{ delorean_base_dir }}/logs/{{ item.0 }}.log 2>&1
+set -e
+umask 0027
+echo "`date "+%Y-%m-%d %H:%M:%S"` - starting backup of {{ item.0 }}:{{ item.1.directory }}"
+
+/usr/bin/lockf -t {{ delorean_lock_timeout }} "{{ delorean_lock_dir }}/{{ item.0 }}.lock" \
+  /usr/bin/ssh \
+    -c arcfour \
+    -o BatchMode=yes \
+    -o StrictHostKeyChecking=no \
+    -i {{ delorean_private_keys_dir }}/{{ item.1.target }}.key \
+  {{ item.0 }} \
+    "(tar --totals --to-stdout -c {{ item.1.directory }} | /usr/local/bin/pigz -c -6 --processes 6)" 1> "{{ delorean_base_dir }}/pools/{{ item.1.pool }}/{{ item.1.target }}/{{ item.0 }}/{{ item.0 }}.tar.gz"
+result=$?
+
+if [ $result -eq 0 ]; then
+  echo "`date "+%Y-%m-%d %H:%M:%S"` - completed backup of {{ item.0 }}:{{ item.1.directory }}"
+else
+  echo "`date "+%Y-%m-%d %H:%M:%S"` - backup FAILED for {{ item.0 }}:{{ item.1.directory }}"
+fi
+
+exit $result
+# create snapshot with retention of 30 days and every month for 2 years.
+# date +"%d"
+#if [ `date +"%d"` = '01' ]; then
+#echo "take a monthly with 2 year retention"
+#zfSnap -e -a 2y -R  tank/var/groupon/delorean/pools/{{ item.1.pool }}/{{ item.1.zfs_fs }}
+#else
+#echo "take a daily with one month(30 days) retention"
+#zfSnap -e -a 1m -R tank/var/groupon/delorean/pools/{{ item.1.pool }}/{{ item.1.zfs_fs }}
+#fi
+
+#result=$?
+#if [ $result -eq 0 ]; then
+#  echo "`date "+%Y-%m-%d %H:%M:%S"` - sanpshot successful {{ item.0 }}:{{ item.1.directory }}"
+#else
+#  echo "`date "+%Y-%m-%d %H:%M:%S"` - snapshot  FAILED for {{ item.0 }}:{{ item.1.directory }}"
+#fi
+#

@@ -1,0 +1,51 @@
+1 - result=$(psql -p $Port -AtF ";" -U postgres -c "select (sum(idx_blks_hit) - sum(idx_blks_read)) / sum(idx_blks_hit) as index_hit_ratiofrom pg_statio_user_indexes;")
+2 - select case when (pg_is_in_recovery()='t') then 50 else 500 end;
+3 - select count(*) from pg_locks where granted='f';
+4 - SELECT pg_xlog_location_diff(write_location, replay_location) AS result FROM pg_catalog.pg_stat_replication WHERE application_name = 'walreceiver' ORDER BY 1 DESC LIMIT 1;
+5 - select case when ((select count(*) from pg_stat_replication) >0) then (select pg_xlog_location_diff(write_location, replay_location) as result from pg_catalog.pg_stat_replication where application_name = 'walreceiver' order by 1 desc limit 1) else 1500000000 end;"
+6 - select case when pg_last_xlog_receive_location() = pg_last_xlog_replay_location() then 0 else extract (epoch from now() - pg_last_xact_replay_timestamp())::integer end as replication_lag_slave;"
+7 - select case when ((select count(*) from pg_stat_activity where state='idle in transaction') >0) then (select extract(epoch from (now() - xact_start)) as result from pg_stat_activity where state='idle in transaction' order by xact_start asc limit 1) else 0 end;
+8 - select case when ((select count(*) from pg_stat_activity where state not in ('idle','idle in transaction') and query not ilike '%vacuum%' and pid <> pg_backend_pid()) > 0) then (select extract(epoch from (now() - xact_start)) as result from pg_stat_activity where state not in ('idle','idle in transaction') and query not ilike '%vacuum%' order by xact_start asc limit 1) else 0 end"
+9 - select count(*) from pg_stat_activity where waiting;"
+10 - select max(age(datfrozenxid)) from pg_database;
+
+
+11 - select (sum(idx_blks_hit) - sum(idx_blks_read)) / sum(idx_blks_hit) as index_hit_ratiofrom pg_statio_user_indexes;
+
+-rwxr-xr-x  1 root  wheel  1699 May 13 14:20 check_db_hitratio_indexes*
+-rwxr-xr-x  1 root  wheel  1399 May 13 14:20 check_db_is_slave*
+-rwxr-xr-x  1 root  wheel  1638 May 13 14:20 check_db_locks_not_g*
+-rwxr-xr-x  1 root  wheel  1811 Apr 30 10:04 check_db_replication_delay*
+-rwxr-xr-x  1 root  wheel  1903 May 13 14:20 check_db_replication_delay_master*
+-rwxr-xr-x  1 root  wheel  1771 May 13 14:20 check_db_replication_delay_slave*
+-rwxr-xr-x  1 root  wheel  1823 May 13 14:20 check_db_txn_idle*
+-rwxr-xr-x  1 root  wheel  1942 May 13 14:20 check_db_txn_time*
+-rwxr-xr-x  1 root  wheel  1621 May 13 14:20 check_db_waiting_q*
+-rwxr-xr-x  1 root  wheel  1592 May 13 14:20 check_db_wraparound*
+
+
+
+
+
+
+
+	OUTPUT="$(echo "select state, count(*) from pg_stat_activity group by state;" |\
+	su - $USER -c "psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -d postgres -A -t -F' '" 2>/dev/null)"
+	real_output=$(echo "$OUTPUT" | grep -E "^active [0-9]+|^idle [0-9]+" | sed -e "s/active/f/" -e "s/idle/t/g")
+
+if [ ! "$(echo "$real_output" | grep -E "^f")" ]; then
+                echo "f 9999999999"
+		echo "$real_output" | tr -d '\n'
+        else
+                echo "$real_output"
+        fi
+        if [ ! "$(echo "$real_output" | grep -E "^t")" ]; then
+                echo "t 0"
+        fi
+done
+
+echo '<<<postgres_stat_database_multi:sep(59)>>>'
+echo 'datid;datname;numbackends;xact_commit;xact_rollback;blks_read;blks_hit;tup_returned;tup_fetched;tup_inserted;tup_updated;tup_deleted;datsize'
+for Port in $Ports; do
+	echo 'select datid, datname, numbackends, xact_commit, xact_rollback, blks_read, blks_hit, tup_returned, tup_fetched, tup_inserted,
+tup_updated, tup_deleted, pg_database_size(datname) "datsize" from pg_stat_database;' \

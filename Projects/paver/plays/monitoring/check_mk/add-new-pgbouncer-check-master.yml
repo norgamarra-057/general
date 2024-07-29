@@ -1,0 +1,75 @@
+---
+- name: Parent tree
+  become: true
+  hosts:
+    - '{{ target_host }}'
+  tasks:
+    - name: Create User
+      command: psql -U postgres -p {{ target_port }} -c "CREATE USER gdsmon password 'gds123123' NOSUPERUSER NOINHERIT NOCREATEDB NOCREATEROLE connection limit 0"
+      register: db_user_creation
+    - debug: var=db_user_creation.stdout
+
+    - name: Create .pgpass file
+      command: touch ~/.pgpass
+
+    - name: set proper mode for the .pgpass file
+      command: chmod 0600 ~/.pgpass
+
+    - name: Create config for the .pgpass file
+      lineinfile: dest=~/.pgpass line="localhost:*:pgbouncer:gdsmon:gds123123"
+
+    - name: Copy checks1
+      copy:
+        src: ../../../roles/check_mk/files/checks/postgresql/check_db_pgbouncer_maxwait
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy checks2
+      copy:
+        src: ../../../roles/check_mk/files/checks/postgresql/check_db_pgbouncer_generic
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy check3
+      copy:
+        src: ../../../roles/check_mk/files/checks/postgresql/check_db_pgbouncer_backends
+        dest: "/var/groupon/check_mk/checks/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy new perl script
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/custom/check_postgres_new.pl
+        dest: "/usr/local/bin/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy local1
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_pgb_trx_maxwait.sh
+        dest: "/usr/lib/check_mk_agent/local/360/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy local2
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_pgb_trx_generic.sh
+        dest: "/usr/lib/check_mk_agent/local/360/"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: Copy local3
+      copy:
+        src: ../../../roles/check_mk/files/locals/postgresql/common/postgres_db_pgb_trx_backends.sh
+        dest: "/usr/lib/check_mk_agent/local/360/"
+        owner: root
+        group: wheel
+        mode: 0655

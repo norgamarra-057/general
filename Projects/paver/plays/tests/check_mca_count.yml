@@ -1,0 +1,14 @@
+---
+- name: Check and report memory errors
+  hosts: gds_all
+  become: true
+  tasks:
+    - name: Look for erros in messages
+      shell: 'sysctl -n hw.mca.count'
+      register: hw_mca_count
+      changed_when: false
+      always_run: true
+      failed_when: false
+
+    - fail: msg="This host has MCEs"
+      when: hw_mca_count is defined and hw_mca_count.stdout|int > 0

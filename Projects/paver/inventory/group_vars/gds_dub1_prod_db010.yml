@@ -1,0 +1,22 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.13.110.248 # gds-dub1-prod-db010m1
+  - 10.13.110.249 # gds-dub1-prod-db010s1
+  - 10.13.184.248 # gds-dub1-prod-db010m1
+  - 10.13.184.249 # gds-dub1-prod-db010s1
+
+gds_instance_group: gds_prod_dub1_db010
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+# List of all GDS instances in this timeline
+gds_instances:
+ # incentive_prod: # GDS-5042  # __SOX__ decom GPROD-247268
+  #grafana_prod: # GDS-4659 #Decom #GDS-35834
+  #regla_prod: # GDS-4763 #Decom #GDS-35834
+   # mana_prod: # GDS-5042  # __SOX__#Decom #GDS-32761
+  #cdapi_prod: # GDS-11223 #Decom #GDS-35834
+# Take care about the next postgresql port the instance incentive_prod use 20018 - 20020 

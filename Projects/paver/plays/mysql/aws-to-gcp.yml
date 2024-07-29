@@ -1,0 +1,56 @@
+---
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Assert that required parameters are set
+      assert:
+        that:
+          - srcpoint is defined
+          - src_dbs is defined
+          - endpoint is defined
+
+    - name: Assert that additional parameters are set, if skip_users is not set
+      assert:
+        that:
+          - src_users is defined
+      when: skip_users is not defined or (skip_users|upper != "YES" or skip_users == False)
+
+- name: AWS To Cloud Copy
+  gather_facts: true
+  become: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Check if running from AWS EC2 instance
+      uri:
+        url: http://169.254.169.254/latest/meta-data
+        timeout: 2
+      register: aws_uri_check
+      failed_when: False
+
+    - set_fact:
+        is_aws_environment: "{{ aws_uri_check.status == 200 }}"
+
+    - name: Check if running from GCP instance
+      when: not is_aws_environment
+      shell: "curl -H 'Metadata-Flavor: Google' http://metadata.google.internal/computeMetadata/v1/instance/"
+      register: gcp_uri_check
+      failed_when: False 
+
+    - set_fact:
+        is_gcp_environment: "{{ gcp_uri_check.rc | default(0) == 0 }}"
+
+    - name: Debug environment
+      debug:
+        msg: "Running on {{ 'AWS' if is_aws_environment else 'GCP' if is_gcp_environment else 'Unknown' }} environment"
+
+    - name: Fail if not running on AWS or GCP
+      fail:
+        msg: "Play can only run from an AWS EC2 instance or GCP Compute instance"
+      when: not (is_aws_environment or is_gcp_environment)
+
+    - name: 
+      include_role:
+        name: gds_aws_to_gcp 

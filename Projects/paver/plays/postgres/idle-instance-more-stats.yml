@@ -1,0 +1,62 @@
+---
+- name: Master
+  become: true
+  hosts:
+    - '{{ master_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - master_host is defined
+          - instance is defined
+          - slave_host is defined
+
+    - name: Get pgbouncer trx stats
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select * from dba.pgbouncer_trx_stats where database!='pgbouncer'"
+      register: pgb_trx_stats
+    - debug: var=pgb_trx_stats.stdout
+
+    - name: Get pgbouncer ses stats
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select * from dba.pgbouncer_ses_stats where database!='pgbouncer'"
+      register: pgb_ses_stats
+    - debug: var=pgb_ses_stats.stdout
+
+    - name: Get db stats
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select xact_commit,xact_rollback,conflicts,temp_files,deadlocks from pg_stat_database where datname='{{ gds_instances[instance].dbnames.0 }}'"
+      register: db_stats
+    - debug: var=db_stats.stdout
+
+    - name: Get db size
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select pg_size_pretty(pg_database_size('{{ gds_instances[instance].dbnames.0 }}'))"
+      register: db_size
+    - debug: var=db_size.stdout
+
+    - name: Get last vacuum/analyze 
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select max(last_autovacuum) as last_vacuum,max(last_autoanalyze) as last_analyze from pg_catalog.pg_stat_user_tables ; "
+      register: db_vac_an
+    - debug: var=db_vac_an.stdout
+
+
+
+- name: Slave
+  become: true
+  hosts:
+    - '{{ slave_host }}'
+  tasks:
+
+
+    - name: Get pgbouncer trx stats
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select * from dba.pgbouncer_trx_stats where database!='pgbouncer'" 
+      register: pgb_trx_stats
+    - debug: var=pgb_trx_stats.stdout
+
+    - name: Get pgbouncer ses stats
+      command: psql -U postgres -A -t -d {{ gds_instances[instance].dbnames.0 }} -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select * from dba.pgbouncer_ses_stats where database!='pgbouncer'"
+      register: pgb_ses_stats
+    - debug: var=pgb_ses_stats.stdout
+
+    - name: Get db stats
+      command: psql -U postgres -A -t -d postgres -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select xact_commit,xact_rollback,conflicts,temp_files,deadlocks from pg_stat_database where datname='{{ gds_instances[instance].dbnames.0 }}'"
+      register: db_stats
+    - debug: var=db_stats.stdout
+

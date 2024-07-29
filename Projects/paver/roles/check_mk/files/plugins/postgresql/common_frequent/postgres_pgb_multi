@@ -1,0 +1,100 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_pgb_ses_multi>>>'
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        OUTPUT="$(echo "SELECT database,
+                        sum(cl_active) as client_active,
+                        sum(cl_waiting) as client_waiting,
+                        sum(sv_active) as server_active,
+                        sum(sv_idle) as server_idle,
+                        sum(sv_used) as server_used,
+                        sum(sv_tested) as server_tested,
+                        sum(sv_login) as server_login,
+                        sum(maxwait) as maxwait
+                        FROM dba.pgbouncer_ses_pools
+                        WHERE database = '${dbname}'
+                        GROUP BY 1;" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -d $dbname -A -t -F' ' 2>/dev/null)"
+        echo "$OUTPUT"
+        sleep 0.5
+done
+
+echo '<<<postgres_pgb_trx_multi>>>'
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        OUTPUT="$(echo "SELECT database,
+                        sum(cl_active) as client_active,
+                        sum(cl_waiting) as client_waiting,
+                        sum(sv_active) as server_active,
+                        sum(sv_idle) as server_idle,
+                        sum(sv_used) as server_used,
+                        sum(sv_tested) as server_tested,
+                        sum(sv_login) as server_login,
+                        sum(maxwait) as maxwait
+                        FROM dba.pgbouncer_trx_pools
+                        WHERE database = '${dbname}'
+                        GROUP BY 1;" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -d $dbname -A -t -F' ' 2>/dev/null)"
+        echo "$OUTPUT"
+        sleep 0.5
+done
+
+stamp=$(date +%s)
+lifetime=$(realpath $0 | egrep -o "[0-9]+")
+
+if [[ -z "${lifetime}" ]]; then
+  lifetime=60
+else
+  lifetime=$((lifetime * 2))
+fi
+
+echo "<<<postgres_pgb_ses_stats_multi:cached(${stamp},${lifetime})>>>"
+echo "measured_at ${stamp}"
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        OUTPUT="$(echo "SELECT *
+                        FROM dba.pgbouncer_ses_stats
+                        WHERE database = '${dbname}';" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -d $dbname -A -t -F' ' 2>/dev/null)"
+        echo "$OUTPUT"
+        sleep 0.5
+done
+
+stamp=$(date +%s)
+
+echo "<<<postgres_pgb_trx_stats_multi:cached(${stamp},${lifetime})>>>"
+echo "measured_at ${stamp}"
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        OUTPUT="$(echo "SELECT *
+                        FROM dba.pgbouncer_trx_stats
+                        WHERE database = '${dbname}';" |\
+        psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -d $dbname -A -t -F' ' 2>/dev/null)"
+        echo "$OUTPUT"
+        sleep 0.5
+done

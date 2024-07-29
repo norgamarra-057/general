@@ -1,0 +1,5 @@
+---
+- include_tasks: FreeBSD.yml
+  tags:
+    - linux-compat
+  when: ansible_os_family == 'FreeBSD'

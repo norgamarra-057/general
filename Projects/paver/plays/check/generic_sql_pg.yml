@@ -1,0 +1,33 @@
+---
+- name: Generic pg sql
+  hosts: gds_all
+  become: yes
+  tasks:
+    - assert:
+        that:
+          - query is defined
+
+
+    - name: Copy check pg size and version
+      copy:
+        src: "../../roles/check_mk/files/checks/postgresql/check_pg_generic"
+        dest: "/usr/lib/check_mk_agent/check_pg_generic"
+        owner: root
+        group: wheel
+        mode: 0655
+
+    - name: pg var
+      shell: "echo {{ query }} "
+      changed_when: false
+      register: pg_g
+      ignore_errors: yes
+
+    - debug: var=pg_g.stdout_lines
+
+    - name: pg generic execution
+      shell: /compat/linux/bin/bash /usr/lib/check_mk_agent/check_pg_generic -q "{{ query }}"
+      changed_when: false
+      register: pg_generic
+      ignore_errors: no
+
+    - debug: var=pg_generic.stdout_lines

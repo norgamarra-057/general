@@ -1,0 +1,26 @@
+---
+- include_tasks: keygen.yml tags=keygen
+
+- name: Remote delorean directory
+  file: path="/var/groupon/delorean" state=directory mode=0755 owner=root group=wheel
+
+- name: Remote delorean MySQL DB Backups Directory
+  file: path="/var/groupon/delorean/mysql_db_backups" state=directory mode=0700 owner=root group=wheel
+
+- name: Install delorean MySQL SSH Key
+  copy: content="{{ mysql_db_backup_keys[inventory_hostname].private }}\n" dest="/var/groupon/delorean/mysql_db_backups/delorean01.snc1.key" mode=0600 owner=root group=wheel
+  when: "'private' in mysql_db_backup_keys[inventory_hostname]"
+
+- name: Create delorean backup script
+  template: src="mysql_backup.sh.j2" dest="/var/groupon/delorean/mysql_db_backups/innobackupex_to_delorean01.snc1.sh" mode=0700 owner=root group=wheel
+
+- name: crontab entry for mysql backup
+  cron:
+    name="MySQL backup script"
+    state=present
+    user=root
+    weekday="7"
+    hour="5"
+    minute="1"
+    cron_file="delorean_mysql_backup.cron"
+    job="/var/groupon/delorean/mysql_db_backups/innobackupex_to_delorean01.snc1.sh"

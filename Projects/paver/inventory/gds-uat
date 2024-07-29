@@ -1,0 +1,128 @@
+###
+### BEGIN: gds_uat_mysql_*
+###
+[gds_uat_mysql_masters_dub1]
+# empty
+
+[gds_uat_mysql_masters_snc1]
+# empty
+
+[gds_uat_mysql_masters_snc2]
+# empty
+
+[gds_uat_mysql_slaves_dub1]
+# empty
+
+[gds_uat_mysql_slaves_snc1]
+# empty
+
+[gds_uat_mysql_slaves_snc2]
+# empty
+
+[gds_uat_mysql_masters:children]
+gds_uat_mysql_masters_dub1
+gds_uat_mysql_masters_snc1
+gds_uat_mysql_masters_snc2
+
+[gds_uat_mysql_slaves:children]
+gds_uat_mysql_slaves_dub1
+gds_uat_mysql_slaves_snc1
+gds_uat_mysql_slaves_snc2
+
+[gds_uat_mysql:children]
+gds_uat_mysql_masters
+gds_uat_mysql_slaves
+
+
+
+###
+### BEGIN: gds_uat_postgresql_*
+###
+[gds_uat_postgresql_masters_dub1]
+# empty
+
+[gds_uat_postgresql_masters_snc1]
+# empty
+
+[gds_uat_postgresql_masters_snc2]
+# empty
+
+[gds_uat_postgresql_slaves_dub1]
+# empty
+
+[gds_uat_postgresql_slaves_snc1]
+# empty
+
+[gds_uat_postgresql_slaves_snc2]
+# empty
+
+[gds_uat_postgresql_masters:children]
+gds_uat_postgresql_masters_dub1
+gds_uat_postgresql_masters_snc1
+gds_uat_postgresql_masters_snc2
+
+[gds_uat_postgresql_slaves:children]
+gds_uat_postgresql_slaves_dub1
+gds_uat_postgresql_slaves_snc1
+gds_uat_postgresql_slaves_snc2
+
+[gds_uat_postgresql:children]
+gds_uat_postgresql_masters
+gds_uat_postgresql_slaves
+
+[gds_postgresql:children]
+gds_uat_postgresql
+
+
+###
+### BEGIN: GDS-wide aggregate groups
+###
+[gds_uat_masters:children]
+gds_uat_mysql_masters
+gds_uat_postgresql_masters
+
+[gds_uat_slaves:children]
+gds_uat_mysql_slaves
+gds_uat_postgresql_slaves
+
+[gds_uat_dbs:children]
+gds_uat_masters
+gds_uat_slaves
+
+[gds_uat_all:children]
+gds_uat_dbs
+
+[gds_all:children]
+gds_uat_all
+
+[FreeBSD:children]
+gds_uat_all
+
+[FreeBSD:vars]
+ansible_python_interpreter=/usr/local/bin/python2.7
+
+
+###
+### BEGIN: GDS-replication domain groups
+###
+[gds_uat_snc1_db001]
+# empty
+
+
+[dc_dub1_uat:children]
+gds_uat_mysql_masters_dub1
+gds_uat_mysql_slaves_dub1
+gds_uat_postgresql_masters_dub1
+gds_uat_postgresql_slaves_dub1
+
+[dc_snc1_uat:children]
+gds_uat_mysql_masters_snc1
+gds_uat_mysql_slaves_snc1
+gds_uat_postgresql_masters_snc1
+gds_uat_postgresql_slaves_snc1
+
+[dc_snc2_uat:children]
+gds_uat_mysql_masters_snc2
+gds_uat_mysql_slaves_snc2
+gds_uat_postgresql_masters_snc2
+gds_uat_postgresql_slaves_snc2

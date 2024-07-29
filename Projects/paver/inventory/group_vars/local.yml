@@ -1,0 +1,107 @@
+---
+host_admins: []
+host_packages: []
+host_packages_legacy: []
+host_zfs: []
+host_zfsnap: []
+system_accounts: []
+
+users:
+# Alphabetically sort by username. UID/GIDs taken from
+# ops-config/etc/users.txt.
+  alock:
+    gid: 1753
+    name: Alex Lock
+    ssh_key: "{{ lookup('file', 'alock.pub') }}"
+    uid: 1753
+  c_mboehm:
+    gid: 2210
+    name: Matthew Boehm
+    ssh_key: "{{ lookup('file', 'c_mboehm.pub') }}"
+    uid: 2210
+  c_pboros:
+    gid: 3014
+    name: Peter Boros
+    ssh_key: "{{ lookup('file', 'c_pboros.pub') }}"
+    uid: 3014
+  rbarabas:
+    gid: 3321
+    name: Robert Barabas
+    ssh_key: "{{ lookup('file', 'rbarabas.pub') }}"
+    uid: 3321
+  c_dguzmanburgos:
+    gid: 3514
+    name: Daniel Guzman Burgos
+    ssh_key: "{{ lookup('file', 'c_dguzmanburgos.pub') }}"
+    uid: 3514
+  c_dducos:
+    gid: 3515
+    name: David Ducos
+    ssh_key: "{{ lookup('file', 'c_dducos.pub') }}"
+    uid: 3515
+  chschneider:
+    gid: 2701
+    name: Chris Schneider
+    ssh_key: "{{ lookup('file', 'chschneider.pub') }}"
+    uid: 2701
+  fkalamidas:
+    gid: 2959
+    name: Flippos Kalamidas
+    ssh_key: "{{ lookup('file', 'fkalamidas.pub') }}"
+    uid: 2959
+  glopezfernandez:
+    gid: 3103
+    name: Gerardo Lopezfernandez
+    ssh_key: "{{ lookup('file', 'glopezfernandez.pub') }}"
+    uid: 3103
+  jdoenhardt:
+    gid: 1908 
+    name: Juergen Doenhardt
+    ssh_key: "{{ lookup('file', 'jdoenhardt.pub') }}"
+    uid: 1908
+  jonathon:
+    gid: 1778
+    name: Jonathon Jenkins
+    ssh_key: "{{ lookup('file', 'jonathon.pub') }}"
+    uid: 1778
+  jose.finotto:
+    gid: 2098
+    name: Jose Finotto
+    ssh_key: "{{ lookup('file', 'jose.finotto.pub') }}"
+    uid: 2098
+  juan:
+    gid: 1518
+    name: Juan Rodriquez
+    ssh_key: "{{ lookup('file', 'juan.pub') }}"
+    uid: 1518
+  msubramanian:
+    gid: 2980
+    name: Mani Subramanian
+    ssh_key: "{{ lookup('file', 'msubramanian.pub') }}"
+    uid: 2980
+  pablo:
+    gid: 1215
+    name: Pablo Bustos
+    ssh_key: "{{ lookup('file', 'pablo.pub') }}"
+    uid: 1215
+  rolando:
+    gid: 1755
+    name: Rolando Ruiz
+    ssh_key: "{{ lookup('file', 'rolando.pub') }}"
+    uid: 1755
+  rpenugonda:
+    gid: 3245
+    name: Ramesh Penugonda
+    ssh_key: "{{ lookup('file', 'rpenugonda.pub') }}"
+    uid: 3245
+  schittenden:
+    gid: 2851
+    name: Sean Chittenden
+    ssh_key: "{{ lookup('file', 'schittenden.pub') }}"
+    uid: 2851
+  splunk:
+    gid: 545
+    name: Splunk System Account
+    homedir: /var/groupon/splunk
+    homedir_mode: 0755
+    uid: 545

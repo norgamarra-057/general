@@ -1,0 +1,38 @@
+---
+- name: Fix mgmt scripts GDS-9312 and GDS-9767
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Only excute all tasks if mi.sh exists
+      stat: 
+        path: "/usr/local/sbin/mi.sh"
+      register: mi
+
+    - name: Push mi.sh
+      copy:
+        src: "../../roles/gds-mysql-scripts/files/mgmt/mi.sh"
+        dest: "/usr/local/sbin/mi.sh"
+        owner: root
+        group: wheel
+        mode: 0750
+      when: mi.stat.exists
+
+    - name: Fix permissions of all mgmt scripts
+      file:
+        path: "/usr/local/sbin/{{ item }}"
+        owner: root
+        group: wheel
+        mode: 0750
+      with_items: 
+        - mi.sh
+        - list_instances
+        - select_instance
+        - unselect_instance
+        - current_instance
+        - xselect_instance
+        - failover_vips.sh
+        - make_rw
+        - make_ro
+      ignore_errors: true
+      when: mi.stat.exists

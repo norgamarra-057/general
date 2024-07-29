@@ -1,0 +1,22 @@
+---
+- name: ifconfig Check 
+  hosts: gds_all
+  become: yes
+- name: Check params
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - vlanid is defined
+          - vhid is defined
+
+    - name: set ipconfig vlan vhid status backup
+      shell: " ifconfig  {{ vlanid }} vhid {{vhid}} state backup"
+      register: instances_status
+
+    - name: ipconfig status
+      shell: " ifconfig"
+      register: ipconfig_status
+
+    - debug: var=ipconfig_status.stdout_lines

@@ -1,0 +1,30 @@
+---
+- name: nad | OS-specific variables
+  tags:
+    - nad
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "../defaults/{{ ansible_os_family }}.yml"
+    - "../defaults/defaults.yml"
+
+- name: nad | derived variables
+  tags:
+    - nad
+  include_vars: derived_vars.yml
+
+- name: nad | service account
+  tags:
+    - nad
+  include_tasks: user.yml
+
+- name: nad | install
+  tags:
+    - nad
+  include_tasks: FreeBSD.yml tags=nad
+  when: ansible_os_family == 'FreeBSD' and gds_repo.find('package_archives') == -1
+
+- name: nad | runit
+  tags:
+    - nad
+  include_tasks: runit.yml tags=nad
+  when: gds_repo.find('package_archives') == -1

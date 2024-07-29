@@ -1,0 +1,2 @@
+binlog_streamer_temp_service_dir: /var/svc/tmp/gds-binlog-streamer_{{ stream_name }}
+binlog_streamer_service_dir: /var/service/gds-binlog-streamer_{{ stream_name }}

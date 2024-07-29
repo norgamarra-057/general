@@ -1,0 +1,55 @@
+---
+- name: Daas part 1
+  gather_facts: False
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+          - aws_host is defined
+
+    - set_fact:
+        my_first_db={{ gds_instances[instance].dbnames.0 }}
+
+    - set_fact:
+        my_db_name: '{{ my_first_db }}'
+      when: db is not defined
+
+    - set_fact:
+        my_db_name: '{{ db }}'
+      when: db is defined
+
+- name: Aws part 
+  gather_facts: False
+  become: true
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+    - set_fact:
+        my_db_name: "{{ hostvars[daas_host]['my_db_name'] }}"
+
+    - name: Drop subscription
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -c "select pglogical.drop_subscription('{{ my_db_name }}_rds_pg10_subscription')"
+
+    - name: Drop node
+      shell: psql -U gds_admin -d {{ my_db_name }} -p 5432 -h {{ aws_host }} -c "select pglogical.drop_node('{{ my_db_name }}_rds_pg10_subscriber')"
+
+    - name: Wait till no more pglogical sessions
+      shell: psql -U gds_admin -d postgres -At -p 5432 -h {{ aws_host }} -c "select count(*) from pg_stat_activity where datname='{{ my_db_name }}' and application_name like 'pglogical%'"
+      register: running_pglogical_ses
+      until: running_pglogical_ses.stdout|int == 0
+      retries: 1000
+      delay: 1
+
+    - name: Kill my sessions
+      shell: psql -U gds_admin -d postgres -At -p 5432 -h {{ aws_host }} -c "select pg_terminate_backend(pid) from pg_stat_activity where datname='{{ my_db_name }}' and usename='gds_admin'"
+
+    - name: Drop database
+      shell: psql -U gds_admin -d postgres -p 5432 -h {{ aws_host }} -c "drop database {{ my_db_name }}"
+
+
+

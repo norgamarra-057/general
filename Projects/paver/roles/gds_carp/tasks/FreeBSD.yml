@@ -1,0 +1,11 @@
+---
+- name: GDS Carp Load | FreeBSD | loader.conf carp
+  lineinfile:
+    dest: /boot/loader.conf
+    regexp: '^{{ item.name }}=.*'
+    line: '{{ item.name }}="{{ item.value }}"'
+  with_items:
+    - name: carp_load
+      value: 'YES'
+  notify:
+    - carp load

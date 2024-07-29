@@ -1,0 +1,21 @@
+---
+- name: Ensure ntp service is running
+  hosts: gds_all
+  become: yes
+  vars:
+    - ntpd_service_dir: /var/service/openntpd
+  roles:
+    - openntpd
+  tasks:
+    - name: Check if ntpd is running
+      shell: "cd {{ ntpd_service_dir }} && sv stat ."
+      tags: 
+        - ntp
+      always_run: yes
+      register: check_ntpd
+    - name: Start ntpd
+      tags: 
+        - ntp
+      shell: "cd {{ ntpd_service_dir }} && sv start ."
+      when: check_ntpd|failed
+

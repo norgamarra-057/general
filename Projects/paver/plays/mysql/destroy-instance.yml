@@ -1,0 +1,183 @@
+---
+###################################################
+# destroy-instance.yml
+#
+# Description:  This playbook is intended to destroy/decommission a MySQL DaaS instance from a GDS server
+#               WARNING!!!! This playbook will remove the instance from the node provided on the command line WITHOUT WARNING!
+#               Make ABSOLUTELY SURE this is the proper instance on the proper server before you begin!
+#
+# Parameters:  node=gds-server 
+#              instance=instance_name_on_server
+#
+#              Parms can also be passed via a json file as -e "@test.json"  
+#
+#              Sample file:
+#              node: gds-snc1-test-db002s1.snc1
+#              instance: duke_nukem
+#
+# Notes:  1. Playbook will connect to the instance to check for existing connections.  If any other than 'root',
+#            it will abort.  
+#         2. It will remove the following for the instance:  check_MK configuration, firewall configuration,
+#            pt-heartbeat configuration, Playback configuration, ft_custom_stopword_file configuration 
+#            and MySQL (configuration and data)
+#         3. THERE IS NO 'UNDESTROY!'  MAKE SURE YOU HAVE A GOOD BACKUP FIRST! 
+#
+###################################################
+
+
+- include: "{{ playbook_dir }}/../common/check-params.yml"
+
+- name: Destroy MySQL Instance
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - include: "{{ playbook_dir }}/tasks/facts.yml"
+    - include: "{{ playbook_dir }}/tasks/playback_facts.yml"
+      when: playback_enabled
+
+    - include: "{{ playbook_dir }}/tasks/playback_status.yml"
+      when: playback_enabled
+    
+    - include: "{{ playbook_dir }}/tasks/mysqlstatus.yml"
+    - include: "{{ playbook_dir }}/tasks/connections.yml"
+    - include: "{{ playbook_dir }}/tasks/heartbeatstatus.yml"
+
+- name: Destroy | check_MK
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Destroy | check_MK | Remove check_mk instance configuration
+      ini_file:
+        dest: /etc/check_mk/mysql.cfg
+        section: "{{ instance }}"
+        no_extra_spaces: yes
+        state: absent
+        backup: yes
+      ignore_errors: true
+
+- name: Destroy | firewall
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+  roles: 
+    - { role: gds_firewall_decomm }
+    
+- name: Destroy | Remove MySQL Instance and supportive files and services
+  become: true
+  gather_facts: false
+  hosts:
+    - "{{ node }}"
+
+  tasks:
+    - name: Destroy | MySQL | Stop MySQL server
+      runit:
+        name: "{{ instance }}-{{ gds_instance_group }}-mysql"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: killed
+      
+    - name: Destroy | MySQL | Verify that MySQL server has stopped
+      shell: "sv status {{ mysql_service_path }} | cut -d':' -f1"
+      register: mysql_service_status
+      changed_when: false
+          
+    - name: Destroy | MySQL | Unlink MySQL instance service link
+      file:
+        path: "{{ mysql_service_path }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Destroy | MySQL | Remove pre-destroyed file, if exists
+      file:
+        path: "/var/groupon/pre-destroyed/{{ instance }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Destroy | MySQL | Remove MySQL instance service data including ft_custom_stopword_file if exists
+      file:
+        path: "{{ mysql_service_data_path }}"
+        state: absent
+      when: mysql_service_data.stat.isdir is defined and mysql_service_data.stat.isdir
+
+    - name: Destroy | MySQL | Find instance ZFS
+      shell: "zfs list -o name -H {{ instance_path }}"
+      register: instance_zfs
+      changed_when: false
+      failed_when: false
+
+    - name: Destroy | MySQL | Remove instance ZFS
+      shell: "zfs destroy -r {{ instance_zfs.stdout }}"
+      when: instance_zfs.stdout.find(instance_path) > 0
+
+    - name: Destroy | MySQL | Remove MySQL instance data
+      file:
+        path: "{{ instance_path }}"
+        state: absent
+
+    - name: Destroy | MySQL | Remove client configuration link
+      file:
+        name: "{{ instance_conf_link }}"
+        state: absent
+
+    - name: Destroy | MySQL | Remove client configuration
+      file:
+        name: "{{ instance_conf }}"
+        state: absent
+
+    - name: Destroy | pt-heartbeat | Stop pt-heartbeat
+      runit:
+        name: "{{ pt_heartbeat_service_runit_path }}"
+        service_dir: /var/groupon/service
+        service_src: /var/groupon/service
+        state: killed
+      ignore_errors: true
+
+    - name: Destroy | pt-heartbeat | Remove pt-heartbeat service link
+      file:
+        path: "{{ pt_heartbeat_service_path }}"
+        state: absent
+      when: pt_heartbeat_service.stat.islnk is defined and pt_heartbeat_service.stat.islnk
+
+    - name: Destroy | pt-heartbeat | Remove pt-heartbeat service data
+      file:
+        path: "{{ pt_heartbeat_service_data_path }}"
+        state: absent
+      when: pt_heartbeat_service_data.stat.isdir is defined and pt_heartbeat_service_data.stat.isdir
+
+    - name: Destroy | Playback | Stop Playback service
+      runit:
+        name: "playback_{{ instance }}_{{ playback_node }}_{{ playback_peer }}"
+        service_dir: /var/service
+        service_src: /var/groupon/service
+        state: killed
+      when: playback_service_status is defined and playback_service_status == "run"
+      ignore_errors: true
+
+    - name: Destroy | Playback | Remove Playback service link
+      file:
+        path: "{{ playback_runit_service_link_path }}"
+        state: absent
+      when: playback_runit_service_link_path is defined and playback_enabled
+
+    - name: Destroy | Playback | Remove Playback service data
+      file:
+        path: "{{ playback_runit_service_path }}"
+        state: absent
+      when: playback_runit_service_path is defined and playback_enabled
+
+    - name: Destroy | MySQL | Create destroy directory, if needed
+      file:
+        path: /var/groupon/destroyed
+        state: directory
+
+    - name: Destroy | MySQL | Log destroy
+      lineinfile:
+        path: "/var/groupon/destroyed/{{ instance }}"
+        create: yes
+        state: present
+        line: "{{ instance }} was destroyed at {{ '%Y/%m/%d %H-%M-%S' | strftime }}"

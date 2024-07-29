@@ -1,0 +1,20 @@
+---
+checker_scripts:
+  - check_conn.sh
+  - check_state.sh
+  - check_vips.sh
+  - check_repl.sh
+  - check_mha_repl.sh
+  - check_slow_queries.sh
+  - check_tablesize.sh
+
+instance_mgmt_scripts:
+  - mi.sh
+  - list_instances
+  - select_instance
+  - unselect_instance
+  - current_instance
+  - xselect_instance
+  - failover_vips.sh
+  - make_rw
+  - make_ro

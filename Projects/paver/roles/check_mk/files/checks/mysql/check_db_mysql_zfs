@@ -1,0 +1,97 @@
+#!/usr/local/bin/bash
+#
+#        _/_/_/    _/_/      _/_/_/
+#     _/        _/    _/  _/
+#      _/_/    _/    _/  _/
+#         _/  _/    _/  _/
+#  _/_/_/      _/_/      _/_/_/
+#
+
+# help
+print_usage (){
+        echo ""
+        echo "$0 -w --> warning count"
+        echo "$0 -c --> critical count"
+	echo "$0 -u --> user"
+	echo "$0 -p --> port"
+        echo "$0 -h --> this help"
+	echo "$0 -s --> Socket to check"
+        echo ""
+        exit 3
+}
+# commandline options given?
+if [ $# -lt 10 ]; then
+        echo "- Not all arguments found!"
+        print_usage
+        exit 3
+fi
+# fetch commandline options
+while test -n "$1"; do
+        case "$1" in
+        -w)
+                warning=$2
+                shift
+        ;;
+        -c)
+                critical=$2
+                shift
+        ;;
+	-s)
+		Socket=$2
+		shift
+	;;
+	-u)
+		User=$2
+		shift
+	;;
+	-p)
+		Port=$2
+		shift
+	;;
+        -h)
+                print_usage
+                shift
+        esac
+        shift
+done
+
+HOURS=${2:-24}
+TIME_NOW=`date +'%s'` || exit 1
+TWENTYFOUR_HOUR=`bc -e "${HOURS}*60*60" -e quit` || exit 1
+DELTA=`bc -e "$TIME_NOW"-"$TWENTYFOUR_HOUR" -e quit` || exit 1
+TMPFILE=`mktemp` || exit 1
+TMPFILE2=`mktemp` || exit 1
+
+
+# run psql query
+mysql -u ${User} -P ${Port} --${Socket} -e "select @@datadir" -s -N | xargs -n1 zfs list -p -r -t snapshot -o name,creation > $TMPFILE || exit 1
+
+awk -v now="$TIME_NOW" -v twenty_four_h="$TWENTYFOUR_HOUR" '$2 >= (now - twenty_four_h)' $TMPFILE | sed -n '1!p' > $TMPFILE2
+
+result2=$(awk -F '-' '{printf "%s-%s\n", $1, $2}' $TMPFILE2  | wc -l)
+
+if [ "$result2" -ne 24 ]; then
+  result=1000
+else
+  result=0
+fi
+
+
+
+
+# prevent calc without query output
+if [ ! "$result" ]; then
+        echo "- Got no Output from mysql client"
+        exit 2
+fi
+# status logic
+if [ "`echo "$result > $critical" | bc -l`" = "1" ]; then
+	echo "result=${result}; CRIT - Hourly Snaphot missing"
+	exit 2
+elif [ "`echo "$result < $critical" | bc -l`" = "1" ] && [ "`echo "$result < $warning" | bc -l`" = "1" ]; then
+	echo "result=${result}; OK - Hourly Snapshots are OK"
+	exit 0
+else
+	echo "- Unexpected Output from check"
+	exit 3
+fi

@@ -1,0 +1,126 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+   - name: FreeBSD | run | check mysql
+     shell: |
+       exec 2>&1
+       if [ "{{ default_primary|default(item.value.hydra.default_primary) is defined }}" == "False" ]; then
+         echo "error: default_primary not defined"
+         exit 1
+       fi
+       dc="$(echo "{{ inventory_hostname }}"|cut -d . -f 2)"
+       id="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d- -f 4)"
+       env="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d- -f 3)"
+       cluster="$(echo $id|head -c 5)"
+       type="$(echo $id|tail -c 3)"
+       master_dc="$(echo "{{ default_primary|default(item.value.hydra.default_primary) }}"|cut -d . -f 2)"
+       isMaster=false
+       followed=""
+       fail=false
+       msg=""
+       if [ "{{ default_primary|default(item.value.hydra.default_primary) == inventory_hostname }}" != "False" ]; then
+           isMaster=true
+       fi
+       {% if (item.value.hydra.cascading is defined)
+         and (item.value.hydra.cascading[inventory_hostname] is defined)
+         and not (item.value.hydra.cascading[inventory_hostname] is mapping) %}
+       followed="$(getent hosts "{{ item.value.hydra.cascading[inventory_hostname] }}"|cut -d ' ' -f 1)"
+       {% else %}
+         {% if (item.value.hydra.cascading is defined)
+           and (item.value.hydra.cascading[inventory_hostname] is defined)
+           and (item.value.hydra.cascading[inventory_hostname] is mapping)
+           and (item.value.hydra.cascading[inventory_hostname][default_primary|default(item.value.hydra.default_primary)] is defined) %}
+       followed="$(getent hosts "$(echo "{{ item.value.hydra.cascading[inventory_hostname][default_primary|default(item.value.hydra.default_primary)] }}"|cut -d ':' -f 1)"|cut -d ' ' -f 1)"
+         {% else %}
+           {% if (item.value.hydra.cascading is defined)
+             and (item.value.hydra.cascading[inventory_hostname] is defined)
+             and (item.value.hydra.cascading[inventory_hostname] is mapping)
+             and (item.value.hydra.cascading[inventory_hostname][default_primary|default(item.value.hydra.default_primary) + ':' + hostvars[default_primary|default(item.value.hydra.default_primary)].gds_instances[item.key].ports.mysqld|string] is defined) %}
+       followed="$(getent hosts "$(echo "{{ item.value.hydra.cascading[inventory_hostname][default_primary|default(item.value.hydra.default_primary) + ':' + hostvars[default_primary|default(item.value.hydra.default_primary)].gds_instances[item.key].ports.mysqld|string] }}"|cut -d ':' -f 1)"|cut -d ' ' -f 1)"
+           {% else %}
+       followed="$(getent hosts "{{ default_primary|default(item.value.hydra.default_primary) }}"|cut -d ' ' -f 1)"
+           {% endif %}
+         {% endif %}
+       {% endif %}
+       read_only="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e "SHOW GLOBAL VARIABLES WHERE Variable_name = 'read_only'" -t -s -N|tail -n -2|head -n +1|sed 's/  *//g'|cut -d '|' -f 3)"
+       slaves="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW SLAVE HOSTS' -t -s -N|tail -n +3|wc -l)"
+       master_ip="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW SLAVE STATUS\G'|grep 'Master_Host:'|sed 's/  *//g'|cut -d ':' -f 2)"
+       last_io_error="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW SLAVE STATUS\G'|grep 'Last_IO_Error:'|sed 's/  *//g'|cut -d ':' -f 2)"
+       last_sql_error="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW SLAVE STATUS\G'|grep 'Last_SQL_Error:'|sed 's/  *//g'|cut -d ':' -f 2)"
+       {% if show_binlog_stats|default(false) %}
+       position_1="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW BINARY LOGS' -t -s -N|tail -n 2|head -n 1|cut -d '|' -f 3|sed 's/[^0-9]*//g')"
+       sleep 10
+       position_2="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e 'SHOW BINARY LOGS' -t -s -N|tail -n 2|head -n 1|cut -d '|' -f 3|sed 's/[^0-9]*//g')"
+       binlog_events_threashold="$(((position_2 - position_1) * 4 / 10))"
+       binlog_batch_size="{{ (item.value.hydra.extras|default({}))['mysql_binlog_batch_size']|default(8192) }}"
+       binlog_batch_interval="{{ (item.value.hydra.extras|default({}))['mysql_binlog_batch_sleep_interval']|default(2000) }}"
+       binlog_events_configured_threashold="$((1000 * $binlog_batch_size / $binlog_batch_interval))"
+       {% endif %}
+       if [ ! -z "$last_io_error" ]
+       then
+         msg="${msg}Last_IO_Error: $last_io_error "
+       fi
+       if [ ! -z "$last_sql_error" ]
+       then
+         msg="${msg}Last_SQL_Error: $last_sql_error "
+       fi
+       {% if show_binlog_stats|default(false) %}
+       if [ "$binlog_events_threashold" -gt "$binlog_events_configured_threashold" ]
+       then
+         msg="${msg}binlog_events_threashold:$binlog_events_threashold (was $binlog_events_configured_threashold) "
+         fail=true
+       fi
+       {% endif %}
+       if $isMaster
+       then
+         if [ "ON" == "$read_only" ]
+         then
+           msg="${msg}not master "
+           fail=true
+         fi
+         if ! [ -z "$master_ip" ]
+         then
+           msg="${msg}following $(getent hosts "$master_ip")"
+           fail=true
+         fi
+       else
+         if [ "OFF" == "$read_only" ]
+         then
+           msg="${msg}not standby "
+           fail=true
+         fi
+         if ! getent hosts "$master_ip"|grep -q -F "$followed"
+         then
+           msg="${msg}not following $followed but $(getent hosts "$master_ip")"
+           fail=true
+         fi
+       fi
+       if $fail
+       then
+         echo "{{ inventory_hostname }}:{{ item.key }} [$dc $type $env] ${msg}" 
+       fi
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: item.value.type == 'mysql' and item.value.hydra is defined and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.key }}"
+     async: 20
+     pool: 12
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"
+

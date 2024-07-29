@@ -1,0 +1,50 @@
+---
+gds_carp_peers:
+  - 10.24.124.62
+  - 10.24.124.189
+  - 10.24.125.62
+  - 10.24.125.189
+gds_carp_interfaces:
+  - vlan325
+  - vlan326
+gds_instance_group: gds_dub1_test_db001
+gds_monitor_cluster_type: mix
+
+gds_instances:
+  gds_snapshot_test:
+    mysqld_options:
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+    admin_redirect_peers:
+      - 10.22.142.10
+    type: mysql
+    dbnames:
+      - test1
+    write_origin: snc1
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-dub1-test-db001m1.dub1
+    master_carp_interface: vlan325
+    slave_carp_interface: vlan326
+    vhid: 66
+    slave_vhid: 66
+    master_vip: 10.24.124.66
+    slave_vips:
+      - 10.24.125.66
+    replication_ips:
+      - 10.20.43.171 # gds-dub1-test-db001m1.dub1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17 # dev1.snc1
+      - 10.22.74.119 # gds-admin01.snc1
+    dba_account_name: gds_snapshot_test_dba
+    dba_src_cidrs:
+      - 10.20.32.17 # dev1.snc1
+    ports:
+      mysqld: 20001

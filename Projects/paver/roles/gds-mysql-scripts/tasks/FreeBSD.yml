@@ -1,0 +1,4 @@
+---
+- include_tasks: mgmt.yml
+- include_tasks: checkers.yml
+- include_tasks: mha.yml

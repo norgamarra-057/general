@@ -1,0 +1,89 @@
+---
+###################################################
+# reverse-repl.yml
+#
+# Description:  This play is intended to setup reverse replication from an RDS endpoint to an on-prem node/instance
+#
+# Parameters:  endpoint=RDS endpoint
+#              node=on-prem replica
+#              instance=instance_name_on_on-prem node
+#
+#              Parms can also be passed via a json file as -e "@test.json"
+#
+#              Sample file:
+#              node: gds-snc1-prod-db001s1.snc1
+#              instance: client_id_prod
+#              endpoint: dminorauroramysql56-0.cz37pbquwh5j.us-west-1.rds.amazonaws.com
+#
+# Version:     1.0.0
+# Date:        2021-05-06
+#
+# Notes:  1. Any existing replication setup on the node/instance will be dropped and reset
+#         2. Endpoint should be set to the private IP of the Endpoint, as it can be too long for the on-prem node
+#         3. GTID_MODE must be set to OFF on source and destination.
+#
+###################################################
+
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - endpoint is defined
+          - node is defined
+          - instance is defined
+
+- name: Setup replication on on-prem instance
+  gather_facts: false
+  become: true
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Does ~/.my.cnf exist?
+      stat:
+        path: ~/.my.cnf
+      register: my_cnf
+      become: false
+      failed_when: my_cnf.stat.exists == false
+
+    - name: Get master log file
+      shell: mysql -h {{ endpoint }} -BAN -e "SHOW MASTER STATUS" | awk '{print $1}'
+      register: master_log_file
+      changed_when: false
+      become: false
+
+    - name: Get master log pos
+      shell: mysql -h {{ endpoint }} -BAN -e "SHOW MASTER STATUS" | awk '{print $2}'
+      register: master_log_pos
+      changed_when: false
+      become: false
+
+    - name: Is binary logging turned on RDS endpoint?
+      fail: 
+        msg: Binary loggin is disabled on RDS endpoint
+      when: master_log_file.stdout == "" or master_log_pos.stdout == ""
+
+    - name: Create replication user
+      mysql_user:
+        name: "replication"
+        password: "GaSxrz1twblgEyl"
+        host: "%"
+        priv: "*.*:REPLICATION SLAVE,REPLICATION CLIENT"
+        login_host: "{{ endpoint }}"
+        state: present
+      become: false
+
+    - name: Stop slave
+      shell: mysql -S /var/groupon/percona/{{ instance }}/mysql.sock -e "STOP SLAVE"
+
+    - name: Reset potential slave info
+      shell: mysql -S /var/groupon/percona/{{ instance }}/mysql.sock -e "RESET SLAVE ALL"
+
+    - name: Configure replication
+      shell: mysql -S /var/groupon/percona/{{ instance }}/mysql.sock -e "CHANGE MASTER TO MASTER_HOST='{{ endpoint }}', MASTER_USER='replication', MASTER_PASSWORD='GaSxrz1twblgEyl', MASTER_LOG_FILE='{{ master_log_file.stdout }}', MASTER_LOG_POS={{ master_log_pos.stdout|int }}"
+
+    - name: Start slave
+      shell: mysql -S /var/groupon/percona/{{ instance }}/mysql.sock -e "START SLAVE"
+

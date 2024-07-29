@@ -1,0 +1,23 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.13.110.234 # gds-dub1-prod-db008m1
+  - 10.13.110.235 # gds-dub1-prod-db008s1
+  - 10.13.184.234 # gds-dub1-prod-db008m1
+  - 10.13.184.235 # gds-dub1-prod-db008s1
+gds_instance_group: gds_prod_dub1_db008
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+# List of all GDS instances in this timeline
+gds_instances:
+  #gps_billingrecord_prod: # GDS-441#Decom #GDS-35613
+  #  third_party_mail_prod: # GDS-21200 #Decom #GDS-35833
+  # merchant_access_prod: # GDS-650  # __SOX__#Decom # GDS-35613
+  # mailman_lup1_prod: # GDS-825 # Decom # GDS-35613
+  # merch-report-lup1: # Decom # GDS-35613
+  # merch-self-pr-lup1: # Decom # GDS-35613
+  # goods_deletion_prod: # GDS-21561 #Decom # GDS-35613
+  #market_ticketing_prod: # GDS-26330

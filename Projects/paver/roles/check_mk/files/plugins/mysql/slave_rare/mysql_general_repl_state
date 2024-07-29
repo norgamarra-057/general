@@ -1,0 +1,12 @@
+#!/usr/local/bin/bash
+stamp=$(date +%s)
+lifetime=$(realpath $0 | egrep -o "[0-9]+" | tail -n1)
+
+if [[ -z "${lifetime}" ]]; then
+  lifetime=60
+else
+  lifetime=$((lifetime * 2))
+fi
+
+echo "<<<mysql_general_repl_state:cached(${stamp},${lifetime})>>>"
+echo $(/usr/local/sbin/check_repl.sh | grep 'not a slave' | wc -l)

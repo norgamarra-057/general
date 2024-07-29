@@ -1,0 +1,3 @@
+---
+- include_tasks: FreeBSD.yml tags=freebsd,ntp,ntpd,openntp,openntpd
+  when: ansible_os_family == 'FreeBSD'

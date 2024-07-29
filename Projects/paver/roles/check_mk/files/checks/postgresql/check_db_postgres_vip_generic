@@ -1,0 +1,77 @@
+#!/usr/local/bin/bash
+#
+#        _/_/_/    _/_/      _/_/_/
+#     _/        _/    _/  _/
+#      _/_/    _/    _/  _/
+#         _/  _/    _/  _/
+#  _/_/_/      _/_/      _/_/_/
+#
+
+# help
+print_usage (){
+        echo ""
+        echo "$0 -w --> warning count"
+        echo "$0 -c --> critical count"
+	echo "$0 -p --> port"
+        echo "$0 -h --> this help"
+        echo "$0 -v --> Vip to check"
+        echo ""
+        exit 3
+}
+# commandline options given?
+if [ $# -lt 6 ]; then
+        echo "- Not all arguments found!"
+        print_usage
+        exit 3
+fi
+# fetch commandline options
+while test -n "$1"; do
+        case "$1" in
+        -w)
+                warning=$2
+                shift
+        ;;
+        -c)
+                critical=$2
+                shift
+        ;;
+        -v)
+                Vip=$2
+                shift
+        ;;
+	-p)
+		Port=$2
+		shift
+	;;
+        -h)
+                print_usage
+                shift
+        esac
+        shift
+done
+# run psql query
+result2=$(nc -z $Vip 5432 2>&1 )
+
+if [ "$?" -ne 0 ]; then
+  result=1000
+else
+  result=0
+fi
+
+# prevent calc without query output
+if [ ! "$result" ]; then
+        echo "- Got no Output from mysql client"
+        exit 2
+fi
+# status logic
+
+if [ "`echo "$result > $critical" | bc -l`" = "1" ]; then
+	echo "result=${result}; CRIT - Possible Failover on the VIP"
+	exit 2
+elif [ "`echo "$result < $critical" | bc -l`" = "1" ] && [ "`echo "$result < $warning" | bc -l`" = "1" ]; then
+	echo "result=${result}; OK - VIP is OK"
+	exit 0
+else
+	echo "- Unexpected Output from check"
+	exit 3
+fi

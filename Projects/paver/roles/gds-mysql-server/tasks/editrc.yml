@@ -1,0 +1,10 @@
+---
+- name: Deploy editrc to restore CTRL-W behavior
+  tags:
+    - editrc
+  copy:
+    src: editrc
+    dest: /root/.editrc
+    mode: 0644
+    owner: root
+    group: wheel

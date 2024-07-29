@@ -1,0 +1,468 @@
+---
+gds_carp_peers:
+  - 10.22.182.222  # gds-snc1-prod-db053m1
+  - 10.22.182.223  # gds-snc1-prod-db053s1
+  - 10.22.183.222  # gds-snc1-prod-db053m1
+  - 10.22.183.223  # gds-snc1-prod-db053s1
+gds_carp_interfaces:
+  - vlan334
+  - vlan335
+gds_instance_group: gds_prod_snc1_db053
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  email_prod: # GDS-7396 Decommed GPROD-225985 
+
+  login_prod: # GDS-8153
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 2000
+      relay_log_recovery_force: ON
+      max_connections_force: 4000
+      max_user_connections_force: 3980
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60002
+    nodes:
+      - gds-snc1-prod-db053m1.snc1
+      - gds-snc1-prod-db053s1.snc1
+    master_carp_interface: vlan334
+    slave_carp_interface: vlan335
+    vhid: 32
+    slave_vhid: 32
+    master_vip: 10.22.182.32
+    slave_vips:
+      - 10.22.183.32
+    replication_ips:
+      - 10.22.148.221 # gds-snc1-prod-db053m1.snc1
+      - 10.22.148.27 # gds-snc1-prod-db053s1.snc1
+      - 10.13.250.11 # gds-dub1-prod-db003m1.dub1
+      - 10.13.250.51  # gds-dub1-prod-db003s1.dub1
+      - 10.32.121.219 # gds-sac1-prod-db053m1.sac1
+      - 10.32.121.151 # gds-sac1-prod-db053s1.sac1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.137.105/32 # login1.snc1
+      - 10.20.87.185/32 # login2.snc1
+      - 10.22.218.163/32 # login3.snc1
+      - 10.22.109.56/32  # login4.snc1
+      - 10.20.99.238/32  # login5.snc1
+      - 10.22.219.244/32 # login6.snc1
+      - 10.13.82.128/32   # login1.dub1
+      - 10.13.45.202/32   # login2.dub1
+      - 10.12.243.125/32   # login3.dub1
+      - 10.13.130.120/32   # login4.dub1
+      - 10.13.82.226/32   # login5.dub1
+      - 10.12.37.239/32   # login6.dub1
+      - 10.32.168.184/32   # login1.sac1
+      - 10.32.217.71/32   # login2.sac1
+      - 10.32.176.32/32   # login3.sac1
+      - 10.32.71.163/32   # login4.sac1
+      - 10.32.148.87/32   # login5.sac1
+      - 10.32.144.203/32   # login6.sac1
+      - 10.32.209.221/32  # arq1.sac1
+      - 10.32.84.23/32  # arq2.sac1
+      - 10.32.229.8/32  # arq3.sac1
+      - 10.32.231.134/32  # arq4.sac1
+      - 10.63.8.164/32   # uschi1vplarq01.group.on
+      - 10.63.8.165/32   # uschi1vplarq02.group.on
+      - 10.63.8.138/32   # uschi1vdlarq02.group.on
+      - 10.63.8.196/32   # uschi1vplarq03.group.on
+      - 10.63.8.197/32   # uschi1vplarq04.group.on
+      - 10.63.8.199/32   # uschi1vplarq06.group.on
+      - 10.150.8.53/32   # iedub0vplarq01.group.on
+      - 10.150.8.55/32   # iedub0vplarq02.group.on
+      - 10.150.8.54/32   # iedub0vplarq03.group.on
+      - 10.150.8.56/32   # iedub0vplarq04.group.on
+      - 10.63.8.198/32   # uschi1vplarq05.group.on
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+      - 10.12.36.144/32  # arq1.dub1
+      - 10.12.207.186/32 # arq2.dub1
+      - 10.13.96.199/32 # arq3.dub1
+      - 10.13.31.19/32 # arq4.dub1
+    dba_account_name: login_prod_dba
+    dba_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+    ports:
+      mysqld: 20002
+#    hydra:
+#      ids:
+#        - afa1f9ff-a643-4fc3-828e-551e32e5d921
+#        - cfc7bd07-cc53-4413-ad6d-6535c8c7454b
+#      default_primary: gds-snc1-prod-db053m1.snc1
+#      cascading:
+#        gds-snc1-prod-db053s1.snc1: 10.22.148.221 # gds-snc1-prod-db053m1.snc1
+    hydra:
+      ids:
+        - 03ee83fa-91fb-a94c-639e-c02d7a0c5edd
+        - f50e60e7-4e2c-6253-71ee-7d5c81f7a1c4
+      default_primary: gds-snc1-prod-db053m1.snc1
+      cascading:
+        gds-snc1-prod-db053s1.snc1:
+          gds-sac1-prod-db053m1.sac1: 10.32.121.151 # gds-sac1-prod-db053s1.sac1
+        gds-snc1-prod-db053m1.snc1:
+          gds-sac1-prod-db053s1.sac1: 10.32.121.219 # gds-sac1-prod-db053m1.sac1
+
+#  dora_prod: # GDS-8240 Decommissioned GPROD-200154
+
+
+#  goods_jobsch_prod: # GDS-8281 Decommissioned GPROD-235668
+
+
+#  testrail_arch_prod: # GDS-4175 Decommissioned GPROD-208374
+
+
+  travel_notif_prod: # GDS-7992
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 8000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60006
+    nodes:
+      - gds-snc1-prod-db053m1.snc1
+      - gds-snc1-prod-db053s1.snc1
+    master_carp_interface: vlan334
+    slave_carp_interface: vlan335
+    vhid: 36
+    slave_vhid: 36
+    master_vip: 10.22.182.36
+    slave_vips:
+      - 10.22.183.36
+    replication_ips:
+      - 10.22.148.221 # gds-snc1-prod-db053m1.snc1
+      - 10.22.148.27 # gds-snc1-prod-db053s1.snc1
+      - 10.32.121.219 # gds-sac1-prod-db053m1.sac1
+      - 10.32.121.151 # gds-sac1-prod-db053s1.sac1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.112.92/32   #getaways-notification-worker1.snc1
+      - 10.20.130.54/32   #getaways-notification-app2.snc1
+      - 10.20.73.197/32   #social-raf-db1.snc1
+      - 10.20.73.142/32   #social-raf-db3.snc1
+      - 10.20.81.195/32   #getaways-notification-app1.snc1
+      - 10.22.134.103/32   #getaways-notification-worker5.snc1
+      - 10.32.152.237/32   # getaways-notification-app1.sac1
+      - 10.32.84.45/32   # getaways-notification-app2.sac1
+      - 10.32.176.127/32   # getaways-notification-worker1.sac1
+      - 10.32.62.165/32   # getaways-notification-worker2.sac1
+      - 10.20.81.91/32   # getaways-supply-utility-dbaccess1.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: dora_prod_dba
+    dba_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+    ports:
+      mysqld: 20006
+    admin_redirect_peers:
+      - 10.20.73.197/32   #social-raf-db1.snc1
+      - 10.20.73.142/32   #social-raf-db3.snc1
+#    hydra:
+#      ids:
+#        - 195b9527-d03a-4b1f-86ee-a102056efdba
+#        - 1b2d0a8e-8a53-4aa4-a215-e93824d1a0e7
+#      default_primary: gds-snc1-prod-db053m1.snc1
+#      cascading:
+#        gds-snc1-prod-db053s1.snc1: 10.22.148.221 # gds-snc1-prod-db053m1.snc1
+    hydra:
+      ids:
+        - a7d98e09-f945-f1e3-782e-26f259c8d930
+        - d3a78436-2e4a-c7d6-4590-c6bb11c1e1d0
+      default_primary: gds-snc1-prod-db053m1.snc1
+      cascading:
+        gds-snc1-prod-db053s1.snc1:
+          gds-sac1-prod-db053m1.sac1: 10.32.121.151 # gds-sac1-prod-db053s1.sac1
+        gds-snc1-prod-db053m1.snc1:
+          gds-sac1-prod-db053s1.sac1: 10.32.121.219 # gds-sac1-prod-db053m1.sac1
+
+
+  janus_prod: # GDS-8644
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 8000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60007
+    nodes:
+      - gds-snc1-prod-db053m1.snc1
+      - gds-snc1-prod-db053s1.snc1
+    master_carp_interface: vlan334
+    slave_carp_interface: vlan335
+    vhid: 37
+    slave_vhid: 37
+    master_vip: 10.22.182.37
+    slave_vips:
+      - 10.22.183.37
+    replication_ips:
+      - 10.22.148.221 # gds-snc1-prod-db053m1.snc1
+      - 10.22.148.27 # gds-snc1-prod-db053s1.snc1
+      - 10.32.121.219 # gds-sac1-prod-db053m1.sac1
+      - 10.32.121.151 # gds-sac1-prod-db053s1.sac1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.112.92/32   #getaways-notification-worker1.snc1
+      - 10.20.130.54/32   #getaways-notification-app2.snc1
+      - 10.20.73.197/32   #social-raf-db1.snc1
+      - 10.20.73.142/32   #social-raf-db3.snc1
+      - 10.20.81.195/32   #getaways-notification-app1.snc1
+      - 10.22.134.103/32   #getaways-notification-worker5.snc1
+      - 10.22.133.254/32   #janus-metadata-management-app1.snc1
+      - 10.22.134.136/32   #janus-metadata-management-app2.snc1
+      - 10.22.138.216/32   #janus-metadata-management-app3.snc1
+      - 10.22.217.161/32   #janus-metadata-management-app4.snc1
+      - 10.20.69.59/32   # gdoop-janus-job-submitter1.snc1
+      - 10.20.83.143/32   # gdoop-janus-job-submitter2.snc1
+      - 10.20.83.230/32   # cerebro-janus-job-submitter1.snc1
+      - 10.20.71.185/32   # gdoop-job-submitter3.snc1
+      - 10.20.71.35/32   # gdoop-job-submitter4.snc1
+      - 10.20.71.152/32   # gdoop-job-submitter5.snc1
+      - 10.20.43.137/32   # cerebro-job-submitter1.snc1
+      - 10.20.71.150/32   # cerebro-job-submitter2.snc1
+      - 10.22.217.205/32   # ultron-app1.snc1
+      - 10.22.233.201/32   # ultron-app2.snc1
+      - 10.22.219.149/32   # ultron-app3.snc1
+      - 10.22.109.122/32   # ultron-prod-frontdoor1.snc1
+      - 10.22.134.107/32   # ultron-prod-frontdoor2.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: janus_prod_dba
+    dba_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+    ports:
+      mysqld: 20007
+    admin_redirect_peers:
+      - 10.20.73.197/32   #social-raf-db1.snc1
+      - 10.20.73.142/32   #social-raf-db3.snc1
+
+#  ultron_prod: # GDS-9112 Decommissioned GPROD-235668
+
+
+#  fast_prod: # GDS-9363 Decommissioned GPROD-235668 
+
+
+#  mechazilla_prod: # GDS-9363 Decommissioned GPROD-208374
+
+
+  getaways_supply_prod: # GDS-9157
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 4000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    dbnames:
+      - getaways_supply_prod
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60012
+    nodes:
+      - gds-snc1-prod-db053m1.snc1
+      - gds-snc1-prod-db053s1.snc1
+    master_carp_interface: vlan334
+    slave_carp_interface: vlan335
+    vhid: 42
+    slave_vhid: 42
+    master_vip: 10.22.182.42
+    slave_vips:
+      - 10.22.183.42
+    replication_ips:
+      - 10.22.148.221 # gds-snc1-prod-db053m1.snc1
+      - 10.22.148.27 # gds-snc1-prod-db053s1.snc1
+      - 10.32.121.219 # gds-sac1-prod-db053m1.sac1
+      - 10.32.121.151 # gds-sac1-prod-db053s1.sac1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.71.246/32   # getaways-channel-manager-integrator-synxis-app1.snc1
+      - 10.20.91.140/32   # getaways-channel-manager-integrator-synxis-app2.snc1
+      - 10.20.130.218/32   # getaways-channel-manager-integrator-synxis-app3.snc1
+      - 10.22.217.172/32   # getaways-channel-manager-integrator-synxis-app4.snc1
+      - 10.22.237.42/32   # getaways-channel-manager-integrator-synxis-utility1.snc1
+      - 10.20.81.91/32   # getaways-supply-utility-dbaccess1.snc1
+      - 10.32.253.96/32   # getaways-channel-manager-integrator-synxis-app1.sac1
+      - 10.32.253.159/32   # getaways-channel-manager-integrator-synxis-app2.sac1
+      - 10.32.253.77/32   # getaways-channel-manager-integrator-synxis-app3.sac1
+      - 10.32.253.92/32   # getaways-channel-manager-integrator-synxis-app4.sac1
+      - 10.32.254.243/32   # getaways-channel-manager-integrator-synxis-app5.sac1
+      - 10.32.100.104/32   # getaways-channel-manager-integrator-synxis-app6.sac1
+      - 10.32.254.70/32   # getaways-channel-manager-integrator-synxis-app7.sac1
+      - 10.22.37.38/32   # optimus-owagent1.snc1
+      - 10.22.37.172/32   # optimus-owagent2.snc1
+      - 10.22.37.71/32   # optimus-owagent3.snc1
+      - 10.22.37.73/32   # optimus-owagent4.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: getaways_supply_prod_dba
+    ro_account_name: getaways_sup_sox
+    dba_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+    ports:
+      mysqld: 20012
+    extra_variables:
+#    hydra:
+#      ids:
+#        - c4d6ea4a-1603-4180-b438-cc503053e141
+#        - f0975050-a746-48db-a29a-55082e644aa5
+#      default_primary: gds-snc1-prod-db053m1.snc1
+#      cascading:
+#        gds-snc1-prod-db053s1.snc1: 10.22.148.221 # gds-snc1-prod-db053m1.snc1
+    hydra:
+      ids:
+        - 6f1f0829-459d-0efb-d481-03310c4d277b
+        - 725e56d8-50f1-4b42-472a-61e43aa64f73
+      default_primary: gds-snc1-prod-db053m1.snc1
+      cascading:
+        gds-snc1-prod-db053s1.snc1:
+          gds-sac1-prod-db053m1.sac1: 10.32.121.151 # gds-sac1-prod-db053s1.sac1
+        gds-snc1-prod-db053m1.snc1:
+          gds-sac1-prod-db053s1.sac1: 10.32.121.219 # gds-sac1-prod-db053m1.sac1
+
+
+#  lba_prod: # GDS-9413 Decommissioned GDS-34046
+
+
+#  phoenix_prod: # GDS-9564 Decommissioned GPROD-208374
+
+
+#  coupons_prod: # GDS-9774 Decommissioned GPROD-235668
+
+
+#  affiliateprograms_prod: # GDS-9840 Decommissioned GPROD-235668
+
+#  gdoop_drelephant_prod: # GDS-19186 Decommissioned GPROD-208374
+
+#  crbv2_drelephant_prod: # GDS-19187 Decommissioned GPROD-208374
+
+  rocketman_v2_n_prod: # GDS-19498
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 2000
+      relay_log_recovery_force: ON
+      max_connections_force: 2000
+      max_user_connections_force: 1980
+    type: mysql
+    dbnames:
+      - rocketman_v2_n_prod
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60019
+    nodes:
+      - gds-snc1-prod-db053m1.snc1
+      - gds-snc1-prod-db053s1.snc1
+    master_carp_interface: vlan334
+    slave_carp_interface: vlan335
+    vhid: 49
+    slave_vhid: 49
+    master_vip: 10.22.182.49
+    slave_vips:
+      - 10.22.183.49
+    replication_ips:
+      - 10.22.148.221 # gds-snc1-prod-db053m1.snc1
+      - 10.22.148.27 # gds-snc1-prod-db053s1.snc1
+      - 10.32.121.219 # gds-sac1-prod-db053m1.sac1
+      - 10.32.121.151 # gds-sac1-prod-db053s1.sac1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.32.62.113/32 # dbclustermon1.sac1
+      - 10.32.74.184/32 # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.40.70/32  # rocketman1.snc1
+      - 10.20.40.84/32  # rocketman2.snc1
+      - 10.20.40.71/32  # rocketman3.snc1
+      - 10.20.71.37/32  # rocketman4.snc1
+      - 10.20.71.53/32  # rocketman5.snc1
+      - 10.20.71.20/32  # rocketman6.snc1
+      - 10.20.71.45/32  # rocketman7.snc1
+      - 10.20.74.184/32  # rocketman8.snc1
+      - 10.20.74.189/32  # rocketman9.snc1
+      - 10.20.74.141/32  # rocketman10.snc1
+      - 10.20.74.145/32  # rocketman11.snc1
+      - 10.20.74.144/32  # rocketman12.snc1
+      - 10.32.55.200/32   # push-dispatcher1.sac1
+      - 10.32.140.114/32   # push-dispatcher2.sac1
+      - 10.32.150.229/32   # push-dispatcher3.sac1
+      - 10.32.144.114/32   # push-dispatcher4.sac1
+      - 10.32.148.125/32   # push-dispatcher5.sac1
+      - 10.32.168.220/32   # push-dispatcher6.sac1
+      - 10.32.162.93/32   # rocketman1.sac1
+      - 10.32.57.108/32   # rocketman2.sac1
+      - 10.32.168.228/32   # rocketman3.sac1
+      - 10.32.160.129/32   # rocketman4.sac1
+      - 10.32.164.197/32   # rocketman5.sac1
+      - 10.32.166.82/32   # rocketman6.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: rocketman_v2_n
+    dba_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+    ports:
+      mysqld: 20019
+    extra_variables:
+
+#  message2ledger_prod: # GDS-19533 # __SOX__ Decommissioned GPROD-235668
+
+

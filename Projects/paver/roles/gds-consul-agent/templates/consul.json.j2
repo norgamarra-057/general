@@ -1,0 +1,21 @@
+{
+    "datacenter": "{{ consul_dc|default("snc1") }}",
+    "node_name": "{{ inventory_hostname }}",
+    "leave_on_terminate": false,
+    "retry_join": [{% for consul_server in consul_servers %}"{{ consul_server }}"{% if not loop.last %},{% endif %}{% endfor %}],
+    "bind_addr": "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}",
+    "client_addr": "{{ consul_client_addr }}",
+{% if env == 'stg' %}    "encrypt": "{{ consul_config['stg']['encrypt_key']}}",
+    "domain": "gds-staging",
+{% endif %}
+{% if env == 'prod' %}    "encrypt": "{{ consul_config['prod']['encrypt_key']}}",
+    "domain": "gds-production",
+{% endif %}
+{% if env == 'uat' %}    "encrypt": "{{ consul_config['uat']['encrypt_key']}}",
+    "domain": "gds-uat",
+{% endif %}
+{% if env == 'test' %}    "encrypt": "{{ consul_config['test']['encrypt_key']}}",
+    "domain": "gds-staging",
+{% endif %}
+    "data_dir": "{{ consul_data_dir }}"
+}

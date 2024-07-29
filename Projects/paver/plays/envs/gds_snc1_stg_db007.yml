@@ -1,0 +1,38 @@
+---
+- hosts: gds_snc1_stg_db007
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: crm_msg_svc_stg }
+  - { role: gds-mysql-ha, instance: lupa_stg }
+  - { role: gds-mysql-ha, instance: booking_tool_stg }
+  - { role: gds-mysql-ha, instance: cons_data_svc_stg }
+  - { role: gds-mysql-ha, instance: killbill_emea_stg }
+  - { role: gds-mysql-ha, instance: orders_emea_stg }
+  - { role: gds-mysql-ha, instance: users_emea_stg }
+  - { role: gds-mysql-ha, instance: coupon_emea_stg }
+  - { role: gds-mysql-ha, instance: itemmaster_emea_stg }
+  - { role: gds-mysql-ha, instance: goods_shipment_stg }
+  - { role: gds-mysql-ha, instance: goods_logistics_stg }
+  - { role: gds-mysql-ha, instance: ssu_stg }
+  - { role: gds-mysql-ha, instance: getaways_content_stg }
+  - { role: gds-mysql-ha, instance: getaways_invent_stg }
+  - { role: gds-mysql-ha, instance: gpn_emea_stg }
+  - { role: gds-mysql-ha, instance: po_manager_emea_stg }
+  - { role: gds-mysql-ha, instance: social_raf_emea_stg }
+  - { role: gds-mysql-ha, instance: rocketman_emea_stg }
+  - { role: gds-mysql-ha, instance: fraud_emea_stg }
+  - { role: gds-mysql-ha, instance: goods_o_cont_emea_stg }
+  - { role: gds-mysql-ha, instance: geekon_pw_uat }
+  - { role: gds-mysql-ha, instance: pwa_stg }
+  - { role: gds-mysql-ha, instance: voucherinventory_stg }
+  - { role: gds-mysql-ha, instance: affiliate_emea_stg }
+  - { role: gds-mysql-ha, instance: orders_msg_stg }
+  - { role: gds-mysql-ha, instance: giftcard_srv_emea_stg }
+  - { role: gds-mysql-ha, instance: afl_recon_emea_stg }
+  - { role: gds-mysql-ha, instance: cart_emea_stg }
+  - { role: gds-mysql-ha, instance: gim_emea_stg }
+  - { role: gds-mysql-ha, instance: gateway_emea_stg }
+  - { role: gds-mysql-ha, instance: opdata_ingest_stg }
+  - { role: gds-mysql-ha, instance: airflow_emea_stg }
+  - { role: gds-mysql-ha, instance: freebsd12_test_stg }

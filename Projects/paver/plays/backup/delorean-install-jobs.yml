@@ -1,0 +1,116 @@
+---
+- name: configure backup zfs filesystems on delorean masters and slaves
+  #hosts: delorean_prod_all
+  hosts: bys01m1.snc1
+  become: True
+  vars_files:
+    - "{{ lookup('env','PWD') }}/inventory/group_vars/{{ delorean_cluster }}.yml"
+  tasks:
+    - name: delorean | verify zfs filesytems for client backups
+      zfs: name=tank/var/groupon/delorean/pools/{{ item.1.pool }}/{{ item.1.zfs_fs }} state=present
+      with_items: pull_backup_jobs | dictsort
+      when: pull_backup_jobs is defined and item.1.zfs_fs is defined
+
+- name: configure backup jobs on delorean masters
+  hosts: delorean_masters
+  become: True
+  vars:
+    delorean_role_dir: "{{ lookup('env','PWD') }}/roles/delorean"
+    delorean_base_dir: /var/groupon/delorean
+    delorean_jobs_dir: /var/groupon/delorean/jobs
+    delorean_logs_dir: /var/groupon/delorean/logs
+    delorean_lock_dir: /var/groupon/delorean/lock
+    delorean_private_keys_dir: /var/groupon/delorean/keys
+    delorean_lock_timeout: 12400
+  vars_files:
+    - "{{ lookup('env','PWD') }}/inventory/group_vars/{{ delorean_cluster }}.yml"
+  tasks:
+    - name: delorean | verify logs directory
+      file:
+        path="{{ delorean_logs_dir }}"
+        state=directory
+        owner=root group=wheel mode=0755
+
+    - name: delorean | verify lock directory
+      file:
+        path="{{ delorean_lock_dir }}"
+        state=directory
+        owner=root group=wheel mode=0755
+
+    - name: delorean | verify daily jobs directory
+      file:
+        path="{{ delorean_jobs_dir }}/daily"
+        state=directory
+        owner=root group=wheel mode=0755
+
+    - name: delorean | configure pull backup jobs
+      template:
+        src="{{ delorean_role_dir }}/templates/{{ item.1.template |default('pull_backup') }}.sh.j2"
+        dest="{{ delorean_jobs_dir }}/{{ item.1.frequency |default('daily') }}/{{ item.0 }}.sh"
+        owner="root" group="wheel" mode=0754
+      with_items: pull_backup_jobs | dictsort
+
+    - name: delorean | list pull backup jobs directory contents
+      shell: "ls -1 {{ delorean_jobs_dir }}/daily"
+      register: daily_contents
+
+    - name: delorean | clean pull backup jobs directory
+      file:
+        name="{{ delorean_jobs_dir }}/daily/{{ item }}"
+        state=absent
+      with_items: daily_contents.stdout_lines
+      when: "item|replace('.sh','') not in pull_backup_jobs.keys()"
+
+    - name: delorean | verify pull backup job directory
+      file:
+        path="{{ delorean_backup_pools[item.1.pool].base_dir }}/{{ item.1.target }}/{{ item.0 }}"
+        state=directory
+        owner="{{ item.1.target }}" group=backup mode=0755
+      with_items: pull_backup_jobs | dictsort
+
+    - name: delorean | daily pull backup script
+      template:
+        src="{{ delorean_role_dir }}/templates/full_backup_run.sh.j2"
+        dest="{{ delorean_jobs_dir }}/pull_backups_daily.sh"
+        owner=root group=wheel mode=0754
+
+    - name: delorean | daily pull backup job
+      cron:
+        name="delorean daily pull backups"
+        job="{{ delorean_jobs_dir }}/pull_backups_daily.sh"
+        hour="3"
+        minute="0"
+    
+- name: check pigz
+  hosts: delorean_backup_targets
+  become: True
+  tags: check_pigz
+  tasks:
+    - name: check pigz exists on FreeBSD
+      command: "/usr/sbin/pkg info pigz"
+      register: pigzpkg_result
+      when: ansible_os_family == 'FreeBSD'
+      changed_when: pigzpkg_result|failed
+      ignore_errors: true
+
+    - name: install pigz on FreeBSD
+      command: "/usr/sbin/pkg install -y pigz"
+      when: pigzpkg_result|failed
+
+    - name: check pigz on CentOS
+      command: /usr/local/bin/epkg -k pigz
+      register: pigzepkg_result
+      when: ansible_os_family == 'RedHat'
+      changed_when: pigzepkg_result|failed
+      ignore_errors: true
+
+    - name: remove old pigz 
+# epkg -r pkgname only removes the links
+# download_encap fails it the package is already downloaded
+# may be a clean way exists.
+      command: rm -rf /packages/encap/pigz-2.3.1_2014.03.03_07.47
+      when: pigzepkg_result|failed
+    
+    - name: install pigz on CentOS
+      command: "/usr/local/bin/download_encap pigz-2.3.1_2014.03.03_07.47"
+      when: pigzepkg_result|failed

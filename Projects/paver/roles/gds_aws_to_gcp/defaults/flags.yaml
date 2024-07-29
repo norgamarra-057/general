@@ -1,0 +1,13 @@
+- --database-flags:
+    sql_mode: ALLOW_INVALID_DATES
+    log_bin_trust_function_creators: on
+    character_set_server: utf8
+    event_scheduler: on
+    slow_query_log: on
+    log_output: FILE
+    performance_schema: on
+    max_connections: "8000"
+    long_query_time: "1"
+    max_allowed_packet: "1073741824"
+    group_concat_max_len: "16384"
+    innodb_sort_buffer_size: "8388608"

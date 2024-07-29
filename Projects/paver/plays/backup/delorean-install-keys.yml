@@ -1,0 +1,39 @@
+---
+- name: install private ssh keys for pull backups
+  hosts: delorean_masters
+  become: true
+  vars:
+    pull_ssh_key_vault_file: "{{ lookup('env','PWD') }}/roles/delorean/vars/pull_backup_ssh_keys_vault.yml"
+    push_ssh_key_vault_file: "{{ lookup('env','PWD') }}/roles/delorean/vars/push_backup_ssh_keys_vault.yml"
+    delorean_private_keys_dir: /var/groupon/delorean/keys
+    delorean_role_dir: "{{ lookup('env','PWD') }}/roles/delorean"
+    public_keys_dir: "{{ delorean_role_dir }}/files/public_keys"
+  vars_files:
+    - "{{ pull_ssh_key_vault_file }}"
+    - "{{ push_ssh_key_vault_file }}"
+    - "{{ lookup('env','PWD') }}/inventory/group_vars/{{ delorean_cluster }}.yml"
+  tasks:
+    - name: delorean | ssh key directory
+      file: path="{{ delorean_private_keys_dir }}" state=directory owner=root group=wheel mode=0750
+
+    - name: delorean | install private ssh keys
+      copy: dest="{{ delorean_private_keys_dir }}/{{ item['user'] }}.key" content="{{ pull_backup_ssh_keys[item['user']].private_ssh_key }}\n" owner=root group=wheel mode=0400
+      with_items: delorean_backup_users
+
+    - name: delorean | install public ssh keys
+      authorized_key: user="{{ item.user }}" key="{{ push_backup_ssh_keys[item['user']].public_ssh_key }}" manage_dir=yes
+      with_items: delorean_backup_users
+
+- name: install public keys on backup source hosts
+  hosts: delorean_backup_targets
+  become: true
+  vars:
+    pull_ssh_key_vault_file: "{{ lookup('env','PWD') }}/roles/delorean/vars/pull_backup_ssh_keys_vault.yml"
+  vars_files:
+    - "{{ pull_ssh_key_vault_file }}"
+    - "{{ lookup('env','PWD') }}/inventory/group_vars/{{ delorean_cluster }}.yml"
+  tasks:
+    - name: add authorized_keys for root user
+      authorized_key: user=root
+        key="{{ pull_backup_ssh_keys[pull_backup_jobs[inventory_hostname].target].public_ssh_key }}"
+        manage_dir=no

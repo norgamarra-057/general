@@ -1,0 +1,82 @@
+package main
+
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"log"
+	"os/exec"
+	"strings"
+	"time"
+)
+
+type Process struct {
+	Entries string
+}
+
+func main() {
+
+	for {
+
+		time.Sleep(30 * time.Second)
+
+		cmd := exec.Command("/bin/ls", "-al", "/var/service/gonad_agent/bin")
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		err := cmd.Start()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = cmd.Wait()
+		if err != nil {
+			log.Fatal(err)
+		}
+		mycounter := 0
+		for {
+			line, err := out.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					break
+				} else {
+					log.Fatal(err)
+				}
+			}
+			mycounter++
+			if mycounter < 4 {
+				continue
+			}
+			tokens := strings.Split(line, " ")
+			ft := make([]string, 0)
+			for _, t := range tokens {
+				if t != "" && t != "\t" {
+					ft = append(ft, t)
+				}
+			}
+			sz := len(ft[8])
+			if sz > 0 && ft[8][sz-1] == '\n' {
+				ft[8] = ft[8][:sz-1]
+			}
+
+			fmt.Printf("%v\n", ft[8])
+			fileExec := "/var/service/gonad_agent/bin/" + ft[8]
+			fmt.Printf("fileExec := %v\n", fileExec)
+			if ft[8] != "gonad.go" {
+				cmd2, err := exec.Command("/usr/local/bin/go", "run", fileExec).Output()
+				//err := cmd2.Start()
+
+				fmt.Printf("fileExec := %v\n", cmd2)
+
+				if err != nil {
+					log.Fatal(err)
+				}
+				//err = cmd2.Wait()
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+		}
+
+	}
+	return
+
+}

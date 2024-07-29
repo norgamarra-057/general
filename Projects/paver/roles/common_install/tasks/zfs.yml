@@ -1,0 +1,95 @@
+---
+- name: ZFS Default datasets
+  zfs: name={{ item.name }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined
+
+- name: ZFS datasets mountpoints
+  zfs: name={{ item.name }} mountpoint={{ item.mountpoint }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.mountpoint is defined
+
+- name: ZFS dataset atime
+  zfs: name={{ item.name }} atime={{ item.atime }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.atime is defined
+
+- name: ZFS dataset compression
+  zfs: name={{ item.name }} compression={{ item.compression }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.compression is defined
+
+- name: ZFS dataset copies
+  zfs: name={{ item.name }} copies={{ item.copies }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.copies is defined
+
+- name : ZFS dataset dedup
+  zfs: name={{ item.name }} dedup={{ item.dedup }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.dedup is defined
+
+- name: ZFS dataset exec
+  zfs: name={{ item.name }} exec={{ item.exec }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.exec is defined
+
+- name: ZFS dataset logbias
+  zfs: name={{ item.name }} logbias={{ item.logbias }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.logbias is defined
+
+- name: ZFS dataset primarycache
+  zfs: name={{ item.name }} primarycache={{ item.primarycache }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.primarycache is defined
+
+- name: ZFS dataset quota
+  zfs: name={{ item.name }} quota={{ item.quota }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.quota is defined
+
+- name: ZFS dataset readonly
+  zfs: name={{ item.name }} readonly={{ item.readonly }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.readonly is defined
+
+- name: ZFS dataset recordsize
+  zfs: name={{ item.name }} recordsize={{ item.recordsize }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.recordsize is defined
+
+- name: ZFS dataset reservation
+  zfs: name={{ item.name }} reservation={{ item.reservation }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.reservation is defined
+
+- name: ZFS dataset secondarycache
+  zfs: name={{ item.name }} secondarycache={{ item.secondarycache }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.secondarycache is defined
+
+- name: ZFS dataset setuid
+  zfs: name={{ item.name }} setuid={{ item.setuid }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.setuid is defined
+
+- name: ZFS dataset snapdir
+  zfs: name={{ item.name }} snapdir={{ item.snapdir }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.snapdir is defined
+
+- name: ZFS dataset sync
+  zfs: name={{ item.name }} sync={{ item.sync }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.sync is defined
+
+- name: ZFS dataset volblocksize
+  zfs: name={{ item.name }} volblocksize={{ item.volblocksize }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.volblocksize is defined
+
+- name: ZFS dataset volsize
+  zfs: name={{ item.name }} volsize={{ item.volsize }} state={{ item.state | default('present') }}
+  with_items: "{{host_zfs}}"
+  when: host_zfs is defined and item.volsize is defined

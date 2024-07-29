@@ -1,0 +1,11 @@
+---
+# NOTE: Check to ensure that this is always set on a per-host basis. Keep the
+# supported values in sync with postgresql-server/main.yml.
+- name: Percona Client | FreeBSD | variable check
+  fail: 'msg="CONFIG ERROR: percona_client_version must be set and a valid value (\"5.5.38.35.2\")"'
+  when: percona_client_version is not defined 
+
+- include_tasks: FreeBSD.yml
+  when: ansible_os_family == 'FreeBSD'
+
+

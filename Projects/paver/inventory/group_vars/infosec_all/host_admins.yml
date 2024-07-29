@@ -1,0 +1,5 @@
+---
+# List of admins for GDS production instances
+host_admins:
+  - jkees
+  - schittenden

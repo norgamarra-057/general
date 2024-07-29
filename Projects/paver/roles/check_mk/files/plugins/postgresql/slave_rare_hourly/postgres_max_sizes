@@ -1,0 +1,42 @@
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_max_sizes>>>'
+for Port in $Ports; do
+        dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+        echo "Port $Port - $dbname"
+
+        max_tablesize="$(echo "WITH my_Q1 AS (
+                               SELECT pg_database_size(datname)/1048576
+                               AS max_db_size
+                               FROM pg_stat_database
+                               ORDER BY 1 desc
+                               LIMIT 1),
+                               my_Q2 AS (
+                               SELECT pg_relation_size(C.oid)/1048576
+                               AS max_table_size
+                               FROM pg_class C
+                               LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
+                               WHERE nspname NOT IN ('pg_catalog', 'information_schema')
+                               ORDER BY pg_relation_size(C.oid) DESC
+                               LIMIT 1)
+                               SELECT * from my_Q1, my_Q2;" |\
+        psql -X -p ${Port} -U postgres --variable ON_ERROR_STOP=1 -d ${dbname} -A -t -F' ')"
+        echo "${max_tablesize}"
+        sleep 0.5
+done

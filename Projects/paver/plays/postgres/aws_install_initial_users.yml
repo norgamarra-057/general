@@ -1,0 +1,71 @@
+---
+###################################################
+# aws_install_initial_users.yml
+#
+# Description:  This play is intended to install initial users on RDS Postgres Endpoints
+#
+# Required Parameters:  
+#      endpoint=rds_endpoint to write to
+#      db=database_name to create 
+#      schema=schema_name to create
+#      dba_name=dba_name user to create
+#      dba_pass=dba_password for dba_name
+#      app_name=app_name user to create
+#      app_pass=app_password for app_name
+#
+# Optional Parameters:
+#      [dryrun=yes] Create aws_initial_users.sql, but do not load it or delete it.  Default is no
+#      [preserve=yes] Create aws_initial_users.sql, load it, but do not delete it.  Default is no
+#              
+#      Parms can also be passed via a json file as -e "@test.json"
+#
+#      Sample file:
+#              endpoint: dminor-pg.cz37pbquwh5j.us-west-1.rds.amazonaws.com
+#              db: client_id_production
+#              schema: dminor
+#              dba_name: dminor_dba
+#              dba_pass: supersecret
+#              app_name: dminor_app
+#              app_pass: anothersupersecret
+#
+# Version:     1.0.0
+# Date:        2021-04-13
+#
+# Notes:      .pgpass must be present in the user's home dir.
+#
+###################################################
+
+- name: Ensure command line variables are set
+  gather_facts: False
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - endpoint is defined
+          - db is defined
+          - schema is defined
+          - dba_name is defined
+          - dba_pass is defined
+          - app_name is defined
+          - app_pass is defined
+        msg: "One or more command line options are not defined: endpoint, db, schema, dba_name, dba_pass, app_name, app_pass"
+
+    - name: Does ~/.pgpass exist?
+      stat:
+        path: ~/.pgpass
+      register: file_data
+      failed_when: not file_data.stat.exists
+
+    - name: Create aws_initial_users.sql and upload
+      template: src=../../templates/aws_initial_users.sql.j2 dest=/tmp/aws_initial_users.sql mode=0644 force=yes
+
+    - name: Load aws_initial_users.sql
+      command: psql -h {{ endpoint }} -U gds_admin -d postgres -f /tmp/aws_initial_users.sql
+      ignore_errors: True
+      when: dryrun is not defined
+
+    - name: Remove aws_initial_users.sql
+      file: path=/tmp/aws_initial_users.sql state=absent
+      ignore_errors: True
+      when: preserve is not defined and dryrun is not defined

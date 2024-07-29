@@ -1,0 +1,94 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.22.51.226 # gds-snc1-prod-db066m1
+  - 10.22.51.227 # gds-snc1-prod-db066s1
+  - 10.22.46.226 # gds-snc1-prod-db066m1
+  - 10.22.46.227 # gds-snc1-prod-db066s1
+gds_instance_group: gds_prod_snc1_db066
+gds_monitor_cluster_type: gds_postgresql
+
+gds_carp_interfaces:
+  - vlan220
+  - vlan221
+# List of all GDS instances in this timeline
+gds_instances:
+  # performer_service_prod: #  GDS-17891#decom   GPROD-188145
+  # display_leadgen_prod: #  GDS-16029 #Decom #GDS-35813
+ #crosslinker_prod: #  GDS-16197 Decommissioned
+  #olympus_prod: #  GDS-16476 #Decom #GPROD-191810
+  #sandbox_pg_prod: #  GDS-16785 #Decom #GPROD-223727
+  #market_ticketing_prod: #  GDS-16808 #Decom #GPROD-197451
+  #mktg_feed_service_prod: #  GDS-16922 #decom #GPROD-197448
+  #merch_lifecycle_prod: #  GDS-17061 #Decom #GPROD-228532
+#  sonar_qube_prod: #  GDS-17174 # Decomm GDS-32166#
+
+# GDS-29230 Decomm  item_auth_prod: #  GDS-17233
+
+ # control_center_prod: #  GDS-17231 Decommissioned
+#  faraday_prod: #  GDS-17297 #Decomm GDS-31592#
+ # history_service_prod: #  GDS-17348 #Decm #GPROD-197444
+  #mkttag_service_prod: #  GDS-17479 decommissioned
+  campaign_alert_prod: #  GDS-17600
+    type: postgresql
+    dbnames:
+      - campaign_alert_prod
+    schemas:
+      campaign_alert_prod:
+        - campaign_alert
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 10
+    unix_user: gds_uid60016
+    master_vip: 10.22.51.66
+    slave_vips:
+      - 10.22.46.66
+    replication_ips:
+      - 10.22.48.107  # gds-snc1-prod-db066m1
+      - 10.22.48.159 # gds-snc1-prod-db066s1
+      - 10.32.121.170  # gds-sac1-prod-db066m1
+      - 10.32.121.205 # gds-sac1-prod-db066s1
+    firewall_permitted_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.130.164/32 # dbclustermon2.snc1
+      - 10.22.217.162/32 # email-campaign-util1.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: campaign_alert_prod_dba
+    app_account_name: campaign_alert_prod_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.22.217.162/32 # email-campaign-util1.snc1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    ports:
+      pgbouncer_txn: 20045
+      pgbouncer_session: 20046
+      postgresql_raw: 20047
+    extra_variables:
+      pglogical: 'on'
+  #coupons_inventory_prod: #  GDS-17634 decommissioned
+# destroyed GDS-26349  pgb_backend_prod: #  GDS-17650 __SOX__
+
+ # seo_columbus_prod: #  GDS-17852 Decommissioned
+ # airflow_prod: #  GDS-17860 #Decom #GDS-35813

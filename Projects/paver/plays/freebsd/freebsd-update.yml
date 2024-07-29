@@ -1,0 +1,6 @@
+---
+# Upgrade FreeBSD
+- hosts: all
+  roles:
+    - { role: ops_freebsd_upgrade, when: "ansible_os_family == 'FreeBSD'" }
+    - { role: os-config }

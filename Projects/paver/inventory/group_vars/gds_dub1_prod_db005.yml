@@ -1,0 +1,416 @@
+---
+gds_carp_peers:
+  - 10.13.110.250  # gds-dub1-prod-db005m1
+  - 10.13.110.251  # gds-dub1-prod-db005s1
+  - 10.13.184.250  # gds-dub1-prod-db005m1
+  - 10.13.184.251  # gds-dub1-prod-db005s1
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+gds_instance_group: gds_prod_dub1_db005
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  email_prod: # GDS-6457 - decommed GPROD-227374
+#  social_raf_prod: # GDS-6459 Decommissioned GPROD-185132
+
+  goods_prod: # GDS-6447
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 20000
+      relay_log_recovery_force: ON
+      max_connections_force: 1000
+      max_user_connections_force: 980
+    type: mysql
+    write_origin: dub1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60004
+    nodes:
+      - gds-dub1-prod-db005m1.dub1
+      - gds-dub1-prod-db005s1.dub1
+    master_carp_interface: vlan201
+    slave_carp_interface: vlan202
+    vhid: 164
+    slave_vhid: 164
+    master_vip: 10.13.110.164
+    slave_vips:
+      - 10.13.184.164
+    replication_ips:
+      - 10.13.250.127 # gds-dub1-prod-db005m1.dub1
+      - 10.13.250.48  # gds-dub1-prod-db005s1.dub1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.12.216.132/32 # gds-admin01.dub1
+      - 10.13.17.216/32 # gds-admin02.dub1
+      - 10.13.35.96/32   #goods-app1.dub1
+      - 10.12.240.138/32   #goods-app2.dub1
+      - 10.13.136.198/32   #goods-app3.dub1
+      - 10.13.134.160/32   # goods-deletion-service1.dub1
+      - 10.13.203.223/32   # goods-deletion-service2.dub1
+      - 10.12.225.98/32   #goods-utility1.dub1
+      - 10.13.122.36/32   #goods-utility2.dub1
+      - 10.13.121.220/32   #goods-worker1.dub1
+      - 10.12.255.125/32   #goods-worker2.dub1
+      - 10.13.31.154/32   #goods-irb1.dub1
+      - 10.13.202.27/32 # goods-app4.dub1
+      - 10.20.115.116/32   # pit-prod-etldata71.snc1
+      - 10.20.115.126/32   # pit-prod-etldata29.snc1
+      - 10.20.115.156/32   # pit-prod-etldata4.snc1
+      - 10.20.115.160/32   # pit-prod-etldata3.snc1
+      - 10.20.115.166/32   # pit-prod-etldata32.snc1
+      - 10.20.115.184/32   # pit-prod-etldata5.snc1
+      - 10.20.115.217/32   # pit-prod-etldata47.snc1
+      - 10.20.115.227/32   # pit-prod-etldata48.snc1
+      - 10.20.115.229/32   # pit-prod-etldata8.snc1
+      - 10.20.115.232/32   # pit-prod-etldata7.snc1
+      - 10.20.115.237/32   # pit-prod-etldata33.snc1
+      - 10.20.115.238/32   # pit-prod-etldata31.snc1
+      - 10.20.115.242/32   # pit-prod-etldata1.snc1
+      - 10.20.115.247/32   # pit-prod-etldata6.snc1
+      - 10.20.115.252/32   # pit-prod-etldata9.snc1
+      - 10.20.115.32/32   # pit-prod-etldata10.snc1
+      - 10.20.115.43/32   # pit-prod-etldata69.snc1
+      - 10.20.115.55/32   # pit-prod-etldata70.snc1
+      - 10.20.115.57/32   # pit-prod-etldata68.snc1
+      - 10.20.115.61/32   # pit-prod-etldata49.snc1
+      - 10.20.115.71/32   # pit-prod-etldata30.snc1
+      - 10.20.115.74/32   # pit-prod-etldata50.snc1
+      - 10.20.115.75/32   # pit-prod-etldata34.snc1
+      - 10.20.115.88/32   # pit-prod-etldata72.snc1
+      - 10.20.115.96/32   # pit-prod-etldata51.snc1
+      - 10.20.41.45/32   # pit-prod-owagent4.snc1
+      - 10.20.64.52/32   # pit-prod-etlname3.snc1
+      - 10.20.70.12/32   # pit-prod-etldata13.snc1
+      - 10.20.70.142/32   # pit-prod-etldata64.snc1
+      - 10.20.70.164/32   # pit-prod-etldata66.snc1
+      - 10.20.70.181/32   # pit-prod-etldata67.snc1
+      - 10.20.70.191/32   # pit-prod-etldata63.snc1
+      - 10.20.70.23/32   # pit-devbh-etldata5.snc1
+      - 10.20.70.251/32   # pit-prod-etldata65.snc1
+      - 10.20.70.28/32   # pit-prod-etldata12.snc1
+      - 10.20.70.33/32   # pit-prod-etldata11.snc1
+      - 10.20.70.35/32   # pit-devbh-etldata10.snc1
+      - 10.20.70.36/32   # pit-devbh-etldata11.snc1
+      - 10.20.70.44/32   # pit-devbh-etldata2.snc1
+      - 10.20.70.48/32   # pit-devbh-etldata3.snc1
+      - 10.20.70.52/32   # pit-devbh-etldata4.snc1
+      - 10.20.70.53/32   # pit-devbh-etldata8.snc1
+      - 10.20.70.54/32   # pit-devbh-etldata7.snc1
+      - 10.20.70.55/32   # pit-devbh-etldata9.snc1
+      - 10.20.70.56/32   # pit-devbh-etldata6.snc1
+      - 10.20.70.75/32   # pit-devbh-etlname1.snc1
+      - 10.20.71.49/32   # pit-prod-owagent5.snc1
+      - 10.20.73.116/32   # pit-prod-etldata37.snc1
+      - 10.20.73.76/32   # pit-prod-etldata44.snc1
+      - 10.20.73.77/32   # pit-prod-etldata45.snc1
+      - 10.20.73.78/32   # pit-prod-etldata46.snc1
+      - 10.20.73.91/32   # pit-prod-etldata35.snc1
+      - 10.20.73.92/32   # pit-prod-etldata36.snc1
+      - 10.20.73.94/32   # pit-prod-etldata38.snc1
+      - 10.20.74.134/32   # pit-prod-etldata53.snc1
+      - 10.20.74.139/32   # pit-prod-etldata54.snc1
+      - 10.20.74.142/32   # pit-prod-etldata55.snc1
+      - 10.20.74.143/32   # pit-prod-etldata56.snc1
+      - 10.20.74.167/32   # pit-prod-etldata57.snc1
+      - 10.20.74.172/32   # pit-prod-etldata58.snc1
+      - 10.20.74.175/32   # pit-prod-etldata59.snc1
+      - 10.20.74.177/32   # pit-prod-etldata60.snc1
+      - 10.20.74.180/32   # pit-prod-etldata61.snc1
+      - 10.20.74.185/32   # pit-prod-etldata62.snc1
+      - 10.20.74.195/32   # pit-devbh-etldata12.snc1
+      - 10.20.74.45/32   # pit-devbh-etldata1.snc1
+      - 10.20.74.66/32   # pit-devbh-etldata13.snc1
+      - 10.20.75.135/32   # pit-prod-owagent6.snc1
+      - 10.20.75.96/32   # pit-prod-etljob1.snc1
+      - 10.20.76.125/32   # pit-prod-owagent3.snc1
+      - 10.20.77.59/32   # pit-prod-etlname1.snc1
+      - 10.20.78.101/32   # pit-prod-etldata42.snc1
+      - 10.20.78.103/32   # pit-prod-etldata41.snc1
+      - 10.20.78.108/32   # pit-prod-etldata40.snc1
+      - 10.20.78.118/32   # pit-prod-etldata39.snc1
+      - 10.20.78.80/32   # pit-prod-etldata43.snc1
+      - 10.20.78.99/32   # pit-prod-etldata52.snc1
+      - 10.20.83.111/32   # pit-prod-etldata17.snc1
+      - 10.20.83.133/32   # pit-prod-etldata14.snc1
+      - 10.20.83.138/32   # pit-prod-etldata25.snc1
+      - 10.20.83.163/32   # pit-prod-etldata26.snc1
+      - 10.20.83.165/32   # pit-prod-etldata16.snc1
+      - 10.20.83.180/32   # pit-prod-etldata2.snc1
+      - 10.20.83.187/32   # pit-prod-etldata20.snc1
+      - 10.20.83.201/32   # pit-prod-etldata18.snc1
+      - 10.20.83.207/32   # pit-prod-etldata28.snc1
+      - 10.20.83.220/32   # pit-prod-etldata23.snc1
+      - 10.20.83.221/32   # pit-prod-etldata21.snc1
+      - 10.20.83.231/32   # pit-prod-etldata24.snc1
+      - 10.20.83.250/32   # pit-prod-etldata19.snc1
+      - 10.20.83.61/32   # pit-prod-etldata22.snc1
+      - 10.20.83.73/32   # pit-prod-etldata27.snc1
+      - 10.20.83.93/32   # pit-prod-etldata15.snc1
+      - 10.20.95.234/32   # pit-dev-owagent1.snc1
+      - 10.20.95.97/32   # pit-dev-owagent2.snc1
+      - 10.22.194.40/32   # gdoop-dev-owagent1.snc1
+      - 10.22.76.131/32   # pit-prod-owagent1.snc1
+      - 10.22.237.197/32   # goods-daas-utility-1.snc1
+      - 10.22.152.176/32   # goods-daas-utility-2.snc1
+      - 10.22.37.38/32   # optimus-owagent1.snc1
+      - 10.22.37.172/32   # optimus-owagent2.snc1
+      - 10.22.37.71/32   # optimus-owagent3.snc1
+      - 10.22.37.73/32   # optimus-owagent4.snc1
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    dba_account_name: goods_prod_dba
+    dba_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+    ports:
+      mysqld: 20004
+#  surveys_intl_prod: # GDS-6840 - decommed GPROD-227374
+  gpn_prod: # GDS-6454
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 20000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: dub1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60006
+    nodes:
+      - gds-dub1-prod-db005m1.dub1
+      - gds-dub1-prod-db005s1.dub1
+    master_carp_interface: vlan201
+    slave_carp_interface: vlan202
+    vhid: 166
+    slave_vhid: 166
+    master_vip: 10.13.110.166
+    slave_vips:
+      - 10.13.184.166
+    replication_ips:
+      - 10.13.250.127 # gds-dub1-prod-db005m1.dub1
+      - 10.13.250.48  # gds-dub1-prod-db005s1.dub1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.12.216.132/32 # gds-admin01.dub1
+      - 10.13.17.216/32 # gds-admin02.dub1
+      - 10.13.96.239/32   #afl-acc1.dub1
+      - 10.12.216.222/32   #afl-acc2.dub1
+      - 10.13.196.132/32   #afl-api1.dub1
+      - 10.13.63.189/32   #afl-api2.dub1
+      - 10.12.249.225/32   #afl-api3.dub1
+      - 10.13.230.102/32   #afl-api4.dub1
+      - 10.12.219.240/32   #afl-api5.dub1
+      - 10.12.234.126/32   #afl-api6.dub1
+      - 10.12.243.171/32   #afl-batch1.dub1
+      - 10.12.35.239/32   #afl-batch2.dub1
+      - 10.13.196.238/32   #afl-ds1.dub1
+      - 10.13.158.100/32   #afl-ds2.dub1
+      - 10.13.203.42/32   #afl-ds3.dub1
+      - 10.13.96.53/32   #afl-ds4.dub1
+      - 10.12.36.122/32   #afl-manager1.dub1
+      - 10.12.249.63/32   #afl-manager2.dub1
+      - 10.12.37.165/32   #afl-pcs1.dub1
+      - 10.13.134.10/32   #afl-pcs2.dub1
+      - 10.12.183.214/32   #afl-portal1.dub1
+      - 10.12.184.231/32   #afl-portal2.dub1
+      - 10.13.196.68/32   #gpn-analytics1.dub1
+      - 10.12.35.90/32   #gpn-analytics2.dub1
+      - 10.13.130.101/32   #gpn-app1.dub1
+      - 10.13.136.201/32   #gpn-app2.dub1
+      - 10.13.188.145/32   #gpn-app3.dub1
+      - 10.13.82.161/32   #gpn-app4.dub1
+      - 10.13.31.112/32   #gpn-app5.dub1
+      - 10.13.230.32/32   #gpn-utility1.dub1
+      - 10.13.130.193/32   #gpn-utility2.dub1
+      - 10.13.86.18/32   #gpn-vm-app1.dub1
+      - 10.13.160.148/32   #gpn-vm-app2.dub1
+      - 10.13.230.217/32   #mm-rs1.dub1
+      - 10.12.210.141/32   #mm-rs2.dub1
+      - 10.13.196.149/32   #mm-rs3.dub1
+      - 10.22.81.56/32   #optimus-agent1.snc1
+      - 10.22.81.206/32   #optimus-agent2.snc1
+      - 10.22.152.129/32   #optimus-agent3.snc1
+      - 10.20.81.101/32   #optimus-agent4.snc1
+      - 10.12.175.243/32   #ai-content-assembly-app1.dub1
+      - 10.12.185.47/32   #ai-content-assembly-app2.dub1
+      - 10.12.180.92/32   #ai-content-assembly-app3.dub1
+      - 10.12.183.9/32   #ai-content-assembly-app4.dub1
+      - 10.12.184.69/32   #ai-content-assembly-app5.dub1
+      - 10.12.176.61/32   #ai-content-assembly-app6.dub1
+      - 10.12.183.151/32   #ai-content-assembly-app7.dub1
+      - 10.12.184.92/32   #ai-content-assembly-app8.dub1
+      - 10.12.185.101/32   #ai-content-assembly-app9.dub1
+      - 10.12.175.201/32   #ai-content-assembly-app10.dub1
+      - 10.13.223.86/32   #afl-ts2-internal1.dub1
+      - 10.12.207.60/32   #afl-ts2-internal2.dub1
+      - 10.23.100.105/32   #afl-self-service1-staging.snc1
+      - 10.13.223.86/32   # afl-ts2-internal1.dub1
+      - 10.12.207.60/32   # afl-ts2-internal2.dub1
+      - 10.23.100.105/32   # afl-self-service1-staging.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.12.224.70/32   # afl-ts1.dub1
+      - 10.13.175.240/32   # afl-ts2.dub1
+      - 10.13.80.154/32   # afl-ts3.dub1
+      - 10.13.86.64/32   # afl-ts4.dub1
+      - 10.13.188.195/32   # afl-ts5.dub1
+      - 10.13.158.22/32   # afl-ts6.dub1
+      - 10.12.39.64/32    # afl-analytics1.dub1
+      - 10.13.136.104/32  # afl-analytics2.dub1
+      - 10.222.0.0/20    # us-west-2
+      - 10.222.16.0/20    # us-west-2
+      - 10.222.32.0/20    # us-west-2
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    dba_account_name: gpn_prod_dba
+    dba_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+    ports:
+      mysqld: 20006
+#  ol_book3rdparty_prod: # GDS-7988 Decommissioned GPROD-224465
+  ol_book_avail_prod: # GDS-7986
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 2000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: dub1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60008
+    nodes:
+      - gds-dub1-prod-db005m1.dub1
+      - gds-dub1-prod-db005s1.dub1
+    master_carp_interface: vlan201
+    slave_carp_interface: vlan202
+    vhid: 168
+    slave_vhid: 168
+    master_vip: 10.13.110.168
+    slave_vips:
+      - 10.13.184.168
+    replication_ips:
+      - 10.13.250.127 # gds-dub1-prod-db005m1.dub1
+      - 10.13.250.48  # gds-dub1-prod-db005s1.dub1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.12.216.132/32 # gds-admin01.dub1
+      - 10.13.17.216/32 # gds-admin02.dub1
+      - 10.13.223.115/32 # booking-engine-availability-app1.dub1
+      - 10.12.35.123/32 # booking-engine-availability-app2.dub1
+      - 10.13.99.131/32 # booking-engine-availability-app3.dub1
+      - 10.12.249.54/32 # booking-engine-availability-app4.dub1
+      - 10.12.249.77/32 # booking-engine-availability-utility1.dub1
+      - 10.12.243.60/32 # booking-engine-availability-utility2.dub1
+      - 10.13.134.145/32 # booking-engine-availability-utility3.dub1
+      - 10.13.65.206/32 # booking-engine-availability-utility4.dub1
+      - 10.13.122.92/32   # booking-engine-calendar-service-app1.dub1
+      - 10.13.222.204/32   # booking-engine-calendar-service-app2.dub1
+      - 10.12.35.217/32   # booking-engine-calendar-service-app3.dub1
+      - 10.13.230.143/32   # booking-engine-calendar-service-app4.dub1
+      - 10.13.160.15/32   # booking-engine-calendar-service-utility1.dub1
+      - 10.12.213.239/32   # booking-engine-calendar-service-utility2.dub1
+      - 10.12.210.168/32   # booking-engine-calendar-service-app5.dub1
+      - 10.13.96.132/32   # booking-engine-calendar-service-app6.dub1
+      - 10.13.160.86/32   # booking-engine-calendar-service-app7.dub1
+      - 10.12.225.127/32   # booking-engine-calendar-service-app8.dub1
+      - 10.13.223.99/32 # booking-engine-calendar-service-app1-emea.dub1
+      - 10.13.65.252/32 # booking-engine-calendar-service-app2-emea.dub1
+      - 10.13.96.176/32 # booking-engine-calendar-service-app3-emea.dub1
+      - 10.13.122.27/32 # booking-engine-calendar-service-app4-emea.dub1
+      - 10.13.86.129/32 # booking-engine-calendar-service-app5-emea.dub1
+      - 10.13.63.99/32 # booking-engine-calendar-service-app6-emea.dub1
+      - 10.13.158.118/32 # booking-engine-calendar-service-app7-emea.dub1
+      - 10.13.86.178/32 # booking-engine-calendar-service-app8-emea.dub1
+      - 10.13.65.162/32 # booking-engine-calendar-service-app9-emea.dub1
+      - 10.13.63.244/32 # booking-engine-calendar-service-app10-emea.dub1
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    dba_account_name: ol_book_avail_prod_dba
+    dba_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.12.216.132/32 # gds-admin01.dub1
+      - 10.13.17.216/32 # gds-admin02.dub1
+    ports:
+      mysqld: 20008
+  ol_book_appnt_prod: # GDS-7988
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 2000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: dub1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60009
+    nodes:
+      - gds-dub1-prod-db005m1.dub1
+      - gds-dub1-prod-db005s1.dub1
+    master_carp_interface: vlan201
+    slave_carp_interface: vlan202
+    vhid: 169
+    slave_vhid: 169
+    master_vip: 10.13.110.169
+    slave_vips:
+      - 10.13.184.169
+    replication_ips:
+      - 10.13.250.127 # gds-dub1-prod-db005m1.dub1
+      - 10.13.250.48  # gds-dub1-prod-db005s1.dub1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.12.216.132/32 # gds-admin01.dub1
+      - 10.13.17.216/32 # gds-admin02.dub1
+      - 10.12.37.216/32   # booking-engine-appointments-app1.dub1
+      - 10.13.63.73/32   # booking-engine-appointments-app2.dub1
+      - 10.13.130.220/32   # booking-engine-appointments-app3.dub1
+      - 10.13.196.193/32   # booking-engine-appointments-app4.dub1
+      - 10.13.86.120/32   # booking-engine-appointments-utility1.dub1
+      - 10.13.65.177/32   # booking-engine-appointments-utility2.dub1
+      - 10.22.81.56/32   # optimus-agent1.snc1
+      - 10.22.81.206/32   # optimus-agent2.snc1
+      - 10.22.152.129/32   # optimus-agent3.snc1
+      - 10.20.81.101/32   # optimus-agent4.snc1
+      - 10.22.37.38/32   # optimus-owagent1.snc1
+      - 10.22.37.172/32   # optimus-owagent2.snc1
+      - 10.22.37.71/32   # optimus-owagent3.snc1
+      - 10.22.37.73/32   # optimus-owagent4.snc1
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    dba_account_name: ol_book_appnt_prod_dba
+    dba_src_cidrs:
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.12.216.132/32 # gds-admin01.dub1
+      - 10.13.17.216/32 # gds-admin02.dub1
+    ports:
+      mysqld: 20009
+# destroyed GDS-25550  artif_prod: # GDS-7994
+#  book_tool_demo_prod: # GDS-7185 decommissioned GDS-30209
+#  goods_oc_prod: # GDS-9492 - decomm'd GDS-33568

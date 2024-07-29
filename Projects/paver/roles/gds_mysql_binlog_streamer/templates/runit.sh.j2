@@ -1,0 +1,4 @@
+#!/bin/sh --
+exec 2>&1
+exec /usr/local/sbin/chpst \
+/usr/local/bin/binlog_streamer_{{ stream_name }}.sh

@@ -1,0 +1,19 @@
+---
+# - { role: ops_carp_setup, anchor_alias: '10.30.16.232/24', vlan: 316 }
+- name: GDS carp(4) Setup | antifootshooting
+  assert:
+    that:
+      - "hostvars[inventory_hostname].ops_carp is defined"
+      - "vlan is defined"
+      - "'vlan' ~ {{ vlan }} in ops_carp"
+      - "hostvars[inventory_hostname].ops_carp['vlan' ~ {{ vlan }}].anchor_address is defined"
+
+# FIXME(seanc@): Need an rc.conf.local cloned_interfaces entry for this vlan device!
+- name: GDS carp(4) | rc.conf.local | vlan dev
+  sysrc:
+    name: ifconfig_vlan{{ vlan }}
+    value: "vlan {{ vlan }} vlandev {{ ansible_default_ipv4.interface }} inet {{ hostvars[inventory_hostname].ops_carp['vlan' ~ vlan].anchor_address }} up"
+    file: /etc/rc.conf.local
+  notify:
+    - vlandev | create
+    - vlandev | interface address

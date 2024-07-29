@@ -1,0 +1,135 @@
+---
+- name: FreeBSD | install | opt directory
+  become: yes
+  file:
+    path: /opt
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: FreeBSD | install | consul directory
+  become: yes
+  file:
+    path: /opt/consul
+    state: directory
+    recurse: yes
+    owner: root
+    group: wheel
+    mode: 0755
+
+- name: FreeBSD | install | Check Version of consul
+  shell: /opt/consul/consul --version | grep 'Consul v{{ consul_version }}'
+  register: consul_ver
+  changed_when: false
+  ignore_errors: true
+
+- name: FreeBSD | install | Download Cosnul Agent
+  become: yes
+  get_url:
+    url: https://releases.hashicorp.com/consul/{{consul_version}}/consul_{{consul_version}}_freebsd_amd64.zip
+    dest: /opt/consul/
+    sha256sum: "{{ consul_sha256sum }}"
+  when: consul_ver is failed
+
+- name: FreeBSD | install | Unzip consul Agent
+  become: yes
+  shell: unzip -o /opt/consul/consul_{{consul_version}}_freebsd_amd64.zip -d /opt/consul/
+  when: consul_ver is failed
+
+- name: FreeBSD | run | svlogd directory
+  become: yes
+  file:
+    path: /var/groupon/service/consul/log/main
+    state: directory
+    owner: _log
+    group: _log
+    mode: 0755
+    recurse: yes
+  changed_when: False
+
+- name: FreeBSD | run | directories (read-only)
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0755
+  with_items:
+    - /var/groupon/service/consul
+    - /var/groupon/service/consul/bin
+    - /var/groupon/service/consul/env
+    - /var/groupon/service/consul/log
+    - /var/groupon/service/consul/data
+
+- name: FreeBSD | setup | load keys
+  include_vars: secrets.yml
+  tags: setup
+
+- name: FreeBSD | setup | consul.json
+  become: yes
+  template:
+    src: "consul.json.j2"
+    dest: /var/groupon/service/consul/consul.json
+    owner: root
+    group: wheel
+    mode: 0600
+  tags: setup
+  notify:
+    - consul reload
+
+- name: FreeBSD | run | environment
+  become: yes
+  copy: 
+    dest: /var/groupon/service/consul/env/PATH
+    content: "/usr/local/bin:/usr/bin:/bin:/opt/hydra/bin"
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: FreeBSD | run | script
+  become: yes
+  template:
+    src: run.j2
+    dest: "/var/groupon/service/consul/run"
+    owner: root
+    group: wheel
+    mode: 0744
+
+- name: FreeBSD | run | log script
+  become: yes
+  template:
+    dest: /var/groupon/service/consul/log/run
+    mode: 0744
+    src: svlogd.sh.j2
+    owner: root
+    group: wheel
+  notify:
+    - consul log restart
+
+- name: FreeBSD | run | consul enable
+  become: yes
+  file:
+    src: /var/groupon/service/consul
+    dest: /var/service/consul
+    owner: root
+    group: wheel
+    state: link
+
+- name: FreeBSD | run | wait_for service.
+  wait_for:
+    host: 0.0.0.0
+    port: 8500
+    delay: 10
+
+- name: FreeBSD | check_mk | Copy Checks
+  become: yes
+  template:
+    src: "{{ item }}.j2"
+    dest: /usr/lib/check_mk_agent/local/120/{{ item }}
+    owner: root
+    group: wheel
+    mode: 0744
+  tags: check_mk
+  with_items: "{{ consul_checks }}"

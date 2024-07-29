@@ -1,0 +1,33 @@
+---
+# List of all carp(4) peers in this replication timeline
+gds_carp_peers:
+  - 10.13.110.230 # gds-dub1-prod-db006m1
+  - 10.13.110.231 # gds-dub1-prod-db006s1
+  - 10.13.184.230 # gds-dub1-prod-db006m1
+  - 10.13.184.231 # gds-dub1-prod-db006s1
+gds_instance_group: gds_prod_dub1_db006
+gds_monitor_cluster_type: gds_postgresql
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+# List of all GDS instances in this timeline
+gds_instances:
+  #  merchant_notif_prod: # GDS-1442 #Decom #GDS-35831
+  seo_wolfhound_prod: # GDS-1496(Decommed)
+  ihq_prod: # GDS-2452 (Decommed)
+  menu_service_prod: # GDS-2937
+    # inbox_mgmt_prod: # GDS-3258 #Decom # GDS-35612
+#  gdc_prod: # GDS-3229 #Decomm GDS-33037
+  #dcor_prod: # GDS-3492 #DEcom #GDS-29760
+  tierra_prod: # GDS-3528(Decommed)
+#  mepuno_prod: # GDS-3608 Decommd - GDS-30359
+  candler_prod: # GDS-3761(decommed)
+    #  calendar_service_prod: # GDS-19853 #Decom # GDS-35612
+    #  flux_api_prod: # GDS-20653 #Decom #GDS-35831
+    #decision_engine_prod: # GDS-20812 #Decom #GDS-35831
+    #geo_isochrones_prod: # GDS-20988(decommed)
+    # epods_prod: # GDS-21557 #Decom #GDS-35831
+#  seo_columbus_prod: # GDS-24189 #Decomm GDS-32277#
+ # metro_draft_prod: # GDS-24714 # Decommissioned 
+ #  merch_change_mgmt_prod: # GDS-24977 #Decom #GDS-35831
+ #customfieldsval_prod: # GDS-25268 #Decom #GDS-35831

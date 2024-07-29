@@ -1,0 +1,640 @@
+---
+gds_carp_peers:
+  - 10.30.24.224  # gds-snc1-prod-db172m1
+  - 10.30.24.225  # gds-snc1-prod-db172s1
+  - 10.30.25.224  # gds-snc1-prod-db172m1
+  - 10.30.25.225  # gds-snc1-prod-db172s1
+gds_carp_interfaces:
+  - vlan324
+  - vlan325
+gds_instance_group: gds_prod_snc1_db172
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  pwa_prod: # GDS-xxxx
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 60
+      max_connections_force: 8000
+      max_user_connections_force: 7980
+      innodb_buffer_pool_size_mb_force: 200000
+      innodb_thread_sleep_delay_force: 0
+      innodb_flush_neighbors_force: 0
+      long_query_time_force: 1
+      log_slow_rate_limit_force: 11
+      log_warnings_force: 2
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+      group_concat_max_len_force: 16384
+      relay_log_recovery_force: ON
+      expire_logs_days: 99
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-snc1-prod-db172m1.snc1
+      - gds-snc1-prod-db172s1.snc1
+    master_carp_interface: vlan324
+    slave_carp_interface: vlan325
+    vhid: 73
+    slave_vhid: 73
+    master_vip: 10.30.24.73
+    slave_vips:
+      - 10.30.25.73
+    replication_ips:
+      - 10.22.142.197 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.246 # gds-snc1-prod-db172s1.snc1
+      - 10.22.142.192 # gds-snc1-prod-db017m1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.22.142.192/32 # gds-snc1-prod-db017m1.snc1
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.148.123/32 # gds-snc1-prod-db037m1.snc1
+      - 10.22.148.213/32 # gds-snc1-prod-db037s1.snc1
+      - 10.20.65.11/32 # db1.snc1
+      - 50.115.209.4/32   #b1.snc1
+      - 50.115.209.5/32   #b2.snc1
+      - 10.20.73.174/32 # users-service-spare1.snc1
+      - 10.22.77.104/32   # merchant-data-merchant-write-api1.snc1
+      - 10.22.134.138/32   # merchant-data-merchant-write-api2.snc1
+      - 10.32.152.93/32   # merchant-data-merchant-write-api1.sac1
+      - 10.32.49.121/32   # merchant-data-merchant-write-api2.sac1
+      - 10.22.217.88/32   #pit-prod-megatron-slave2.snc1
+      - 10.22.77.73/32   #subscription-utility-app3.snc1
+      - 10.22.77.138/32   #subscription-utility-app4.snc1
+      - 10.22.71.105/32   #subscription-utility-app5.snc1
+      - 10.22.67.72/32   #subscription-utility-app6.snc1
+      - 10.22.127.22/32   #users-service-app10.snc1
+      - 10.20.80.114/32   #users-service-app1-integration.snc1
+      - 10.20.74.155/32   #users-service-app1.snc1
+      - 10.20.79.168/32   #users-service-app1-tat.snc1
+      - 10.20.74.159/32   #users-service-app2.snc1
+      - 10.22.200.240/32   #users-service-app2-test.snc1
+      - 10.20.74.140/32   #users-service-app3.snc1
+      - 10.20.74.170/32   #users-service-app4.snc1
+      - 10.20.75.82/32   #users-service-app5.snc1
+      - 10.20.75.93/32   #users-service-app6.snc1
+      - 10.22.127.220/32   #users-service-app7.snc1
+      - 10.22.127.231/32   #users-service-app8.snc1
+      - 10.22.127.187/32   #users-service-app9.snc1
+      - 10.22.70.28/32   #users-service-utility1.snc1
+      - 10.20.91.103/32   #users-service-utility2.snc1
+      - 10.22.71.140/32   # darwin-batch-utility1.snc1
+      - 10.22.77.172/32   #ugc-app3.snc1
+      - 10.22.77.149/32   #ugc-app4.snc1
+      - 10.22.135.251/32   #ugc-app5.snc1
+      - 10.22.133.194/32   #ugc-app6.snc1
+      - 10.22.78.119/32   #ugc-app7.snc1
+      - 10.22.219.141/32   #ugc-app8.snc1
+      - 10.22.151.90/32   #ugc-app10.snc1
+      - 10.22.217.126/32   #ugc-app11.snc1
+      - 10.22.67.182/32   #ugc-app12.snc1
+      - 10.22.218.19/32 # ugc-app13.snc1
+      - 10.22.149.238/32   #ugc-util1.snc1
+      - 10.20.77.196/32   #ugc-places-util1.snc1
+      - 10.20.81.178/32   #ugc-places-util2.snc1
+      - 10.20.77.90/32   #seo-content-optimizer.snc1
+      - 10.20.114.190/32   #seo-content-optimizer2.snc1
+      - 10.20.114.202/32   #prospero-worker10.snc1
+      - 10.20.114.173/32   #prospero-worker11.snc1
+      - 10.20.114.124/32   #prospero-worker12.snc1
+      - 10.20.114.110/32   #prospero-worker13.snc1
+      - 10.20.114.181/32   #prospero-worker14.snc1
+      - 10.20.114.78/32   #prospero-worker15.snc1
+      - 10.22.64.62/32   #prospero-worker16.snc1
+      - 10.22.64.217/32   #prospero-worker17.snc1
+      - 10.22.64.54/32   #prospero-worker18.snc1
+      - 10.22.64.148/32   #prospero-worker19.snc1
+      - 10.20.78.216/32   #prospero-worker1.snc1
+      - 10.22.7.60/32   #prospero-worker20.snc1
+      - 10.20.78.214/32   #prospero-worker2.snc1
+      - 10.20.78.218/32   #prospero-worker3.snc1
+      - 10.20.78.207/32   #prospero-worker4.snc1
+      - 10.20.78.190/32   #prospero-worker5.snc1
+      - 10.20.114.116/32   #prospero-worker6.snc1
+      - 10.20.114.234/32   #prospero-worker7.snc1
+      - 10.20.114.150/32   #prospero-worker8.snc1
+      - 10.20.114.74/32   #prospero-worker9.snc1
+      - 10.22.67.163/32   #staas-worker1.snc1
+      - 10.22.67.29/32   #staas-worker2.snc1
+      - 10.22.67.117/32   #staas-worker3.snc1
+      - 10.22.67.182/32   #staas-worker4.snc1
+      - 10.22.67.242/32   #staas-worker5.snc1
+      - 10.22.67.194/32   #staas-worker6.snc1
+      - 10.22.67.230/32   #staas-worker7.snc1
+      - 10.22.67.112/32   #staas-worker8.snc1
+      - 10.22.67.135/32   #staas-worker9.snc1
+      - 10.22.67.53/32   #staas-worker10.snc1
+      - 10.22.67.67/32   #staas-worker11.snc1
+      - 10.22.67.186/32   #staas-worker12.snc1
+      - 10.22.67.8/32   #staas-worker13.snc1
+      - 10.22.67.190/32   #staas-worker14.snc1
+      - 10.22.67.155/32   #staas-worker15.snc1
+      - 10.22.68.168/32   #staas-worker16.snc1
+      - 10.22.68.45/32   #staas-worker17.snc1
+      - 10.22.68.73/32   #staas-worker18.snc1
+      - 10.22.68.68/32   #staas-worker19.snc1
+      - 10.22.68.142/32   #staas-worker21.snc1
+      - 10.22.68.131/32   #staas-worker22.snc1
+      - 10.22.68.192/32   #staas-worker23.snc1
+      - 10.22.68.151/32   #staas-worker24.snc1
+      - 10.22.68.224/32   #staas-worker25.snc1
+      - 10.22.68.207/32   #staas-worker27.snc1
+      - 10.22.68.222/32   #staas-worker29.snc1
+      - 10.22.132.103/32   #staas-worker31.snc1
+      - 10.22.132.119/32   #staas-worker32.snc1
+      - 10.22.132.14/32   #staas-worker33.snc1
+      - 10.22.132.176/32   #staas-worker34.snc1
+      - 10.22.132.219/32   #staas-worker35.snc1
+      - 10.22.132.238/32   #staas-worker36.snc1
+      - 10.22.132.31/32   #staas-worker37.snc1
+      - 10.22.132.54/32   #staas-worker38.snc1
+      - 10.22.132.68/32   #staas-worker39.snc1
+      - 10.22.132.94/32   #staas-worker40.snc1
+      - 10.22.155.170/32   #staas-worker41.snc1
+      - 10.22.155.229/32   #staas-worker42.snc1
+      - 10.22.155.244/32   #staas-worker43.snc1
+      - 10.22.155.62/32   #staas-worker44.snc1
+      - 10.22.155.231/32   #staas-worker45.snc1
+      - 10.22.155.15/32   #staas-worker46.snc1
+      - 10.22.155.24/32   #staas-worker47.snc1
+      - 10.22.155.97/32   #staas-worker48.snc1
+      - 10.22.155.74/32   #staas-worker49.snc1
+      - 10.22.155.91/32   #staas-worker50.snc1
+      - 10.22.148.217/32   #staas-worker51.snc1
+      - 10.22.148.78/32   #staas-worker52.snc1
+      - 10.22.148.246/32   #staas-worker53.snc1
+      - 10.22.148.224/32   #staas-worker54.snc1
+      - 10.22.148.52/32   #staas-worker55.snc1
+      - 10.22.148.174/32   #staas-worker56.snc1
+      - 10.22.148.102/32   #staas-worker57.snc1
+      - 10.22.148.242/32   #staas-worker58.snc1
+      - 10.22.148.92/32   #staas-worker59.snc1
+      - 10.22.148.172/32   #staas-worker60.snc1
+      - 10.22.148.198/32   #staas-worker61.snc1
+      - 10.22.148.7/32   #staas-worker62.snc1
+      - 10.22.148.111/32   #staas-worker63.snc1
+      - 10.22.148.73/32   #staas-worker64.snc1
+      - 10.22.148.125/32   #staas-worker65.snc1
+      - 10.22.148.77/32   #staas-worker66.snc1
+      - 10.22.148.129/32   #staas-worker67.snc1
+      - 10.22.148.43/32   #staas-worker68.snc1
+      - 10.22.148.35/32   #staas-worker69.snc1
+      - 10.22.148.229/32   #staas-worker70.snc1
+      - 10.22.148.254/32   #staas-worker71.snc1
+      - 10.22.148.79/32   #staas-worker72.snc1
+      - 10.22.148.119/32   #staas-worker73.snc1
+      - 10.22.148.113/32   #staas-worker74.snc1
+      - 10.22.149.238/32  #ugc-util1.snc1
+      - 10.20.70.75/32   #pit-devbh-etlname1.snc1
+      - 10.20.115.242/32   #pit-prod-etldata1.snc1
+      - 10.20.83.180/32   #pit-prod-etldata2.snc1
+      - 10.20.115.160/32   #pit-prod-etldata3.snc1
+      - 10.20.115.156/32   #pit-prod-etldata4.snc1
+      - 10.20.115.184/32   #pit-prod-etldata5.snc1
+      - 10.20.115.247/32   #pit-prod-etldata6.snc1
+      - 10.20.115.232/32   #pit-prod-etldata7.snc1
+      - 10.20.115.229/32   #pit-prod-etldata8.snc1
+      - 10.20.115.252/32   #pit-prod-etldata9.snc1
+      - 10.20.115.32/32   #pit-prod-etldata10.snc1
+      - 10.20.70.33/32   #pit-prod-etldata11.snc1
+      - 10.20.70.28/32   #pit-prod-etldata12.snc1
+      - 10.20.70.12/32   #pit-prod-etldata13.snc1
+      - 10.20.83.133/32   #pit-prod-etldata14.snc1
+      - 10.20.83.93/32   #pit-prod-etldata15.snc1
+      - 10.20.83.165/32   #pit-prod-etldata16.snc1
+      - 10.20.83.111/32   #pit-prod-etldata17.snc1
+      - 10.20.83.201/32   #pit-prod-etldata18.snc1
+      - 10.20.83.250/32   #pit-prod-etldata19.snc1
+      - 10.20.83.187/32   #pit-prod-etldata20.snc1
+      - 10.20.83.221/32   #pit-prod-etldata21.snc1
+      - 10.20.83.61/32   #pit-prod-etldata22.snc1
+      - 10.20.83.220/32   #pit-prod-etldata23.snc1
+      - 10.20.83.231/32   #pit-prod-etldata24.snc1
+      - 10.20.83.138/32   #pit-prod-etldata25.snc1
+      - 10.20.83.163/32   #pit-prod-etldata26.snc1
+      - 10.20.83.73/32   #pit-prod-etldata27.snc1
+      - 10.20.83.207/32   #pit-prod-etldata28.snc1
+      - 10.20.115.126/32   #pit-prod-etldata29.snc1
+      - 10.20.115.71/32   #pit-prod-etldata30.snc1
+      - 10.20.115.238/32   #pit-prod-etldata31.snc1
+      - 10.20.115.166/32   #pit-prod-etldata32.snc1
+      - 10.20.115.237/32   #pit-prod-etldata33.snc1
+      - 10.20.115.75/32   #pit-prod-etldata34.snc1
+      - 10.20.73.91/32   #pit-prod-etldata35.snc1
+      - 10.20.73.92/32   #pit-prod-etldata36.snc1
+      - 10.20.73.116/32   #pit-prod-etldata37.snc1
+      - 10.20.73.94/32   #pit-prod-etldata38.snc1
+      - 10.20.78.118/32   #pit-prod-etldata39.snc1
+      - 10.20.78.108/32   #pit-prod-etldata40.snc1
+      - 10.20.78.103/32   #pit-prod-etldata41.snc1
+      - 10.20.78.101/32   #pit-prod-etldata42.snc1
+      - 10.20.78.80/32   #pit-prod-etldata43.snc1
+      - 10.20.73.76/32   #pit-prod-etldata44.snc1
+      - 10.20.73.77/32   #pit-prod-etldata45.snc1
+      - 10.20.73.78/32   #pit-prod-etldata46.snc1
+      - 10.20.115.217/32   #pit-prod-etldata47.snc1
+      - 10.20.115.227/32   #pit-prod-etldata48.snc1
+      - 10.20.115.61/32   #pit-prod-etldata49.snc1
+      - 10.20.115.74/32   #pit-prod-etldata50.snc1
+      - 10.20.115.96/32   #pit-prod-etldata51.snc1
+      - 10.20.78.99/32   #pit-prod-etldata52.snc1
+      - 10.20.74.134/32   #pit-prod-etldata53.snc1
+      - 10.20.74.139/32   #pit-prod-etldata54.snc1
+      - 10.20.74.142/32   #pit-prod-etldata55.snc1
+      - 10.20.74.143/32   #pit-prod-etldata56.snc1
+      - 10.20.74.167/32   #pit-prod-etldata57.snc1
+      - 10.20.74.172/32   #pit-prod-etldata58.snc1
+      - 10.20.74.175/32   #pit-prod-etldata59.snc1
+      - 10.20.74.177/32   #pit-prod-etldata60.snc1
+      - 10.20.74.180/32   #pit-prod-etldata61.snc1
+      - 10.20.74.185/32   #pit-prod-etldata62.snc1
+      - 10.20.70.191/32   #pit-prod-etldata63.snc1
+      - 10.20.70.142/32   #pit-prod-etldata64.snc1
+      - 10.20.70.251/32   #pit-prod-etldata65.snc1
+      - 10.20.70.164/32   #pit-prod-etldata66.snc1
+      - 10.20.70.181/32   #pit-prod-etldata67.snc1
+      - 10.20.115.57/32   #pit-prod-etldata68.snc1
+      - 10.20.115.43/32   #pit-prod-etldata69.snc1
+      - 10.20.115.55/32   #pit-prod-etldata70.snc1
+      - 10.20.115.116/32   #pit-prod-etldata71.snc1
+      - 10.20.115.88/32   #pit-prod-etldata72.snc1
+      - 10.20.77.59/32   #pit-prod-etlname1.snc1
+      - 10.22.109.105/32  #mobile-token1.snc1
+      - 10.20.131.187/32  #mobile-token2.snc1
+      - 10.22.140.53/32  #mobile-token3.snc1
+      - 10.22.70.60/32  #mobile-token4.snc1
+      - 10.20.70.74/32   #pit-prod-megatron-master1.snc1
+      - 10.20.42.48/32   #flumecollector3.snc1
+      - 10.20.42.46/32   #pit-prod-megatron-slave1.snc1
+      - 10.20.70.79/32   #pit-prod-megatron-slave2.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.20.42.47/32 # pit-prod-megatron-master2.snc1
+      - 10.20.76.23/32   #darwin-test-indexer1.snc1
+      - 10.22.76.198/32   #darwin-indexer1.snc1
+      - 10.20.77.148/32   #darwin-ci-indexer1.snc1
+      - 10.23.43.215/32   #dealservice-app1-performance.snc1
+      - 10.23.95.107/32   #dealservice-app2-performance.snc1
+      - 10.23.41.23/32   #dealservice-app3-performance.snc1
+      - 10.23.41.202/32   #dealservice-app4-performance.snc1
+      - 10.23.100.82/32   #dealservice-app5-performance.snc1
+      - 10.23.41.157/32   #dealservice-app6-performance.snc1
+      - 10.23.43.215/32   #dealservice-app1-performance.snc1
+      - 10.23.95.107/32   #dealservice-app2-performance.snc1
+      - 10.23.41.23/32   #dealservice-app3-performance.snc1
+      - 10.23.41.202/32   #dealservice-app4-performance.snc1
+      - 10.23.100.82/32   #dealservice-app5-performance.snc1
+      - 10.23.41.157/32   #dealservice-app6-performance.snc1
+      - 10.20.77.241/32   #darwin-test-agg1.snc1
+      - 10.20.68.81/32   #darwin-test-agg2.snc1
+      - 10.22.64.160/32   #darwin-test-agg3.snc1
+      - 10.22.64.248/32   #darwin-test-agg4.snc1
+      - 10.20.113.57/32   #darwin-test-agg5.snc1
+      - 10.22.76.116/32   #darwin-ci-aggregator1.snc1
+      - 10.20.42.123/32   #darwin-ci-aggregator2.snc1
+      - 10.32.168.251/32   #ugc-app4.sac1
+      - 10.32.112.252/32   #ugc-app5.sac1
+      - 10.32.144.201/32   #ugc-app6.sac1
+      - 10.32.103.98/32   #ugc-app7.sac1
+      - 10.32.84.167/32   #ugc-app8.sac1
+      - 10.22.70.192/32 # pit-prod-megatron-master3.snc1
+      - 10.20.69.87/32   # pit-prod-etldata-mronly1
+      - 10.20.69.95/32   # pit-prod-etldata-mronly10
+      - 10.20.69.86/32   # pit-prod-etldata-mronly2
+      - 10.20.69.85/32   # pit-prod-etldata-mronly3
+      - 10.20.69.88/32   # pit-prod-etldata-mronly4
+      - 10.20.69.89/32   # pit-prod-etldata-mronly5
+      - 10.20.69.90/32   # pit-prod-etldata-mronly6
+      - 10.20.69.91/32   # pit-prod-etldata-mronly7
+      - 10.20.69.92/32   # pit-prod-etldata-mronly8
+      - 10.20.69.93/32   # pit-prod-etldata-mronly9
+      - 10.20.74.89/32   # pit-prod-etldata100
+      - 10.20.77.187/32   # pit-prod-etldata101
+      - 10.20.77.226/32   # pit-prod-etldata102
+      - 10.20.70.46/32   # pit-prod-etldata103
+      - 10.20.73.83/32   # pit-prod-etldata104
+      - 10.20.73.89/32   # pit-prod-etldata105
+      - 10.20.73.90/32   # pit-prod-etldata106
+      - 10.20.73.81/32   # pit-prod-etldata107
+      - 10.20.74.148/32   # pit-prod-etldata108
+      - 10.20.73.86/32   # pit-prod-etldata109
+      - 10.20.73.88/32   # pit-prod-etldata110
+      - 10.20.73.75/32   # pit-prod-etldata111
+      - 10.20.74.151/32   # pit-prod-etldata112
+      - 10.20.74.152/32   # pit-prod-etldata113
+      - 10.20.70.65/32   # pit-prod-etldata114
+      - 10.20.70.66/32   # pit-prod-etldata115
+      - 10.20.70.37/32   # pit-prod-etldata116
+      - 10.20.70.38/32   # pit-prod-etldata73
+      - 10.20.70.39/32   # pit-prod-etldata74
+      - 10.20.70.40/32   # pit-prod-etldata75
+      - 10.20.70.41/32   # pit-prod-etldata76
+      - 10.20.70.42/32   # pit-prod-etldata77
+      - 10.20.78.33/32   # pit-prod-etldata78
+      - 10.20.78.37/32   # pit-prod-etldata79
+      - 10.20.78.30/32   # pit-prod-etldata80
+      - 10.20.78.253/32   # pit-prod-etldata81
+      - 10.20.77.147/32   # pit-prod-etldata82
+      - 10.20.77.138/32   # pit-prod-etldata83
+      - 10.20.77.179/32   # pit-prod-etldata84
+      - 10.20.77.69/32   # pit-prod-etldata85
+      - 10.20.74.69/32   # pit-prod-etldata86
+      - 10.20.74.70/32   # pit-prod-etldata87
+      - 10.20.74.71/32   # pit-prod-etldata88
+      - 10.20.74.72/32   # pit-prod-etldata89
+      - 10.20.74.73/32   # pit-prod-etldata90
+      - 10.20.74.74/32   # pit-prod-etldata91
+      - 10.20.74.75/32   # pit-prod-etldata92
+      - 10.20.74.76/32   # pit-prod-etldata93
+      - 10.20.74.125/32   # pit-prod-etldata94
+      - 10.20.74.124/32   # pit-prod-etldata95
+      - 10.20.74.123/32   # pit-prod-etldata96
+      - 10.20.74.122/32   # pit-prod-etldata97
+      - 10.20.74.121/32   # pit-prod-etldata98
+      - 10.20.74.120/32   # pit-prod-etldata99
+      - 10.22.71.215/32   # darwin-test2-agg1.snc1
+      - 10.22.77.241/32   # darwin-test2-agg2.snc1
+      - 10.22.68.192/32   # darwin-test2-agg3.snc1
+      - 10.22.74.134/32   # darwin-test2-agg4.snc1
+      - 10.22.74.113/32   # darwin-test2-agg5.snc1
+      - 10.32.160.246/32   # users-service-app1.sac1
+      - 10.32.170.158/32   # users-service-app2.sac1
+      - 10.32.164.218/32   # users-service-app3.sac1
+      - 10.32.57.146/32   # users-service-app4.sac1
+      - 10.32.69.107/32   # users-service-utility1.sac1
+      - 10.32.148.130/32   # users-service-utility2.sac1
+      - 10.20.69.127/32   # darwin-indexer2.snc1
+      - 10.20.41.76/32   # darwin-prod-collections-indexer2.snc1
+      - 10.22.77.170/32   # tronicon-cms-app1.snc1
+      - 10.22.72.198/32   # dealservice-utility3.snc1
+      - 10.22.133.154/32   # dealservice-utility4.snc1
+      - 10.22.137.130/32   # dealservice-utility5.snc1
+      - 10.22.233.147/32   # dealservice-utility6.snc1
+      - 10.22.218.158/32   # dealservice-utility7.snc1
+      - 10.22.218.173/32   # dealservice-utility8.snc1
+      - 10.22.218.74/32   # dealservice-app16.snc1
+      - 10.22.233.217/32   # dealservice-app17.snc1
+      - 10.22.233.92/32   # dealservice-app18.snc1
+      - 10.22.217.194/32   # dealservice-app19.snc1
+      - 10.22.218.64/32   # dealservice-app20.snc1
+      - 10.22.218.224/32   # dealservice-app22.snc1
+      - 10.22.218.202/32   # dealservice-app23.snc1
+      - 10.22.217.218/32   # dealservice-app24.snc1
+      - 10.22.217.190/32   # dealservice-app25.snc1
+      - 10.22.217.79/32   # dealservice-app26.snc1
+      - 10.22.217.229/32   # dealservice-app27.snc1
+      - 10.22.233.227/32   # dealservice-app28.snc1
+      - 10.22.109.91/32   # dealservice-app29.snc1
+      - 10.22.233.30/32   # dealservice-app30.snc1
+      - 10.22.233.62/32   # dealservice-app31.snc1
+      - 10.22.233.155/32   # dealservice-app-rw1.snc1
+      - 10.22.218.24/32   # dealservice-app-rw2.snc1
+      - 10.20.130.150/32   # dealservice-app-rw3.snc1
+      - 10.22.218.111/32   # dealservice-app-rw4.snc1
+      - 10.22.218.254/32   # dealservice-app-rw5.snc1
+      - 10.22.233.76/32   # dealservice-app-rw6.snc1
+      - 10.22.217.84/32   # dealservice-app-rw7.snc1
+      - 10.22.233.29/32   # dealservice-app-rw8.snc1
+      - 10.22.218.201/32   # dealservice-app-rw9.snc1
+      - 10.22.67.229/32   # dealservice-app1.snc1
+      - 10.22.78.42/32   # dealservice-app2.snc1
+      - 10.22.72.122/32   # dealservice-app3.snc1
+      - 10.22.233.200/32   # dealservice-app4.snc1
+      - 10.22.81.177/32   # dealservice-app5.snc1
+      - 10.22.219.115/32   # dealservice-app-rw10.snc1
+      - 10.22.70.33/32   # dealservice-app-rw11.snc1
+      - 10.22.138.184/32   # pit-prod-megatron-slave3.snc1
+      - 10.22.74.254/32   # pit-prod-megatron-slave4.snc1
+      - 10.22.70.220/32   # pit-prod-megatron-slave5.snc1
+      - 10.22.134.27/32   # pit-prod-megatron-slave6.snc1
+      - 10.22.134.105/32   # pit-prod-megatron-slave7.snc1
+      - 10.22.216.180/32   # pit-prod-megatron-slave8.snc1
+      - 10.22.67.108/32   # pit-prod-megatron-slave9.snc1
+      - 10.22.53.32/32   # pit-prod-megatron-slave10.snc1
+      - 10.211.128.0/22   # us-west1 DB subnet 1a
+      - 10.211.132.0/22  # us-west1 DB Subnet 1c
+      - 10.20.78.67/32   # pit-prod-etldata117.snc1
+      - 10.20.74.27/32   # pit-prod-etldata118.snc1
+      - 10.20.74.28/32   # pit-prod-etldata119.snc1
+      - 10.20.74.30/32   # pit-prod-etldata120.snc1
+      - 10.20.74.37/32   # pit-prod-etldata121.snc1
+      - 10.20.74.32/32   # pit-prod-etldata122.snc1
+      - 10.20.74.39/32   # pit-prod-etldata123.snc1
+      - 10.20.74.31/32   # pit-prod-etldata124.snc1
+      - 10.20.74.40/32   # pit-prod-etldata125.snc1
+      - 10.20.74.36/32   # pit-prod-etldata126.snc1
+      - 10.20.74.38/32   # pit-prod-etldata127.snc1
+      - 10.20.74.35/32   # pit-prod-etldata128.snc1
+      - 10.20.74.41/32   # pit-prod-etldata129.snc1
+      - 10.20.74.42/32   # pit-prod-etldata130.snc1
+      - 10.20.74.33/32   # pit-prod-etldata131.snc1
+      - 10.20.74.44/32   # pit-prod-etldata132.snc1
+      - 10.20.74.55/32   # pit-prod-etldata133.snc1
+      - 10.20.74.57/32   # pit-prod-etldata134.snc1
+      - 10.20.74.58/32   # pit-prod-etldata135.snc1
+      - 10.20.74.59/32   # pit-prod-etldata136.snc1
+      - 10.20.74.60/32   # pit-prod-etldata137.snc1
+      - 10.20.74.12/32   # pit-prod-etldata138.snc1
+      - 10.20.74.14/32   # pit-prod-etldata139.snc1
+      - 10.20.74.13/32   # pit-prod-etldata140.snc1
+      - 10.20.74.15/32   # pit-prod-etldata141.snc1
+      - 10.20.74.16/32   # pit-prod-etldata142.snc1
+      - 10.20.74.17/32   # pit-prod-etldata143.snc1
+      - 10.20.74.18/32   # pit-prod-etldata144.snc1
+      - 10.20.74.19/32   # pit-prod-etldata145.snc1
+      - 10.20.74.20/32   # pit-prod-etldata146.snc1
+      - 10.20.74.21/32   # pit-prod-etldata147.snc1
+      - 10.20.74.23/32   # pit-prod-etldata148.snc1
+      - 10.20.74.34/32   # pit-prod-etldata149.snc1
+      - 10.20.74.25/32   # pit-prod-etldata150.snc1
+      - 10.20.74.29/32   # pit-prod-etldata151.snc1
+      - 10.20.78.60/32   # pit-prod-etldata152.snc1
+      - 10.20.74.50/32   # pit-prod-etldata153.snc1
+      - 10.20.74.51/32   # pit-prod-etldata154.snc1
+      - 10.20.74.48/32   # pit-prod-etldata155.snc1
+      - 10.20.74.47/32   # pit-prod-etldata156.snc1
+      - 10.20.74.52/32   # pit-prod-etldata157.snc1
+      - 10.20.78.59/32   # pit-prod-etldata158.snc1
+      - 10.20.78.63/32   # pit-prod-etldata159.snc1
+      - 10.20.78.66/32   # pit-prod-etldata160.snc1
+      - 10.20.78.71/32   # pit-prod-etldata161.snc1
+      - 10.20.78.72/32   # pit-prod-etldata162.snc1
+      - 10.20.78.73/32   # pit-prod-etldata163.snc1
+      - 10.20.78.74/32   # pit-prod-etldata164.snc1
+      - 10.20.78.75/32   # pit-prod-etldata165.snc1
+      - 10.20.78.78/32   # pit-prod-etldata166.snc1
+      - 10.20.83.49/32   # pit-prod-etldata167.snc1
+      - 10.20.78.94/32   # pit-prod-etldata168.snc1
+      - 10.20.78.65/32   # pit-prod-etldata169.snc1
+      - 10.20.83.172/32   # pit-prod-etldata170.snc1
+      - 10.20.83.222/32   # pit-prod-etldata171.snc1
+      - 10.20.83.83/32   # pit-prod-etldata172.snc1
+      - 10.20.78.169/32   # pit-prod-etldata173.snc1
+      - 10.20.83.246/32   # pit-prod-etldata174.snc1
+      - 10.20.78.21/32   # pit-prod-etldata175.snc1
+      - 10.20.83.158/32   # pit-prod-etldata176.snc1
+      - 10.22.141.133/32   # dealservice-app-rw12.snc1
+      - 10.22.71.74/32   # dealservice-app-rw13.snc1
+      - 10.22.71.36/32   # dealservice-app-rw14.snc1
+      - 10.211.64.0/19   # conSub1
+      - 10.211.96.0/19   # conSub2
+      - 10.211.142.0/24   # conSub3
+      - 10.222.0.0/20  # RDS Subnet
+      - 10.222.16.0/20 # RDS Subnet
+      - 10.222.32.0/20 # RDS Subnet
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+      - 10.22.37.236/32   # gdoop-megatron-slave2-sox.snc1
+      - 10.22.49.11/32   # gdoop-megatron-slave1-sox.snc1
+      - 10.20.42.46/32   # pit-prod-megatron-slave1.snc1
+      - 10.20.70.79/32   # pit-prod-megatron-slave2.snc1
+      - 10.22.138.184/32   # pit-prod-megatron-slave3.snc1
+      - 10.22.74.254/32   # pit-prod-megatron-slave4.snc1
+      - 10.22.70.220/32   # pit-prod-megatron-slave5.snc1
+      - 10.22.53.32/32   # pit-prod-megatron-slave10.snc1
+      - 10.22.133.188/32   # pit-prod-megatron-slave11.snc1
+      - 10.22.233.33/32   # pit-prod-megatron-slave12.snc1
+      - 10.22.135.30/32   # pit-prod-megatron-slave13.snc1
+      - 10.22.49.194/32   # pit-prod-megatron-slave14.snc1
+      - 10.20.42.46/32   # pit-prod-megatron-slave1.snc1
+      - 10.20.70.74/32   # pit-prod-megatron-master1.snc1
+      - 10.20.42.47/32   # pit-prod-megatron-master2.snc1
+      - 10.22.70.192/32   # pit-prod-megatron-master3.snc1
+      - 10.23.44.160/32   # pit-prod-megatron-master4.snc1
+      - 10.22.133.217/32   # pit-prod-megatron-master5.snc1
+      - 10.22.132.133/32   # pit-prod-megatron-master6.snc1
+      - 10.22.233.83/32   # pit-prod-megatron-master7.snc1
+      - 10.181.0.0/21   # Dev CIDR
+      - 10.182.0.0/21   # Stable CIDR
+      - 10.183.0.0/21   # Prod CIDR
+    dba_account_name: pwa_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 50.115.209.4/32   #b1.snc1
+      - 50.115.209.5/32   #b2.snc1
+      - 10.22.77.172/32   #ugc-app3.snc1
+      - 10.22.77.149/32   #ugc-app4.snc1
+      - 10.22.135.251/32   #ugc-app5.snc1
+      - 10.22.133.194/32   #ugc-app6.snc1
+      - 10.20.77.196/32   #ugc-places-util1.snc1
+      - 10.20.81.178/32   #ugc-places-util2.snc1
+      - 10.20.77.90/32   #seo-content-optimizer.snc1
+      - 10.20.114.190/32   #seo-content-optimizer2.snc1
+      - 10.20.114.202/32   #prospero-worker10.snc1
+      - 10.20.114.173/32   #prospero-worker11.snc1
+      - 10.20.114.124/32   #prospero-worker12.snc1
+      - 10.20.114.110/32   #prospero-worker13.snc1
+      - 10.20.114.181/32   #prospero-worker14.snc1
+      - 10.20.114.78/32   #prospero-worker15.snc1
+      - 10.22.64.62/32   #prospero-worker16.snc1
+      - 10.22.64.217/32   #prospero-worker17.snc1
+      - 10.22.64.54/32   #prospero-worker18.snc1
+      - 10.22.64.148/32   #prospero-worker19.snc1
+      - 10.20.78.216/32   #prospero-worker1.snc1
+      - 10.22.7.60/32   #prospero-worker20.snc1
+      - 10.20.78.214/32   #prospero-worker2.snc1
+      - 10.20.78.218/32   #prospero-worker3.snc1
+      - 10.20.78.207/32   #prospero-worker4.snc1
+      - 10.20.78.190/32   #prospero-worker5.snc1
+      - 10.20.114.116/32   #prospero-worker6.snc1
+      - 10.20.114.234/32   #prospero-worker7.snc1
+      - 10.20.114.150/32   #prospero-worker8.snc1
+      - 10.20.114.74/32   #prospero-worker9.snc1
+      - 10.22.67.53/32   #staas-worker10.snc1
+      - 10.22.67.67/32   #staas-worker11.snc1
+      - 10.22.67.186/32   #staas-worker12.snc1
+      - 10.22.67.190/32   #staas-worker14.snc1
+      - 10.22.67.155/32   #staas-worker15.snc1
+      - 10.22.68.168/32   #staas-worker16.snc1
+      - 10.22.68.45/32   #staas-worker17.snc1
+      - 10.22.68.68/32   #staas-worker19.snc1
+      - 10.22.67.163/32   #staas-worker1.snc1
+      - 10.22.68.142/32   #staas-worker21.snc1
+      - 10.22.68.131/32   #staas-worker22.snc1
+      - 10.22.68.151/32   #staas-worker24.snc1
+      - 10.22.68.207/32   #staas-worker27.snc1
+      - 10.22.68.222/32   #staas-worker29.snc1
+      - 10.22.132.103/32   #staas-worker31.snc1
+      - 10.22.132.119/32   #staas-worker32.snc1
+      - 10.22.132.14/32   #staas-worker33.snc1
+      - 10.22.132.176/32   #staas-worker34.snc1
+      - 10.22.132.238/32   #staas-worker36.snc1
+      - 10.22.132.31/32   #staas-worker37.snc1
+      - 10.22.132.68/32   #staas-worker39.snc1
+      - 10.22.132.94/32   #staas-worker40.snc1
+      - 10.22.155.170/32   #staas-worker41.snc1
+      - 10.22.155.244/32   #staas-worker43.snc1
+      - 10.22.155.62/32   #staas-worker44.snc1
+      - 10.22.155.231/32   #staas-worker45.snc1
+      - 10.22.155.15/32   #staas-worker46.snc1
+      - 10.22.155.24/32   #staas-worker47.snc1
+      - 10.22.155.97/32   #staas-worker48.snc1
+      - 10.22.155.74/32   #staas-worker49.snc1
+      - 10.22.67.182/32   #staas-worker4.snc1
+      - 10.22.155.91/32   #staas-worker50.snc1
+      - 10.22.67.194/32   #staas-worker6.snc1
+      - 10.22.67.230/32   #staas-worker7.snc1
+      - 10.22.67.112/32   #staas-worker8.snc1
+      - 10.22.67.135/32   #staas-worker9.snc1
+      - 10.22.77.73/32 # subscription-utility-app3.snc1
+      - 10.20.42.47/32 # pit-prod-megatron-master2.snc1
+      - 10.224.114.160/27 #
+    ports:
+      mysqld: 20001
+    admin_redirect_peers:
+      - 10.22.142.192 # gds-snc1-prod-db017m1.snc1
+      - 10.22.142.216 # gds-snc1-prod-db017s1.snc1
+      - 10.23.100.166   #geo-redundancy-load-test1.snc1
+      - 10.23.76.59   #geo-redundancy-load-test2.snc1
+      - 10.23.72.99   #geo-redundancy-load-test3.snc1
+      - 10.22.142.197 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.246 # gds-snc1-prod-db172s1.snc1
+      - 10.22.142.177 # gds-snc1-prod-db173m1.snc1
+      - 10.22.142.77 # gds-snc1-prod-db173s1.snc1
+      - 10.22.142.214 # gds-snc1-prod-db174m1.snc1
+      - 10.22.142.247 # gds-snc1-prod-db174s1.snc1
+      - 10.22.142.19   # gds-snc1-prod-db175m1.snc1
+      - 10.22.142.229   # gds-snc1-prod-db175s1.snc1
+      - 10.22.142.229 # gds-snc1-prod-db017m2.snc1
+      - 10.32.114.27  # gds-sac1-prod-db017m1.sac1
+      - 10.32.114.128  # gds-sac1-prod-db017s1.sac1
+      - 10.32.121.73   #gds-sac1-prod-db172m1.sac1
+      - 10.32.121.222   #gds-sac1-prod-db172s1.sac1
+      - 10.32.121.53   #gds-sac1-prod-db173m1.sac1
+      - 10.32.121.68   #gds-sac1-prod-db173s1.sac1
+      - 10.32.121.187   #gds-sac1-prod-db174m1.sac1
+      - 10.32.121.206   #gds-sac1-prod-db174s1.sac1
+      - 10.32.121.203   #gds-sac1-prod-db175m1.sac1
+      - 10.32.114.98   #gds-sac1-prod-db175s1.sac1
+      - 10.13.250.142 # gds-dub1-prod-db171m1.dub1
+      - 10.13.250.115  # gds-dub1-prod-db171s1.dub1
+      - 10.13.250.163   #gds-dub1-prod-db172m1.dub1
+      - 10.13.250.125   #gds-dub1-prod-db172s1.dub1
+      - 10.13.250.42   #gds-dub1-prod-db173m1.dub1
+      - 10.13.250.217   #gds-dub1-prod-db173s1.dub1
+    playback_enabled: true
+    playback:
+      peers:
+        - node: gds-snc1-prod-db172m1.snc1
+          peer: gds-snc1-prod-db172s1.snc1
+        - node: gds-snc1-prod-db172s1.snc1
+          peer: gds-snc1-prod-db172m1.snc1
+      manage_mysql_slowlogd: 1
+      mysql_user_to_check: thepoint_db
+      user: playback_user
+      password: mee5pieK
+      schema: groupon_production
+      thread_pool_size: 100
+      user_connection_threshold: 15
+      playback_connection_timeout: 20
+      mysql_slowlogd_port: 30001

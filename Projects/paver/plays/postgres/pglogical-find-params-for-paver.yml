@@ -1,0 +1,47 @@
+---
+- name: Ensure command line variables are set
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+    - assert:
+        that:
+          - daas_host is defined
+          - instance is defined
+
+    - set_fact:
+        my_dbs={{ gds_instances[instance].dbnames }}
+      ignore_errors: yes
+
+
+- name: Daas part (master)
+  gather_facts: False
+  become: true
+  hosts:
+    - '{{ daas_host }}'
+  tasks:
+
+
+    - set_fact:
+        my_dbs: "{{ hostvars[daas_host]['my_dbs'] }}"
+
+    - name: Get dbnames
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select datname from pg_catalog.pg_database where datname not in ('postgres','template0','template1')"
+      register: datnames
+    - debug: var=datnames.stdout
+
+    - name: Get users
+      shell: psql -U postgres -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select usename from pg_catalog.pg_user where usename not in ('postgres','gdsmon','gds_admin')"
+      register: pgusers
+    - debug: var=pgusers.stdout
+
+    - name: Get schemas
+      shell: psql -U postgres -d {{ item }} -At -p {{ gds_instances[instance].ports.postgresql_raw }} -c "select schema_name from information_schema.schemata where schema_owner not in ('postgres');"
+      register: schemata
+      with_items: "{{ my_dbs }}"
+
+
+    - debug: msg="item.item={{item.item}}, item.stdout={{item.stdout}}"
+      with_items: "{{ schemata.results }}"

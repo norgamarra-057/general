@@ -1,0 +1,1784 @@
+
+---
+gds_carp_peers:
+  - 10.30.26.232  # gds-snc1-stg-db022m1
+  - 10.30.26.233  # gds-snc1-stg-db022s1
+  - 10.30.27.232  # gds-snc1-stg-db022m1
+  - 10.30.27.233  # gds-snc1-stg-db022s1
+gds_carp_interfaces:
+  - vlan326
+  - vlan327
+gds_instance_group: gds_snc1_stg_db022
+gds_monitor_cluster_type: mix
+
+gds_instances:
+#  wilson_uat: # GDS-2369 Decommissioned GDS-34122
+  taxonomy_service_uat: # GDS-2557
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+      max_allowed_packet_force: 268435456
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60003
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 103
+    slave_vhid: 103
+    master_vip: 10.30.26.103
+    slave_vips:
+      - 10.30.27.103
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.106.121/32   #taxonomy-app3-staging.snc1
+      - 10.23.76.158/32   #taxonomy-app3-uat.snc1
+      - 10.23.43.138/32   #taxonomy-app4-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: taxonomy_service_uat_dba
+    dba_src_cidrs: 
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20003
+  mossy_service_uat: # GDS-2464
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60009
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 109
+    slave_vhid: 109
+    master_vip: 10.30.26.109
+    slave_vips:
+      - 10.30.27.109
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: mossy_service_stg
+    dba_src_cidrs: 
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20009
+#  gifting_service_uat: # GDS-2538 Decommissioned GDS-34122
+  mpp_offer_uat: # GDS-2547
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60012
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 112
+    slave_vhid: 112
+    master_vip: 10.30.26.112
+    slave_vips:
+      - 10.30.27.112
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.128.13/32 # mpp-offer-aggregator-app1-uat.snc1
+      - 10.22.193.8/32  # mpp-service1-uat.snc1 
+      - 10.20.80.151/32  # mpp-service2-uat.snc1 
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: mpp_offer_uat_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.193.8/32  # mpp-service1-uat.snc1 
+      - 10.20.80.151/32  # mpp-service2-uat.snc1 
+    ports:
+      mysqld: 20012
+#  janus_uat: # GDS-2695
+  num_uat: # GDS-2812
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60020
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 120
+    slave_vhid: 120
+    master_vip: 10.30.26.120
+    slave_vips:
+      - 10.30.27.120
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.44.139/32 # latam-dealrank-collector1-uat.snc1
+      - 10.23.42.199/32 # latam-dealrank-collector1-staging.snc1
+      - 10.23.42.188/32 # latam-dealrank-collector2-staging.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: num_uat_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20020
+  collab_contract_uat: # GDS-3138
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60024
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 124
+    slave_vhid: 124
+    master_vip: 10.30.26.124
+    slave_vips:
+      - 10.30.27.124
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.96.76/32    # ethos-collabortation-contracts-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: collab_contract_uat_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.96.76/32    # ethos-collabortation-contracts-app1-uat.snc1
+    ports:
+      mysqld: 20024
+#  gdoop_oozie_uat: # GDS-3205
+  birdcage_uat: # GDS-2260
+    mysqld_options:
+      character_set_server_force: utf8mb4
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60028
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 128
+    slave_vhid: 128
+    master_vip: 10.30.26.128
+    slave_vips:
+      - 10.30.27.128
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.192.185/32  # birdcage-db3-uat.snc1
+      - 10.22.192.236/32  # birdcage-db4-uat.snc1
+      - 10.20.96.91/32    # birdcage-app1-uat.snc1
+      - 10.20.96.41/32    # birdcage-app2-uat.snc1
+      - 10.20.79.169/32   # birdcage1-uat.snc1
+      - 10.20.79.172/32   # birdcage1-staging.snc1
+      - 10.22.81.56/32 # optimus-agent1.snc1
+      - 10.22.81.206/32 # optimus-agent2.snc1
+      - 10.22.152.129/32 # optimus-agent3.snc1
+      - 10.20.81.101/32 # optimus-agent4.snc1
+      - 10.20.94.210/32   # birdcage-app1-staging.snc1
+      - 10.20.96.163/32   # birdcage-app2-staging.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: birdcage_uat_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.192.185/32  # birdcage-db3-uat.snc1
+      - 10.22.192.236/32  # birdcage-db4-uat.snc1
+      - 10.20.96.91/32    # birdcage-app1-uat.snc1
+      - 10.20.96.41/32    # birdcage-app2-uat.snc1
+      - 10.20.79.169/32   # birdcage1-uat.snc1
+      - 10.20.79.172/32   # birdcage1-staging.snc1 
+      - 10.20.94.210/32   # birdcage-app1-staging.snc1
+      - 10.20.96.163/32   # birdcage-app2-staging.snc1
+    ports:
+      mysqld: 20028
+  # vendor_returns_uat: # GDS-3225 # decommissioned ##
+  ##vendor_returns_stg: # GDS-3226  ## decommissioned
+  glive_3rd_party_uat: # GDS-2900
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60032
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 132
+    slave_vhid: 132
+    master_vip: 10.30.26.132
+    slave_vips:
+      - 10.30.27.132
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.94.106/32  # glive-3rd-party-app1-uat.snc1
+      - 10.20.94.162/32  # glive-3rd-party-worker1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: glive_3rd_party_uat_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.94.106/32  # glive-3rd-party-app1-uat.snc1
+      - 10.20.94.162/32  # glive-3rd-party-worker1-uat.snc1
+    ports:
+      mysqld: 20032
+#  killbill_uat: # GDS-3340
+#  hive_app_stg: # GDS-3523 Decommissioned GDS-34122
+  dealservice_uat: # GDS-3173
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60048
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 148
+    slave_vhid: 148
+    master_vip: 10.30.26.148
+    slave_vips:
+      - 10.30.27.148
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.194.238/32   #dealservice-app3-uat.snc1
+      - 10.22.195.185/32   #dealservice-app4-uat.snc1
+      - 10.20.95.120/32   #dealservice-app5-uat.snc1
+      - 10.20.114.252/32   #dealservice-app6-uat.snc1
+      - 10.22.195.77/32   #dealservice-app7-uat.snc1
+      - 10.22.194.219/32   #dealservice-app8-uat.snc1
+      - 10.20.82.139/32   #dealservice-utility1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: dealservice_uat_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+    ports:
+      mysqld: 20048
+  dm_api_uat: # Deal Management API GDS-3847
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 1000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60049
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 149
+    slave_vhid: 149
+    master_vip: 10.30.26.149
+    slave_vips:
+      - 10.30.27.149
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.106.103/32 # deal-management-app1-uat.snc1
+      - 10.23.92.215/32 # deal-management-app2-uat.snc1
+      - 10.23.106.39/32 # deal-management-utility1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: dm_api_uat_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.106.103/32 # deal-management-app1-uat.snc1
+      - 10.23.92.215/32 # deal-management-app2-uat.snc1
+      - 10.23.106.39/32 # deal-management-utility1-uat.snc1
+    ports:
+      mysqld: 20049
+  orders_uat: # GDS-3955
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 10000
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60079
+    nodes:
+      - gds-snc1-stg-db022m1.snc1
+      - gds-snc1-stg-db022s1.snc1
+    master_carp_interface: vlan326
+    slave_carp_interface: vlan327
+    vhid: 179
+    slave_vhid: 179
+    master_vip: 10.30.26.179
+    slave_vips:
+      - 10.30.27.179
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.76.194/32 # orders-app1-qa-uat.snc1
+      - 10.23.84.159/32   #orders-app2-qa-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: orders_uat_dba
+    dba_src_cidrs:
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.76.194/32 # orders-app1-qa-uat.snc1
+      - 10.23.84.251/32 # orders-worker1-qa-uat.snc1
+    ports:
+      mysqld: 20135
+########### MySQL ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#####################
+########### Postgres vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv#####################
+  searchotron_uat: # GDS-3955
+    type: postgresql
+    dbnames:
+      - searchotron_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60080
+    master_vip: 10.30.26.180
+    slave_vips:
+      - 10.30.27.180
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.128.52/32 # searchotron1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: searchotron_uat_dba
+    app_account_name: searchotron_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.128.52/32 # searchotron1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20136
+      pgbouncer_session: 20137
+      postgresql_raw: 20138
+    extra_variables:
+      max_connections: 30
+  im_push_stg: # GDS-1979
+    type: postgresql
+    dbnames:
+      - im_push_stg
+    schemas:
+       im_push_stg:
+         - im_push
+         - livingsocial
+         - mobile_push
+         - push
+         - test
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60051
+    master_vip: 10.30.26.151
+    slave_vips:
+      - 10.30.27.151
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.83.211/32   # im-util1-staging.snc1
+      - 10.23.82.129/32   # im-coord1-staging.snc1
+      - 10.23.82.104/32   # im-dispatcher1-staging.snc1
+      - 10.23.82.78/32    # im-realtime1-staging.snc1
+      - 10.23.84.200/32    # im-realtime2-staging.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.23.82.52/32   # im-util2-staging.snc1
+    dba_account_name: im_push_stg_dba
+    app_account_name: im_push_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.83.211/32   # im-util1-staging.snc1
+      - 10.23.82.129/32   # im-coord1-staging.snc1
+      - 10.23.82.104/32   # im-dispatcher1-staging.snc1
+      - 10.23.82.78/32    # im-realtime1-staging.snc1
+      - 10.23.84.200/32    # im-realtime2-staging.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.23.82.52/32   # im-util2-staging.snc1
+    ports:
+      pgbouncer_txn: 20051
+      pgbouncer_session: 20052
+      postgresql_raw: 20053
+    extra_variables:
+      max_connections: 30
+      pglogical: 'on'
+  orchestrator_uat: # GDS-2214
+    type: postgresql
+    dbnames:
+      - orchestrator_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60052
+    master_vip: 10.30.26.152
+    slave_vips:
+      - 10.30.27.152
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: orchestrator_uat_dba
+    app_account_name: orchestrator_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20054
+      pgbouncer_session: 20055
+      postgresql_raw: 20056
+    extra_variables:
+      max_connections: 30
+  points_uat: # GDS-2224
+    type: postgresql
+    dbnames:
+      - points_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60053
+    master_vip: 10.30.26.153
+    slave_vips:
+      - 10.30.27.153
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: points_uat_dba
+    app_account_name: points_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20057
+      pgbouncer_session: 20058
+      postgresql_raw: 20059
+    extra_variables:
+      max_connections: 30
+  points_stg: # GDS-2225
+    type: postgresql
+    dbnames:
+      - points_stg
+    schemas:
+      points_stg:
+        - points
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60054
+    master_vip: 10.30.26.154
+    slave_vips:
+      - 10.30.27.154
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.232.136.212/32  # dms
+      - 10.22.74.119/32   #gds-admin01.snc1
+    dba_account_name: points_stg_dba
+    app_account_name: points_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.232.136.212/32 # dms
+      - 10.22.74.119/32  # gds-admin01.snc1
+    ports:
+      pgbouncer_txn: 20060
+      pgbouncer_session: 20061
+      postgresql_raw: 20062
+    extra_variables:
+      max_connections: 30
+      pglogical: 'on'
+  mds_uat: # GDS-2235
+    type: postgresql
+    dbnames:
+      - mds_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60055
+    master_vip: 10.30.26.155
+    slave_vips:
+      - 10.30.27.155
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.69.134/32   # seo-db1-staging.snc1
+      - 10.20.69.72/32   # seo-db2-staging.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: mds_uat_dba
+    app_account_name: mds_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.69.134/32   # seo-db1-staging.snc1
+      - 10.20.69.72/32   # seo-db2-staging.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20063
+      pgbouncer_session: 20064
+      postgresql_raw: 20065
+    extra_variables:
+      max_connections: 30
+  audience_service_stg: # GDS-2244
+    type: postgresql
+    dbnames:
+      - audience_service_stg
+    schemas:
+      audience_service_stg:
+        - aes_service
+        - audience_service
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60056
+    master_vip: 10.30.26.156
+    slave_vips:
+      - 10.30.27.156
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.22.74.119/32   #gds-admin01.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.84.55/32   # ad-reporting1-staging.snc1
+      - 10.23.30.75/32   # ad-reporting2-staging.snc1
+      - 10.22.233.243/32   # aes-service1.snc1
+      - 10.22.219.18/32   # aes-service2.snc1
+      - 10.23.30.170/32  # aes-service1-staging.snc1
+      - 10.23.48.208/32  # aes-service2-staging.snc1
+      - 10.23.29.203/32   # da-audience1-staging.snc1
+      - 10.23.49.154/32   # da-leadgen1-staging.snc1
+      - 10.23.76.145/32   # da-leadgen2-staging.snc1
+      - 10.23.54.16/32   # da-reporting-staging1.snc1
+      - 10.23.30.33/32   # goods-deletion-service1-staging.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: audience_service_stg_dba
+    app_account_name: audience_service_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.22.74.119/32   #gds-admin01.snc1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.84.55/32   # ad-reporting1-staging.snc1
+      - 10.23.30.75/32   # ad-reporting2-staging.snc1
+      - 10.22.233.243/32   # aes-service1.snc1
+      - 10.22.219.18/32   # aes-service2.snc1
+      - 10.23.30.170/32  # aes-service1-staging.snc1
+      - 10.23.48.208/32  # aes-service2-staging.snc1
+      - 10.23.29.203/32   # da-audience1-staging.snc1
+      - 10.23.49.154/32   # da-leadgen1-staging.snc1
+      - 10.23.76.145/32   # da-leadgen2-staging.snc1
+      - 10.23.54.16/32   # da-reporting-staging1.snc1
+      - 10.23.30.33/32   # goods-deletion-service1-staging.snc1
+      - 10.22.37.38/32   #optimus-owagent1.snc1
+      - 10.22.37.172/32  #optimus-owagent2.snc1
+      - 10.22.37.71/32   #optimus-owagent3.snc1
+      - 10.22.37.73/32   #optimus-owagent4.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20066
+      pgbouncer_session: 20067
+      postgresql_raw: 20068
+    extra_variables:
+      max_connections: 30
+      pglogical: 'on'
+  gstream_stg: # GDS-2246
+    type: postgresql
+    dbnames:
+      - gstream_stg
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60057
+    master_vip: 10.30.26.157
+    slave_vips:
+      - 10.30.27.157
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.138.250/32  # gstream-switchboard1.snc1
+      - 10.20.81.173/32  # gstream-switchboard2.snc1
+      - 10.22.71.47/32  # gstream-switchboard3.snc1
+      - 10.20.132.179/32  # gstream-util1.snc1
+      - 10.20.81.79/32  # gstream-util2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: gstream_stg_dba
+    app_account_name: gstream_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.138.250/32  # gstream-switchboard1.snc1
+      - 10.20.81.173/32  # gstream-switchboard2.snc1
+      - 10.22.71.47/32  # gstream-switchboard3.snc1
+      - 10.20.132.179/32  # gstream-util1.snc1
+      - 10.20.81.79/32  # gstream-util2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20069
+      pgbouncer_session: 20070
+      postgresql_raw: 20071
+    extra_variables:
+      max_connections: 30
+  ci_apac_uat: # GDS-2250
+    type: postgresql
+    dbnames:
+      - ci_apac_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60058
+    master_vip: 10.30.26.158
+    slave_vips:
+      - 10.30.27.158
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.96.75/32    # goodscentral-app1-uat.snc1
+      - 10.22.197.52/32   # goodscentral-apac-app2-uat.snc1
+      - 10.22.197.143/32  # goodscentral-apac-memcache1-staging.snc1
+      - 10.22.197.174/32  # goodscentral-apac-redis1-staging.snc1
+      - 10.22.197.55/32   # goodscentral-apac-worker1-uat.snc1
+      - 10.22.197.140/32  # goodscentral-apac-worker2-uat.snc1
+      - 10.22.197.184/32  # goodscentral-apac-app1-uat.snc1
+      - 10.22.197.150/32  # goodscentral-apac-utility1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: ci_apac_uat_dba
+    app_account_name: ci_apac_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.96.75/32    # goodscentral-app1-uat.snc1
+      - 10.22.197.55/32   # goodscentral-apac-worker1-uat.snc1
+      - 10.22.197.140/32  # goodscentral-apac-worker2-uat.snc1
+      - 10.22.197.52/32   # goodscentral-apac-app2-uat.snc1
+      - 10.22.197.143/32  # goodscentral-apac-memcache1-staging.snc1
+      - 10.22.197.174/32  # goodscentral-apac-redis1-staging.snc1
+      - 10.22.197.184/32  # goodscentral-apac-app1-uat.snc1
+      - 10.22.197.150/32  # goodscentral-apac-utility1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20072
+      pgbouncer_session: 20073
+      postgresql_raw: 20074
+    extra_variables:
+      max_connections: 30
+  gds_test_stg: # GDS-13190
+    type: postgresql
+    dbnames:
+      - gds_test_stg
+    schemas:
+      gds_test_stg:
+        - gds_test
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60059
+    master_vip: 10.30.26.159
+    slave_vips:
+      - 10.30.27.159
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: gds_test_stg_dba
+    app_account_name: gds_test_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20075
+      pgbouncer_session: 20076
+      postgresql_raw: 20077
+    extra_variables:
+      max_connections: 30
+  fba_stg: # GDS-2273
+    type: postgresql
+    dbnames:
+      - fba_stg
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60061
+    master_vip: 10.30.26.161
+    slave_vips:
+      - 10.30.27.161
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.94.70/32    # da-fba1-staging.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: fba_stg_dba
+    app_account_name: fba_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.94.70/32    # da-fba1-staging.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20081
+      pgbouncer_session: 20082
+      postgresql_raw: 20083
+    extra_variables:
+      max_connections: 30
+  goods_invoice_uat: # GDS-2347
+    type: postgresql
+    dbnames:
+      - goods_invoice_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60062
+    master_vip: 10.30.26.162
+    slave_vips:
+      - 10.30.27.162
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.200.64/32   # goods-invoicing-app1-uat.snc1
+      - 10.23.85.180/32   # gls-datamart-app1-staging.snc1 
+      - 10.20.115.126/32 #pit-prod-etldata29.snc1
+      - 10.20.115.156/32 #pit-prod-etldata4.snc1
+      - 10.20.115.160/32 #pit-prod-etldata3.snc1
+      - 10.20.115.166/32 #pit-prod-etldata32.snc1
+      - 10.20.115.184/32 #pit-prod-etldata5.snc1
+      - 10.20.115.217/32 #pit-prod-etldata47.snc1
+      - 10.20.115.227/32 #pit-prod-etldata48.snc1
+      - 10.20.115.229/32 #pit-prod-etldata8.snc1
+      - 10.20.115.232/32 #pit-prod-etldata7.snc1
+      - 10.20.115.237/32 #pit-prod-etldata33.snc1
+      - 10.20.115.238/32 #pit-prod-etldata31.snc1
+      - 10.20.115.242/32 #pit-prod-etldata1.snc1
+      - 10.20.115.247/32 #pit-prod-etldata6.snc1
+      - 10.20.115.252/32 #pit-prod-etldata9.snc1
+      - 10.20.115.32/32 #pit-prod-etldata10.snc1
+      - 10.20.115.61/32 #pit-prod-etldata49.snc1
+      - 10.20.115.71/32 #pit-prod-etldata30.snc1
+      - 10.20.115.74/32 #pit-prod-etldata50.snc1
+      - 10.20.115.75/32 #pit-prod-etldata34.snc1
+      - 10.20.115.96/32 #pit-prod-etldata51.snc1
+      - 10.20.41.45/32 #pit-prod-owagent4.snc1
+      - 10.20.64.52/32 #pit-prod-etlname3.snc1
+      - 10.20.70.11/32 #pit-dev-etlhive1.snc1
+      - 10.20.70.12/32 #pit-prod-etldata13.snc1
+      - 10.20.70.23/32 #pit-devbh-etldata5.snc1
+      - 10.20.70.28/32 #pit-prod-etldata12.snc1
+      - 10.20.70.33/32 #pit-prod-etldata11.snc1
+      - 10.20.70.35/32 #pit-devbh-etldata10.snc1
+      - 10.20.70.36/32 #pit-devbh-etldata11.snc1
+      - 10.20.70.44/32 #pit-devbh-etldata2.snc1
+      - 10.20.70.48/32 #pit-devbh-etldata3.snc1
+      - 10.20.70.52/32 #pit-devbh-etldata4.snc1
+      - 10.20.70.53/32 #pit-devbh-etldata8.snc1
+      - 10.20.70.54/32 #pit-devbh-etldata7.snc1
+      - 10.20.70.55/32 #pit-devbh-etldata9.snc1
+      - 10.20.70.56/32 #pit-devbh-etldata6.snc1
+      - 10.20.70.74/32 #pit-prod-owagent1.snc1
+      - 10.20.70.75/32 #pit-devbh-etlname1.snc1
+      - 10.20.70.79/32 #pit-prod-owagent2.snc1
+      - 10.20.71.49/32 #pit-prod-owagent5.snc1
+      - 10.20.73.116/32 #pit-prod-etldata37.snc1
+      - 10.20.73.76/32 #pit-prod-etldata44.snc1
+      - 10.20.73.77/32 #pit-prod-etldata45.snc1
+      - 10.20.73.78/32 #pit-prod-etldata46.snc1
+      - 10.20.73.91/32 #pit-prod-etldata35.snc1
+      - 10.20.73.92/32 #pit-prod-etldata36.snc1
+      - 10.20.73.94/32 #pit-prod-etldata38.snc1
+      - 10.20.74.134/32 #pit-prod-etldata53.snc1
+      - 10.20.74.139/32 #pit-prod-etldata54.snc1
+      - 10.20.74.142/32 #pit-prod-etldata55.snc1
+      - 10.20.74.143/32 #pit-prod-etldata56.snc1
+      - 10.20.74.167/32 #pit-prod-etldata57.snc1
+      - 10.20.74.172/32 #pit-prod-etldata58.snc1
+      - 10.20.74.175/32 #pit-prod-etldata59.snc1
+      - 10.20.74.177/32 #pit-prod-etldata60.snc1
+      - 10.20.74.180/32 #pit-prod-etldata61.snc1
+      - 10.20.74.185/32 #pit-prod-etldata62.snc1
+      - 10.20.74.195/32 #pit-devbh-etldata12.snc1
+      - 10.20.74.45/32 #pit-devbh-etldata1.snc1
+      - 10.20.74.66/32 #pit-devbh-etldata13.snc1
+      - 10.20.75.135/32 #pit-prod-owagent6.snc1
+      - 10.20.75.74/32 #pit-prod-etlhive1.snc1
+      - 10.20.76.125/32 #pit-prod-owagent3.snc1
+      - 10.20.77.59/32 #pit-prod-etlname1.snc1
+      - 10.20.78.101/32 #pit-prod-etldata42.snc1
+      - 10.20.78.103/32 #pit-prod-etldata41.snc1
+      - 10.20.78.108/32 #pit-prod-etldata40.snc1
+      - 10.20.78.118/32 #pit-prod-etldata39.snc1
+      - 10.20.78.80/32 #pit-prod-etldata43.snc1
+      - 10.20.78.99/32 #pit-prod-etldata52.snc1
+      - 10.20.83.111/32 #pit-prod-etldata17.snc1
+      - 10.20.83.133/32 #pit-prod-etldata14.snc1
+      - 10.20.83.138/32 #pit-prod-etldata25.snc1
+      - 10.20.83.163/32 #pit-prod-etldata26.snc1
+      - 10.20.83.165/32 #pit-prod-etldata16.snc1
+      - 10.20.83.180/32 #pit-prod-etldata2.snc1
+      - 10.20.83.187/32 #pit-prod-etldata20.snc1
+      - 10.20.83.201/32 #pit-prod-etldata18.snc1
+      - 10.20.83.207/32 #pit-prod-etldata28.snc1
+      - 10.20.83.220/32 #pit-prod-etldata23.snc1
+      - 10.20.83.221/32 #pit-prod-etldata21.snc1
+      - 10.20.83.231/32 #pit-prod-etldata24.snc1
+      - 10.20.83.250/32 #pit-prod-etldata19.snc1
+      - 10.20.83.61/32 #pit-prod-etldata22.snc1
+      - 10.20.83.73/32 #pit-prod-etldata27.snc1
+      - 10.20.83.93/32 #pit-prod-etldata15.snc1
+      - 10.20.95.234/32 #pit-dev-owagent1.snc1
+      - 10.20.95.97/32 #pit-dev-owagent2.snc1
+      - 10.22.194.40/32 #pit-dev-owagent3.snc1
+      - 10.20.70.191/24 #pit-prod-etldata63.snc1
+      - 10.20.70.251/24 #pit-prod-etldata65.snc1
+      - 10.20.70.164/24 #pit-prod-etldata66.snc1
+      - 10.20.70.181/24 #pit-prod-etldata67.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: goods_invoice_uat_dba
+    app_account_name: goods_invoice_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.200.64/32   # goods-invoicing-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20084
+      pgbouncer_session: 20085
+      postgresql_raw: 20086
+    extra_variables:
+      max_connections: 30
+  ondemand_backend_stg: # GDS-2363
+    type: postgresql
+    dbnames:
+      - ondemand_backend_stg
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60064
+    master_vip: 10.30.26.164
+    slave_vips:
+      - 10.30.27.164
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.213.137.31/32  # dms
+    dba_account_name: ondemand_backend_stg_dba
+    app_account_name: ondemand_backend_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.213.137.31/32  # dms
+    ports:
+      pgbouncer_txn: 20090
+      pgbouncer_session: 20091
+      postgresql_raw: 20092
+    extra_variables:
+      max_connections: 30
+  spaceman_tpis_uat: # GDS-2401
+    type: postgresql
+    dbnames:
+      - spaceman_tpis_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60065
+    master_vip: 10.30.26.165
+    slave_vips:
+      - 10.30.27.165
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.82.55/32    # tpis-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: spaceman_tpis_uat_dba
+    app_account_name: spaceman_tpis_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.23.82.55/32    # tpis-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20093
+      pgbouncer_session: 20094
+      postgresql_raw: 20095
+    extra_variables:
+      max_connections: 30
+# fed_ledger_uat destroyed GDS-2570
+# fed_ledger_stg destroyed GDS-2570
+#  compass_stg: # GDS-2582  #Decomm GDS-33874 #
+  merchant_spl_stg: # GDS-2699 
+    type: postgresql
+    dbnames:
+      - merchant_spl_stg
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60072
+    master_vip: 10.30.26.172
+    slave_vips:
+      - 10.30.27.172
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: merchant_spl_stg_dba
+    app_account_name: merchant_spl_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20114
+      pgbouncer_session: 20115
+      postgresql_raw: 20116
+    extra_variables:
+      max_connections: 30
+  msg_to_ledger_uat: # GDS-2799 
+    type: postgresql
+    dbnames:
+      - msg_to_ledger_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60073
+    master_vip: 10.30.26.173
+    slave_vips:
+      - 10.30.27.173
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.80.136/32  # accounting-utility2-uat.snc1
+      - 10.20.68.42/32    # accounting-app1-uat.snc1
+      - 10.20.73.74/32
+      - 10.20.77.121/32
+      - 10.20.71.136/32
+      - 10.20.70.11/32
+      - 10.20.74.54/32
+      - 10.20.76.104/32
+      - 10.20.95.234/32
+      - 10.20.95.97/32
+      - 10.22.194.40/32
+      - 10.20.76.184/32
+      - 10.20.76.227/32
+      - 10.20.74.45/32
+      - 10.20.70.35/32
+      - 10.20.70.36/32
+      - 10.20.74.195/32
+      - 10.20.74.66/32
+      - 10.20.70.44/32
+      - 10.20.70.48/32
+      - 10.20.70.52/32
+      - 10.20.70.23/32
+      - 10.20.70.56/32
+      - 10.20.70.54/32
+      - 10.20.70.53/32
+      - 10.20.70.55/32
+      - 10.20.70.75/32
+      - 10.20.82.77/32
+      - 10.20.82.227/32
+      - 10.20.82.85/32
+      - 10.20.84.191/32
+      - 10.20.82.236/32
+      - 10.20.76.126/32
+      - 10.20.76.119/32
+      - 10.23.29.230/32
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: msg_to_ledger_uat_dba
+    app_account_name: msg_to_ledger_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.80.136/32  # accounting-utility2-uat.snc1
+      - 10.20.68.42/32    # accounting-app1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20117
+      pgbouncer_session: 20118
+      postgresql_raw: 20119
+    extra_variables:
+      max_connections: 30
+#  god_dashboard_stg: # GDS-2799  #Decomm GDS-33874#
+  crs_uat: # GDS-2295
+    type: postgresql
+    dbnames:
+      - crs_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60076
+    master_vip: 10.30.26.176
+    slave_vips:
+      - 10.30.27.176
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.195.251/32  # im-resting1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: crs_uat_dba
+    app_account_name: crs_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.22.195.251/32  # im-resting1-uat.snc1
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20126
+      pgbouncer_session: 20127
+      postgresql_raw: 20128
+    extra_variables:
+      max_connections: 30    
+  msg_to_ledger_stg: # GDS-2800
+    type: postgresql
+    dbnames:
+      - msg_to_ledger_stg
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60077
+    master_vip: 10.30.26.177
+    slave_vips:
+      - 10.30.27.177
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.80.96/32  # accounting-utility2-staging.snc1
+      - 10.20.68.45/32    # accounting-app1-staging.snc1 
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    dba_account_name: msg_to_ledger_stg_dba
+    app_account_name: msg_to_ledger_stg_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.80.96/32  # accounting-utility2-staging.snc1
+      - 10.20.68.45/32    # accounting-app1-staging.snc1 
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+    ports:
+      pgbouncer_txn: 20129
+      pgbouncer_session: 20130
+      postgresql_raw: 20131
+    extra_variables:
+      max_connections: 30
+  compass_uat: # GDS-2583 
+    type: postgresql
+    dbnames:
+      - compass_uat
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 100
+    unix_user: gds_uid60078
+    master_vip: 10.30.26.178
+    slave_vips:
+      - 10.30.27.178
+    replication_ips:
+      - 10.22.142.161 # gds-snc1-stg-db022m1.snc1
+      - 10.22.142.26  # gds-snc1-stg-db022s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.79.71/32   # global-payments-config-service-uat-us-app1.snc1 
+      - 10.20.115.103/32   # global-payments-config-service-uat-us-app2.snc1 
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    dba_account_name: compass_uat_dba
+    app_account_name: compass_uat_app
+    dba_src_cidrs:
+      - 10.20.131.214/32   # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.20.32.17/32    # dev1.snc1
+      - 10.22.198.126/32  # dev2.snc1
+      - 10.20.79.71/32   # global-payments-config-service-uat-us-app1.snc1 
+      - 10.20.115.103/32   # global-payments-config-service-uat-us-app2.snc1 
+      - 10.213.48.0/20   # us-west-1
+      - 10.213.64.0/20   # us-west-1
+      - 10.213.138.0/24   # us-west-1
+      - 10.221.48.0/20   # us-west-2
+      - 10.221.64.0/20   # us-west-2
+      - 10.221.80.0/20   # us-west-2
+    ports:
+      pgbouncer_txn: 20132
+      pgbouncer_session: 20133
+      postgresql_raw: 20134
+    extra_variables:
+      max_connections: 30

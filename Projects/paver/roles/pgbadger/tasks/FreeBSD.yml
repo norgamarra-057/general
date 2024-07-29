@@ -1,0 +1,128 @@
+---
+# Create parent if it doens't exist
+- name: get host uuid
+  command: sysctl -n kern.hostuuid
+  register: sysctl_kern_hostuuid
+  changed_when: false
+  always_run: true
+
+- name: set jail_uuid
+  set_fact: 
+    jail_uuid: "{{ sysctl_kern_hostuuid.stdout }}"
+
+- name: PostgreSQL | FreeBSD | zfs | groupon root  
+  zfs:
+    name: "tank/iocage/jails/{{ jail_uuid }}/root/grpn"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'on'
+    mountpoint: "{{ groupon_root }}"
+    primarycache: all
+    readonly: 'off'
+    recordsize: 16K
+    secondarycache: all
+    setuid: 'off'
+    state: present
+    sync: standard
+
+- name: zfs set facts
+  set_fact:
+    jail_zfs: "tank/iocage/jails/{{ jail_uuid }}/root/grpn"
+
+# Create the base dataset that all databases inherit from
+- name: PostgreSQL | FreeBSD | zfs | root
+  zfs:
+    name: "{{ jail_zfs }}/pgbadger"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "{{ pgbadger_root }}"
+    primarycache: all
+    readonly: 'off'
+    recordsize: 16K
+    secondarycache: all
+    setuid: 'off'
+    state: present
+    sync: standard
+
+- name: install consul packages
+  pkgng: name={{ item }} state=present
+  with_items:
+    - pgbadger
+
+- name: create data directory
+  file:
+    path={{ pgbadger_root }}
+    state=directory
+    owner=root
+    group=wheel
+
+- name: pgbadger | create datacenter folder
+  file:
+    path={{ pgbadger_root }}/{{item}}
+    state=directory
+    owner=root
+    group=wheel
+    mode=0766
+  with_items:
+    - snc1
+    - lup1
+
+- name: pgbadger | create lup1 instances
+  file:
+    path={{ pgbadger_root }}/lup1/{{ item }}
+    state=directory
+    owner=root
+    group=wheel
+    mode=0766
+  with_items:
+    - "{{ lup1_instances }}"
+
+- name: pgbadger | create snc1 instances
+  file:
+    path={{ pgbadger_root }}/snc1/{{ item }}
+    state=directory
+    owner=root
+    group=wheel
+    mode=0766
+  with_items:
+    - "{{ snc1_instances }}"
+
+- name: pgbadger | snc1 scripts
+  template:
+    dest="{{ pgbadger_root }}/pgbadger_snc1.sh"
+    mode=0755
+    src=pgbadger_snc1.sh.j2
+    owner=root
+    group=wheel
+
+
+- name: pgbadger | lup1 scripts
+  template:
+    dest="{{ pgbadger_root }}/pgbadger_lup1.sh"
+    mode=0755
+    src=pgbadger_lup1.sh.j2
+    owner=root
+    group=wheel
+
+- name: pgbadger | FreeBSD | cron snc1
+  cron:
+    name="pgbadger  SNC1 "
+    minute=0
+    hour=1
+    user="root"
+    job="{{ pgbadger_root }}/pgbadger_snc1.sh"
+
+- name: pgbadger | FreeBSD | cron lup1
+  cron:
+    name="pgbadger  LUP1 "
+    minute=0
+    hour=3
+    user="root"
+    job="{{ pgbadger_root }}/pgbadger_lup1.sh"

@@ -1,0 +1,21 @@
+---
+# Register Playback service status for MySQL instance
+
+- name: Decommission | Playback | See if Playback MySQL service is defined
+  stat:
+    path: "{{ playback_runit_service_path }}"
+  register: playback_service
+  changed_when: false
+  
+- name: Decommission | Playback | See if Playback MySQL service data path exists
+  stat:
+    path: "{{ playback_runit_service_path }}"
+  register: playback_service_data
+  changed_when: false  
+
+- name: Decommission | Playback | Register Playback MySQL instance status
+  shell: sv status {{ playback_runit_service_path }} | cut -d':' -f1
+  register: playback_service_status
+  when: playback_service.stat.isdir is defined and playback_service.stat.isdir
+  changed_when: false
+

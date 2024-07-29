@@ -1,0 +1,6 @@
+---
+- name: Apply os-config
+  hosts: gds_all
+  become: yes
+  roles:
+    - os-config

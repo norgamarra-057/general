@@ -1,0 +1,13 @@
+# See smtpd.conf(5) for more information.
+
+# To accept external mail, replace with: listen on all
+listen on lo0
+
+# If you edit the file, you have to run "smtpctl update table aliases"
+table aliases file:/etc/mail/aliases
+table local_domains { "groupon.com", "groupondev.com" }
+
+accept from local for domain <local_domains> relay via "smtp.snc1"
+
+# Rewrite mail as ${USER}@groupon.com for only @groupon.com (i.e. don't allow for inadvertant)
+accept for local relay via "smtp.snc1" as "@groupon.com"

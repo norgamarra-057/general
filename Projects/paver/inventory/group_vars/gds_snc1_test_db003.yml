@@ -1,0 +1,15 @@
+---
+gds_carp_peers:
+  - 10.24.134.62 # FIXME
+  - 10.24.134.189 # FIXME
+  - 10.24.135.62 # FIXME
+  - 10.24.135.189 # FIXME
+gds_carp_interfaces:
+  - vlan332
+  - vlan333
+gds_instance_group: gds_snc1_test_db003
+gds_monitor_cluster_type: mix
+
+gds_instances:
+#  pwa_prod:
+#  orders_prod:

@@ -1,0 +1,498 @@
+---
+gds_carp_peers:
+  - 10.32.86.252  # gds-sac1-prod-db061m1
+  - 10.32.86.253  # gds-sac1-prod-db061s1
+  - 10.32.80.252  # gds-sac1-prod-db061m1
+  - 10.32.80.253  # gds-sac1-prod-db061s1
+gds_carp_interfaces:
+  - vlan204
+  - vlan205
+gds_instance_group: gds_prod_sac1_db061
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  voucherinventory_prod: # GDS-2346
+    mysqld_options:
+      innodb_buffer_pool_size_mb_force: 8000
+      relay_log_recovery_force: ON
+      max_connections_force: 8000
+      max_user_connections_force: 7990
+      binlog_checksum: none
+      log_bin_use_v1_row_events: 1
+      innodb_autoinc_lock_mode_force: 2
+    type: mysql
+    write_origin: snc1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-sac1-prod-db061m1.sac1
+      - gds-sac1-prod-db061s1.sac1
+    master_carp_interface: vlan204
+    slave_carp_interface: vlan205
+    vhid: 197
+    slave_vhid: 197
+    master_vip: 10.32.86.197
+    slave_vips:
+      - 10.32.80.197
+    replication_ips:
+      - 10.22.148.72 # gds-snc1-prod-db061m1.snc1
+      - 10.22.148.91 # gds-snc1-prod-db061s1.snc1
+      - 10.32.121.91   #gds-sac1-prod-db061m1.sac1
+      - 10.32.121.139   #gds-sac1-prod-db061s1.sac1
+      - 10.22.142.195 # gds-snc1-prod-db019m1.snc1
+      - 10.22.142.163 # gds-snc1-prod-db019s1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.109.211/32   #voucher-inventory-japp1.snc1
+      - 10.22.109.155/32   #voucher-inventory-japp2.snc1
+      - 10.22.149.130/32   #voucher-inventory-japp3.snc1
+      - 10.22.149.31/32   #voucher-inventory-japp4.snc1
+      - 10.22.237.73/32   #voucher-inventory-japp5.snc1
+      - 10.22.216.201/32   #voucher-inventory-japp6.snc1
+      - 10.22.237.104/32   #voucher-inventory-japp7.snc1
+      - 10.22.237.140/32   #voucher-inventory-japp8.snc1
+      - 10.22.233.127/32   #voucher-inventory-japp9.snc1
+      - 10.22.67.235/32   #voucher-inventory-japp10.snc1
+      - 10.22.150.154/32   #voucher-inventory-japp11.snc1
+      - 10.22.217.136/32   #voucher-inventory-japp12.snc1
+      - 10.22.237.117/32   #voucher-inventory-japp13.snc1
+      - 10.22.67.164/32   #voucher-inventory-japp14.snc1
+      - 10.22.67.15/32   #voucher-inventory-japp15.snc1
+      - 10.22.67.36/32   #voucher-inventory-japp16.snc1
+      - 10.22.135.201/32   #voucher-inventory-japp17.snc1
+      - 10.22.237.37/32   #voucher-inventory-japp18.snc1
+      - 10.22.216.44/32   #voucher-inventory-japp19.snc1
+      - 10.22.71.251/32   #voucher-inventory-japp20.snc1
+      - 10.22.237.124/32   #voucher-inventory-jworker1.snc1
+      - 10.22.109.131/32   #voucher-inventory-jworker2.snc1
+      - 10.32.72.149/32   #voucher-inventory-japp1.sac1
+      - 10.32.69.108/32   #voucher-inventory-japp2.sac1
+      - 10.32.94.53/32   #voucher-inventory-japp3.sac1
+      - 10.32.97.217/32   #voucher-inventory-japp4.sac1
+      - 10.32.225.35/32   #voucher-inventory-japp5.sac1
+      - 10.32.230.8/32   #voucher-inventory-japp6.sac1
+      - 10.32.120.120/32   #voucher-inventory-japp7.sac1
+      - 10.32.176.220/32   #voucher-inventory-japp8.sac1
+      - 10.32.208.115/32   #voucher-inventory-japp9.sac1
+      - 10.32.178.236/32   #voucher-inventory-japp10.sac1
+      - 10.32.234.84/32   #voucher-inventory-japp11.sac1
+      - 10.32.103.105/32   #voucher-inventory-japp12.sac1
+      - 10.32.231.142/32   #voucher-inventory-japp13.sac1
+      - 10.32.62.162/32   #voucher-inventory-japp14.sac1
+      - 10.32.49.84/32   #voucher-inventory-japp15.sac1
+      - 10.32.37.61/32   #voucher-inventory-japp16.sac1
+      - 10.32.160.222/32   #voucher-inventory-japp17.sac1
+      - 10.32.100.95/32   #voucher-inventory-japp18.sac1
+      - 10.32.229.30/32   #voucher-inventory-japp19.sac1
+      - 10.32.248.217/32   #voucher-inventory-japp20.sac1
+      - 10.32.248.171/32   #voucher-inventory-jworker1.sac1
+      - 10.32.69.221/32   #voucher-inventory-jworker2.sac1
+      - 10.22.72.55/32   #voucher-inventory-utility1.snc1
+      - 10.22.109.129/32   #voucher-inventory-utility2.snc1
+      - 10.23.100.166/32   #geo-redundancy-load-test1.snc1
+      - 10.23.76.59/32   #geo-redundancy-load-test2.snc1
+      - 10.23.72.99/32   #geo-redundancy-load-test3.snc1
+      - 10.20.42.175/32  # pit-dev-megatron-slave1.snc1
+      - 10.20.74.160/32  # deal-ecosystem-app1.snc1
+      - 10.20.74.147/32  # deal-ecosystem-app2.snc1
+      - 10.20.73.186/32  # deal-ecosystem-app3.snc1
+      - 10.20.73.178/32  # deal-ecosystem-app4.snc1
+      - 10.20.68.122/32  # deal-ecosystem-app5.snc1
+      - 10.20.78.231/32  # deal-ecosystem-worker1.snc1
+      - 10.20.78.181/32  # deal-ecosystem-worker2.snc1
+      - 10.20.91.179/32  # deal-ecosystem-worker3.snc1
+      - 10.20.73.195/32  # deal-ecosystem-app1-staging.snc1
+      - 10.20.71.180/32   # deal-ecosystem-db2.snc1
+      - 10.20.71.147/32   # deal-ecosystem-db1.snc1
+      - 10.22.237.185/32   #voucher-inventory-app1.snc1
+      - 10.20.77.235/32   #voucher-inventory-app2.snc1
+      - 10.22.237.141/32   #voucher-inventory-app3.snc1
+      - 10.22.140.134/32   #voucher-inventory-app4.snc1
+      - 10.22.237.8/32   #voucher-inventory-app5.snc1
+      - 10.22.150.185/32   #voucher-inventory-app6.snc1
+      - 10.22.152.205/32   #voucher-inventory-app7.snc1
+      - 10.22.237.148/32   #voucher-inventory-app8.snc1
+      - 10.20.70.68/32   #pit-prod-didata11.snc1
+      - 10.20.70.69/32   #pit-prod-didata12.snc1
+      - 10.20.70.13/32   #pit-prod-didata13.snc1
+      - 10.20.70.19/32   #pit-prod-didata14.snc1
+      - 10.20.70.20/32   #pit-prod-didata15.snc1
+      - 10.20.70.21/32   #pit-prod-didata16.snc1
+      - 10.20.70.70/32   #pit-prod-didata17.snc1
+      - 10.20.73.89/32   #pit-prod-didata18.snc1
+      - 10.20.73.90/32   #pit-prod-didata19.snc1
+      - 10.20.73.79/32   #pit-prod-didata1.snc1
+      - 10.20.73.80/32   #pit-prod-didata20.snc1
+      - 10.20.73.81/32   #pit-prod-didata21.snc1
+      - 10.20.74.148/32   #pit-prod-didata22.snc1
+      - 10.20.73.86/32   #pit-prod-didata23.snc1
+      - 10.20.73.88/32   #pit-prod-didata24.snc1
+      - 10.20.73.75/32   #pit-prod-didata25.snc1
+      - 10.20.74.151/32   #pit-prod-didata26.snc1
+      - 10.20.74.152/32   #pit-prod-didata27.snc1
+      - 10.20.70.65/32   #pit-prod-didata28.snc1
+      - 10.20.70.66/32   #pit-prod-didata29.snc1
+      - 10.20.73.82/32   #pit-prod-didata2.snc1
+      - 10.20.70.37/32   #pit-prod-didata30.snc1
+      - 10.20.70.38/32   #pit-prod-didata31.snc1
+      - 10.20.70.39/32   #pit-prod-didata32.snc1
+      - 10.20.70.40/32   #pit-prod-didata33.snc1
+      - 10.20.70.41/32   #pit-prod-didata34.snc1
+      - 10.20.70.42/32   #pit-prod-didata35.snc1
+      - 10.20.70.22/32   #pit-prod-didata3.snc1
+      - 10.20.70.24/32   #pit-prod-didata4.snc1
+      - 10.20.70.46/32   #pit-prod-didata5.snc1
+      - 10.20.70.47/32   #pit-prod-didata6.snc1
+      - 10.20.74.135/32   #pit-prod-didata7.snc1
+      - 10.20.74.136/32   #pit-prod-didata8.snc1
+      - 10.20.74.53/32   #pit-prod-didata9.snc1
+      - 10.20.78.35/32   #pit-prod-diname1.snc1
+      - 10.20.42.54/32   #pit-prod-diutil1.snc1
+      - 50.115.209.98/32   #pit-prod-dropbox1.snc1
+      - 10.20.115.32/32   #pit-prod-etldata10.snc1
+      - 10.20.70.33/32   #pit-prod-etldata11.snc1
+      - 10.20.70.28/32   #pit-prod-etldata12.snc1
+      - 10.20.70.12/32   #pit-prod-etldata13.snc1
+      - 10.20.83.133/32   #pit-prod-etldata14.snc1
+      - 10.20.83.93/32   #pit-prod-etldata15.snc1
+      - 10.20.83.165/32   #pit-prod-etldata16.snc1
+      - 10.20.83.111/32   #pit-prod-etldata17.snc1
+      - 10.20.83.201/32   #pit-prod-etldata18.snc1
+      - 10.20.83.250/32   #pit-prod-etldata19.snc1
+      - 10.20.115.242/32   #pit-prod-etldata1.snc1
+      - 10.20.83.187/32   #pit-prod-etldata20.snc1
+      - 10.20.83.221/32   #pit-prod-etldata21.snc1
+      - 10.20.83.61/32   #pit-prod-etldata22.snc1
+      - 10.20.83.220/32   #pit-prod-etldata23.snc1
+      - 10.20.83.231/32   #pit-prod-etldata24.snc1
+      - 10.20.83.138/32   #pit-prod-etldata25.snc1
+      - 10.20.83.163/32   #pit-prod-etldata26.snc1
+      - 10.20.83.73/32   #pit-prod-etldata27.snc1
+      - 10.20.83.207/32   #pit-prod-etldata28.snc1
+      - 10.20.115.126/32   #pit-prod-etldata29.snc1
+      - 10.20.83.180/32   #pit-prod-etldata2.snc1
+      - 10.20.115.71/32   #pit-prod-etldata30.snc1
+      - 10.20.115.238/32   #pit-prod-etldata31.snc1
+      - 10.20.115.166/32   #pit-prod-etldata32.snc1
+      - 10.20.115.237/32   #pit-prod-etldata33.snc1
+      - 10.20.115.75/32   #pit-prod-etldata34.snc1
+      - 10.20.73.91/32   #pit-prod-etldata35.snc1
+      - 10.20.73.92/32   #pit-prod-etldata36.snc1
+      - 10.20.73.116/32   #pit-prod-etldata37.snc1
+      - 10.20.73.94/32   #pit-prod-etldata38.snc1
+      - 10.20.78.118/32   #pit-prod-etldata39.snc1
+      - 10.20.115.160/32   #pit-prod-etldata3.snc1
+      - 10.20.78.108/32   #pit-prod-etldata40.snc1
+      - 10.20.78.103/32   #pit-prod-etldata41.snc1
+      - 10.20.78.101/32   #pit-prod-etldata42.snc1
+      - 10.20.78.80/32   #pit-prod-etldata43.snc1
+      - 10.20.73.76/32   #pit-prod-etldata44.snc1
+      - 10.20.73.77/32   #pit-prod-etldata45.snc1
+      - 10.20.73.78/32   #pit-prod-etldata46.snc1
+      - 10.20.115.217/32   #pit-prod-etldata47.snc1
+      - 10.20.115.227/32   #pit-prod-etldata48.snc1
+      - 10.20.115.61/32   #pit-prod-etldata49.snc1
+      - 10.20.115.156/32   #pit-prod-etldata4.snc1
+      - 10.20.115.74/32   #pit-prod-etldata50.snc1
+      - 10.20.115.96/32   #pit-prod-etldata51.snc1
+      - 10.20.78.99/32   #pit-prod-etldata52.snc1
+      - 10.20.74.134/32   #pit-prod-etldata53.snc1
+      - 10.20.74.139/32   #pit-prod-etldata54.snc1
+      - 10.20.74.142/32   #pit-prod-etldata55.snc1
+      - 10.20.74.143/32   #pit-prod-etldata56.snc1
+      - 10.20.74.167/32   #pit-prod-etldata57.snc1
+      - 10.20.74.172/32   #pit-prod-etldata58.snc1
+      - 10.20.74.175/32   #pit-prod-etldata59.snc1
+      - 10.20.115.184/32   #pit-prod-etldata5.snc1
+      - 10.20.74.177/32   #pit-prod-etldata60.snc1
+      - 10.20.74.180/32   #pit-prod-etldata61.snc1
+      - 10.20.74.185/32   #pit-prod-etldata62.snc1
+      - 10.20.70.191/32   #pit-prod-etldata63.snc1
+      - 10.20.70.142/32   #pit-prod-etldata64.snc1
+      - 10.20.70.251/32   #pit-prod-etldata65.snc1
+      - 10.20.70.164/32   #pit-prod-etldata66.snc1
+      - 10.20.70.181/32   #pit-prod-etldata67.snc1
+      - 10.20.115.57/32   #pit-prod-etldata68.snc1
+      - 10.20.115.43/32   #pit-prod-etldata69.snc1
+      - 10.20.115.247/32   #pit-prod-etldata6.snc1
+      - 10.20.115.55/32   #pit-prod-etldata70.snc1
+      - 10.20.115.116/32   #pit-prod-etldata71.snc1
+      - 10.20.115.88/32   #pit-prod-etldata72.snc1
+      - 10.20.115.232/32   #pit-prod-etldata7.snc1
+      - 10.20.115.229/32   #pit-prod-etldata8.snc1
+      - 10.20.115.252/32   #pit-prod-etldata9.snc1
+      - 10.20.75.74/32   #pit-prod-etlhive1.snc1
+      - 10.20.75.96/32   #pit-prod-etljob1.snc1
+      - 10.20.78.11/32   #pit-prod-etljob2.snc1
+      - 10.20.77.59/32   #pit-prod-etlname1.snc1
+      - 10.20.64.52/32   #pit-prod-etlname3.snc1
+      - 10.22.141.124/32   #pit-prod-etlname4.snc1
+      - 10.20.131.111/32   #pit-prod-etl-zk1.snc1
+      - 10.20.73.110/32   #pit-prod-etl-zk2.snc1
+      - 10.22.139.72/32   #pit-prod-etl-zk3.snc1
+      - 10.20.70.76/32   #pit-prod-hdpjob1.snc1
+      - 10.20.70.74/32   #pit-prod-megatron-master1.snc1
+      - 10.20.42.46/32   #pit-prod-megatron-slave1.snc1
+      - 10.20.70.79/32   #pit-prod-megatron-slave2.snc1
+      - 10.22.76.241/32   #pit-prod-owagent2.snc1
+      - 10.20.76.125/32   #pit-prod-owagent3.snc1
+      - 10.20.41.45/32   #pit-prod-owagent4.snc1
+      - 10.20.71.49/32   #pit-prod-owagent5.snc1
+      - 10.20.75.135/32   #pit-prod-owagent6.snc1
+      - 10.20.70.72/32   #pit-prod-owmaster1.snc1
+      - 10.20.41.83/32   #pit-prod-owmaster2.snc1
+      - 10.20.41.83/32   #pit-prod-owmaster2.snc1
+      - 10.23.29.230/32   #pit1-dev.snc1
+      - 10.20.70.35/32   #pit-devbh-etldata10.snc1
+      - 10.20.70.36/32   #pit-devbh-etldata11.snc1
+      - 10.20.74.195/32   #pit-devbh-etldata12.snc1
+      - 10.20.74.66/32   #pit-devbh-etldata13.snc1
+      - 10.20.74.45/32   #pit-devbh-etldata1.snc1
+      - 10.20.70.44/32   #pit-devbh-etldata2.snc1
+      - 10.20.70.48/32   #pit-devbh-etldata3.snc1
+      - 10.20.70.52/32   #pit-devbh-etldata4.snc1
+      - 10.20.70.23/32   #pit-devbh-etldata5.snc1
+      - 10.20.70.56/32   #pit-devbh-etldata6.snc1
+      - 10.20.70.54/32   #pit-devbh-etldata7.snc1
+      - 10.20.70.53/32   #pit-devbh-etldata8.snc1
+      - 10.20.70.55/32   #pit-devbh-etldata9.snc1
+      - 10.20.70.75/32   #pit-devbh-etlname1.snc1
+      - 10.20.73.74/32   #pit-dev-didata1.snc1
+      - 10.20.77.121/32   #pit-dev-diname1.snc1
+      - 10.20.71.136/32   #pit-dev-diutil1.snc1
+      - 10.20.70.11/32   #pit-dev-etlhive1.snc1
+      - 10.20.74.54/32   #pit-dev-hdpjob1.snc1
+      - 10.20.76.104/32   #pit-dev-hdpname1.snc1
+      - 10.20.95.234/32   #pit-dev-owagent1.snc1
+      - 10.20.95.97/32   #pit-dev-owagent2.snc1
+      - 10.22.194.40/32   #pit-dev-owagent3.snc1
+      - 10.20.76.184/32   #pit-dev-owmaster1.snc1
+      - 10.20.76.227/32   #pit-dev-tdw1.snc1
+      - 10.20.82.77/32   #pit-devvm-opswiseagent1.snc1
+      - 10.20.82.227/32   #pit-devvm-opswiseagent2.snc1
+      - 10.20.82.85/32   #pit-devvm-opswiseagent3.snc1
+      - 10.20.84.191/32   #pit-devvm-opswiseagent4.snc1
+      - 10.20.82.236/32   #pit-devvm-opswisemaster2.snc1
+      - 10.20.76.126/32   #pit-util-dev2.snc1
+      - 10.20.76.119/32   #pit-util-dev3.snc1
+      - 10.20.42.48/32   #flumecollector3.snc1
+      - 10.20.70.74/32   #pit-prod-megatron-master1.snc1
+      - 10.20.70.79/32   #pit-prod-megatron-slave2.snc1
+      - 10.20.42.46/32   #pit-prod-megatron-slave1.snc1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.13.250.11/32   # gds-dub1-prod-db003m1.dub1
+      - 10.13.250.51/32   # gds-dub1-prod-db003s1.dub1
+      - 10.20.76.55/32   #pit-prod-owagent7.snc1
+      - 10.20.76.59/32   #pit-prod-owagent8.snc1
+      - 10.20.76.64/32   #pit-prod-owagent9.snc1
+      - 10.22.70.192/32 # pit-prod-megatron-master3.snc1
+      - 10.22.76.39/32   #voucher-inventory-worker3.snc1
+      - 10.20.76.237/32   #voucher-inventory-worker4.snc1
+      - 10.32.71.181/32 # voucher-inventory-app1.sac1
+      - 10.32.213.141/32 # voucher-inventory-app2.sac1
+      - 10.32.142.155/32 # voucher-inventory-app3.sac1
+      - 10.32.120.197/32 # voucher-inventory-app4.sac1
+      - 10.32.209.155/32 # voucher-inventory-memcache1.sac1
+      - 10.32.174.131/32 # voucher-inventory-memcache2.sac1
+      - 10.32.152.35/32 # voucher-inventory-utility1.sac1
+      - 10.32.150.215/32 # voucher-inventory-utility2.sac1
+      - 10.32.55.15/32 # voucher-inventory-worker1.sac1
+      - 10.32.142.209/32 # voucher-inventory-worker2.sac1
+      - 10.32.105.168/32 # deal-ecosystem-app1.sac1
+      - 10.32.239.124/32 # deal-ecosystem-app2.sac1
+      - 10.32.110.78/32 # deal-ecosystem-app3.sac1
+      - 10.32.164.143/32   # deal-ecosystem-app4.sac1
+      - 10.20.78.67/32   #pit-prod-etldata117.snc1
+      - 10.20.74.27/32   #pit-prod-etldata118.snc1
+      - 10.20.74.28/32   #pit-prod-etldata119.snc1
+      - 10.20.74.30/32   #pit-prod-etldata120.snc1
+      - 10.20.74.37/32   #pit-prod-etldata121.snc1
+      - 10.20.74.32/32   #pit-prod-etldata122.snc1
+      - 10.20.74.39/32   #pit-prod-etldata123.snc1
+      - 10.20.74.31/32   #pit-prod-etldata124.snc1
+      - 10.20.74.40/32   #pit-prod-etldata125.snc1
+      - 10.20.74.36/32   #pit-prod-etldata126.snc1
+      - 10.20.74.38/32   #pit-prod-etldata127.snc1
+      - 10.20.74.35/32   #pit-prod-etldata128.snc1
+      - 10.20.74.41/32   #pit-prod-etldata129.snc1
+      - 10.20.74.42/32   #pit-prod-etldata130.snc1
+      - 10.20.74.33/32   #pit-prod-etldata131.snc1
+      - 10.20.74.44/32   #pit-prod-etldata132.snc1
+      - 10.20.74.55/32   #pit-prod-etldata133.snc1
+      - 10.20.74.57/32   #pit-prod-etldata134.snc1
+      - 10.20.74.58/32   #pit-prod-etldata135.snc1
+      - 10.20.74.59/32   #pit-prod-etldata136.snc1
+      - 10.20.74.60/32   #pit-prod-etldata137.snc1
+      - 10.20.74.12/32   #pit-prod-etldata138.snc1
+      - 10.20.74.14/32   #pit-prod-etldata139.snc1
+      - 10.20.74.13/32   #pit-prod-etldata140.snc1
+      - 10.20.74.15/32   #pit-prod-etldata141.snc1
+      - 10.20.74.16/32   #pit-prod-etldata142.snc1
+      - 10.20.74.17/32   #pit-prod-etldata143.snc1
+      - 10.20.74.18/32   #pit-prod-etldata144.snc1
+      - 10.20.74.19/32   #pit-prod-etldata145.snc1
+      - 10.20.74.20/32   #pit-prod-etldata146.snc1
+      - 10.20.74.21/32   #pit-prod-etldata147.snc1
+      - 10.20.74.23/32   #pit-prod-etldata148.snc1
+      - 10.20.74.34/32   #pit-prod-etldata149.snc1
+      - 10.20.74.25/32   #pit-prod-etldata150.snc1
+      - 10.20.74.29/32   #pit-prod-etldata151.snc1
+      - 10.20.78.60/32   #pit-prod-etldata152.snc1
+      - 10.20.74.50/32   #pit-prod-etldata153.snc1
+      - 10.20.74.51/32   #pit-prod-etldata154.snc1
+      - 10.20.74.48/32   #pit-prod-etldata155.snc1
+      - 10.20.74.47/32   #pit-prod-etldata156.snc1
+      - 10.20.74.52/32   #pit-prod-etldata157.snc1
+      - 10.20.78.59/32   #pit-prod-etldata158.snc1
+      - 10.20.78.63/32   #pit-prod-etldata159.snc1
+      - 10.20.78.66/32   #pit-prod-etldata160.snc1
+      - 10.20.78.71/32   #pit-prod-etldata161.snc1
+      - 10.20.78.72/32   #pit-prod-etldata162.snc1
+      - 10.20.78.73/32   #pit-prod-etldata163.snc1
+      - 10.20.78.74/32   #pit-prod-etldata164.snc1
+      - 10.20.78.75/32   #pit-prod-etldata165.snc1
+      - 10.20.78.78/32   #pit-prod-etldata166.snc1
+      - 10.20.83.49/32   #pit-prod-etldata167.snc1
+      - 10.20.78.94/32   #pit-prod-etldata168.snc1
+      - 10.20.78.65/32   #pit-prod-etldata169.snc1
+      - 10.20.83.172/32   #pit-prod-etldata170.snc1
+      - 10.20.83.222/32   #pit-prod-etldata171.snc1
+      - 10.20.83.83/32   #pit-prod-etldata172.snc1
+      - 10.20.78.169/32   #pit-prod-etldata173.snc1
+      - 10.20.83.246/32   #pit-prod-etldata174.snc1
+      - 10.20.78.21/32   #pit-prod-etldata175.snc1
+      - 10.20.83.158/32   #pit-prod-etldata176.snc1
+      - 10.20.75.143/32  # deal-ecosystem-app6.snc1
+      - 10.20.69.30/32  # deal-ecosystem-app7.snc1
+      - 10.20.75.107/32  # deal-ecosystem-app8.snc1
+      - 10.20.131.88/32   # deal-ecosystem-app9.snc1
+      - 10.22.217.253/32   # deal-ecosystem-app10.snc1
+      - 10.22.233.242/32   # deal-ecosystem-app11.snc1
+      - 10.22.218.219/32   # deal-ecosystem-app12.snc1
+      - 10.22.218.50/32   # deal-ecosystem-app13.snc1
+      - 10.22.218.230/32   # deal-ecosystem-app14.snc1
+      - 10.22.233.200/32   # deal-ecosystem-app15.snc1
+      - 10.22.218.150/32   # deal-ecosystem-app16.snc1
+      - 10.22.218.143/32   # deal-ecosystem-app17.snc1
+      - 10.22.233.25/32   # deal-ecosystem-app18.snc1
+      - 10.22.217.188/32   # voucher-inventory-app9.snc1
+      - 10.22.217.19/32   # voucher-inventory-app10.snc1
+      - 10.22.233.71/32   # voucher-inventory-app11.snc1
+      - 10.22.218.44/32   # voucher-inventory-app12.snc1
+      - 10.22.218.149/32   # voucher-inventory-app13.snc1
+      - 10.22.233.37/32   # voucher-inventory-app14.snc1
+      - 10.22.233.121/32   # voucher-inventory-app15.snc1
+      - 10.22.233.70/32   # voucher-inventory-app16.snc1
+      - 10.22.218.45/32   # voucher-inventory-app17.snc1
+      - 10.22.233.207/32   # voucher-inventory-app18.snc1
+      - 10.32.71.181/32   #voucher-inventory-app1.sac1
+      - 10.32.213.141/32   #voucher-inventory-app2.sac1
+      - 10.32.142.155/32   #voucher-inventory-app3.sac1
+      - 10.32.120.197/32   #voucher-inventory-app4.sac1
+      - 10.32.152.35/32   #voucher-inventory-utility1.sac1
+      - 10.32.150.215/32   #voucher-inventory-utility2.sac1
+      - 10.32.55.15/32   #voucher-inventory-worker1.sac1
+      - 10.32.142.209/32   #voucher-inventory-worker2.sac1
+      - 10.32.105.168/32   #deal-ecosystem-app1.sac1
+      - 10.32.239.124/32   #deal-ecosystem-app2.sac1
+      - 10.32.110.78/32   #deal-ecosystem-app3.sac1
+      - 10.32.164.143/32   # deal-ecosystem-app4.sac1
+      - 10.32.176.46/32   # deal-ecosystem-app5.sac1
+      - 10.32.239.240/32   # deal-ecosystem-app6.sac1
+      - 10.32.224.192/32   # deal-ecosystem-app7.sac1
+      - 10.32.158.61/32   # deal-ecosystem-app8.sac1
+      - 10.32.253.6/32   # deal-ecosystem-app9.sac1
+      - 10.32.72.149/32   # voucher-inventory-app5.sac1
+      - 10.32.69.108/32   # voucher-inventory-app6.sac1
+      - 10.32.94.53/32   # voucher-inventory-app7.sac1
+      - 10.32.97.217/32   # voucher-inventory-app8.sac1
+      - 10.32.225.35/32   # voucher-inventory-app9.sac1
+      - 10.32.230.8/32   # voucher-inventory-app10.sac1
+      - 10.32.120.120/32   # voucher-inventory-app11.sac1
+      - 10.32.176.220/32   # voucher-inventory-app12.sac1
+      - 10.32.208.115/32   # voucher-inventory-app13.sac1
+      - 10.32.178.236/32   # voucher-inventory-app14.sac1
+      - 10.32.234.84/32   # voucher-inventory-app15.sac1
+      - 10.32.103.105/32   # voucher-inventory-app16.sac1
+      - 10.32.231.142/32   # voucher-inventory-app17.sac1
+      - 10.32.62.162/32   # voucher-inventory-app18.sac1
+      - 10.32.49.84/32   # voucher-inventory-app19.sac1
+      - 10.32.37.61/32   # voucher-inventory-app20.sac1
+      - 10.32.160.222/32   # voucher-inventory-app21.sac1
+      - 10.32.100.95/32   # voucher-inventory-app22.sac1
+      - 10.32.229.30/32   # voucher-inventory-app23.sac1
+      - 10.32.248.217/32   # voucher-inventory-app24.sac1
+      - 10.32.248.171/32   # voucher-inventory-jworker1.sac1
+      - 10.32.69.221/32   # voucher-inventory-jworker2.sac1
+      - 10.32.178.224/32   # voucher-inventory-app5.sac1
+      - 10.32.37.127/32   # voucher-inventory-app6.sac1
+      - 10.32.160.188/32   # voucher-inventory-app7.sac1
+      - 10.32.62.118/32   # voucher-inventory-app8.sac1
+      - 10.32.84.231/32   # voucher-inventory-app9.sac1
+      - 10.32.49.142/32   # voucher-inventory-app10.sac1
+      - 10.32.248.93/32   # voucher-inventory-app11.sac1
+      - 10.32.176.46/32   # deal-ecosystem-app5.sac1
+      - 10.32.239.240/32   # deal-ecosystem-app6.sac1
+      - 10.32.224.192/32   # deal-ecosystem-app7.sac1
+      - 10.32.158.61/32   # deal-ecosystem-app8.sac1
+      - 10.32.253.6/32   # deal-ecosystem-app9.sac1
+      - 10.32.172.86/32   # deal-ecosystem-app10.sac1
+      - 10.32.178.157/32   # deal-ecosystem-app11.sac1
+      - 10.32.40.145/32   # deal-ecosystem-app12.sac1
+      - 10.32.37.8/32   # deal-ecosystem-app13.sac1
+      - 10.32.158.101/32   # deal-ecosystem-app14.sac1
+      - 10.32.170.140/32   # deal-ecosystem-app15.sac1
+      - 10.32.213.13/32   # deal-ecosystem-app16.sac1
+      - 10.32.254.55/32   # voucher-inventory-japp21.sac1
+      - 10.32.230.89/32   # voucher-inventory-japp22.sac1
+      - 10.32.254.203/32   # voucher-inventory-japp23.sac1
+      - 10.32.254.204/32   # voucher-inventory-japp24.sac1
+      - 10.32.247.83/32   # voucher-inventory-japp25.sac1
+      - 10.32.170.62/32   # voucher-inventory-ht-read-app1.sac1
+      - 10.32.172.20/32   # voucher-inventory-ht-read-app2.sac1
+      - 10.32.158.9/32   # voucher-inventory-ht-read-app3.sac1
+      - 10.32.152.166/32   # voucher-inventory-ht-read-app4.sac1
+      - 10.32.154.75/32   # voucher-inventory-lt-read-app5.sac1
+      - 10.32.146.155/32   # voucher-inventory-lt-read-app6.sac1
+      - 10.32.208.118/32   # voucher-inventory-lt-read-app7.sac1
+      - 10.32.57.218/32   # voucher-inventory-lt-read-app8.sac1
+      - 10.32.103.50/32   # voucher-inventory-ht-write-app1.sac1
+      - 10.32.248.146/32   # voucher-inventory-ht-write-app2.sac1
+      - 10.32.148.100/32   # voucher-inventory-ht-write-app3.sac1
+      - 10.32.158.220/32   # voucher-inventory-ht-write-app4.sac1
+      - 10.32.224.84/32   # voucher-inventory-lt-write-app1.sac1
+      - 10.32.178.29/32   # voucher-inventory-lt-write-app2.sac1
+      - 10.32.37.177/32   # voucher-inventory-lt-write-app3.sac1
+      - 10.32.164.177/32   # voucher-inventory-lt-write-app4.sac1
+      - 10.32.40.106/32   # voucher-inventory-worker3.sac1
+      - 10.32.76.99/32   # voucher-inventory-ht-read-app5.sac1
+      - 10.32.69.250/32   # voucher-inventory-ht-read-app6.sac1
+      - 10.32.37.231/32   # voucher-inventory-ht-read-app7.sac1
+      - 10.32.209.238/32   # voucher-inventory-ht-read-app8.sac1
+      - 10.32.74.190/32   # voucher-inventory-ht-read-app9.sac1
+      - 10.32.223.103/32   # voucher-inventory-ht-read-app10.sac1
+      - 10.211.64.0/19   # us-west-1
+      - 10.211.96.0/19   # us-west-1
+      - 10.211.142.0/24   # us-west-1
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: voucherinventory_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.snc1
+    ports:
+      mysqld: 20001
+    admin_redirect_peers:
+      - 10.32.121.91/32   #gds-sac1-prod-db061m1.sac1
+      - 10.32.121.139/32   #gds-sac1-prod-db061s1.sac1
+      - 10.13.250.11/32   # gds-dub1-prod-db003m1.dub1
+      - 10.13.250.51/32   # gds-dub1-prod-db003s1.dub1
+      - 10.22.142.195/32 # gds-snc1-prod-db019m1.snc1
+      - 10.22.142.163/32 # gds-snc1-prod-db019s1.snc1

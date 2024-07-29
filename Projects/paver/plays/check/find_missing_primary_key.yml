@@ -1,0 +1,59 @@
+---
+
+- hosts: all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+  tasks:
+
+   - name: Check PK
+     shell: |
+      exec 2>&1
+      if [ {{ item.value.type }} == 'mysql' ]
+      then
+        PK="$(mysql -u root -S /var/groupon/percona/{{ item.key }}/mysql.sock -e "select tab.table_schema as database_name, tab.table_name from information_schema.tables tab left join information_schema.table_constraints tco on tab.table_schema = tco.table_schema and tab.table_name = tco.table_name and tco.constraint_type = 'PRIMARY KEY' where tco.constraint_type is null and tab.table_schema not in('mysql', 'information_schema', 'performance_schema', 'sys', 'gds_pm', 'hydra', 'percona') and tab.table_type = 'BASE TABLE' order by tab.table_schema, tab.table_name" -t -s )"
+        if [ "" != "$PK" ]
+        then
+         echo "+-----------------------------------+"
+         echo "Instance: {{ item.key }} tables without primary keys:"
+         echo -n "$PK"
+        fi
+      fi
+      
+      if [ {{ item.value.type }} == 'postgresql' ]
+      then
+        PK_POSTGRESQL="$(psql -h localhost -p "{{ item.value.ports.postgresql_raw | default('20003')}}" -U postgres -c "select tab.table_schema, tab.table_name from information_schema.tables tab left join information_schema.table_constraints tco on tab.table_schema = tco.table_schema and tab.table_name = tco.table_name and tco.constraint_type = 'PRIMARY KEY' where tab.table_type = 'BASE TABLE' and tab.table_schema not in ('pg_catalog', 'information_schema', 'hydra') and tco.constraint_name is null order by table_schema, table_name;")"
+  
+        if (( $(grep -c . <<<"$PK_POSTGRESQL") > 3 ))
+        then
+         echo "+-----------------------------------+"
+         echo "Instance: {{ item.key }} port: {{ item.value.ports.postgresql_raw | default('20003')}} tables without primary keys:"
+         echo -n "$PK_POSTGRESQL"
+        fi 
+      fi
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when:
+      - gds_instances is defined
+     changed_when: False
+     loop_control:
+       label: "{{ item.key }} Type: {{ item.value.type }}"
+
+
+   - name: Append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: 
+      - item.skipped is not defined
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: Report
+     debug:
+       msg: "{{ outputs }}"
+
+

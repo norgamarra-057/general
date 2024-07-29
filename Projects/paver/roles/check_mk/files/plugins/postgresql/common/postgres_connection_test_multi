@@ -1,0 +1,57 @@
+
+#!/usr/local/bin/bash
+MK_CONFDIR=/etc/check_mk
+# Ports to check
+Ports="$(fgrep port= $MK_CONFDIR/postgres.cfg | sed -e 's/port=//g' | tr '\n' ' ')"
+
+# Don't change anything beyond this line
+
+# Try to detect the postgres user
+if id pgsql >/dev/null 2>&1; then
+        USER=pgsql
+elif id postgres >/dev/null 2>&1; then
+        USER=postgres
+else
+        exit 0
+fi
+
+psql=$(which psql)
+
+echo '<<<postgres_connection_test_multi>>>'
+for Port in $Ports; do
+    dbname=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg | grep dbname | sed -e 's/dbname=//g')
+    echo "Port $Port - $dbname"
+
+    currentinstance=$(grep -B2 -A1 $Port $MK_CONFDIR/postgres.cfg)
+    vip=$(echo "$currentinstance" | grep "vip=" | sed -e 's/vip=//')
+
+    transaction_output=$(nc -w 5 -z $vip 5432 &>/dev/null;echo $?)
+    session_output=$(nc -w 5 -z $vip 6432 &>/dev/null;echo $?)
+
+    what_are_we="$(echo "select pg_is_in_recovery();" |\
+    psql -X -p ${Port} -d ${dbname} -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' 2>/dev/null)"
+
+    accepting_conns="$(echo "SELECT case
+                             WHEN ((SELECT count(*)
+                             FROM pg_database where datallowconn is false
+                             AND datname not in ('template0','template1')) > 0)
+                             THEN 1
+                             ELSE 0 end" |\
+    psql -X -p $Port -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' 2>/dev/null)"
+
+    if [ "$what_are_we" == "f" ]; then
+        vip_output="$(echo "select 100;" |\
+        psql -X -p 15432 -h ${vip} -d ${dbname} -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' &>/dev/null;echo $?)"
+
+        if [ "$vip_output" != "0" ]; then
+            sleep 1
+            vip_output="$(echo "select 100;" |\
+            psql -X -p 15432 -h ${vip} -d ${dbname} -U postgres --variable ON_ERROR_STOP=1 -A -t -F' ' &>/dev/null;echo $?)"
+        fi
+    else
+        vip_output=""
+    fi
+
+    echo "$transaction_output $session_output $accepting_conns $vip_output"
+    sleep 0.5
+done

@@ -1,0 +1,94 @@
+- hosts: gds_all
+  gather_facts: no 
+  become: yes
+  vars:
+    outputs: []
+    datacenter: "{{ inventory_hostname | regex_replace('^.*\\.([^\\.]+)$', '\\1') }}"
+  tasks:
+   - name: FreeBSD | run | set Consul DNS
+     shell: |
+       exec 2>&1
+       dc="$(echo "{{ inventory_hostname }}"|cut -d . -f 2)"
+       id="$(echo "{{ inventory_hostname }}"|cut -d . -f 1|cut -d - -f 4)"
+       master_dc="$(echo "{{ default_primary|default(item.value.hydra.default_primary) }}"|cut -d . -f 2)"
+       cluster="$(echo $id|head -c 5)"
+       type="$(echo $id|tail -c 3)"
+       fail=false
+       isMaster=false
+       isLocalSecondary=false
+       isRemoteSecondary=false
+       isTertiary=false
+       {% if inventory_hostname.endswith('m1.' + datacenter) %}
+       instance_id="{{ item.value.hydra.ids[0] }}"
+       vip="{{ item.value.master_vip }}"
+       {% else %}
+       instance_id="{{ item.value.hydra.ids[1] }}"
+       vip="{{ item.value.slave_vips[0] }}"
+       {% endif %}
+       {% if item.value.type == 'postgresql' %}
+       port="{{ item.value.ports.postgresql_raw }}"
+       {% else %}
+       port="{{ item.value.ports.mysqld }}"
+       {% endif %}
+
+       if [ "{{ default_primary|default(item.value.hydra.default_primary) == inventory_hostname }}" != "False" ]; then
+           isMaster=true
+       fi
+
+       if [ "{{ item.value.hydra.cascading is defined and item.value.hydra.cascading[inventory_hostname] is defined and not (item.value.hydra.cascading[inventory_hostname] is mapping) }}" != "False" ]; then
+           isTertiary=true
+       fi
+
+       if ! $isMaster && ! $isTertiary && [ "$dc" == "$master_dc" ]; then
+           isLocalSecondary=true
+       fi
+
+       if ! $isMaster && ! $isTertiary && [ "$dc" != "$master_dc" ]; then
+           isRemoteSecondary=true
+       fi
+
+       service="{{item.value.type}}-{{ item.key | replace("_","-") }}"
+
+       if $isMaster; then
+         echo -n "registering master "
+         curl -s -X PUT "http://localhost:8500/v1/catalog/register" -d '{"Datacenter":"'"$dc"'","Node":"hydra@{{ inventory_hostname }}","Address":"'"$(getent hosts {{ inventory_hostname }}|cut -d ' ' -f 1)"'","Service":{"Service":"'"$service"'","ID":"'"$instance_id"'","Tags":["hydra","primary"],"Address":"'"$vip"'","Port": '"$port"', "EnableTagOverride": true}}'
+         echo
+       fi
+
+       if $isLocalSecondary; then
+         echo -n "registering local standby "
+         curl -s -X PUT "http://localhost:8500/v1/catalog/register" -d '{"Datacenter":"'"$dc"'","Node":"hydra@{{ inventory_hostname }}","Address":"'"$(getent hosts {{ inventory_hostname }}|cut -d ' ' -f 1)"'","Service":{"Service":"'"$service"'","ID":"'"$instance_id"'","Tags":["hydra","secondaries","local"],"Address":"'"$vip"'","Port": '"$port"', "EnableTagOverride": true}}'
+         echo
+       fi
+
+       if $isRemoteSecondary; then
+         echo -n "registering remote standby "
+         curl -s -X PUT "http://localhost:8500/v1/catalog/register" -d '{"Datacenter":"'"$dc"'","Node":"hydra@{{ inventory_hostname }}","Address":"'"$(getent hosts {{ inventory_hostname }}|cut -d ' ' -f 1)"'","Service":{"Service":"'"$service"'","ID":"'"$instance_id"'","Tags":["hydra","secondaries","remote"],"Address":"'"$vip"'","Port": '"$port"', "EnableTagOverride": true}}'
+         echo
+       fi
+
+       if $isTertiary; then
+         echo -n "registering cascading standby "
+         curl -s -X PUT "http://localhost:8500/v1/catalog/register" -d '{"Datacenter":"'"$dc"'","Node":"hydra@{{ inventory_hostname }}","Address":"'"$(getent hosts {{ inventory_hostname }}|cut -d ' ' -f 1)"'","Service":{"Service":"'"$service"'","ID":"'"$instance_id"'","Tags":["hydra","secondaries","cascading"],"Address":"'"$vip"'","Port": '"$port"', "EnableTagOverride": true}}'
+         echo
+       fi
+     args:
+       executable: /usr/local/bin/bash
+     register: log_output
+     with_dict: "{{ gds_instances }}"
+     when: item.value.hydra is defined
+     loop_control:
+       label: "{{ item.key }}"
+
+
+   - name: FreeBSD | run | append outputs
+     set_fact:
+       outputs: "{{ outputs }} + {{ item.stdout_lines }}"
+     with_items: "{{ log_output.results }}"
+     when: item.skipped is not defined and (target_instance is not defined or target_instance == item.key)
+     loop_control:
+       label: "{{ item.item.key }}"
+
+   - name: FreeBSD | run | debug log
+     debug:
+       msg: "{{ outputs }}"

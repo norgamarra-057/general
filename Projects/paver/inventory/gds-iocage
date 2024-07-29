@@ -1,0 +1,8 @@
+[pwa-daas]
+pwa-daas-db1.snc1
+pwa-daas-db2.snc1
+pwa-daas-db3.snc1
+pwa-daas-db4.snc1
+
+[pwa-daas:vars]
+ansible_python_interpreter=/usr/local/bin/python2.7

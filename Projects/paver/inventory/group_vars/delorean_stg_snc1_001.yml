@@ -1,0 +1,42 @@
+---
+host_zfs:
+  - { name: zroot, mountpoint: none, compression: lz4, copies: 2, atime: 'off' }
+  - { name: zroot/root, mountpoint: / }
+  - { name: zroot/root/tmp, sync=disabled }
+  - { name: zroot/root/var }
+  - { name: tank, mountpoint: none, compression: gzip-9, copies: 1, atime: 'off', logbias: throughput }
+  - { name: tank/var }
+  - { name: tank/var/tmp, sync=disabled }
+  - { name: tank/var/groupon, mountpoint: /var/groupon }
+  - { name: tank/var/groupon/delorean }
+  - { name: tank/var/groupon/delorean/pools, exec: 'off', setuid: 'off' }
+  - { name: tank/var/groupon/delorean/pools/us }
+  - { name: tank/var/groupon/delorean/pools/us/test, quota: 1G }
+  - { name: tank/var/groupon/delorean/pools/sox }
+  - { name: tank/var/groupon/delorean/pools/sox/github, quota: 5G }
+
+host_zfsnap:
+  - { name: zroot/root, recursive: True, hourly: True, daily: True, weekly: True, monthly: True, reboot: True }
+  - { name: tank, recursive: True, hourly: True, daily: True, weekly: True, monthly: True, reboot: True }
+  - { name: tank/var/groupon/delorean/pools/us, recursive: True, hourly: True, daily: True, weekly: True, monthly: 2y, reboot: True }
+  - { name: tank/var/groupon/delorean/pools/sox, recursive: True, hourly: True, daily: True, weekly: True, monthly: 7y, reboot: True }
+
+pull_backup_jobs:
+  virtlab1.snc1:
+    directory: /home/alock
+    pool: us
+    target: test
+    frequency: daily
+    rate: 10m
+
+delorean_pools_base_dir: /var/groupon/delorean/pools
+
+delorean_backup_pools:
+  us:
+    base_dir: '{{ delorean_pools_base_dir }}/us'
+  sox:
+    base_dir: '{{ delorean_pools_base_dir }}/sox'
+
+delorean_backup_users:
+  - { user: test, pool: us }
+  - { user: github, pool: sox }

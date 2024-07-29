@@ -1,0 +1,6 @@
+---
+- name: local_unbound reload
+  service: name=local_unbound state=reloaded
+
+- name: local_unbound start
+  service: name=local_unbound state=started

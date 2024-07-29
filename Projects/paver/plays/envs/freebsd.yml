@@ -1,0 +1,16 @@
+---
+- hosts: FreeBSD
+  become: yes
+  roles:
+    - os-config
+    - common_install
+#    - resolv_conf # turn on when ready
+    - openntpd
+#   - monitord-agent
+    - gds_carp
+#    - consul
+    - gds_motd
+#    - splunk_forwarder
+  post_tasks:
+    - import_tasks: "../../roles/ports/tasks/audit.yml"
+

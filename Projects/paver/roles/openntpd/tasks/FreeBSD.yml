@@ -1,0 +1,79 @@
+---
+- name: OpenNTPD | FreeBSD | rc.conf | ntpd disable
+  service: name=ntpd state=stopped enabled=no
+
+- name: Disable ntpd* in rc.conf
+  lineinfile:
+    dest: /etc/rc.conf
+    regexp: '^[#]*{{ item }}.*$'
+    line: '{{ item }}="NO"'
+  with_items:
+    - "ntpd_enable"
+    - "ntpdate_enable"
+
+- name: OpenNTPD | FreeBSD | xntpd | purge
+  file: path=/etc/ntpd.conf state=absent
+
+- name: OpenNTPD | FreeBSD | pkg | openntpd
+  pkgng: name=openntpd state=present
+
+- name: OpenNTPD | FreeBSD | runit | directories (read-only)
+  file: path="{{ item }}" state=directory owner=root group=wheel mode=0755
+  with_items:
+    - /var/groupon/service/openntpd
+    - /var/groupon/service/openntpd/env
+    - /var/groupon/service/openntpd/log
+
+- name: OpenNTPD | FreeBSD | runit | directories (writable)
+  file:
+    path=/var/groupon/service/openntpd/log/main
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+
+- name: OpenNTPD | FreeBSD | runit | environment
+  copy: dest=/var/groupon/service/openntpd/env/PATH
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - openntpd restart
+
+- name: OpenNTPD | FreeBSD | config install
+  template:
+    dest=/var/groupon/service/openntpd/ntpd.conf
+    src=openntpd.conf.j2
+    validate='/usr/local/sbin/ntpd -n -f %s'
+  notify:
+    - openntpd restart
+
+- name: OpenNTPD | FreeBSD | runit | run script
+  template:
+    dest=/var/groupon/service/openntpd/run
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - openntpd restart
+
+- name: OpenNTPD | FreeBSD | runit | log script
+  copy:
+    dest=/var/groupon/service/openntpd/log/run
+    mode=0744
+    src=svlogd.sh
+    owner=root
+    group=wheel
+  notify:
+    - openntpd log restart
+
+- name: OpenNTPD | FreeBSD | runit | enable
+  file:
+    src: /var/groupon/service/openntpd
+    dest: /var/service/openntpd
+    owner: root
+    group: wheel
+    state: link

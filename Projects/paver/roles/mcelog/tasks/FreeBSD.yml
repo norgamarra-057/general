@@ -1,0 +1,25 @@
+---
+- name: Ensure mcelog is installed
+  pkgng:
+    name: mcelog
+    state: present
+
+- name: Deploy init script
+  copy:
+    src: mcelog
+    dest: /usr/local/etc/rc.d/mcelog
+    mode: 0755
+    owner: root
+    group: wheel
+
+- name: Enable service
+  lineinfile:
+    dest: /etc/rc.conf
+    regexp: '^mcelog_enable=.*'
+    line: 'mcelog_enable="YES"'
+
+- name: Ensure service is running
+  service:
+    name: mcelog
+    state: running
+

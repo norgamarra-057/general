@@ -1,0 +1,14 @@
+---
+- hosts: gds_snc1_test_db002
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: users_prod }
+  - { role: gds-mysql-ha, instance: taxonomy_prod }
+  - { role: gds-mysql-ha, instance: pwa_prod }
+  - { role: gds-mysql-ha, instance: orders_prod }
+  - { role: gds-mysql-ha, instance: ansible_test }
+  - { role: gds-mysql-ha, instance: gds_test3 }
+  - { role: gds-mysql-ha, instance: gds_test4 }
+  - { role: gds-mysql-ha, instance: backup_restore }
+  - { role: gds-mysql-ha, instance: dminor2_test }

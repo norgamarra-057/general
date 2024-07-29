@@ -1,0 +1,106 @@
+---
+gds_carp_peers:
+  - 10.23.34.250  # gds-snc1-stg-db005m1
+  - 10.23.34.251  # gds-snc1-stg-db005s1
+  - 10.23.35.250  # gds-snc1-stg-db005m1
+  - 10.23.35.251  # gds-snc1-stg-db005s1
+
+gds_carp_interfaces:
+  - vlan334
+  - vlan335
+
+gds_instance_group: gds_snc1_stg_db005
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+#  coupon_stg: # GDS-7143 decommissioned GDS-33860
+
+#  audience_emea_stg: # GDS-7042 decommissioned GDS-33860
+
+#  cds_stg: # GDS-7197 decommissioned GDS-33860
+
+#  merchbrandsvc_stg: # GDS-7157 decommissioned GDS-33860
+
+#  analytics_stg: # GDS-7281 Decommissioned GDS-33860
+
+#  commeng_stg: # GDS-7358 Decommissioned GDS-33860
+
+#  contract_service_stg: # GDS-7359 Decommissioned GDS-33860
+
+#  custsvc_stg: # GDS-7360 Decommissioned GDS-33860
+
+
+#  dealestate_stg: # GDS-7361 Decommissioned GDS-33860
+
+#  event_data_stg: # GDS-7363 Decommissioned GDS-33860
+
+#  ol_book_inv_svc_stg: # GDS-7443 iDecommissioned GDS-33860
+
+#  geo_lupa_stg: # GDS-7365 Decommissioned GDS-33860
+
+#  getaways_notif_stg: # GDS-7366 Decommissioned GDS-33860
+
+#  goods_cbt_emea_stg: # GDS-7367 Decommissioned GDS-33860
+
+#  goods_inven_mgt_stg: # GDS-7368 Decommissioned GDS-33860
+
+#  getaways_content_stg: # GDS-7512 # GDS-27294 - Migrated to cloud Decommissioned GDS-33860
+
+#  goods_po_gateway_stg: # GDS-7369 Decommissioned GDS-33860
+
+#  goods_wlm_stg: # GDS-7371 Decommissioned GDS-33860
+
+#  mastermerchant_stg: # GDS-7372 Decommissioned GDS-33860
+
+#  goods_shipment_stg: # GDS-7370 Decommissioned GDS-33860
+
+#  rocketman_perf_stg: # GDS-7425 Decommissioned GDS-33860
+
+#  medusa_stg: # GDS-7373 Decommissioned GDS-33860
+
+#  merchant_sse_stg: # GDS-7375 Decommissioned GDS-33860
+
+#  mos_data_stg: # GDS-7376 Decommissioned GDS-33860
+
+#  paygw_stg: # GDS-7377 Decommissioned GDS-33860
+
+#  pricing_service_stg: # GDS-7378 Decommissioned GDS-33860
+#  stores_stg: # GDS-7381 Decommissioned GDS-33860
+#  deal_wiz_stg: # GDS-7760 Decommissioned GDS-33860
+#  pricing_diff_stg: # GDS-7379 Decommissioned GDS-33860
+#  seodeals_stg: # GDS-7380 Decommissioned GDS-33860
+#  web_crawl_stg: # GDS-7383 Decommissioned GDS-33860
+#  gpn_perf_stg: # GDS-7404 Decommissioned GDS-33860
+#  paygw_perf_stg: # GDS-7419 Decommissioned GDS-33860
+#  dora_stg: # GDS-8138 Decommissioned GDS-33860
+#  trvl_pymt_recons_stg: # GDS-7382 Decommissioned GDS-33860
+# inbd_port_emea_stg destroyed GDS-8619
+#  iba_stg: # GDS-8707 Decommissioned GDS-33860
+#  cyclops_stg: # GDS-8793 Decommissioned GDS-33860
+#  config_wizard_stg: # GDS-8972 Decommissioned GDS-33860
+#  ultron_stg: # GDS-9113 Decommissioned GDS-33860
+#  chnl_man_integ_stg: # GDS-9156 Decommissioned GDS-33860
+#  coupons-revproc_stg: # GDS-9351 Decommissioned GDS-33860 
+#  cs_api_stg: # GDS-9290 Decommissioned GDS-33860
+#  fast_stg: # GDS-9362 Decommissioned GDS-33860
+#  lba_stg: # GDS-9542 Decommissioned GDS-33860
+#  ranger_stg: # GDS-9598 Decommissioned GDS-33860
+#  killbill_stg: # GDS-9853 Decommissioned  GDS-33860
+#  affiliates_stg: # GDS-9839 Decommissioned  GDS-33860
+ # bookingtool_stg: # GDS-9839 Decommissioned  GDS-33860
+# cia_customer_stg: # GDS-10019 Decommissioned  GDS-33860
+#  jira2_stg: # GDS-10116
+# destroyed GDS-25237  goods_prs_stg: # GDS-9854
+#  ls_va_orders_stg: # GDS-10517 Decommissioned GDS-33860
+#  staas_stg: # GDS-10565 Decommissioned GDS-33860
+#  content_assembly_stg: # GDS-10619 Decommissioned GDS-33860
+#  ls_va_deals_stg: # GDS-10641 # GDS-28476 - Migrated to cloud Decommissioned GDS-33860
+#  ls_va_travel_stg: # GDS-10642 Decommissioned GDS-33860
+#  ls_va_users_stg: # GDS-10640 Decommissioned GDS-33860
+#  ls_va_subscrip_stg: # GDS-10643 Decommissioned GDS-33860
+#  prcng_cntrl_cntr_stg: # GDS-10680 Decommissioned GDS-33860
+#  goods_forecast_stg: # GDS-11139 Decommissioned GDS-33860
+#  lex_emea_stg: # GDS-11441 Decommissioned GDS-33860
+#  voucher_txn_stg: # GDS-11375 Decommissioned GDS-33860
+#  chan_man_int_tvl_stg: # GDS-11681 Decommissioned GDS-33860
+################## NO MORE Instances #######################

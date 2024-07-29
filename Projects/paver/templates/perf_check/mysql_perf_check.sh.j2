@@ -1,0 +1,32 @@
+#!/bin/bash
+echo '##################################################################################################################################################'
+{% for instance in gds_instances.keys() %}
+{% if gds_instances[instance].type == 'mysql' -%}
+echo '##################################################################################################################################################'
+echo  Instance: {{ instance }} 
+echo '##################################################################################################################################################'
+
+echo MYSQL INDEX DUPLICATED
+mysql -t -S /var/groupon/percona/{{ instance }}/mysql.sock -u root -e "{{ lookup ('template', '../../roles/check_mk/files/checks/mysql/mysql_duplicated.sql') }}"
+echo '##################################################################################################################################################'
+
+echo MYSQL table fragmentation 
+mysql -t -S /var/groupon/percona/{{ instance }}/mysql.sock -u root -e "{{ lookup ('template', '../../roles/check_mk/files/checks/mysql/mysql_frag.sql') }}"
+echo '##################################################################################################################################################'
+
+echo MYSQL low used indexes
+mysql -t -S /var/groupon/percona/{{ instance }}/mysql.sock -u root -e "{{ lookup ('template', '../../roles/check_mk/files/checks/mysql/mysql_index.sql') }}"
+echo '##################################################################################################################################################'
+
+echo MYSQL query most executed querie
+mysql -t -S /var/groupon/percona/{{ instance }}/mysql.sock -u root -e "{{ lookup ('template', '../../roles/check_mk/files/checks/mysql/mysql_query_1.sql') }}"
+echo '##################################################################################################################################################'
+
+echo MYSQL slowest queries
+mysql -t -S /var/groupon/percona/{{ instance }}/mysql.sock -u root -e "{{ lookup ('template', '../../roles/check_mk/files/checks/mysql/mysql_query_2.sql') }}"
+echo '##################################################################################################################################################'
+
+{% endif %}
+{% endfor %}
+
+

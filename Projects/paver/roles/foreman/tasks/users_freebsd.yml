@@ -1,0 +1,30 @@
+---
+- name: make sure authorized users have their accounts (FreeBSD)
+  user: name="{{ item }}" comment="{{ users[item].name }}" shell='/bin/tcsh'
+        uid="{{ users[item].uid }}" state='present' groups="{{ users[item].groups|join(',') }}" group="{{ users[item].group }}"
+        append='yes' #login_class="{{ item.login_class | default('default') }}"
+  when: item in users
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc
+
+# FIXME(seanc@): /var/empty is a read-only ZFS dataaset, or should be. This
+# shouldn't fail, but does.
+- name: Ensure nonexistent directory does not exist (FreeBSD)
+  file: name="/var/empty" state='directory' owner='root' group='wheel' mode='0755'
+  ignore_errors: True
+
+- name: users with invalid home directory (FreeBSD)
+  user: name="{{ item }}" state='present' home="/var/empty" create="no"
+  when: item in users and users[item].homedir is defined and users[item].homedir == False
+  with_flattened:
+    - host_admins
+    - ops_accounts_soc
+    - ops_accounts_sre
+    - ops_accounts_sa
+    - ops_accounts_tdo
+    - ops_accounts_imoc

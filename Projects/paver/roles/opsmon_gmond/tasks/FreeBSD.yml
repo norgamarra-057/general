@@ -1,0 +1,106 @@
+---
+- name: Ops Monintoring - ganglia | FreeBSD | zfs | root
+  zfs:
+    name: "tank/var/groupon/ganglia"
+    atime: 'off'
+    checksum: 'on'
+    compression: lz4
+    copies: '1'
+    dedup: 'off'
+    exec: 'off'
+    mountpoint: "/var/groupon/ganglia"
+    primarycache: all
+    readonly: 'off'
+    recordsize: 128K
+    secondarycache: all
+    setuid: 'off'
+    state: present
+    sync: disabled
+    logbias: throughput
+
+- name: Ops Monintoring - ganglia | FreeBSD | zfs | root
+  zfs:
+    name: "tank{{ ganglia_cluster_path }}"
+    state: present
+
+- name: Ops Monintoring - ganglia | FreeBSD | zfs | root | permissions
+  file:
+    path="/var/groupon/ganglia"
+    state=directory
+    owner=ganglia
+    group=ganglia
+    mode=0755
+
+- name: Ops Monintoring - ganglia | FreeBSD | zfs | cluster | permissions
+  file:
+    path="{{ ganglia_cluster_path }}"
+    state=directory
+    owner=ganglia
+    group=ganglia
+    mode=0755
+
+- name: Ops Monitoring - gmond | FreeBSD | runit | directories (read-only)
+  file:
+    path="{{ item }}"
+    state=directory
+    owner=root
+    group=wheel
+    mode=0755
+  with_items:
+    - "{{ gmond_service_path }}"
+    - "{{ gmond_service_path }}/bin"
+    - "{{ gmond_service_path }}/env"
+    - "{{ gmond_service_path }}/log"
+
+- name: Ops Monitoring - gmond | FreeBSD | runit | directories mode(writable)
+  file:
+    path="{{ gmond_service_path }}/log/main"
+    state=directory
+    owner=_log
+    group=_log
+    mode=0755
+    recurse=yes
+
+- name: Ops Monitoring - gmond | FreeBSD | runit | environment mode
+  copy: dest="{{ gmond_service_path }}/env/PATH"
+        content="/usr/local/bin:/usr/bin:/bin"
+        owner=root
+        group=wheel
+        mode=0644
+  notify:
+    - gmond restart
+
+- name: Ops Monitoring - gmond | FreeBSD | runit | log script mode
+  template:
+    dest="{{ gmond_service_path }}/log/run"
+    mode=0744
+    src=svlogd.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - gmond log restart
+
+- name: Ops Monitoring - gmond | FreeBSD | config gmond.conf
+  template:
+    dest="{{ gmond_service_path }}/gmond.conf"
+    mode=0644
+    owner=root
+    group=wheel
+    src=gmond.conf.j2
+  notify:
+    - gmond restart
+
+- name: Ops Monitoring - gmond | FreeBSD | config gmetad.conf
+  lineinfile: "line='data_source \"{{ ganglia_cluster_name }}\" 60 localhost:{{ gmond_port }}' dest=/var/service/ganglia-gmetad/gmetad.conf insertafter=EOF state=present"
+  notify:
+    - gmetad restart
+
+- name: Ops Monitoring - gmond | FreeBSD | runit | run script mode
+  template:
+    dest="{{ gmond_service_path }}/run"
+    mode=0744
+    src=runit.sh.j2
+    owner=root
+    group=wheel
+  notify:
+    - gmond restart

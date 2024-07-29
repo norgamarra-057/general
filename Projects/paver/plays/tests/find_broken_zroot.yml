@@ -1,0 +1,13 @@
+---
+- name: Identify zroot pools with incorrect config
+  hosts: gds_all
+  become: yes
+  tasks:
+    - name: Obtain zpool status for zroot
+      shell: zpool status zroot
+      register: zroot_status
+
+    - name: Check if mirror-0 is found
+      fail: msg="zroot is not standard"
+      when: zroot_status.stdout | search("mirror-0") == false
+

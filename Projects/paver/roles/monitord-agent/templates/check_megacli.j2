@@ -1,0 +1,194 @@
+#!/usr/bin/env ruby
+#!/usr/local/bin/ruby
+
+require 'rubygems'
+require 'monitoring_script_multithreshold'
+
+class CheckMegaCLI < MonitoringScriptMultithreshold
+  SERVICE_NAME = 'megacli'
+  SERVICE_DESC = 'Checker for PERC6 controller stats via MegaCli'
+  PRIMARY_METRIC = 'notused'
+  OPTIONS = {
+    :detail   => { :text => "Detail", :short => "d", :type => :bool },
+    :verbose  => { :text => "Verbose", :short => "V", :type => :bool },
+    :adapter  => { :text => "Adapter number to include, exclude all others", :short => "a", :type => :integer }
+  }
+
+
+  def set_executables()
+    # find 'sudo'
+    sudos = [ "/usr/local/bin/sudo", "/usr/bin/sudo" ]
+    @sudo = nil
+    sudos.each do |sudo_candidate|
+      if File.exist? sudo_candidate
+        @sudo = sudo_candidate
+        break
+      end
+    end
+
+    # find 'MegaCli'
+    megaclis = [ "/usr/local/sbin/MegaCli", "/usr/sbin/MegaCli" ]
+    @megacli = nil
+    megaclis.each do |megacli_candidate|
+      if File.exist? megacli_candidate
+        @megacli = megacli_candidate
+        break
+      end
+    end
+
+    if @sudo.nil?
+      set_message("Cannot find sudo in [#{sudos.join(",")}]")
+      return false
+    end
+    if @megacli.nil?
+      set_message("Cannot find MegaCli in [#{megaclis.join(",")}]")
+      return false
+    end
+    return true
+  end
+
+  MEGACLI_LOG = "/var/groupon/log/MegaSAS.log"
+
+  INTERESTING_METRICS = {
+    "-AdpAllInfo -aALL -nolog" => { # disk metrics
+      "Degraded"       => "disks_degr",
+      "Critical Disks" => "disks_crit",
+      "Failed Disks"   => "disks_fail",
+      "Disks"          => "disks",
+      "Memory Uncorrectable Errors"   => "mem_errs",
+    },
+    "-AdpBbuCmd -aALL -AppLogFile #{MEGACLI_LOG}" => { # BBU metrics
+      "Relative State of Charge" => "bbu_rel_charge",
+      "Absolute State of Charge" => "bbu_abs_charge",
+      "Cycle Count" => "bbu_cycles",
+      "Learn Cycle Requested" => "bbu_cycle_requested",
+      "Learn Cycle Active" => "bbu_cycle_active",
+      "Learn Cycle Timeout" => "bbu_learn_cycle_timeout",
+      "I2c Errors Detected" => "bbu_i2c_errors_detected",
+      "Battery Pack Missing" => "bbu_battery_pack_missing",
+      "Battery Replacement required" => "bbu_battery_replacement_required",
+      "Remaining Capacity Low" => "bbu_remaining_capacity_low",
+      "Periodic Learn Required" => "bbu_periodic_learn_required",
+      "Transparent Learn" => "bbu_transparent_learn",
+      "No space to cache offload" => "bbu_no_cache_offload_space",
+      "Pack is about to fail & should be replaced" => "bbu_battery_about_to_fail",
+      "Cache Offload premium feature required" => "bbu_cache_offload_feature_required",
+      "Module microcode update required" => "bbu_microcode_update_required",
+      "Remaining Capacity" => "bbu_remaining_capacity",
+      "Full Charge Capacity" => "bbu_full_charge_capacity",
+      "Max Error" => "bbu_max_error_pct",
+    },
+    "-LDPDInfo -aAll -AppLogFile #{MEGACLI_LOG}" => { # array metrics
+      "State" => "drive_state_optimal",
+    },
+    "-AdpBbuCmd GetBbuProperties -aALL -AppLogFile #{MEGACLI_LOG}" => { # BBU Capacity Info for Adapter: 0
+      "Auto Learn Period" => "bbu_auto_learn_period",
+      "Next Learn time" => "bbu_next_learn_time",
+      "Learn Delay Interval" => "bbu_learn_delay_interval",
+      "Auto-Learn Mode" => "bbu_auto_learn_mode_enabled",
+    },
+  }
+
+  def service_check
+    set_status(STATUS_UNKNOWN) if !set_executables()
+    metrics = {}
+
+    adapter_count = -1
+    run_command(@sudo, @megacli, '-adpCount -nolog') do |line|
+      if matches = line.match(/^\s*Controller Count: (\d+)\.$/)
+        puts "Adapter count set to #{matches[1]}" if options[:verbose]
+        adapter_count = matches[1].to_i
+        metrics["adapter_count"] = adapter_count
+        break
+      end
+    end
+
+    INTERESTING_METRICS.each do |opts, metrics_hash|
+      current_adapter = -1
+      run_command(@sudo, @megacli, *opts.split(" ")) do |line|
+        processed = false if options[:verbose]
+
+        # set/change the current_adapter for metrics which should use the adapter number as a suffix
+        if matches = line.match(/^\s*Adapter #(\d+)$/)
+          puts "Current adapter changed to '#{matches}'" if options[:verbose]
+          current_adapter = matches[1]
+          next
+        elsif matches = line.match(/^\s*BBU.*for Adapter: ([\d.]+)/)
+          puts "Current adapter changed to '#{matches}'" if options[:verbose]
+          current_adapter = matches[1]
+          next
+        end
+
+        # skip if the user specified an adapter which does not match current_adapter
+        if options[:adapter] && current_adapter.to_f != options[:adapter].to_f
+          puts "Skipping (wrong adapter received=#{current_adapter}, expected=#{options[:adapter]}) line='#{line.chomp.sub(/^[\n\r]*/, '')}'" if options[:verbose]
+          next
+        end
+
+        metrics_hash.each do |str, metric_name|
+          metric_name = "#{metric_name}_adapter_#{current_adapter}" if options[:adapter].nil? && adapter_count > 1
+          if matches = line.match(/^\s*#{str}\s*:\s*([\-\d.]+)/)
+            puts "Handling numeric for str='#{str}' metric_name='#{metric_name}' line='#{line.chomp}'" if options[:verbose]
+            metrics[metric_name] = matches[1].to_f
+            puts "Set metrics['#{metric_name}'] to '#{metrics[metric_name]}'" if options[:verbose]
+            processed = true if options[:verbose]
+          elsif matches = line.match(/^\s*#{str}\s*: (Yes|No)/)
+            puts "Handling Yes|No for str='#{str}' metric_name='#{metric_name}' line='#{line.chomp}'" if options[:verbose]
+            if matches[1] == 'Yes'
+              set_metric(metric_name, 1)
+            elsif matches[1] == 'No'
+              set_metric(metric_name, 0)
+            else
+              set_message("Unexpected response for str='#{str}' metric_name='#{metric_name}' line='#{line.chomp}'")
+              set_status(STATUS_UNKNOWN)
+            end
+            processed = true if options[:verbose]
+          elsif matches = line.match(/^\s*#{str}\s*: (Enabled|Disabled)/)
+            puts "Handling Enabled|Disabled for str='#{str}' metric_name='#{metric_name}' line='#{line.chomp}'" if options[:verbose]
+            if matches[1] == 'Enabled'
+              set_metric(metric_name, 1)
+            elsif matches[1] == 'Disabled'
+              set_metric(metric_name, 0)
+            else
+              set_message("Unexpected response for str='#{str}' metric_name='#{metric_name}' line='#{line.chomp}'")
+              set_status(STATUS_UNKNOWN)
+            end
+            processed = true if options[:verbose]
+          elsif metric_name == 'drive_state_optimal' && matches = line.match(/^\s*#{str}\s*: (Optimal|Degraded)/)
+            if matches[1] == 'Optimal'
+              set_metric(metric_name, 1)
+            elsif matches[1] == 'Degraded'
+              set_metric(metric_name, 0)
+            else
+              # known states are optimal and degraded, defaulting to 0 in case there are other states which are unknown
+              set_metric(metric_name, 0)
+            end
+            processed = true if options[:verbose]
+          else
+            # No handler for the current line and metric
+          end
+        end
+        puts "No handler for line='#{line.chomp}'" if options[:verbose] && !processed
+      end
+
+      metrics.each do |metric_name, val|
+        set_metric(metric_name, val)
+      end
+    end
+
+    # custom metric which will be 100 unless bbu is not enabled in which case it will be set to bbu_rel_charge
+    custom_charge_name = 'bbu_auto_learn_mode_disabled_or_rel_charge'
+    custom_metrics = {custom_charge_name => 100}
+    if @metrics[custom_charge_name] == 0
+      custom_metrics[custom_charge_name] == @metrics['bbu_rel_charge']
+    end
+    set_metric(custom_charge_name, custom_metrics[custom_charge_name])
+
+    if options[:thresholds]
+      evaluate_thresholds
+    else
+      set_status(STATUS_OK)
+    end
+  end
+end
+CheckMegaCLI.new.run!

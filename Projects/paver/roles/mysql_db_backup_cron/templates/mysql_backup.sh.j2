@@ -1,0 +1,19 @@
+#!/bin/sh --
+
+set -e
+umask 0027
+/usr/bin/lockf -t {{ delorean_lock_timeout }} "{{ delorean_lock_dir }}/{{ item }}.lock" \
+  /usr/bin/ssh \
+    -c arcfour \
+    -o BatchMode=yes \
+    -o StrictHostKeyChecking=no \
+    -i {{ delorean_private_keys_dir }}/{{ item }}.key \
+  {{ item }} \
+    /usr/local/bin/innobackupex \
+      --stream=tar ./ \
+      --no-lock \
+    2>> {{ delorean_logs_dir }}/{{ item }}.log \
+    1> {{ delorean_data_dir }}/{{ item }}.tar
+
+# Signal success to the caller
+/usr/bin/tail -1 {{ delorean_logs_dir }}/{{ item }}.log | /usr/bin/grep -q 'completed OK\!$'

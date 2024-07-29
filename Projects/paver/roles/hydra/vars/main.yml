@@ -1,0 +1,4 @@
+---
+datacenter: "{{ inventory_hostname | regex_replace('^.*\\.([^\\.]+)$', '\\1') }}"
+hydra_version: 1.2.19
+hydra_type: "{{ hydra_as|default('agent') }}"

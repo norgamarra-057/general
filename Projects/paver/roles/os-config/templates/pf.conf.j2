@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+#
+# NOTE: This is the default pf.conf that is used after provisioning the OS,
+# but is not intended for production use. Please install a production-ready
+# set of firewall rules that abides by GRPN "deny by default" policies.
+
+ext_if="lagg0"
+
+set skip on lo
+
+scrub in all fragment reassemble
+
+# Deny by default
+block in
+pass out
+
+pass in on $ext_if proto tcp to ($ext_if) port ssh
+pass in on $ext_if inet proto icmp from any to ($ext_if) icmp-type { unreach, redir, timex }

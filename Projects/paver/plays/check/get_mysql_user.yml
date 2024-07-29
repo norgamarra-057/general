@@ -1,0 +1,90 @@
+---
+###################################################
+# get_mysql_user.yml
+#
+# Description:   This playbook pulls the requested user@host from MySQL for a single host, for each configured instance.
+#
+# Usage:        ansible-playbook -i inventory/gds-stage plays/check/ -e "user=spock hostname=vulcan"
+# become:       false
+# gather_facts: false
+# 
+# Parameters:   node=server user=MySQL_username hostname=host_portion
+#
+#               Parms can also be passed via a json file as -e "@user.json"
+#
+#               Sample file:
+#               node: gds-snc1-prod-db001s1.snc1
+#               user=spock
+#               hostname=vulcan
+# 
+# Requirements: filter_plugins: conv_kb_mb_gb_bytes.py, split_first.py
+#
+# Notes:        1. Variables that match will have Status: OK.  
+#               2. Variables that don't match will have Status: Out-of-Sync
+#               3. Variables that exist in MySQL, but are not defined, will have Status: N/A
+#                  and report a configured value as: 'Using System Default'.
+#               4. Variable that doesn't exist will cause the playbook to halt with an error.
+###################################################
+
+- name: Check params
+  gather_facts: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+          - user is defined
+          - hostname is defined
+
+- name: Get the requested MySQL user
+  gather_facts: false
+  become: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Retrieve user 
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item }}/mysql.sock -e"SHOW GRANTS FOR {{ user }}@'{{ hostname }}'"
+      with_items: 
+        - "{{ gds_instances.keys() }}"
+      ignore_errors: true
+      changed_when: false
+      register: show_results
+
+    - name: Show user
+      debug: var=show_results.results
+
+#      debug: var={{ item['stdout_lines'] }}
+#      with_items: "{{ show_results.results }}"
+
+#    - name: Check that a valid MySQL variable was provided
+#      local_action: fail msg="{{ mysql_check }} is not a valid MySQL variable"
+#      with_items: "{{ show_results.results }}"
+#      no_log: true
+#      when: item['stdout_lines'][0] is not defined
+#
+#    - name: Set Report file location
+#      set_fact:
+#        report_file: "/tmp/{{ node }}_{{ mysql_check }}.txt"
+#      when: report_file is not defined
+#
+#    - name: Initialize Report file
+#      local_action: shell echo "Configured vs Running MySQL Variable Report for {{ node }} at `date`" > {{ report_file }}
+#      run_once: true
+#      no_log: true
+#
+#    - name: Generate Report Part 1
+#      local_action: shell echo "Instance{{':'}} '{{ item['item'] }}', Variable{{':'}} '{{ item['stdout_lines'][0]|split_first }}', Configured{{':'}} '{{ item['stdout_lines'][0]|conv_values }}', Running{{':'}} '{{ item['stdout_lines'][1]|conv_values }}', Status{{':'}}{% if (item['stdout_lines'][0]|conv_values|string) == (item['stdout_lines'][1]|conv_values|string) %} OK {% else %} Out-of-Sync {% endif %}" >> {{ report_file }}
+#      with_items: "{{ show_results.results }}"
+#      no_log: true
+#      when: item['stdout_lines'][1] is defined
+#
+#    - name: Generate Report Part 2, if needed
+#      local_action: shell echo "Instance{{':'}} '{{ item['item'] }}', Variable{{':'}} '{{ item['stdout_lines'][0]|split_first }}', Configured{{':'}} 'Using System Default', Running{{':'}} '{{ item['stdout_lines'][0]|conv_values }}', Status{{':'}} N/A" >> {{ report_file }}
+#      with_items: "{{ show_results.results }}"
+#      no_log: true
+#      when: item['stdout_lines'][1] is not defined
+#
+#    - name: Report Generated
+#      debug: msg="Generated{{':'}} {{ report_file }}"
+

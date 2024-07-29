@@ -1,0 +1,16 @@
+[client]
+user=root
+password=
+port={{ port }}
+socket={{ percona_instance_path }}/mysql.sock
+
+[mysql]
+prompt='[\\R:\\m:\\s] {{ instance_name }} <\\d> '
+default-character-set=utf8
+syslog
+
+[mysqldump]
+default-character-set=utf8
+max_allowed_packet= 32M
+quick
+routines

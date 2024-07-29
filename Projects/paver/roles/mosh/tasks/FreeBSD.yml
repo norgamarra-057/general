@@ -1,0 +1,3 @@
+---
+- name: FreeBSD | pkg | mosh
+  pkgng: name=mosh state=present

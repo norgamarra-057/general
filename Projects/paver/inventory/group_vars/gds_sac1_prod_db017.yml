@@ -1,0 +1,234 @@
+---
+gds_carp_peers:
+  - 10.32.124.212  # gds-sac1-prod-db017m1
+  - 10.32.124.213  # gds-sac1-prod-db017s1
+  - 10.32.125.212  # gds-sac1-prod-db017m1
+  - 10.32.125.213  # gds-sac1-prod-db017s1
+gds_carp_interfaces:
+  - vlan202
+  - vlan203
+gds_instance_group: gds_prod_sac1_db017
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  pwa_prod: # GDS-1868
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 60
+      max_connections_force: 8000
+      max_user_connections_force: 7980
+      innodb_buffer_pool_size_mb_force: 200000
+      innodb_thread_sleep_delay_force: 0
+      innodb_flush_neighbors_force: 0
+      long_query_time_force: 1
+      log_slow_rate_limit_force: 11
+      log_warnings_force: 2
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+      group_concat_max_len_force: 16384
+      relay_log_recovery_force: ON
+    type: mysql
+    write_origin: sac1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-sac1-prod-db017m1.sac1
+      - gds-sac1-prod-db017s1.sac1
+    master_carp_interface: vlan202
+    slave_carp_interface: vlan203
+    vhid: 71
+    slave_vhid: 71
+    master_vip: 10.32.124.71
+    slave_vips:
+      - 10.32.125.71
+    replication_ips:
+      - 10.32.114.27 # gds-sac1-prod-db017m1.sac1
+      - 10.32.114.128 # gds-sac1-prod-db017s1.sac1
+      - 10.22.142.192 # gds-snc1-prod-db017m1.snc1
+    firewall_permitted_src_cidrs:
+      - 10.22.142.192/32 # gds-snc1-prod-db017m1.snc1
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 50.115.209.4/32   #b1.sac1
+      - 50.115.209.5/32   #b2.sac1
+      - 10.22.74.119/32  # gds-admin01.sac1
+      - 10.22.142.192/32 # gds-snc1-prod-db017m1.snc1
+      - 10.22.142.216/32 # gds-snc1-prod-db017s1.snc1
+      - 10.22.142.197/32 # gds-snc1-prod-db172m1.snc1
+      - 10.22.142.246/32 # gds-snc1-prod-db172s1.snc1
+      - 10.22.142.177/32 # gds-snc1-prod-db173m1.snc1
+      - 10.22.142.77/32 # gds-snc1-prod-db173s1.snc1
+      - 10.22.142.214/32 # gds-snc1-prod-db174m1.snc1
+      - 10.22.142.247/32 # gds-snc1-prod-db174s1.snc1
+      - 10.32.103.205/32   # orders-read-app1.sac1
+      - 10.32.168.153/32   # orders-read-app2.sac1
+      - 10.32.213.38/32   # orders-read-app3.sac1
+      - 10.32.162.83/32   # orders-read-app4.sac1
+      - 10.32.105.194/32   # orders-read-app5.sac1
+      - 10.32.69.239/32   # orders-read-app6.sac1
+      - 10.32.49.229/32   # orders-read-app7.sac1
+      - 10.32.170.249/32   # orders-read-app8.sac1
+      - 10.32.208.85/32   # orders-read-app9.sac1
+      - 10.32.49.98/32   # orders-read-app10.sac1
+      - 10.32.176.191/32   # orders-read-app11.sac1
+      - 10.32.150.47/32   # orders-read-app12.sac1
+      - 10.32.154.235/32   # orders-read-app13.sac1
+      - 10.32.152.97/32   # orders-read-app14.sac1
+      - 10.32.254.204/32   # orders-read-app15.sac1
+      - 10.32.57.78/32   # orders-read-app16.sac1
+      - 10.32.74.28/32   # orders-read-app17.sac1
+      - 10.32.40.132/32   # orders-read-app18.sac1
+      - 10.32.108.220/32   # orders-read-app19.sac1
+      - 10.32.107.156/32   # orders-read-app20.sac1
+      - 10.32.69.52/32   # orders-read-app21.sac1
+      - 10.32.217.248/32   # orders-read-app22.sac1
+      - 10.32.224.68/32   # orders-read-app23.sac1
+      - 10.32.215.232/32   # orders-read-app24.sac1
+      - 10.32.174.115/32   # orders-read-app25.sac1
+      - 10.32.105.48/32   # orders-read-app26.sac1
+      - 10.32.162.184/32   # orders-read-app27.sac1
+      - 10.32.166.32/32   # orders-read-app28.sac1
+      - 10.32.223.213/32   # orders-read-app29.sac1
+      - 10.32.168.112/32   # orders-read-app30.sac1
+      - 10.32.140.240/32   # orders-read-app31.sac1
+      - 10.32.107.86/32   # orders-read-app32.sac1
+      - 10.32.148.90/32   # orders-read-app33.sac1
+      - 10.32.110.136/32   # orders-read-app34.sac1
+      - 10.32.112.197/32   # orders-read-app35.sac1
+      - 10.32.144.75/32   # orders-read-app36.sac1
+      - 10.32.55.72/32 # pricing-app1.sac1
+      - 10.32.154.93/32 # pricing-app2.sac1
+      - 10.32.176.31/32 # pricing-app3.sac1
+      - 10.32.156.100/32 # pricing-app4.sac1
+      - 10.32.217.203/32 # pricing-app5.sac1
+      - 10.32.57.222/32 # pricing-app6.sac1
+      - 10.32.174.93/32 # pricing-app7.sac1
+      - 10.32.164.128/32 # pricing-app8.sac1
+      - 10.32.93.29/32 # pricing-app9.sac1
+      - 10.32.146.171/32 # pricing-app10.sac1
+      - 10.32.93.220/32 # voucher-txn-service-app1.sac1
+      - 10.32.158.155/32 # voucher-txn-service-app2.sac1
+      - 10.32.97.105/32 # pricing-differential-app1.sac1
+      - 10.32.164.117/32 # pricing-differential-app2.sac1
+      - 10.32.140.120/32 # goods-outbound-controller-app1.sac1
+      - 10.32.160.115/32 # goods-outbound-controller-app2.sac1
+      - 10.32.152.207/32 # goods-outbound-controller-app3.sac1
+      - 10.32.164.121/32 # goods-outbound-controller-app4.sac1
+      - 10.32.69.55/32 # goods-outbound-controller-app5.sac1
+      - 10.32.55.55/32 # goods-outbound-controller-app6.sac1
+      - 10.32.140.93/32   # dpinfo-app1.sac1
+      - 10.32.248.193/32   # dpinfo-app2.sac1
+      - 10.32.156.22/32   # merchant-umapi-app1-us.sac1
+      - 10.32.164.223/32   # merchant-umapi-app2-us.sac1
+      - 10.32.142.216/32   # merchant-umapi-app3-us.sac1
+      - 10.32.224.237/32   # merchant-umapi-app4-us.sac1
+      - 10.32.148.26/32   # goods-app1.sac1
+      - 10.32.156.63/32   # goods-app2.sac1
+      - 10.32.154.150/32   # goods-app3.sac1
+      - 10.32.107.195/32   # goods-app4.sac1
+      - 10.32.140.190/32   # goods-worker1.sac1
+      - 10.32.148.236/32   # goods-worker2.sac1
+      - 10.32.140.9/32   # goods-utility1.sac1
+      - 10.32.49.167/32   # goods-utility2.sac1
+      - 10.32.49.196/32   # goods-irb1.sac1
+      - 10.32.166.156/32   # subscription-service-app1.sac1
+      - 10.32.156.141/32   # subscription-service-app2.sac1
+      - 10.32.158.52/32   # subscription-service-app3.sac1
+      - 10.32.154.96/32   # subscription-service-app4.sac1
+      - 10.32.120.206/32   # subscription-service-app5.sac1
+      - 10.32.103.140/32   # subscription-service-app6.sac1
+      - 10.32.40.230/32   # subscription-service-app7.sac1
+      - 10.32.74.241/32   # subscription-service-app8.sac1
+      - 10.32.62.120/32   # subscription-service-app9.sac1
+      - 10.32.100.109/32   # subscription-service-app10.sac1
+      - 10.32.37.30/32   # subscription-service-app11.sac1
+      - 10.32.55.213/32   # subscription-service-app12.sac1
+      - 10.32.110.51/32   # subscription-service-app13.sac1
+      - 10.32.76.251/32   # subscription-service-app14.sac1
+      - 10.32.247.57/32   # pricing-app11.sac1
+      - 10.32.100.160/32   # gdoop-worker1-sox.sac1
+      - 10.32.37.90/32   # gdoop-worker2-sox.sac1
+      - 10.32.93.193/32   # gdoop-worker3-sox.sac1
+      - 10.32.105.142/32   # gdoop-worker4-sox.sac1
+      - 10.32.76.171/32   # gdoop-worker5-sox.sac1
+      - 10.32.55.10/32   # gdoop-worker6-sox.sac1
+      - 10.32.62.242/32   # gdoop-worker7-sox.sac1
+      - 10.32.40.211/32   # gdoop-worker8-sox.sac1
+      - 10.32.110.187/32   # gdoop-worker9-sox.sac1
+      - 10.32.74.31/32   # gdoop-worker10-sox.sac1
+      - 10.32.100.10/32   # gdoop-worker11-sox.sac1
+      - 10.32.37.197/32   # gdoop-worker12-sox.sac1
+      - 10.32.93.173/32   # gdoop-worker13-sox.sac1
+      - 10.32.105.192/32   # gdoop-worker14-sox.sac1
+      - 10.32.76.233/32   # gdoop-worker15-sox.sac1
+      - 10.32.55.132/32   # gdoop-worker16-sox.sac1
+      - 10.32.62.51/32   # gdoop-worker17-sox.sac1
+      - 10.32.40.152/32   # gdoop-worker18-sox.sac1
+      - 10.32.110.98/32   # gdoop-worker19-sox.sac1
+      - 10.32.74.15/32   # gdoop-worker20-sox.sac1
+      - 10.32.100.253/32   # gdoop-worker21-sox.sac1
+      - 10.32.37.141/32   # gdoop-worker22-sox.sac1
+      - 10.32.93.7/32   # gdoop-worker23-sox.sac1
+      - 10.32.105.21/32   # gdoop-worker24-sox.sac1
+      - 10.32.254.202/32   # gdoop-job-submitter1-sox.sac1
+      - 10.32.254.65/32   # gdoop-job-submitter2-sox.sac1
+      - 10.32.176.199/32   # gdoop-megatron-slave1-sox.sac1
+      - 10.32.234.137/32   # gdoop-megatron-slave2-sox.sac1
+      - 10.32.88.235/32   # gdoop-megatron-slave3-sox.sac1
+      - 10.32.248.234/32   # pit-prod-megatron-master1.sac1
+      - 10.32.168.147/32   # pit-prod-megatron-master2.sac1
+      - 10.32.208.64/32   # pit-prod-megatron-master3.sac1
+      - 10.32.55.42/32   # pricing-app11.sac1
+      - 10.32.160.24/32   # pricing-app12.sac1
+      - 10.32.140.52/32   # pricing-app13.sac1
+      - 10.32.93.122/32   # pricing-app14.sac1
+      - 10.32.76.181/32   # pricing-app15.sac1
+      - 10.32.208.234/32   # pricing-app16.sac1
+      - 10.211.64.0/19   # conSub1
+      - 10.211.96.0/19   # conSub2
+      - 10.211.142.0/24   # conSub3
+      - 10.219.48.0/20   # us-west-2a
+      - 10.219.64.0/20   # us-west-2b
+      - 10.219.80.0/20   # us-west-2c
+    dba_account_name: pwa_prod_dba
+    dba_src_cidrs: 
+      - 10.20.131.214/32 # dbclustermon1.sac1
+      - 50.115.209.4/32   #b1.sac1
+      - 50.115.209.5/32   #b2.sac1
+    ports:
+      mysqld: 20001
+    playback_enabled: true
+    playback:
+      peers:
+        - node: gds-sac1-prod-db017m1.sac1
+          peer: gds-sac1-prod-db017s1.sac1
+        - node: gds-sac1-prod-db017s1.sac1
+          peer: gds-sac1-prod-db017m1.sac1
+      manage_mysql_slowlogd: 1
+      mysql_user_to_check: thepoint_db
+      user: playback_user
+      password: mee5pieK
+      schema: groupon_production
+      thread_pool_size: 100
+      user_connection_threshold: 15
+      playback_connection_timeout: 20
+      mysql_slowlogd_port: 30001
+    admin_redirect_peers:
+      - 10.22.142.192/32 # gds-snc1-prod-db017m1.snc1
+      - 10.22.142.216/32 # gds-snc1-prod-db017s1.snc1
+      - 10.32.121.73/32 # gds-sac1-prod-db172m1.sac1
+      - 10.32.121.222/32 # gds-sac1-prod-db172s1.sac1
+      - 10.32.121.53/32 # gds-sac1-prod-db173m1.sac1
+      - 10.32.121.68/32 # gds-sac1-prod-db173s1.sac1
+      - 10.32.121.187/32 # gds-sac1-prod-db174m1.sac1
+      - 10.32.121.206/32 # gds-sac1-prod-db174s1.sac1
+      - 10.32.121.203/32 # gds-sac1-prod-db175m1.sac1
+      - 10.32.114.98/32 # gds-sac1-prod-db175s1.sac1

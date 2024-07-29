@@ -1,0 +1,4 @@
+---
+- name: Terminated users
+  user: name="{{ item }}" state=absent remove=yes
+  with_items: terminated_accounts

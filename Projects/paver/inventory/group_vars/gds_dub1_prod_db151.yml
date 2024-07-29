@@ -1,0 +1,329 @@
+---
+gds_carp_peers:
+  - 10.13.110.238  # gds-dub1-prod-db151m1
+  - 10.13.110.239  # gds-dub1-prod-db151s1
+  - 10.13.184.238  # gds-dub1-prod-db151m1
+  - 10.13.184.239  # gds-dub1-prod-db151s1
+gds_carp_interfaces:
+  - vlan201
+  - vlan202
+gds_instance_group: gds_prod_dub1_db151
+gds_monitor_cluster_type: gds_mysql
+
+gds_instances:
+  orders_prod: # GDS-5922  # __SOX__
+    mysqld_options:
+      innodb_io_capacity_force: 8000
+      innodb_io_capacity_max_force: 16000
+      innodb_lru_scan_depth_force: 6000
+      max_slowlog_files_force: 60
+      max_connections_force: 8000
+      max_user_connections_force: 7980
+      innodb_buffer_pool_size_mb_force: 200000
+      innodb_thread_sleep_delay_force: 0
+      innodb_flush_neighbors_force: 0
+      long_query_time_force: 1
+      log_slow_rate_limit_force: 11
+      log_warnings_force: 2
+      sync_binlog_force: 0
+      innodb_flush_log_at_trx_commit_force: 2
+      relay_log_info_repository_force: TABLE
+      relay_log_recovery_force: ON
+      expire_logs_days: 99
+      max_heap_table_size_force: 72M
+      tmp_table_size_force: 72M
+    type: mysql
+    write_origin: dub1
+    # Priority is a numeric value between 0 and 100, lower priority rules get
+    # sorted first. No priority == priority 100.
+    firewall_priority: 150
+    unix_user: gds_uid60001
+    nodes:
+      - gds-dub1-prod-db151m1.dub1
+      - gds-dub1-prod-db151s1.dub1
+    master_carp_interface: vlan201
+    slave_carp_interface: vlan202
+    vhid: 73
+    slave_vhid: 73
+    master_vip: 10.13.110.73
+    slave_vips:
+      - 10.13.184.73
+    replication_ips:
+      - 10.13.250.57 # gds-dub1-prod-db151m1.dub1
+      - 10.13.250.49  # gds-dub1-prod-db151s1.dub1
+      - 10.13.250.10 # gds-dub1-prod-db152m1.dub1
+      - 10.13.250.184 # gds-dub1-prod-db152s1.dub1
+      - 10.13.250.108 # gds-dub1-prod-db153m1.dub1
+      - 10.13.250.120 # gds-dub1-prod-db153s1.dub1
+    firewall_permitted_src_cidrs:
+      - 10.20.131.214/32 # dbclustermon1.snc1
+      - 10.20.130.164/32   # dbclustermon2.snc1
+      - 10.12.33.17/32   # dbclustermon1.dub1
+      - 10.12.39.172/32   # dbclustermon2.dub1
+      - 10.32.62.113/32   # dbclustermon1.sac1
+      - 10.32.74.184/32   # dbclustermon2.sac1
+      - 10.22.74.119/32  # gds-admin01.snc1
+      - 10.12.216.132/32   #gds-admin01.dub1
+      - 10.13.17.216/32   #gds-admin02.dub1
+      - 10.12.33.29/32   #voucher-inventory-app1.dub1
+      - 10.12.35.118/32   #voucher-inventory-app2.dub1
+      - 10.12.37.64/32   #voucher-inventory-app3.dub1
+      - 10.12.36.236/32   #voucher-inventory-app4.dub1
+      - 10.12.33.129/32   #voucher-inventory-app5.dub1
+      - 10.12.36.248/32   #voucher-inventory-app6.dub1
+      - 10.12.35.6/32   #voucher-inventory-app7.dub1
+      - 10.12.37.234/32   #voucher-inventory-app8.dub1
+      - 10.12.231.65/32   #voucher-inventory-utility1.dub1
+      - 10.12.222.111/32   #voucher-inventory-utility2.dub1
+      - 10.12.33.69/32   #voucher-inventory-worker1.dub1
+      - 10.12.37.167/32   #voucher-inventory-worker2.dub1
+      - 10.12.33.29/32   #voucher-inventory-app1.dub1
+      - 10.12.35.118/32   #voucher-inventory-app2.dub1
+      - 10.12.37.64/32   #voucher-inventory-app3.dub1
+      - 10.12.36.236/32   #voucher-inventory-app4.dub1
+      - 10.12.33.129/32   #voucher-inventory-app5.dub1
+      - 10.12.36.248/32   #voucher-inventory-app6.dub1
+      - 10.12.35.6/32   #voucher-inventory-app7.dub1
+      - 10.12.37.234/32   #voucher-inventory-app8.dub1
+      - 10.12.231.65/32   #voucher-inventory-utility1.dub1
+      - 10.12.222.111/32   #voucher-inventory-utility2.dub1
+      - 10.12.33.69/32   #voucher-inventory-worker1.dub1
+      - 10.12.37.167/32   #voucher-inventory-worker2.dub1
+      - 10.12.231.73/32   # orders-app1.dub1
+      - 10.12.210.124/32   # orders-app2.dub1
+      - 10.12.207.41/32   # orders-app3.dub1
+      - 10.12.234.32/32   # orders-app4.dub1
+      - 10.12.219.211/32   # orders-app5.dub1
+      - 10.12.213.128/32   # orders-app6.dub1
+      - 10.12.237.53/32   # orders-app7.dub1
+      - 10.12.204.8/32   # orders-app8.dub1
+      - 10.12.33.196/32   # orders-app9.dub1
+      - 10.12.225.46/32   # orders-app10.dub1
+      - 10.12.228.236/32   # orders-app11.dub1
+      - 10.12.222.5/32   # orders-app12.dub1
+      - 10.12.228.154/32   # orders-app13.dub1
+      - 10.12.249.104/32   #orders-app14.dub1
+      - 10.12.204.194/32   # orders-app15.dub1
+      - 10.12.210.67/32   # orders-app16.dub1
+      - 10.13.134.55/32   # orders-app17.dub1
+      - 10.13.63.49/32   # orders-app18.dub1
+      - 10.12.37.152/32   # orders-app19.dub1
+      - 10.12.35.226/32   # orders-app20.dub1
+      - 10.13.122.73/32   # orders-app21.dub1
+      - 10.12.36.107/32   # orders-app22.dub1
+      - 10.12.33.252/32   # orders-app23.dub1
+      - 10.13.96.33/32   # orders-app24.dub1
+      - 10.13.161.43/32   # orders-app25.dub1
+      - 10.13.161.89/32   # orders-app26.dub1
+      - 10.13.161.195/32   # orders-app27.dub1
+      - 10.13.161.199/32   # orders-app28.dub1
+      - 10.13.161.48/32   # orders-app29.dub1
+      - 10.13.161.203/32   # orders-app30.dub1
+      - 10.13.161.82/32   # orders-app31.dub1
+      - 10.13.161.185/32   # orders-app32.dub1
+      - 10.13.161.233/32   # orders-app33.dub1
+      - 10.13.122.249/32   # orders-app34.dub1
+      - 10.12.138.211/32   # orders-app35.dub1
+      - 10.12.136.243/32   # orders-app36.dub1
+      - 10.13.161.145/32   # orders-app37.dub1
+      - 10.13.220.3/32   # orders-app38.dub1
+      - 10.12.133.41/32   # orders-app39.dub1
+      - 10.12.138.227/32   # orders-app40.dub1
+      - 10.13.223.198/32   # orders-app41.dub1
+      - 10.13.248.150/32   # orders-app42.dub1
+      - 10.13.122.13/32   # orders-app43.dub1
+      - 10.13.248.106/32   # orders-app44.dub1
+      - 10.12.138.177/32   # orders-app45.dub1
+      - 10.13.220.2/32   # orders-app46.dub1
+      - 10.13.161.151/32   # orders-app47.dub1
+      - 10.12.136.28/32   # orders-app48.dub1
+      - 10.12.133.71/32   # orders-app49.dub1
+      - 10.13.161.173/32   # orders-app50.dub1
+      - 10.12.37.144/32   # orders-app51.dub1
+      - 10.12.139.220/32   # orders-app52.dub1
+      - 10.13.158.80/32   # orders-app53.dub1
+      - 10.13.220.35/32   # orders-app54.dub1
+      - 10.12.134.10/32   # orders-app55.dub1
+      - 10.13.160.36/32   # orders-app56.dub1
+      - 10.13.203.72/32   # orders-app57.dub1
+      - 10.12.139.205/32   # orders-app58.dub1
+      - 10.13.161.201/32   # orders-app59.dub1
+      - 10.12.134.215/32   # orders-app60.dub1
+      - 10.13.203.74/32   # orders-app61.dub1
+      - 10.13.158.127/32   # orders-app62.dub1
+      - 10.13.220.158/32   # orders-app63.dub1
+      - 10.12.139.239/32   # orders-app64.dub1
+      - 10.13.220.105/32   # orders-app65.dub1
+      - 10.12.36.131/32   # orders-irb1.dub1
+      - 10.12.222.34/32 # orders-irb2.dub1
+      - 10.12.207.128/32   # orders-irb3.dub1
+      - 10.12.231.163/32   #orders-irb-rw1.dub1
+      - 10.12.36.242/32   #orders-irb-rw2.dub1
+      - 10.13.31.92/32   # orders-irb-rw3.dub1
+      - 10.12.222.72/32   # orders-read-app1.dub1
+      - 10.12.204.242/32   # orders-read-app2.dub1
+      - 10.12.237.251/32   # orders-read-app3.dub1
+      - 10.12.225.175/32   # orders-read-app4.dub1
+      - 10.12.219.81/32   # orders-read-app5.dub1
+      - 10.12.213.38/32   # orders-read-app6.dub1
+      - 10.12.234.199/32   # orders-read-app7.dub1
+      - 10.12.228.156/32   # orders-read-app8.dub1
+      - 10.12.210.129/32   # orders-read-app9.dub1
+      - 10.12.234.205/32   # orders-read-app10.dub1
+      - 10.12.204.85/32   # orders-read-app11.dub1
+      - 10.12.210.130/32   # orders-read-app12.dub1
+      - 10.12.222.184/32   # orders-read-app13.dub1
+      - 10.12.213.120/32   # orders-read-app14.dub1
+      - 10.12.219.132/32   # orders-read-app15.dub1
+      - 10.12.213.226/32   # orders-read-app16.dub1
+      - 10.12.35.102/32   # orders-read-app17.dub1
+      - 10.12.39.99/32   # orders-read-app18.dub1
+      - 10.13.63.60/32   # orders-read-app19.dub1
+      - 10.12.35.204/32   # orders-read-app20.dub1
+      - 10.13.122.35/32   # orders-read-app21.dub1
+      - 10.12.36.166/32   # orders-read-app22.dub1
+      - 10.13.160.88/32   # orders-read-app23.dub1
+      - 10.13.65.239/32   # orders-read-app24.dub1
+      - 10.13.161.150/32   # orders-read-app25.dub1
+      - 10.13.161.19/32   # orders-read-app26.dub1
+      - 10.13.161.41/32   # orders-read-app27.dub1
+      - 10.13.161.248/32   # orders-read-app28.dub1
+      - 10.13.161.139/32   # orders-read-app29.dub1
+      - 10.13.161.25/32   # orders-read-app30.dub1
+      - 10.13.161.141/32   # orders-read-app31.dub1
+      - 10.13.161.66/32   # orders-read-app32.dub1
+      - 10.13.122.172/32   # orders-read-app33.dub1
+      - 10.13.220.233/32   # orders-read-app34.dub1
+      - 10.13.223.42/32   # orders-read-app35.dub1
+      - 10.12.138.215/32   # orders-read-app36.dub1
+      - 10.12.136.217/32   # orders-read-app37.dub1
+      - 10.13.161.37/32   # orders-read-app38.dub1
+      - 10.12.133.245/32   # orders-read-app39.dub1
+      - 10.12.132.101/32   # orders-read-app40.dub1
+      - 10.13.248.39/32   # orders-read-app41.dub1
+      - 10.12.138.214/32   # orders-read-app42.dub1
+      - 10.12.132.58/32   # orders-read-app43.dub1
+      - 10.12.133.100/32   # orders-read-app44.dub1
+      - 10.13.122.7/32   # orders-read-app45.dub1
+      - 10.13.161.64/32   # orders-read-app46.dub1
+      - 10.13.248.44/32   # orders-read-app47.dub1
+      - 10.13.220.80/32   # orders-read-app48.dub1
+      - 10.12.136.149/32   # orders-read-app49.dub1
+      - 10.12.134.84/32   # orders-read-app50.dub1
+      - 10.12.225.190/32   # orders-read-app51.dub1
+      - 10.12.36.157/32   # orders-read-app52.dub1
+      - 10.13.161.132/32   # orders-read-app53.dub1
+      - 10.13.158.164/32   # orders-read-app54.dub1
+      - 10.13.220.186/32   # orders-read-app55.dub1
+      - 10.12.37.232/32   # orders-read-app56.dub1
+      - 10.13.160.229/32   # orders-read-app57.dub1
+      - 10.13.130.98/32   # orders-read-app58.dub1
+      - 10.13.161.245/32   # orders-read-app59.dub1
+      - 10.12.139.203/32   # orders-read-app60.dub1
+      - 10.12.138.74/32   # orders-read-app61.dub1
+      - 10.13.122.33/32   # orders-read-app62.dub1
+      - 10.13.161.110/32   # orders-read-app63.dub1
+      - 10.13.161.127/32   # orders-read-app64.dub1
+      - 10.13.160.76/32   # orders-read-batch3.dub1
+      - 10.13.122.220/32   # orders-read-batch4.dub1
+      - 10.12.234.37/32   #orders-worker1.dub1
+      - 10.12.210.54/32   #orders-worker2.dub1
+      - 10.13.86.159/32   # orders-worker3.dub1
+      - 10.13.63.206/32   # orders-worker4.dub1
+      - 10.13.161.161/32   # orders-worker5.dub1
+      - 10.13.160.12/32   # orders-worker6.dub1
+      - 10.12.219.160/32   #orders-utility1.dub1
+      - 10.12.234.13/32   #orders-utility2.dub1
+      - 10.13.151.21/32   # orders-utility3.dub1
+      - 10.13.203.30/32   # orders-utility4.dub1
+      - 10.12.249.13/32   # orders-utility5.dub1
+      - 10.13.250.10/32  # gds-dub1-prod-db152m1.dub1
+      - 10.13.250.184/32  # gds-dub1-prod-db152s1.dub1
+      - 10.12.216.66/32 #goods-outbound-controller-app1.dub1
+      - 10.13.31.126/32 #goods-outbound-controller-app2.dub1
+      - 10.13.96.47/32 #goods-outbound-controller-app3.dub1
+      - 10.12.243.235/32 #goods-outbound-controller-app4.dub1
+      - 10.12.249.198/32 #goods-outbound-controller-app5.dub1
+      - 10.13.86.111/32 #goods-outbound-controller-app6.dub1
+      - 10.22.237.197/32   # goods-daas-utility-1.snc1
+      - 10.12.249.183/32   # voucher-inventory-worker3.dub1
+      - 10.13.130.236/32   # voucher-inventory-worker4.dub1
+      - 10.13.86.160/32   # voucher-inventory-worker5.dub1
+      - 10.12.219.198/32   # voucher-inventory-worker6.dub1
+      - 10.13.151.162/32   # voucher-inventory-read-app1.dub1
+      - 10.12.33.235/32   # voucher-inventory-read-app2.dub1
+      - 10.12.37.190/32   # voucher-inventory-read-app3.dub1
+      - 10.12.35.122/32   # voucher-inventory-read-app4.dub1
+      - 10.13.222.230/32   # voucher-inventory-read-app5.dub1
+      - 10.13.34.231/32   # voucher-inventory-read-app6.dub1
+      - 10.13.230.133/32   # voucher-inventory-read-app7.dub1
+      - 10.12.246.41/32   # voucher-inventory-read-app8.dub1
+      - 10.13.45.28/32   # voucher-inventory-read-app9.dub1
+      - 10.13.63.151/32   # voucher-inventory-read-app10.dub1
+      - 10.13.134.80/32   # voucher-inventory-read-app11.dub1
+      - 10.12.243.249/32   # voucher-inventory-read-app12.dub1
+      - 10.13.160.244/32   # voucher-inventory-read-app13.dub1
+      - 10.13.65.111/32   # voucher-inventory-read-app14.dub1
+      - 10.13.99.7/32   # voucher-inventory-write-app1.dub1
+      - 10.13.203.199/32   # voucher-inventory-write-app2.dub1
+      - 10.12.204.172/32   # voucher-inventory-write-app3.dub1
+      - 10.12.33.59/32   # voucher-inventory-write-app4.dub1
+      - 10.13.136.121/32   # voucher-inventory-write-app5.dub1
+      - 10.12.213.178/32   # voucher-inventory-write-app6.dub1
+      - 10.12.228.171/32   # voucher-inventory-write-app7.dub1
+      - 10.12.33.126/32   # voucher-inventory-backfill-write-app1.dub1
+      - 10.13.193.46/32   # voucher-inventory-backfill-write-app2.dub1
+      - 10.13.223.157/32   # voucher-inventory-backfill-write-app3.dub1
+      - 10.13.160.206/32   # voucher-inventory-backfill-write-app4.dub1
+      - 10.13.63.9/32   # voucher-inventory-backfill-write-app5.dub1
+      - 10.13.65.171/32   # voucher-inventory-backfill-write-app6.dub1
+      - 10.13.96.238/32   # voucher-inventory-backfill-write-app7.dub1
+      - 10.12.207.149/32   # voucher-inventory-worker7.dub1
+      - 10.13.31.129/32   # voucher-inventory-worker8.dub1
+      - 10.12.39.208/32   # voucher-inventory-lt-read-app1.dub1
+      - 10.13.223.246/32   # voucher-inventory-lt-read-app2.dub1
+      - 10.13.96.49/32   # voucher-inventory-lt-read-app3.dub1
+      - 10.13.134.221/32   # voucher-inventory-lt-read-app4.dub1
+      - 10.13.63.33/32   # voucher-inventory-lt-read-app5.dub1
+      - 10.13.223.247/32   # voucher-inventory-lt-read-app6.dub1
+      - 10.13.65.92/32   # voucher-inventory-lt-read-app7.dub1
+      - 10.13.230.190/32   # voucher-inventory-lt-read-app8.dub1
+      - 10.13.158.30/32   # voucher-inventory-lt-read-app9.dub1
+      - 10.13.203.41/32   # voucher-inventory-lt-read-app10.dub1
+      - 10.13.182.61/32   # voucher-inventory-lt-write-app1.dub1
+      - 10.13.63.14/32   # voucher-inventory-lt-write-app2.dub1
+      - 10.13.134.144/32   # voucher-inventory-lt-write-app3.dub1
+      - 10.13.203.24/32   # voucher-inventory-lt-write-app4.dub1
+      - 10.13.134.160/32   # goods-deletion-service1.dub1
+      - 10.13.203.223/32   # goods-deletion-service2.dub1
+      - 10.228.48.0/20   # eu-west-1
+      - 10.228.64.0/20   # eu-west-1
+      - 10.228.80.0/20   # eu-west-1
+    dba_account_name: orders_prod_dba
+    dba_src_cidrs:
+      - 10.12.216.132/32  # gds-admin01.dub1
+    ports:
+      mysqld: 20001
+    playback_enabled: false
+    playback:
+      peers:
+        - node: gds-dub1-prod-db151m1.dub1
+          peer: gds-dub1-prod-db151s1.dub1
+        - node: gds-dub1-prod-db151s1.dub1
+          peer: gds-dub1-prod-db151m1.dub1
+      manage_mysql_slowlogd: 1
+      mysql_user_to_check: thepoint_db
+      user: playback_user
+      password: mee5pieK
+      schema: groupon_production
+      thread_pool_size: 100
+      user_connection_threshold: 15
+      playback_connection_timeout: 20
+      mysql_slowlogd_port: 30001
+    admin_redirect_peers:
+      - 10.13.250.57/32   #gds-dub1-prod-db151m1.dub1
+      - 10.13.250.49/32   #gds-dub1-prod-db151s1.dub1
+      - 10.13.250.10/32   #gds-dub1-prod-db152m1.dub1
+      - 10.13.250.184/32   #gds-dub1-prod-db152s1.dub1
+      - 10.13.250.108/32   #gds-dub1-prod-db153m1.dub1
+      - 10.13.250.120/32   #gds-dub1-prod-db153s1.dub1

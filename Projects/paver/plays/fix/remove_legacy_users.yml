@@ -1,0 +1,52 @@
+---
+###################################################
+# remove_legacy_users.yml
+#
+# Description:   This playbook removes the legacy users mmm_agent and mysql_admin from all instances on the server.
+#
+# Usage:        ansible-playbook plays/fix/remove_legacy_users.yml -e "node=gds-snc1-test-db001m1.snc1"
+# become:       false
+# gather_facts: false
+# 
+# Parameters:   node=server
+# 
+# Requirements: None
+#
+# Notes:        None
+###################################################
+
+- name: Check params
+  gather_facts: false
+  hosts: localhost
+  connection: local
+  tasks:
+    - assert:
+        that:
+          - node is defined
+
+- name: Remove Legacy MySQL Users
+  gather_facts: false
+  become: false
+  hosts:
+    - "{{ node }}"
+  tasks:
+    - name: Remove all mmm_agent users
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"SET SQL_LOG_BIN=0;DELETE FROM mysql.user WHERE User='mmm_agent';DELETE FROM mysql.db WHERE User='mmm_agent';FLUSH PRIVILEGES"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      no_log: true
+      ignore_errors: true
+
+    - name: Remove all mysql_admin users
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"SET SQL_LOG_BIN=0;DELETE FROM mysql.user WHERE User='mysql_admin';DELETE FROM mysql.db WHERE User='mysql_admin';FLUSH PRIVILEGES"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      no_log: true
+      ignore_errors: true
+
+    - name: Remove all ptosc users
+      shell: mysql -BN -uroot -S/var/groupon/percona/{{ item.key }}/mysql.sock -e"SET SQL_LOG_BIN=0;DELETE FROM mysql.user WHERE User='ptosc';DELETE FROM mysql.db WHERE User='ptosc';FLUSH PRIVILEGES"
+      when: item.value.type == "mysql"
+      with_dict: "{{ gds_instances }}"
+      no_log: true
+      ignore_errors: true

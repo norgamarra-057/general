@@ -1,0 +1,7 @@
+---
+groupon_root: /var/groupon
+percona_root: /var/groupon/percona
+monitoring_template_dir: /var/tmp/ops-config-monitoring
+
+include_tasks: playback_defaults.yml
+

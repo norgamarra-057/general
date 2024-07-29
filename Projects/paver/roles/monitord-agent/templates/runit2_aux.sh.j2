@@ -1,0 +1,10 @@
+#!/bin/sh --
+
+exec \
+  /usr/bin/env -i \
+  /usr/local/sbin/chpst -v \
+    -e /var/service/monitord_agent/env \
+    -n 15 \
+    -m {{ 200 * 1024 * 1024 }} \
+  /var/groupon/service/monitord_agent_aux/monitord --no-daemonize \
+    -v -o -c /var/groupon/monitord/config_aux.yml

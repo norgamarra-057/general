@@ -1,0 +1,10 @@
+---
+- hosts: gds_snc1_prod_db009
+  become: yes
+  roles:
+  - { role: gds-mysql-server }
+  - { role: gds-mysql-ha, instance: custsvc_latam_prod }
+  - { role: gds-mysql-ha, instance: deal_book_service_prod }
+  - { role: gds-mysql-ha, instance: starman_prod }
+  - { role: gds-mysql-ha, instance: afl_portal_prod }
+  - { role: gds-mysql-ha, instance: card_purge_batch_prod }
