@@ -20,6 +20,8 @@ redis-cli -h $h -c FLUSHALL ASYNC
 
 redis-cli -h $h CLIENT LIST
 
+redis-cli -h $h --stat
+
 Redis report
 ------------
 

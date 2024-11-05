@@ -204,3 +204,5 @@ select distinct(user),count(user),db from information_Schema.processlist group b
 ALTER USER 'c_prod_usr_ro'@'%' ACCOUNT UNLOCK ;
 ALTER USER 'rds_client_id'@'%' ACCOUNT UNLOCK ;
 ALTER USER 'repl_user'@'%' ACCOUNT UNLOCK ;
+
+SHOW VARIABLES LIKE 'gtid_mode';

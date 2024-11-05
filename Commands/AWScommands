@@ -39,4 +39,6 @@ aws rds restore-db-cluster-from-snapshot --db-cluster-identifier arifactory-rest
 
 :1,$d (borrar todo en vim)
 
+:%s/`//g (Cambiar signo ´)
+
 gsutil -i grpn-sa-terraform-gds@prj-grp-central-sa-stable-66eb.iam.gserviceaccount.com rm gs://grpn-gcp-gds-gcp-databases-3301-state-926600789615/stable/us-central1/cnames/watson-api/default.tflock

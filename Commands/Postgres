@@ -42,7 +42,9 @@ WHERE  r.rolname = 'goods_mkt_pric_stg_dba' OR d.datname = 'goods_market_pricing
 
 - Get user grants -
 
-\du username
+SELECT *
+  FROM information_schema.role_table_grants 
+ WHERE grantee = 'YOUR_USER';
 
 -Describe table-
 

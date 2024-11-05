@@ -28,3 +28,8 @@ function targetmem(){
     -target=aws_elasticache_cluster.$1[0] \
     -target=aws_route53_record.$1_cname[0]
 }
+
+export TF_RAAS_ENV=$(basename $(cd ..; pwd)|head -c3)
+ eval $(cd $RAAS_SECRETS_PATH; ruby load_passwords.rb)
+aws-okta exec $TF_RAAS_ENV -- terragrunt  apply \
+ -target=aws_security_group.raas_redis_conveyor_prod
