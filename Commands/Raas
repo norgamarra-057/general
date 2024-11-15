@@ -22,6 +22,12 @@ redis-cli -h $h CLIENT LIST
 
 redis-cli -h $h --stat
 
+redis-cli --cluster rebalance 192.168.11.135:6379
+
+redis-cli --cluster check 192.168.11.131:6379
+
+
+
 Redis report
 ------------
 
