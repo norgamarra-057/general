@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "crm-msg-service-prod-emea",
+         "skipReplicationSetup": true
+       }
+}

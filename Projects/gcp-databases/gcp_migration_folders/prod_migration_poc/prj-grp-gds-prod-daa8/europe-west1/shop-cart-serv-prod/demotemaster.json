@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "shop-cart-serv-prod",
+         "skipReplicationSetup": true
+       }
+}

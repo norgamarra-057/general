@@ -1,0 +1,7 @@
+srcpoint: 10.221.133.209
+endpoint: 10.182.203.245 
+src_dbs: ["gkb_stg"]
+src_users: ["gkb","replication"]
+REPLICA_INST_NAME: my-core-emea-572-killbill-stg-0
+env: stable
+AWS_CNAME: my-core-emea-57-stg.cluster-csgyhkohakjl.us-west-2.rds.amazonaws.com. 

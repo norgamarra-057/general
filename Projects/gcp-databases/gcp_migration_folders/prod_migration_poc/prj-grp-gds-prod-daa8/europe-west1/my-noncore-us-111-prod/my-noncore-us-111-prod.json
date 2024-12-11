@@ -1,0 +1,7 @@
+srcpoint: 10.219.128.198
+endpoint: 10.183.195.216
+src_dbs: ["fde_prod","my_noncore_us_111_prod","refresh_api"]
+src_users: ["apirefresh_rw","fde_prod_app","replication"]
+REPLICA_INST_NAME: my-noncore-us-111-prod-0
+env: prod
+AWS_CNAME: my-noncore-us-111-prod.cluster-cjkehezkc6xn.us-west-2.rds.amazonaws.com.

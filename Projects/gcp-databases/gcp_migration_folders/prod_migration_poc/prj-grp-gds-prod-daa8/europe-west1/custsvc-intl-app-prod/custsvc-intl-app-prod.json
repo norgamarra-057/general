@@ -1,0 +1,7 @@
+srcpoint: 10.228.130.67
+endpoint: 10.183.195.243 
+src_dbs: ["custsvc_intl_app_production","cyclops_groupon","cyclops_groupon_india","percona","restored_tables"]
+src_users: ["c_prod_usr_ro","custsvc_intl_app","cyclops_db","cyclops_ro","datawarehouse","edw_gcp_ro","edw_ro","keboola_prod_eu_ro","mani","non_sox_util","replication","replication2","styx_ilm_ro","non_sox_util","cyclops_db","non_sox_util","non_sox_util","non_sox_util"]
+REPLICA_INST_NAME: custsvc-intl-app-prod-0
+env: prod
+AWS_CNAME: custsvc-intl-app-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

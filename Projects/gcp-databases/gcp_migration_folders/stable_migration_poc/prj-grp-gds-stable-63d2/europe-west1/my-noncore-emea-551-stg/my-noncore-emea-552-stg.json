@@ -1,0 +1,7 @@
+srcpoint: 10.221.128.191
+endpoint: 10.182.203.240
+src_dbs: ["afl_3pgw","afl_3pgw_emea_stg","afl_recon_emea_stg","expy_service_stg","fde_stg","giftcard_srv_emea_stg","gim_emea_stg","goods_outbound_cont_emea_stg","gso_merchant_success_stg","mols","my_noncore_emea_551_stg","octopete_stg","opdata_ingest_stg","orders_msg_stg","percona","qrtz","qrtz_staging","rapt_db_stg","rocketman_emea_stg","ssu_stg"]
+src_users: ["afl_3pgw_app","afl_3pgw_emea_stg_rw","afl_recon_dba","airflow_emea","c_stg_usr_ro","cart_emea_root","carts_emea_ro","carts_emea_rw","expy_service_stg_ro","expy_service_stg_rw","fde_stg_app","gftcrd_srv_emea","gim_emea_admin","goods_out_c_serv","gso_merchant_success_stg_rw","mols_stg_ro","mols_stg_rw","octo_stg_app","opdata_ingest","orders_msg_dba","rapt_emea_stg","rapt_emea_usr","rapt_ro_emea_usr","replication","rocketman_emea","ssu"]
+REPLICA_INST_NAME: my-noncore-emea-552-stg-2
+env: stable
+AWS_CNAME: my-noncore-emea-551-stg.cluster-csgyhkohakjl.us-west-2.rds.amazonaws.com. 

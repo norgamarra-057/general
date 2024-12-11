@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "my-noncore-emea-202-prod",
+         "skipReplicationSetup": true
+       }
+}

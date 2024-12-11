@@ -1,0 +1,7 @@
+srcpoint: 10.228.133.62
+endpoint: 10.183.195.245
+src_dbs: ["goods_shipment_db","goods_shipment_prod","percona"]
+src_users: ["bi_readonly","c_prod_usr_ro","edw_gcp_ro","etl_readonly","gls_reports_ro","goods_logistics","goods_readonly","goods_shp_dub_ro","goods_shp_dub_rw","replication","sts_bck_goodshrw","sts_frnt_goodsrw"]
+REPLICA_INST_NAME: goods-shipment-prod-0
+env: prod
+AWS_CNAME: goods-shipment-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

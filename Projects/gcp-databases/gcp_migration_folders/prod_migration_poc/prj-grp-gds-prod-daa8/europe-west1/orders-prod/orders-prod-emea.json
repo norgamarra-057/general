@@ -1,0 +1,7 @@
+srcpoint: 10.228.133.193
+endpoint: 10.183.195.37 
+src_dbs: ["groupon_production","percona","tungsten_aws_groupon_orders","tungsten_groupon_orders"]
+src_users: ["c_prod_usr_ro","cloud_edw_ro","datastream","datastream_poc","dw_etl","edw_gcp_ro","goods","goods_dashboard","goods_del_svc_rw","goods_fulfill","hadoop","keboola_ro","megatron_ro","orders_ht_ro","orders_lt_ro","orders_rails3_ro","orders_rails3_rw","orders_rw","ptselect","replication","smartdeals","styx_ilm_ro","thepoint_db","tungsten","tungsten_aws","vis20_ht_ro","vis20_lt_ro","vis20_ro","vis20_rw","voucher_inv"]
+REPLICA_INST_NAME: orders-prod-emea-0 
+env: prod
+AWS_CNAME: orders-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

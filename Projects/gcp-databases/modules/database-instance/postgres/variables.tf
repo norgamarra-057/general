@@ -19,6 +19,12 @@ variable "vpc_name_project" {
   type        = string
 }
 
+variable "backup_location" {
+  description = "The location of the backup, either us or eu"
+  type        = string
+  default     = "us"
+}
+
 variable "db_name" {
   description = "The name of the database."
   type        = string
@@ -42,6 +48,12 @@ variable "db_version" {
 }
 
 variable "db_tier" {
+  description = "The tiering or size for the database."
+  type        = string
+}
+
+
+variable "db_tier_replica" {
   description = "The tiering or size for the database."
   type        = string
 }
@@ -167,8 +179,8 @@ variable "max_replication_slots" {
 
 variable "hot_standby_feedback" {
   description = "Enables the sending of information from the standby to the primary about transactions that are near a rollback point"
-  type        = number
-  default     = 1
+  type        = string
+  default     = "on"
 }
 
 variable "max_standby_streaming_delay" {
@@ -192,7 +204,7 @@ variable "max_worker_processes" {
 variable "max_sync_workers_per_subscription" {
   description = "Sets the maximum number of background worker processes"
   type        = number
-  default     = 3
+  default     = null
 }
 
 
@@ -217,7 +229,13 @@ variable "default_statistics_target" {
 variable "log_min_duration_statement" {
   description = "Sets the minimum execution time above which statements will be logged"
   type        = string
-  default     = 100
+  default     = 200
+}
+
+variable "auto_explain_log_min_duration" {
+  description = "Sets the minimum execution time above which statements will be logged"
+  type        = number
+  default     = 60000
 }
 
 variable "log_autovacuum_min_duration" {
@@ -280,11 +298,18 @@ variable "idle_in_transaction_session_timeout" {
   default     = 86400000
 }
 
+variable "enable_auto_explain" {
+  description = "Sets Wal level to logical"
+  type        = bool
+  default     = true
+}
+
 variable "cloudsql_logical_decoding" {
   description = "Sets Wal level to logical"
   type        = bool
   default     = true
 }
+
 
 variable "autovacuum_vacuum_cost_delay" {
   description = "Specifies the cost limit value that determines the point at which the cost-based vacuuming will be used"

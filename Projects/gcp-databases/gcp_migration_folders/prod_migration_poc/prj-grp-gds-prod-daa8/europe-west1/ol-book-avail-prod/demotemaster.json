@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "ol-book-avail-prod",
+         "skipReplicationSetup": true
+       }
+}

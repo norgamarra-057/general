@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "custsvc-intl-app-prod",
+         "skipReplicationSetup": true
+       }
+}

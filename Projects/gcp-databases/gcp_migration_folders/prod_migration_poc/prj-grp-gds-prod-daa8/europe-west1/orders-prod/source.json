@@ -1,0 +1,10 @@
+  {
+       "name": "orders-prod-emea",
+       "region": "europe-west1",
+       "databaseVersion": "MYSQL_8_0",
+       "onPremisesConfiguration": {
+         "hostPort": "10.228.133.193:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

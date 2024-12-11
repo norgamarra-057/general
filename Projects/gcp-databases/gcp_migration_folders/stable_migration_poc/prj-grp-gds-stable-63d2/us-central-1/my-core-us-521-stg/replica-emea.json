@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "tier": "db-n1-standard-16",
+        "dataDiskSizeGb": "2600",
+        "ipConfiguration": {
+            "ipv4Enabled": false,
+            "privateNetwork": "projects/prj-grp-shared-vpc-stable-134f/global/networks/vpc-stable-sharedvpc01"
+        }
+    },
+    "masterInstanceName": "my-core-us-521-stg-2",
+    "region": "europe-west1",
+    "databaseVersion": "MYSQL_8_0",
+    "name": "my-core-us-521-replica-emea-stg-0"
+}

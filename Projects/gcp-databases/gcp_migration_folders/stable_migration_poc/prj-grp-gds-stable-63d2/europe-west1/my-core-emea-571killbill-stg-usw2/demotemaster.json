@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "my-core-emea-572-killbill-stg",
+         "skipReplicationSetup": true
+       }
+}

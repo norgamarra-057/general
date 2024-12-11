@@ -1,0 +1,7 @@
+srcpoint: 10.228.131.125
+endpoint: 10.183.195.128 
+src_dbs: ["my_temp_db","percona","users_prod","users_service_production"]
+src_users: ["c_prod_usr_ro","cust_data_eng","datastream","keboola_ro","megatron_ro","replication","rocketman_user","svc_bemod","users_service","usr_inv_ro","users_service","users_service","users_service","users_service","users_service","users_service","users_service" ]
+REPLICA_INST_NAME: users-prod-emea-1
+env: prod
+AWS_CNAME: users-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

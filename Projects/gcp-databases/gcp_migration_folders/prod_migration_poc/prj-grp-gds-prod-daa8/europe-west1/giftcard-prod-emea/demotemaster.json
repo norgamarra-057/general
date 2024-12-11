@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "giftcard-prod-emea",
+         "skipReplicationSetup": true
+       }
+}

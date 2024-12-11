@@ -1,0 +1,7 @@
+srcpoint: 10.228.131.59
+endpoint: 10.183.195.119
+src_dbs: ["crm_message_service","percona"]
+src_users: ["c_prod_usr_ro","crm","edw_ro","replication"]
+REPLICA_INST_NAME: crm-msg-service-prod-emea-1
+env: prod
+AWS_CNAME: crm-msg-service-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

@@ -1,0 +1,7 @@
+srcpoint: 10.221.133.50
+endpoint: 10.182.203.28
+src_dbs: ["rapt_db_stg"]
+src_users: ["c_stg_usr_ro","rapt_emea_stg","rapt_emea_usr","rapt_ro_emea_usr","user1","user2"]
+REPLICA_INST_NAME: rapt-emea-stg-0
+env: stable
+AWS_CNAME: rapt-emea-stg.cluster-csgyhkohakjl.us-west-2.rds.amazonaws.com.

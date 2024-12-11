@@ -1,0 +1,7 @@
+srcpoint: 10.228.129.245
+endpoint: 10.183.195.67
+src_dbs: ["goods_oc_prod","percona"]
+src_users: ["c_prod_usr_ro","edw_gcp_ro","goods_del_svc_rw","goods_oc","goods_oc_ro","replication"]
+REPLICA_INST_NAME: goods-oc-prod-0
+env: prod
+AWS_CNAME: goods-oc-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

@@ -3,6 +3,7 @@
   db_type = "postgres"
   db_version = "POSTGRES_15"
   db_tier = "db-custom-4-15360"
+  db_tier_replica = "db-custom-4-15360"
   disk_size = 1000
   max_connections = 2669
   autovacuum_analyze_scale_factor = 0.01

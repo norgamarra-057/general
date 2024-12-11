@@ -31,9 +31,9 @@ then
     exit 1
 fi
 
-if [ ! $GDS_REGION == "us-central1" ]
+if [ ! $GDS_REGION == "us-central1" ] && [ ! $GDS_REGION == "eu-west1" ]
 then
-  echo "Illegal region. Please use us-central1."
+  echo "Illegal region. Please use us-central1 or eu-west1."
   exit 1
 fi
 

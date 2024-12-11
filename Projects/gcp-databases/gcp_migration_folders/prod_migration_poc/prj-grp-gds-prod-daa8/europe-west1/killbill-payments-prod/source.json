@@ -1,0 +1,10 @@
+  {
+       "name": "killbill-payments-emea",
+       "region": "europe-west1",
+       "databaseVersion": "MYSQL_5_7",
+       "onPremisesConfiguration": {
+         "hostPort": "10.228.132.189:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

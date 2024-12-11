@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "goods-job-sched-emea-prod",
+         "skipReplicationSetup": true
+       }
+}

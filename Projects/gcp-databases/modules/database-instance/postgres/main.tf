@@ -318,11 +318,17 @@ dynamic "database_flags" {
   backup_configuration {
 #    enabled            = false
     enabled            = true
+    location           = var.backup_location
   }
 
+    maintenance_window {
+      day         = 1   # Day of the week (1 = Monday, 7 = Sunday)
+      hour        = 0   # Hour of the day (0-23, in UTC)
+      update_track = "stable"  # Update track (options: "canary" or "stable")
+    }
 
 
-    availability_type = "REGIONAL"
+    availability_type = "ZONAL"
   }
 
 }
@@ -344,7 +350,7 @@ resource "google_sql_database_instance" "replica_instance" {
   // Configure replication settings for the replica instance
 
   settings {
-     tier = var.db_tier
+     tier = var.db_tier_replica
      deletion_protection_enabled = true
 
     database_flags {
@@ -629,7 +635,7 @@ dynamic "database_flags" {
       }
 
     }
-    availability_type = "REGIONAL"
+    availability_type = "ZONAL"
 }
 
   depends_on = [google_sql_database_instance.instance]

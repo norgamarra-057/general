@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "booking-3rdparty-prod",
+         "skipReplicationSetup": true
+       }
+}

@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "expyservice-prod-emea",
+         "skipReplicationSetup": true
+       }
+}

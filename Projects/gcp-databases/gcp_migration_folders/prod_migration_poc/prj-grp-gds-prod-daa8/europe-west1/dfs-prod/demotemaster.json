@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "dfs-prod",
+         "skipReplicationSetup": true
+       }
+}

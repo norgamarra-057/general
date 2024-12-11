@@ -1,0 +1,10 @@
+  {
+       "name": "my-core-emea-572-killbill-stg",
+       "region": "europe-west1",
+       "databaseVersion": "MYSQL_5_7",
+       "onPremisesConfiguration": {
+         "hostPort": "10.221.133.209:3306",
+         "username": "replication",
+         "password": "GaSxrz1twblgEyl"
+        }
+  }

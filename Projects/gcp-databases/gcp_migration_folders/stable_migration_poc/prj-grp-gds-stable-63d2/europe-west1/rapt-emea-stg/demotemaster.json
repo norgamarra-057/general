@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "rapt-emea-stg",
+         "skipReplicationSetup": true
+       }
+}

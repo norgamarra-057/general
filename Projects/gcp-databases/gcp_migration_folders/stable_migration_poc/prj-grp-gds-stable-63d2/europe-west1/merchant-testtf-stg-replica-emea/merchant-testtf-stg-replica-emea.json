@@ -1,0 +1,7 @@
+srcpoint: 10.221.129.15
+endpoint: 10.182.199.4
+src_dbs: ["abacus_e513","abacus_stg","merchantservice","octopus","octopus_e513","proxy_service","proxy_service_e513","sfupdater"]
+src_users: ["abacus","c_stg_usr_ro","gds_migration","merch_ro_stg","merch_ro_uat","mthree","replication"]
+REPLICA_INST_NAME: merchant-testtf-stg-replica-0
+env: stable
+AWS_CNAME: merchant-stg-replica.cluster-csgyhkohakjl.us-west-2.rds.amazonaws.com

@@ -1,0 +1,7 @@
+srcpoint: 10.228.132.189
+endpoint: 10.183.195.39
+src_dbs: ["killbill_emea_admin_production","killbill_emea_production","killbill_payments","percona","tungsten_aws_killbill_emea","tungsten_killbill_emea"]
+src_users: ["c_prod_usr_ro","datastream","edw_readonly","hadoop","kbl_emea_app_ro","killbill_emea","megatron_ro","replication","styx_ilm_ro","tungsten","tungsten_aws"]
+REPLICA_INST_NAME: killbill-payments-emea-0 
+env: prod
+AWS_CNAME: killbill-payments-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

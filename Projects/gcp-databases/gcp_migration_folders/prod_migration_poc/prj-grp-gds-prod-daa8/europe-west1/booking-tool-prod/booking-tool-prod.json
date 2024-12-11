@@ -1,0 +1,7 @@
+srcpoint: 10.228.133.109
+endpoint: 10.183.195.202
+src_dbs: ["BookingTool_prod_ae","BookingTool_prod_all","BookingTool_prod_ar","BookingTool_prod_au","BookingTool_prod_be","BookingTool_prod_br","BookingTool_prod_ca","BookingTool_prod_ch","BookingTool_prod_de","BookingTool_prod_dk","BookingTool_prod_es","BookingTool_prod_fr","BookingTool_prod_hk","BookingTool_prod_ie","BookingTool_prod_it","BookingTool_prod_my","BookingTool_prod_nl","BookingTool_prod_no","BookingTool_prod_nz","BookingTool_prod_pl","BookingTool_prod_pt","BookingTool_prod_se","BookingTool_prod_sg","BookingTool_prod_uk","BookingTool_prod_za","booking_tool_prod","booking_tool_production","bookingtool_prod_jp","gds_validate","percona"]
+src_users: ["booking_tool","bookingtool_ae","bookingtool_all","bookingtool_ar","bookingtool_at","bookingtool_au","bookingtool_be","bookingtool_br","bookingtool_ca","bookingtool_ch","bookingtool_de","bookingtool_dk","bookingtool_es","bookingtool_fi","bookingtool_fr","bookingtool_hk","bookingtool_ie","bookingtool_it","bookingtool_jp","bookingtool_my","bookingtool_nl","bookingtool_no","bookingtool_nz","bookingtool_pl","bookingtool_pt","bookingtool_se","bookingtool_sg","bookingtool_uk","bookingtool_za","c_prod_usr_ro","optimus_ro","pai_ro","replication"]
+REPLICA_INST_NAME: booking-tool-prod-emea-0
+env: prod
+AWS_CNAME: booking-tool-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

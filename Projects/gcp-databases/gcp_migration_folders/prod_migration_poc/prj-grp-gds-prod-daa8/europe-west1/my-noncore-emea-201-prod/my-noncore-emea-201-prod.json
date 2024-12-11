@@ -1,0 +1,7 @@
+srcpoint: 10.228.129.29
+endpoint: 10.183.195.40
+src_dbs: ["afl_3pgw_emea_prod","afl_3pgw_production","afl_rta_prod","content_assembly","gas","gpn_data","gpn_dist_store","gpn_report_dw","gpn_stats","gso_merchant_success_emea_prod","gso_merchant_success_emea_qa","my_noncore_emea_201_prod","opdata_ingest_prod","opswise","percona","report_liquibase","srs_job_scheduler_emea_prod","us_ds_liquibase","us_liquibase"]
+src_users: ["affnet","affnet_emea_ro","afl3pgw_emea_rw","afl_3pgw_prod_rw","afl_ro","afl_rta","c1_affnet","c_prod_usr_ro","ca","campaign_performance_ro","cld_srs_job_scheduler_emea_rw","dcoleman","flyway","gpn_emea_usr_ro","gso_merch_succ_emea_qa_user","gso_mrcht_dub_rw","mao_mysql_ro","opdata_ingest","repl","replication","sem_gcp_ro","ca","opswise","afl_ro","opswise"]
+REPLICA_INST_NAME: my-noncore-emea-201-prod-1 
+env: prod
+AWS_CNAME: my-noncore-emea-201-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

@@ -1,0 +1,7 @@
+srcpoint: 10.228.133.91
+endpoint: 10.183.195.121 
+src_dbs: ["consumer_data_production_lup1","my_temp_db","percona"]
+src_users: ["c_prod_usr_ro","cons_data_ro","consumer_data","relevance","replication"]
+REPLICA_INST_NAME: cons-data-svc-prod-emea-1
+env: prod
+AWS_CNAME: cons-data-svc-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

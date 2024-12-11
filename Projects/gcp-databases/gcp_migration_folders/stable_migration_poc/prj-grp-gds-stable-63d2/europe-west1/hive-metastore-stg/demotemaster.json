@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "merchant-stg-replica",
+         "skipReplicationSetup": true
+       }
+}

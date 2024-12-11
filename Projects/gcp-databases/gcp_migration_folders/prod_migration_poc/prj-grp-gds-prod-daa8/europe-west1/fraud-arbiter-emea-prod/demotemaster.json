@@ -1,0 +1,6 @@
+{
+       "demoteMasterContext": {
+         "masterInstanceName": "fraud-arbiter-emea-prod",
+         "skipReplicationSetup": true
+       }
+}

@@ -1,0 +1,7 @@
+srcpoint: 10.228.128.57
+endpoint: 10.183.195.43
+src_dbs: ["fraud_production","percona"]
+src_users: ["c_prod_usr_ro","fraud","fraud_rails3_ro","fraud_rails3_rw","replication"]
+REPLICA_INST_NAME: fraud-prod-emea-0
+env: prod
+AWS_CNAME: fraud-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

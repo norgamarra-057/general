@@ -1,0 +1,7 @@
+srcpoint: 10.228.133.17
+endpoint: 10.183.195.165 
+src_dbs: ["orders_msg_prod","percona"]
+src_users: ["c_prod_usr_ro","orders_msg_dba","replication"]
+REPLICA_INST_NAME: orders-msg-prod-emea-2
+env: prod
+AWS_CNAME: orders-msg-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.

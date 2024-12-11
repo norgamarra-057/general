@@ -1,0 +1,7 @@
+srcpoint: 10.228.131.119
+endpoint: 10.183.195.200
+src_dbs: ["groupon_production","percona","tungsten_aws_voucherinventory_emea","tungsten_voucherinventory_emea","vis20_emea_prod","vis20_production"]
+src_users: ["aws_vis20_jt_ro","c_prod_usr_ro","datastream","datastream_poc","gds_migration","keboola_ro","megatron_ro","orders_ro","replication","tungsten","tungsten_aws","tungsten_rds","tunsten","vis20","vis20_etl_ro","vis20_test","vis_ro_jtier","tungsten","tungsten","tungsten","tungsten","tungsten","tungsten","tungsten","tungsten","voucher_ro"]
+REPLICA_INST_NAME: vis20-emea-prod-0
+env: prod
+AWS_CNAME: vis20-emea-prod.cluster-cqgqresxrenm.eu-west-1.rds.amazonaws.com.
