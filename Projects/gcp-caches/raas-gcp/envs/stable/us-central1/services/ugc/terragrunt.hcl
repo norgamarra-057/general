@@ -13,7 +13,9 @@ inputs = {
   cache_name = "ugc"
   memory_size = 1
   labels = {
-    service  = "ugc-api-jtier"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "ugc-api-jtier"
     ticket = "raas-1882"
   }
 }

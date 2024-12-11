@@ -13,7 +13,9 @@ inputs = {
   cache_name = "minos-cache"
   memory_size = 1
   labels = {
-    service  = "minos"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "minos"
     ticket = "raas-1142"
   }
 }

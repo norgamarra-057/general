@@ -13,7 +13,9 @@ inputs = {
   cache_name = "goodscentral-async"
   memory_size = 1
   labels = {
-    service  = "goods_commerce_interface"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "goods_commerce_interface"
     ticket = "raas-1910"
   }
 }

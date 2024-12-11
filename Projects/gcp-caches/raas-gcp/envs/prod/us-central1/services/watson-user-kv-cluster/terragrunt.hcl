@@ -15,7 +15,9 @@ inputs = {
   node_type = "REDIS_HIGHMEM_MEDIUM"
   replica_count = 0
   labels = {
-    service  = "watson-api"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "watson-api"
     ticket = "raas-1152"
   }
 }

@@ -13,7 +13,9 @@ inputs = {
   cache_name = "proximity-notifications"
   memory_size = 1
   labels = {
-    service  = "proximity_notifications"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "proximity_notifications"
     ticket = "raas-1422"
   }
 }

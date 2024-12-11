@@ -11,11 +11,13 @@ include {
 
 inputs = {
   cache_name = "dlsvc-shield-cache"
-  shard_count = 11
+  shard_count = 12
   node_type = "REDIS_HIGHMEM_MEDIUM"
   replica_count = 0
   labels = {
-    service  = "deal-catalog"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "deal-catalog"
     ticket = "raas-1115"
   }
 }

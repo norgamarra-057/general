@@ -13,7 +13,9 @@ inputs = {
   cache_name = "calendar-service-cache"
   memory_size = 2
   labels = {
-    service  = "calendar-service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "calendar-service"
     ticket = "raas-2153"
   }
 }

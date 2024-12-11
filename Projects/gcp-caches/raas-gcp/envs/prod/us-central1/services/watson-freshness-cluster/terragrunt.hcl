@@ -11,11 +11,13 @@ include {
 
 inputs = {
   cache_name = "watson-freshness"
-  shard_count = 5
+  shard_count = 7
   node_type = "REDIS_HIGHMEM_XLARGE"
   replica_count = 0
   labels = {
-    service  = "watson-api"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "watson-api"
     ticket = "raas-2441"
   }
 }

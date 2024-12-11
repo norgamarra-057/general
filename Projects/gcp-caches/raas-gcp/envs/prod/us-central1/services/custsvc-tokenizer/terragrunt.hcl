@@ -13,7 +13,9 @@ inputs = {
   cache_name = "custsvc-tokenizer"
   memory_size = 1
   labels = {
-    service  = "cs-token-service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "cs-token-service"
     ticket = "raas-2181"
   }
 }

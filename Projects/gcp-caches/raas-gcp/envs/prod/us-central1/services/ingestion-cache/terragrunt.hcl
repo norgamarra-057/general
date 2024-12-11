@@ -13,7 +13,9 @@ inputs = {
   cache_name = "ingestion-cache"
   memory_size = 1
   labels = {
-    service  = "ingestion-jtier"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "ingestion-jtier"
     ticket = "raas-2165"
   }
 }

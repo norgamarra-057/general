@@ -39,6 +39,16 @@ variable "oom_critical_threshold_cluster" {
   description = "OOM Critical Threshold value in percent. Will trigger Critical Notification Channel."
 }
 
+variable "oom_per_node_warn_threshold_cluster" {
+  type = number
+  description = "OOM Warning Threshold per node value in percent. Will trigger Warning Notification Channel."
+}
+
+variable "oom_per_node_critical_threshold_cluster" {
+  type = number
+  description = "OOM Critical Threshold per node value in percent. Will trigger Critical Notification Channel."
+}
+
 variable "cpu_warn_threshold_cluster" {
   type = number
   description = "CPU Warning Threshold value in percent. Will trigger Warning Notification Channel."
@@ -73,6 +83,11 @@ variable "managed_zone_prod" {
 
 variable "oom_exclusion_list" {
   description = "List of clusters to exclude from OOM alerts"
+  type        = list(string)
+}
+
+variable "oom_per_node_exclusion_list" {
+  description = "List of clusters to exclude from OOM per node alerts"
   type        = list(string)
 }
 

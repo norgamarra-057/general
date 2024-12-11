@@ -15,7 +15,9 @@ inputs = {
   node_type = "REDIS_SHARED_CORE_NANO"
   replica_count = 0
   labels = {
-    service  = "arbitration-service"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "arbitration-service"
     ticket = "raas-2364"
   }
 }

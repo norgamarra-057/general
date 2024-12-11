@@ -13,7 +13,9 @@ inputs = {
   cache_name = "inbox-mgmt-mobile-stg-users01"
   memory_size = 3
   labels = {
-    service  = "inbox_management_platform"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "inbox_management_platform"
     ticket = "raas-1965"
   }
 }

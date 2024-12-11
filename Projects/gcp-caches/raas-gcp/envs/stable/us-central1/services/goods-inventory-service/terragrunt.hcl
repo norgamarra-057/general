@@ -11,9 +11,11 @@ include {
 
 inputs = {
   cache_name = "goods-inventory-service"
-  memory_size = 3
+  memory_size = 2
   labels = {
-    service  = "goods-inventory-service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "goods-inventory-service"
     ticket = "raas-2075"
   }
 }

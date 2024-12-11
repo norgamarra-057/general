@@ -13,7 +13,9 @@ inputs = {
   cache_name = "pricing"
   memory_size = 2
   labels = {
-    service  = "pricing_service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "pricing_service"
     ticket = "raas-2336"
   }
 }

@@ -10,10 +10,12 @@ include {
 }
 
 inputs = {
-  cache_name = "users-service"
+  cache_name = "ticketsvc"
   memory_size = 1
   labels = {
-    service  = "ticketing_service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "ticketing_service"
     ticket = "raas-2590"
   }
 }

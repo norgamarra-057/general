@@ -13,7 +13,9 @@ inputs = {
   cache_name = "holmes-deals-rt-core-ranking"
   memory_size = 1
   labels = {
-    service  = "holmes-feature-pipelines"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "holmes-feature-pipelines"
     ticket = "raas-1203"
   }
 }

@@ -13,7 +13,9 @@ inputs = {
   cache_name = "layout-service-templates"
   memory_size = 3
   labels = {
-    service  = "layout-service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "layout-service"
     ticket = "raas-2421"
   }
 }

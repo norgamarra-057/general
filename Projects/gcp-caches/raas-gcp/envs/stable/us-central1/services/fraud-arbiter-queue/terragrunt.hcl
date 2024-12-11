@@ -13,7 +13,9 @@ inputs = {
   cache_name = "fraud-arbiter-queue"
   memory_size = 1
   labels = {
-    service  = "fraud-arbiter"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "fraud-arbiter"
     ticket = "raas-2292"
   }
 }

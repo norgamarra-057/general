@@ -13,7 +13,9 @@ inputs = {
   cache_name = "sportal-cache-dev"
   memory_size = 1
   labels = {
-    service  = "service-portal"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "service-portal"
     ticket = "raas-1217"
   }
 }

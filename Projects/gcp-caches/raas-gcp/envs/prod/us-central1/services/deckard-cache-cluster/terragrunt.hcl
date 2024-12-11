@@ -15,7 +15,9 @@ inputs = {
   node_type = "REDIS_STANDARD_SMALL"
   replica_count = 0
   labels = {
-    service  = "deckard"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "deckard"
     ticket = "raas-2369"
   }
 }

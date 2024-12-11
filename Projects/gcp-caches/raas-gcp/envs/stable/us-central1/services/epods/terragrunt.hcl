@@ -13,7 +13,9 @@ inputs = {
   cache_name = "epods"
   memory_size = 1
   labels = {
-    service  = "epods"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "epods"
     ticket = "raas-2260"
   }
 }

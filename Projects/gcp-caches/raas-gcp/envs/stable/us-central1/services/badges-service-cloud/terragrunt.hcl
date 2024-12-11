@@ -13,7 +13,9 @@ inputs = {
   cache_name = "badges-service-cloud"
   memory_size = 1
   labels = {
-    service  = "badges-service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "badges-service"
     ticket = "raas-1209"
   }
 }

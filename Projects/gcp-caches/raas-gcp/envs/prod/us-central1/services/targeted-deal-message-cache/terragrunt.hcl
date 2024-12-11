@@ -13,7 +13,9 @@ inputs = {
   cache_name = "targeted-deal-message-cache"
   memory_size = 3
   labels = {
-    service  = "targeted-deal-message"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "targeted-deal-message"
     ticket = "raas-1723"
   }
 }

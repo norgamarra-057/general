@@ -15,7 +15,9 @@ inputs = {
   node_count = 1
   cpu_count = 1
   labels = {
-    service  = "itier-ls-voucher-archive"
+    owner = "raas"
+    service = "raas_memcached"
+    tenantservice = "itier-ls-voucher-archive"
     ticket = "raas-1242"
   }
 }

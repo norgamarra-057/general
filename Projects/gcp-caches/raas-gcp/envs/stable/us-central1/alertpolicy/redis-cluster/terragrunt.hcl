@@ -18,6 +18,11 @@ inputs = {
   #oom_critical_threshold_cluster = 0.9
   oom_exclusion_list =[]
 
+  # oom per node percent threshold
+  #oom_per_node_warn_threshold_cluster = 0.8
+  #oom_per_node_critical_threshold_cluster = 0.9
+  oom_per_node_exclusion_list =[]
+
   # cpu percent threshold
   #cpu_warn_threshold_cluster = 0.8
   #cpu_critical_threshold_cluster = 0.9

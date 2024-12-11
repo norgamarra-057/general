@@ -12,10 +12,12 @@ include {
 inputs = {
   cache_name = "occasions"
   memory_size = 2048
-  node_count = 6
+  node_count = 3
   cpu_count = 1
   labels = {
-    service  = "occasions"
+    owner = "raas"
+    service = "raas_memcached"
+    tenantservice = "occasions"
     ticket = "raas-1823"
   }
 }

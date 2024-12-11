@@ -13,7 +13,9 @@ inputs = {
   cache_name = "rfs-cache"
   memory_size = 1
   labels = {
-    service  = "regulatory-consent-log"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "regulatory-consent-log"
     ticket = "raas-1175"
   }
 }

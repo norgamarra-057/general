@@ -271,756 +271,775 @@ resource "google_monitoring_dashboard" "dashboard_redis_instance" {
       "templateVariable": ""
     }
   ],
-  "mosaicLayout": {
-    "columns": 48,
-    "tiles": [
+  "gridLayout": {
+    "columns": "3",
+    "widgets": [
       {
-        "xPos": 24,
-        "width": 24,
-        "height": 15,
-        "widget": {
-          "title": "Memory Usage (%)",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilterRatio": {
-                    "denominator": {
-                      "aggregation": {
-                        "crossSeriesReducer": "REDUCE_MAX",
-                        "groupByFields": [
-                          "resource.label.\"instance_id\""
-                        ],
-                        "perSeriesAligner": "ALIGN_MEAN"
-                      },
-                      "filter": "metric.type=\"redis.googleapis.com/stats/memory/maxmemory\" resource.type=\"redis_instance\""
-                    },
-                    "numerator": {
-                      "aggregation": {
-                        "alignmentPeriod": "60s",
-                        "crossSeriesReducer": "REDUCE_MEAN",
-                        "groupByFields": [
-                          "resource.label.\"instance_id\""
-                        ],
-                        "perSeriesAligner": "ALIGN_MEAN"
-                      },
-                      "filter": "metric.type=\"redis.googleapis.com/stats/memory/usage\" resource.type=\"redis_instance\""
-                    }
-                  }
-                }
+        "scorecard": {
+          "timeSeriesQuery": {
+            "timeSeriesFilter": {
+              "filter": "metric.type=\"redis.googleapis.com/stats/memory/usage_ratio\" resource.type=\"redis_instance\"",
+              "aggregation": {
+                "alignmentPeriod": "60s",
+                "perSeriesAligner": "ALIGN_MEAN",
+                "crossSeriesReducer": "REDUCE_MEAN",
+                "groupByFields": []
               }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
+            },
+            "unitOverride": "",
+            "outputFullDuration": false
+          },
+          "gaugeView": {
+            "lowerBound": 0,
+            "upperBound": 1
+          },
+          "thresholds": [
+            {
               "label": "",
-              "scale": "LINEAR"
+              "value": 0.8,
+              "color": "YELLOW",
+              "direction": "ABOVE",
+              "targetAxis": "TARGET_AXIS_UNSPECIFIED"
+            },
+            {
+              "label": "",
+              "value": 0.9,
+              "color": "RED",
+              "direction": "ABOVE",
+              "targetAxis": "TARGET_AXIS_UNSPECIFIED"
             }
-          }
-        }
+          ],
+          "dimensions": [],
+          "measures": []
+        },
+        "title": "Memory Usage Ratio",
+        "id": ""
       },
       {
-        "yPos": 95,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Clients",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilterRatio": {
+                  "numerator": {
+                    "filter": "metric.type=\"redis.googleapis.com/stats/memory/usage\" resource.type=\"redis_instance\"",
                     "aggregation": {
                       "alignmentPeriod": "60s",
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/clients/connected\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "yPos": 79,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "CPU Usage",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilterRatio": {
-                    "denominator": {
-                      "aggregation": {
-                        "alignmentPeriod": "60s",
-                        "crossSeriesReducer": "REDUCE_MEAN",
-                        "groupByFields": [
-                          "resource.label.\"instance_id\""
-                        ],
-                        "perSeriesAligner": "ALIGN_RATE"
-                      },
-                      "filter": "metric.type=\"redis.googleapis.com/stats/cpu_utilization\" resource.type=\"redis_instance\""
-                    },
-                    "numerator": {
-                      "aggregation": {
-                        "alignmentPeriod": "60s",
-                        "crossSeriesReducer": "REDUCE_MIN",
-                        "groupByFields": [
-                          "resource.label.\"instance_id\""
-                        ],
-                        "perSeriesAligner": "ALIGN_RATE"
-                      },
-                      "filter": "metric.type=\"redis.googleapis.com/stats/cpu_utilization\" resource.type=\"redis_instance\""
-                    }
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "yPos": 31,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Commands (all)",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
+                      "perSeriesAligner": "ALIGN_MEAN",
+                      "crossSeriesReducer": "REDUCE_MEAN",
                       "groupByFields": [
-                        "metric.label.\"cmd\""
-                      ],
-                      "perSeriesAligner": "ALIGN_RATE"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/commands/calls\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "yPos": 47,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Hit Ratio",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
+                        "resource.label.\"instance_id\""
+                      ]
+                    }
+                  },
+                  "denominator": {
+                    "filter": "metric.type=\"redis.googleapis.com/stats/memory/maxmemory\" resource.type=\"redis_instance\"",
                     "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/stats/cache_hit_ratio\" resource.type=\"redis_instance\""
+                      "perSeriesAligner": "ALIGN_MEAN",
+                      "crossSeriesReducer": "REDUCE_MAX",
+                      "groupByFields": [
+                        "resource.label.\"instance_id\""
+                      ]
+                    }
                   }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "xPos": 24,
-        "yPos": 79,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Average TTL",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/keyspace/avg_ttl\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "width": 24,
-        "height": 15,
-        "widget": {
-          "title": "Memory Usage Ratio",
-          "scorecard": {
-            "gaugeView": {
-              "lowerBound": 0,
-              "upperBound": 1
-            },
-            "thresholds": [
-              {
-                "color": "YELLOW",
-                "direction": "ABOVE",
-                "label": "",
-                "value": 0.8
-              },
-              {
-                "color": "RED",
-                "direction": "ABOVE",
-                "label": "",
-                "value": 0.9
-              }
-            ],
-            "timeSeriesQuery": {
-              "timeSeriesFilter": {
-                "aggregation": {
-                  "alignmentPeriod": "60s",
-                  "crossSeriesReducer": "REDUCE_MEAN",
-                  "groupByFields": [],
-                  "perSeriesAligner": "ALIGN_MEAN"
                 },
-                "filter": "metric.type=\"redis.googleapis.com/stats/memory/usage_ratio\" resource.type=\"redis_instance\""
-              }
-            }
-          }
-        }
-      },
-      {
-        "xPos": 24,
-        "yPos": 15,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Keys",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/keyspace/keys\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "xPos": 24,
-        "yPos": 31,
-        "width": 24,
-        "height": 8,
-        "widget": {
-          "title": "Evictions",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_RATE"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/stats/evicted_keys\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "xPos": 24,
-        "yPos": 39,
-        "width": 24,
-        "height": 8,
-        "widget": {
-          "title": "Expirations",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_RATE"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/stats/expired_keys\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "xPos": 24,
-        "yPos": 47,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Hits/misses",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_RATE"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/stats/keyspace_hits\" resource.type=\"redis_instance\""
-                  }
-                }
+                "unitOverride": "",
+                "outputFullDuration": false
               },
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_RATE"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/stats/keyspace_misses\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
             }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
           }
-        }
+        },
+        "title": "Memory Usage (%)",
+        "id": ""
       },
       {
-        "yPos": 111,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Network Traffic",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_RATE"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/stats/network_traffic\" resource.type=\"redis_instance\""
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/stats/memory/usage\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
                   }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "xPos": 24,
-        "yPos": 111,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Uptime",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/server/uptime\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
-            }
-          }
-        }
-      },
-      {
-        "xPos": 24,
-        "yPos": 95,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Connected/Blocked Clients",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/clients/connected\" resource.type=\"redis_instance\""
-                  }
-                }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
               },
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/clients/blocked\" resource.type=\"redis_instance\""
-                  }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
             }
+          ],
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
           }
-        }
+        },
+        "title": "Memory Usage",
+        "id": ""
       },
       {
-        "xPos": 24,
-        "yPos": 63,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Time per Call",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/commands/calls\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_RATE",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": [
+                      "metric.label.\"cmd\""
+                    ]
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Commands (all)",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/keyspace/keys\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Keys",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/stats/keyspace_hits\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_RATE",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
             },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/stats/keyspace_misses\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_RATE",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Hits/misses",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/stats/expired_keys\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_RATE",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Expirations",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/stats/evicted_keys\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_RATE",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Evictions",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilterRatio": {
+                  "numerator": {
+                    "filter": "metric.type=\"redis.googleapis.com/stats/cpu_utilization\" resource.type=\"redis_instance\"",
                     "aggregation": {
                       "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_MIN",
                       "groupByFields": [
-                        "metric.label.\"cmd\""
-                      ],
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/commands/usec_per_call\" resource.type=\"redis_instance\""
+                        "resource.label.\"instance_id\""
+                      ]
+                    }
+                  },
+                  "denominator": {
+                    "filter": "metric.type=\"redis.googleapis.com/stats/cpu_utilization\" resource.type=\"redis_instance\"",
+                    "aggregation": {
+                      "perSeriesAligner": "ALIGN_RATE",
+                      "crossSeriesReducer": "REDUCE_MEAN",
+                      "groupByFields": [
+                        "resource.label.\"instance_id\""
+                      ]
+                    }
                   }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
             }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
           }
-        }
+        },
+        "title": "CPU Usage",
+        "id": ""
       },
       {
-        "yPos": 63,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Keys with TTL",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/keyspace/keys_with_expiration\" resource.type=\"redis_instance\""
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/keyspace/keys_with_expiration\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
                   }
-                }
-              }
-            ],
-            "thresholds": [],
-            "timeshiftDuration": "0s",
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
             }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
           }
-        }
+        },
+        "title": "Keys with TTL",
+        "id": ""
       },
       {
-        "yPos": 15,
-        "width": 24,
-        "height": 16,
-        "widget": {
-          "title": "Memory Usage",
-          "xyChart": {
-            "chartOptions": {
-              "mode": "COLOR"
-            },
-            "dataSets": [
-              {
-                "breakdowns": [],
-                "dimensions": [],
-                "measures": [],
-                "minAlignmentPeriod": "60s",
-                "plotType": "LINE",
-                "targetAxis": "Y1",
-                "timeSeriesQuery": {
-                  "timeSeriesFilter": {
-                    "aggregation": {
-                      "alignmentPeriod": "60s",
-                      "crossSeriesReducer": "REDUCE_SUM",
-                      "groupByFields": [],
-                      "perSeriesAligner": "ALIGN_MEAN"
-                    },
-                    "filter": "metric.type=\"redis.googleapis.com/stats/memory/usage\" resource.type=\"redis_instance\""
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/stats/cache_hit_ratio\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "groupByFields": []
                   }
-                }
-              }
-            ],
-            "thresholds": [],
-            "yAxis": {
-              "label": "",
-              "scale": "LINEAR"
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
             }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
           }
-        }
+        },
+        "title": "Hit Ratio",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/clients/connected\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            },
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/clients/blocked\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Connected/Blocked Clients",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/keyspace/avg_ttl\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Average TTL",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/commands/usec_per_call\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": [
+                      "metric.label.\"cmd\""
+                    ]
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Time per Call",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/server/uptime\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Uptime",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/stats/network_traffic\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_RATE",
+                    "crossSeriesReducer": "REDUCE_SUM",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Network Traffic",
+        "id": ""
+      },
+      {
+        "xyChart": {
+          "dataSets": [
+            {
+              "timeSeriesQuery": {
+                "timeSeriesFilter": {
+                  "filter": "metric.type=\"redis.googleapis.com/clients/connected\" resource.type=\"redis_instance\"",
+                  "aggregation": {
+                    "alignmentPeriod": "60s",
+                    "perSeriesAligner": "ALIGN_MEAN",
+                    "groupByFields": []
+                  }
+                },
+                "unitOverride": "",
+                "outputFullDuration": false
+              },
+              "plotType": "LINE",
+              "legendTemplate": "",
+              "minAlignmentPeriod": "60s",
+              "targetAxis": "Y1",
+              "dimensions": [],
+              "measures": [],
+              "breakdowns": []
+            }
+          ],
+          "timeshiftDuration": "0s",
+          "thresholds": [],
+          "yAxis": {
+            "label": "",
+            "scale": "LINEAR"
+          },
+          "chartOptions": {
+            "mode": "COLOR",
+            "showLegend": false,
+            "displayHorizontal": false
+          }
+        },
+        "title": "Clients",
+        "id": ""
       }
     ]
   },

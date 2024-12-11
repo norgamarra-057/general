@@ -370,7 +370,7 @@ resource "google_monitoring_dashboard" "dashboard_memcache" {
               "timeSeriesFilter": {
                 "aggregation": {
                   "alignmentPeriod": "60s",
-                  "crossSeriesReducer": "REDUCE_SUM",
+                  "crossSeriesReducer": "REDUCE_MEAN",
                   "groupByFields": [],
                   "perSeriesAligner": "ALIGN_MEAN"
                 },

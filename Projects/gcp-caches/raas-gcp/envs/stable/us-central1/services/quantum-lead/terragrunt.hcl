@@ -13,7 +13,9 @@ inputs = {
   cache_name = "quantum-lead"
   memory_size = 1
   labels = {
-    service  = "salesforce-cache"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "salesforce-cache"
     ticket = "raas-2283"
   }
 }

@@ -11,9 +11,11 @@ include {
 
 inputs = {
   cache_name = "m3-merchant-service-cache"
-  memory_size = 2
+  memory_size = 1
   labels = {
-    service  = "m3_merchant_service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "m3_merchant_service"
     ticket = "raas-1763"
   }
 }

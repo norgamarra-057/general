@@ -13,7 +13,9 @@ inputs = {
   cache_name = "supply-chain-gateway-cache"
   memory_size = 1
   labels = {
-    service  = "supply_chain_gateway"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "supply_chain_gateway"
     ticket = "raas-1747"
   }
 }

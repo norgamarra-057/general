@@ -15,7 +15,9 @@ inputs = {
   node_type = "REDIS_STANDARD_SMALL"
   replica_count = 0
   labels = {
-    service  = "ugc-api-jtier"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "ugc-api-jtier"
     ticket = "raas-1883"
   }
 }

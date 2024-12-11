@@ -31,9 +31,9 @@ then
     exit 1
 fi
 
-if [ ! $CACHES_REGION == "us-central1" ]
+if [ ! $CACHES_REGION == "us-central1" ] && [ ! $CACHES_REGION == "europe-west1" ]
 then
-  echo "Illegal region. Please use us-central1."
+  echo "Illegal region. Please use us-central1 or europe-west1."
   exit 1
 fi
 

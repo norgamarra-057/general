@@ -13,7 +13,9 @@ inputs = {
   cache_name = "deckard-cache"
   memory_size = 1
   labels = {
-    service  = "deckard"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "deckard"
     ticket = "raas-2370"
   }
 }

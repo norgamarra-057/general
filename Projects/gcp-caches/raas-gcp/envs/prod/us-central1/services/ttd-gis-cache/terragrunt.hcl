@@ -13,7 +13,9 @@ inputs = {
   cache_name = "ttd-gis-cache"
   memory_size = 16
   labels = {
-    service  = "grouponlive-inventory-service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "grouponlive-inventory-service"
     ticket = "raas-1939"
   }
 }

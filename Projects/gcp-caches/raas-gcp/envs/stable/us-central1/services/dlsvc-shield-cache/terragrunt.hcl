@@ -13,7 +13,9 @@ inputs = {
   cache_name = "dlsvc-shield-cache"
   memory_size = 10
   labels = {
-    service  = "deal-catalog"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "deal-catalog"
     ticket = "raas-1114"
   }
 }

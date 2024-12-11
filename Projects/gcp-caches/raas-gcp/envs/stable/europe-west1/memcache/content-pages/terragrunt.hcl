@@ -15,7 +15,9 @@ inputs = {
   node_count = 1
   cpu_count = 1
   labels = {
-    service  = "content-pages"
+    owner = "raas"
+    service = "raas_memcached"
+    tenantservice = "content-pages"
     ticket = "raas-2446"
   }
 }

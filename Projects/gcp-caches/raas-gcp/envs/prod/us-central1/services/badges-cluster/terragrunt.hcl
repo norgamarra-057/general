@@ -15,7 +15,9 @@ inputs = {
   node_type = "REDIS_SHARED_CORE_NANO"
   replica_count = 0
   labels = {
-    service  = "badges-service"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "badges-service"
     ticket = "raas-1156"
   }
 }

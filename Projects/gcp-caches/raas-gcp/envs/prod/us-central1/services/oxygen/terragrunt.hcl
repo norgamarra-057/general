@@ -13,7 +13,9 @@ inputs = {
   cache_name = "oxygen"
   memory_size = 1
   labels = {
-    service  = "jtier-oxygen"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "jtier-oxygen"
     ticket = "raas-1227"
   }
 }

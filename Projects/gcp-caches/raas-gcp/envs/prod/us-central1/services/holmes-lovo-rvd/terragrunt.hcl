@@ -11,9 +11,11 @@ include {
 
 inputs = {
   cache_name = "holmes-lovo-rvd"
-  memory_size = 35
+  memory_size = 17
   labels = {
-    service  = "watson-api"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "watson-api"
     ticket = "raas-1152"
   }
 }

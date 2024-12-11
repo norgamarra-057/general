@@ -13,7 +13,9 @@ inputs = {
   cache_name = "tpis-third-party-inventory-service"
   memory_size = 1
   labels = {
-    service  = "tpis-third-party-inventory-service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "tpis-third-party-inventory-service"
     ticket = "raas-1993"
   }
 }

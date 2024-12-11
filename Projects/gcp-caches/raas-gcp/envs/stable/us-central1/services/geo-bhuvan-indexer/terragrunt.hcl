@@ -13,7 +13,9 @@ inputs = {
   cache_name = "geo-bhuvan-indexer"
   memory_size = 1
   labels = {
-    service  = "bhuvan"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "bhuvan"
     ticket = "raas-1178"
   }
 }

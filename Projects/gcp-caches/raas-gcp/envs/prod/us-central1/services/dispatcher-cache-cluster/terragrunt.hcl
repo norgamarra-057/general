@@ -11,11 +11,13 @@ include {
 
 inputs = {
   cache_name = "dispatcher-cache"
-  shard_count = 3
+  shard_count = 7
   node_type = "REDIS_HIGHMEM_MEDIUM"
   replica_count = 0
   labels = {
-    service  = "rocketman-commercial"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "rocketman-commercial"
     ticket = "raas-2351"
   }
 }

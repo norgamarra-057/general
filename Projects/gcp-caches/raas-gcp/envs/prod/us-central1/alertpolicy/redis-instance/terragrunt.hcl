@@ -16,7 +16,7 @@ inputs = {
   # oom percent threshold
   #oom_warn_threshold_instance = 0.8
   #oom_critical_threshold_instance = 0.9
-  oom_exclusion_list =[]
+  oom_exclusion_list =["ttd-gis-cache"]
 
   # cpu percent threshold
   #cpu_warn_threshold_instance = 0.8

@@ -13,7 +13,9 @@ inputs = {
   cache_name = "crm-message-service"
   memory_size = 1
   labels = {
-    service  = "crm-message-service"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "crm-message-service"
     ticket = "raas-1638"
   }
 }

@@ -11,9 +11,11 @@ include {
 
 inputs = {
   cache_name = "dmapi"
-  memory_size = 1
+  memory_size = 2
   labels = {
-    service  = "deal_management_api"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "deal_management_api"
     ticket = "raas-1827"
   }
 }

@@ -13,7 +13,9 @@ inputs = {
   cache_name = "ttd-gia-resque"
   memory_size = 1
   labels = {
-    service  = "grouponlive-inventory-admin"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "grouponlive-inventory-admin"
     ticket = "raas-1622"
   }
 }

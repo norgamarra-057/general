@@ -13,7 +13,9 @@ inputs = {
   cache_name = "taxonomyv2"
   memory_size = 4
   labels = {
-    service  = "taxonomyv2"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "taxonomyv2"
     ticket = "raas-2636"
   }
 }

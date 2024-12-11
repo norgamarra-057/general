@@ -15,7 +15,9 @@ inputs = {
   node_type = "REDIS_HIGHMEM_MEDIUM"
   replica_count = 0
   labels = {
-    service  = "arbitration-service"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "arbitration-service"
     ticket = "raas-2365"
   }
 }

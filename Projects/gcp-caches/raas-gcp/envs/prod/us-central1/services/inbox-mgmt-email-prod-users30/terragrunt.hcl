@@ -11,9 +11,11 @@ include {
 
 inputs = {
   cache_name = "inbox-mgmt-email-prod-users30"
-  memory_size = 5
+  memory_size = 6
   labels = {
-    service  = "inbox_management_platform"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "inbox_management_platform"
     ticket = "raas-1964"
   }
 }

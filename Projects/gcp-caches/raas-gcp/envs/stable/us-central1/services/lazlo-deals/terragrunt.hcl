@@ -13,7 +13,9 @@ inputs = {
   cache_name = "lazlo-deals"
   memory_size = 1
   labels = {
-    service  = "api-lazlo"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "api-lazlo"
     ticket = "raas-2308"
   }
 }

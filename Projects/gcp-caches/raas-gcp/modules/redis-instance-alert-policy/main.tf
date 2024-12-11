@@ -33,11 +33,11 @@ data "google_redis_instance" "max_cons_exclusion_redis-instances" {
 
 resource "google_monitoring_alert_policy" "alert_policy_oom_warning" {
   project = var.gcp_project_id
-  display_name = "Redis Instance - OOM - WARN"
+  display_name = "${var.gcp_region} - Redis Instance - OOM - WARN"
   combiner     = "OR"
   notification_channels = [data.google_monitoring_notification_channel.email_raas.id]
   conditions {
-    display_name = "Cloud Memorystore Redis Instance - OOM"
+    display_name = "${var.gcp_region} - Cloud Memorystore Redis Instance - OOM"
     condition_threshold {
       aggregations {
         alignment_period   = "300s"
@@ -45,7 +45,7 @@ resource "google_monitoring_alert_policy" "alert_policy_oom_warning" {
       }
       comparison = "COMPARISON_GT"
       duration   = "60s"
-      filter     = format("%s%s%s","resource.type = \"redis_instance\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.oom_exclusion_redis-instances[*].id)), " AND metric.type = \"redis.googleapis.com/stats/memory/usage_ratio\"")
+      filter     = format("%s%s%s","resource.type = \"redis_instance\" AND (resource.labels.region = \"${var.gcp_region}\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.oom_exclusion_redis-instances[*].id)), ") AND metric.type = \"redis.googleapis.com/stats/memory/usage_ratio\"")
       threshold_value = var.oom_warn_threshold_instance
       trigger {
         count = 1
@@ -56,7 +56,7 @@ resource "google_monitoring_alert_policy" "alert_policy_oom_warning" {
   user_labels =  var.labels
   severity = "WARNING"
   documentation {
-    subject = "GCP Redis Instance - OOM - WARN"
+    subject = "${var.gcp_region} - GCP Redis Instance - OOM - WARN"
     mime_type = "text/markdown"
     content = "Dashboards URL: https://console.cloud.google.com/monitoring/dashboards?project=${var.gcp_project_id}"
   }
@@ -64,11 +64,11 @@ resource "google_monitoring_alert_policy" "alert_policy_oom_warning" {
 
 resource "google_monitoring_alert_policy" "alert_policy_oom_critical" {
   project = var.gcp_project_id
-  display_name = "Redis Instance - OOM - CRITICAL"
+  display_name = "${var.gcp_region} - Redis Instance - OOM - CRITICAL"
   combiner     = "OR"
   notification_channels = [data.google_monitoring_notification_channel.email_opsgenie.id]
   conditions {
-    display_name = "Cloud Memorystore Redis Instance - OOM"
+    display_name = "${var.gcp_region} - Cloud Memorystore Redis Instance - OOM"
     condition_threshold {
       aggregations {
         alignment_period   = "300s"
@@ -76,7 +76,7 @@ resource "google_monitoring_alert_policy" "alert_policy_oom_critical" {
       }
       comparison = "COMPARISON_GT"
       duration   = "60s"
-      filter     = format("%s%s%s","resource.type = \"redis_instance\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.oom_exclusion_redis-instances[*].id)), " AND metric.type = \"redis.googleapis.com/stats/memory/usage_ratio\"")
+      filter     = format("%s%s%s","resource.type = \"redis_instance\" AND (resource.labels.region = \"${var.gcp_region}\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.oom_exclusion_redis-instances[*].id)), ") AND metric.type = \"redis.googleapis.com/stats/memory/usage_ratio\"")
       threshold_value = var.oom_critical_threshold_instance
       trigger {
         count = 1
@@ -87,7 +87,7 @@ resource "google_monitoring_alert_policy" "alert_policy_oom_critical" {
   user_labels =  var.labels
   severity = "CRITICAL"
   documentation {
-    subject = "GCP Redis Instance - OOM - CRITICAL"
+    subject = "${var.gcp_region} - GCP Redis Instance - OOM - CRITICAL"
     mime_type = "text/markdown"
     content = "Dashboards URL: https://console.cloud.google.com/monitoring/dashboards?project=${var.gcp_project_id}"
   }
@@ -99,11 +99,11 @@ resource "google_monitoring_alert_policy" "alert_policy_oom_critical" {
 
 resource "google_monitoring_alert_policy" "alert_policy_cpu_warning" {
   project = var.gcp_project_id
-  display_name = "Redis Instance - CPU - WARN"
+  display_name = "${var.gcp_region} - Redis Instance - CPU - WARN"
   combiner     = "OR"
   notification_channels = [data.google_monitoring_notification_channel.email_raas.id]
   conditions {
-    display_name = "Cloud Memorystore Redis Instance - CPU"
+    display_name = "${var.gcp_region} - Cloud Memorystore Redis Instance - CPU"
     condition_threshold {
       aggregations {
         alignment_period   = "300s"
@@ -111,7 +111,7 @@ resource "google_monitoring_alert_policy" "alert_policy_cpu_warning" {
       }
       comparison = "COMPARISON_GT"
       duration   = "60s"
-      filter     = format("%s%s%s","resource.type = \"redis_instance\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.cpu_exclusion_redis-instances[*].id)), " AND metric.type = \"redis.googleapis.com/stats/cpu_utilization\"")
+      filter     = format("%s%s%s","resource.type = \"redis_instance\" AND (resource.labels.region = \"${var.gcp_region}\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.cpu_exclusion_redis-instances[*].id)), ") AND metric.type = \"redis.googleapis.com/stats/cpu_utilization\"")
       threshold_value = var.cpu_warn_threshold_instance
       trigger {
         count = 1
@@ -122,7 +122,7 @@ resource "google_monitoring_alert_policy" "alert_policy_cpu_warning" {
   user_labels =  var.labels
   severity = "WARNING"
   documentation {
-    subject = "GCP Redis Instance - CPU - WARN"
+    subject = "${var.gcp_region} - GCP Redis Instance - CPU - WARN"
     mime_type = "text/markdown"
     content = "Dashboards URL: https://console.cloud.google.com/monitoring/dashboards?project=${var.gcp_project_id}"
   }
@@ -130,11 +130,11 @@ resource "google_monitoring_alert_policy" "alert_policy_cpu_warning" {
 
 resource "google_monitoring_alert_policy" "alert_policy_cpu_critical" {
   project = var.gcp_project_id
-  display_name = "Redis Instance - CPU - CRITICAL"
+  display_name = "${var.gcp_region} - Redis Instance - CPU - CRITICAL"
   combiner     = "OR"
   notification_channels = [data.google_monitoring_notification_channel.email_opsgenie.id]
   conditions {
-    display_name = "Cloud Memorystore Redis Instance - CPU"
+    display_name = "${var.gcp_region} - Cloud Memorystore Redis Instance - CPU"
     condition_threshold {
       aggregations {
         alignment_period   = "300s"
@@ -142,7 +142,7 @@ resource "google_monitoring_alert_policy" "alert_policy_cpu_critical" {
       }
       comparison = "COMPARISON_GT"
       duration   = "60s"
-      filter     = format("%s%s%s","resource.type = \"redis_instance\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.cpu_exclusion_redis-instances[*].id)), " AND metric.type = \"redis.googleapis.com/stats/cpu_utilization\"")
+      filter     = format("%s%s%s","resource.type = \"redis_instance\" AND (resource.labels.region = \"${var.gcp_region}\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.cpu_exclusion_redis-instances[*].id)), ") AND metric.type = \"redis.googleapis.com/stats/cpu_utilization\"")
       threshold_value = var.cpu_critical_threshold_instance
       trigger {
         count = 1
@@ -153,7 +153,7 @@ resource "google_monitoring_alert_policy" "alert_policy_cpu_critical" {
   user_labels =  var.labels
   severity = "CRITICAL"
   documentation {
-    subject = "GCP Redis Instance - CPU - CRITICAL"
+    subject = "${var.gcp_region} - GCP Redis Instance - CPU - CRITICAL"
     mime_type = "text/markdown"
     content = "Dashboards URL: https://console.cloud.google.com/monitoring/dashboards?project=${var.gcp_project_id}"
   }
@@ -164,11 +164,11 @@ resource "google_monitoring_alert_policy" "alert_policy_cpu_critical" {
 
 resource "google_monitoring_alert_policy" "alert_policy_max_connections_warning" {
   project = var.gcp_project_id
-  display_name = "Redis Instance - Max Connections - WARN"
+  display_name = "${var.gcp_region} - Redis Instance - Max Connections - WARN"
   combiner     = "OR"
   notification_channels = [data.google_monitoring_notification_channel.email_raas.id]
   conditions {
-    display_name = "Cloud Memorystore Redis Instance - Max Connections"
+    display_name = "${var.gcp_region} - Cloud Memorystore Redis Instance - Max Connections"
     condition_threshold {
       aggregations {
         alignment_period   = "300s"
@@ -176,7 +176,7 @@ resource "google_monitoring_alert_policy" "alert_policy_max_connections_warning"
       }
       comparison = "COMPARISON_GT"
       duration   = "60s"
-      filter     = format("%s%s%s","resource.type = \"redis_instance\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.max_cons_exclusion_redis-instances[*].id)), " AND metric.type = \"redis.googleapis.com/stats/connections/total\"")
+      filter     = format("%s%s%s","resource.type = \"redis_instance\" AND (resource.labels.region = \"${var.gcp_region}\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.max_cons_exclusion_redis-instances[*].id)), ") AND metric.type = \"redis.googleapis.com/clients/connected\"")
       threshold_value = var.max_connect_warn_threshold_instance
       trigger {
         count = 1
@@ -187,7 +187,7 @@ resource "google_monitoring_alert_policy" "alert_policy_max_connections_warning"
   user_labels =  var.labels
   severity = "WARNING"
   documentation {
-    subject = "GCP Redis Instance - Max Connections - WARN"
+    subject = "${var.gcp_region} - GCP Redis Instance - Max Connections - WARN"
     mime_type = "text/markdown"
     content = "Dashboards URL: https://console.cloud.google.com/monitoring/dashboards?project=${var.gcp_project_id}"
   }
@@ -195,11 +195,11 @@ resource "google_monitoring_alert_policy" "alert_policy_max_connections_warning"
 
 resource "google_monitoring_alert_policy" "alert_policy_max_connections_critical" {
   project = var.gcp_project_id
-  display_name = "Redis Instance - Max Connections - CRITICAL"
+  display_name = "${var.gcp_region} - Redis Instance - Max Connections - CRITICAL"
   combiner     = "OR"
   notification_channels = [data.google_monitoring_notification_channel.email_opsgenie.id]
   conditions {
-    display_name = "Cloud Memorystore Redis Instance - Max Connections"
+    display_name = "${var.gcp_region} - Cloud Memorystore Redis Instance - Max Connections"
     condition_threshold {
       aggregations {
         alignment_period   = "300s"
@@ -207,7 +207,7 @@ resource "google_monitoring_alert_policy" "alert_policy_max_connections_critical
       }
       comparison = "COMPARISON_GT"
       duration   = "60s"
-      filter     = format("%s%s%s","resource.type = \"redis_instance\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.max_cons_exclusion_redis-instances[*].id)), " AND metric.type = \"redis.googleapis.com/stats/connections/total\"")
+      filter     = format("%s%s%s","resource.type = \"redis_instance\" AND (resource.labels.region = \"${var.gcp_region}\" ", join("", formatlist("AND resource.labels.instance_id != \"%s\" ", data.google_redis_instance.max_cons_exclusion_redis-instances[*].id)), ") AND metric.type = \"redis.googleapis.com/clients/connected\"")
       threshold_value = var.max_connect_critical_threshold_instance
       trigger {
         count = 1
@@ -218,7 +218,7 @@ resource "google_monitoring_alert_policy" "alert_policy_max_connections_critical
   user_labels =  var.labels
   severity = "CRITICAL"
   documentation {
-    subject = "GCP Redis Instance - Max Connections - CRITICAL"
+    subject = "${var.gcp_region} - GCP Redis Instance - Max Connections - CRITICAL"
     mime_type = "text/markdown"
     content = "Dashboards URL: https://console.cloud.google.com/monitoring/dashboards?project=${var.gcp_project_id}"
   }

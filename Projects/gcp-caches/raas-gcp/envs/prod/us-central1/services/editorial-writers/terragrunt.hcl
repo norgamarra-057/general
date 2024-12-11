@@ -13,7 +13,9 @@ inputs = {
   cache_name = "editorial-writers"
   memory_size = 1
   labels = {
-    service  = "gazebo"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "gazebo"
     ticket = "raas-2124"
   }
 }

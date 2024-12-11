@@ -13,7 +13,9 @@ inputs = {
   cache_name = "bookingtool-cache"
   memory_size = 1
   labels = {
-    service  = "bookingtool"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "bookingtool"
     ticket = "raas-1138"
   }
 }

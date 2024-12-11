@@ -39,6 +39,10 @@ max_connect_critical_threshold_instance = 58500
 oom_warn_threshold_cluster = 0.8
 oom_critical_threshold_cluster = 0.9
 
+# oom per node percent threshold
+oom_per_node_warn_threshold_cluster = 0.8
+oom_per_node_critical_threshold_cluster = 0.9
+
 # cpu percent threshold
 cpu_warn_threshold_cluster = 0.8
 cpu_critical_threshold_cluster = 0.9

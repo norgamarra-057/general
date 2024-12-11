@@ -13,7 +13,9 @@ inputs = {
   cache_name = "online-booking-3rd-party"
   memory_size = 1
   labels = {
-    service  = "online_booking_3rd_party"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "online_booking_3rd_party"
     ticket = "raas-1766"
   }
 }

@@ -13,7 +13,9 @@ inputs = {
   cache_name = "watson-search-kv"
   memory_size = 1
   labels = {
-    service  = "watson-api"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "watson-api"
     ticket = "raas-2441"
   }
 }

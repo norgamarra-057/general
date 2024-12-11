@@ -13,7 +13,9 @@ inputs = {
   cache_name = "sportal-workers-sidekiq"
   memory_size = 1
   labels = {
-    service  = "service-portal"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "service-portal"
     ticket = "raas-1164"
   }
 }

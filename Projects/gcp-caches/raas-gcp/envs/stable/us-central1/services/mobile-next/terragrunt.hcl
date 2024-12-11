@@ -13,7 +13,9 @@ inputs = {
   cache_name = "mobile-next"
   memory_size = 1
   labels = {
-    service  = "next-pwa-app"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "next-pwa-app"
     ticket = "raas-2584"
   }
 }

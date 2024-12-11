@@ -15,7 +15,9 @@ inputs = {
   node_type = "REDIS_SHARED_CORE_NANO"
   replica_count = 0
   labels = {
-    service  = "voucher-inventory-jtier"
+    owner = "raas"
+    service = "raas_redis_cluster"
+    tenantservice = "voucher-inventory-jtier"
     ticket = "raas-1128"
   }
 }

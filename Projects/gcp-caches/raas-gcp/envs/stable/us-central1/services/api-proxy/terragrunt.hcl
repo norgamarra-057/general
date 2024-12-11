@@ -13,7 +13,9 @@ inputs = {
   cache_name = "api-proxy"
   memory_size = 1
   labels = {
-    service  = "api-proxy"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "api-proxy"
     ticket = "raas-1107"
   }
 }

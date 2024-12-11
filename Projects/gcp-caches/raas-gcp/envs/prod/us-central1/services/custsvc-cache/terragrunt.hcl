@@ -13,7 +13,9 @@ inputs = {
   cache_name = "custsvc-cache"
   memory_size = 2
   labels = {
-    service  = "cyclops"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "cyclops"
     ticket = "raas-1799"
   }
 }

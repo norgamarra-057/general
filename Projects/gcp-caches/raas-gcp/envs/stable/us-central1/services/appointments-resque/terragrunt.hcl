@@ -13,7 +13,9 @@ inputs = {
   cache_name = "appointments-resque"
   memory_size = 1
   labels = {
-    service  = "appointment_engine"
+    owner = "raas"
+    service = "raas_redis_instance"
+    tenantservice = "appointment_engine"
     ticket = "raas-1787"
   }
 }
