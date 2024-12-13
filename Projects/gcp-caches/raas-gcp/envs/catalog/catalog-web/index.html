@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Table</title>
+    <link rel="stylesheet" href="style.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+
+<div id="page-container">
+    <div id="title-page">GCP Memorystore Instances</div>
+
+    <div id="filters">
+        <label for="env-filter">Environment:</label>
+        <select id="env-filter">
+            <option value="">All</option>
+            <option value="prod">Production</option>
+            <option value="stable">Stable</option>
+            <!-- Add other options based on your available types -->
+        </select>
+        
+        <label for="region-filter">Region:</label>
+        <select id="region-filter">
+            <option value="">All</option>
+            <option value="us-central1">US Central 1</option>
+            <option value="europe-west1">Europe West 1</option>
+            <!-- Add other options based on your available regions -->
+        </select>
+
+        <label for="type-filter">Engine:</label>
+        <select id="type-filter">
+            <option value="">All</option>
+            <option value="redis_instance">Redis Instance</option>
+            <option value="redis_cluster">Redis Cluster</option>
+            <option value="memcached">Memcached</option>
+            <!-- Add other options based on your available types -->
+        </select>
+
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Region</th>
+                <th>Type</th>
+                <th>Service</th>
+                <th>Instance Type</th>
+                <th>Shard Count</th>
+                <th>Memory Size (GB)</th>
+                <th>Cache Cname</th>
+                <th>Jira Ticket</th>
+                <th>$/mo</th>
+                <th>Dash</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <!-- Rows will be generated here by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script src="script.js"></script> <!-- Link to your JavaScript file -->
+
+</body>
+</html>

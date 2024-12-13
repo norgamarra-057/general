@@ -1,0 +1,40 @@
+{
+    "us-central1":{
+        "redis_instance": {
+            "M1": 0.049,
+            "M2": 0.027,
+            "M3": 0.023,
+            "M4": 0.019,
+            "M5": 0.016
+        },
+        "redis_cluster":{
+            "REDIS_SHARED_CORE_NANO": 0.0318,
+            "REDIS_STANDARD_SMALL": 0.1425,
+            "REDIS_HIGHMEM_MEDIUM": 0.1923,
+            "REDIS_HIGHMEM_XLARGE": 0.8581
+        },
+        "memcached": {
+            "node<=4": 0.054,
+            "node>4": 0.059
+        }
+    },
+    "europe-west1":{
+        "redis_instance": {
+            "M1": 0.051,
+            "M2": 0.032,
+            "M3": 0.026,
+            "M4": 0.022,
+            "M5": 0.017
+        },
+        "redis_cluster":{
+            "REDIS_SHARED_CORE_NANO": 0.0350,
+            "REDIS_STANDARD_SMALL": 0.1569,
+            "REDIS_HIGHMEM_MEDIUM": 0.2117,
+            "REDIS_HIGHMEM_XLARGE": 0.9449
+        },
+        "memcached": {
+            "node<=4": 0.0598,
+            "node>4": 0.0648
+        }
+    }
+}

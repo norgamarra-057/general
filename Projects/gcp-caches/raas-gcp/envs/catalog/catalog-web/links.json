@@ -1,0 +1,40 @@
+{
+    "prod": {
+        "us-central1":{
+            "redis_instance": {
+                "api-proxy": "https://console.cloud.google.com/monitoring/dashboards/builder/35432577-5a8c-4143-89a2-cff60c1b9fcb?project=prj-grp-caches-prod-8a6d",
+                "accounting-service": "https://console.cloud.google.com/monitoring/dashboards/builder/d3080312-c782-4a7f-8b31-ec8c1d8e131c?project=prj-grp-caches-prod-8a6d"
+            },
+            "redis_cluster":{
+            },
+            "memcached": {
+            }
+        },
+        "europe-west1":{
+            "redis_instance": {
+            },
+            "redis_cluster":{
+            },
+            "memcached": {
+            }
+        }
+    },
+    "stable":{
+        "us-central1":{
+            "redis_instance": {
+            },
+            "redis_cluster":{
+            },
+            "memcached": {
+            }
+        },
+        "europe-west1":{
+            "redis_instance": {
+            },
+            "redis_cluster":{
+            },
+            "memcached": {
+            }
+        }
+    }
+}
